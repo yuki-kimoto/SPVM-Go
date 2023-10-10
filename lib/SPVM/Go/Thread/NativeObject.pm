@@ -1,4 +1,4 @@
-package SPVM::Go::Thread;
+package SPVM::Go::Thread::NativeObject;
 
 our $VERSION = '0.01';
 
@@ -6,15 +6,15 @@ our $VERSION = '0.01';
 
 =head1 Name
 
-SPVM::Go::Thread - Go::Thread is a SPVM module
+SPVM::Go::Thread::NativeObject - Go::Thread::NativeObject is a SPVM module
 
 =head1 Usage
 
-  use Go::Thread;
+  use Go::Thread::NativeObject;
   
 =head1 Description
 
-C<Go::Thread> is a L<SPVM> module.
+C<Go::Thread::NativeObject> is a L<SPVM> module.
 
 =head1 Fields
 
@@ -34,11 +34,11 @@ C<Go::Thread> is a L<SPVM> module.
 
 =head1 Author
 
-[--user-name] C<[--user-email]>
+Yuki Kimoto C<kimoto.yuki@gmail.com>
 
 =head1 Copyright & License
 
-Copyright 2022-2022 [--user-name], all rights reserved.
+Copyright 2022-2022 Yuki Kimoto, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

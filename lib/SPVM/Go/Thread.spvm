@@ -1,6 +1,11 @@
-# Copyright (c) 2023 Yuki Kimoto
-# MIT License
-
 class Go::Thread {
+  use Go::Thread::Handler;
   
+  native static method new : Go::Thread ($handler : Go::Thread::Handler);
+  
+  native method join : void ();
+
+  native method detach : void ();
+
+  native method joinable : int ();
 }

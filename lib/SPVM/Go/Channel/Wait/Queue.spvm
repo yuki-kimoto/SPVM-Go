@@ -2,7 +2,7 @@
 # MIT License
 
 class Go::Channel::Wait::Queue {
-  use 
+  use Go::Channel::Wait;
   has head : Go::Channel::Wait;
   has tail : Go::Channel::Wait;
 }

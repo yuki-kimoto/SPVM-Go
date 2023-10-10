@@ -53,10 +53,6 @@ class Go::Channel {
     my $values_in_buffer = new object[$capacity];
     $self->{values_in_buffer} = $values_in_buffer;
     
-    if ($capacity == 0) {
-      $mutex->lock;
-    }
-    
     return $self;
   }
   
