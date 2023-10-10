@@ -61,6 +61,7 @@ sub MY::postamble {
     require SPVM::Builder::Util::API;
     
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Go::Thread');
+    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Go::Goroutine');
     
   }
   
