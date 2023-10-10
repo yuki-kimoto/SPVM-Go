@@ -43,12 +43,6 @@ lib/SPVM/Go/Thread.pm
 lib/SPVM/Go/Thread.spvm
 lib/SPVM/Go/Thread/Handler.pm
 lib/SPVM/Go/Thread/Handler.spvm
-lib/SPVM/Go/Thread/NativeObject.config
-lib/SPVM/Go/Thread/NativeObject.cpp
-lib/SPVM/Go/Thread/NativeObject.native/include/.gitkeep
-lib/SPVM/Go/Thread/NativeObject.native/src/.gitkeep
-lib/SPVM/Go/Thread/NativeObject.pm
-lib/SPVM/Go/Thread/NativeObject.spvm
 lib/SPVM/Go/Thread/Queue.pm
 lib/SPVM/Go/Thread/Queue.spvm
 LICENSE
