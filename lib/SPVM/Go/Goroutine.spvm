@@ -2,7 +2,7 @@
 # MIT License
 
 class Go::Goroutine {
-  use Go::Goroutine::Handler;
+  use Go::Goroutine::Callback;
   use Go::Channel;
   
   # Enumerations
@@ -22,7 +22,7 @@ class Go::Goroutine {
   
   has running : byte;
   
-  has callback : Go::Goroutine::Handler;
+  has callback : Go::Goroutine::Callback;
   
   has prev : Go::Goroutine;
   

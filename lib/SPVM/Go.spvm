@@ -5,7 +5,7 @@ class Go {
   version "0.001";
   
   use Go::Goroutine;
-  use Go::Goroutine::Handler;
+  use Go::Goroutine::Callback;
   use Go::Channel::ReadCallback;
   use Go::Channel;
   
@@ -19,7 +19,7 @@ class Go {
     return $GO;
   }
   
-  method go : void ($cb : Go::Goroutine::Handler) {
+  method go : void ($cb : Go::Goroutine::Callback) {
     
   }
   
