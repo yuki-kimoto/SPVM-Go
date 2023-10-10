@@ -30,11 +30,26 @@ int32_t SPVM__Go__Thread__new(SPVM_ENV* env, SPVM_VALUE* stack) {
   std::thread* nt_thread = (std::thread*)env->new_memory_block(env, stack, sizeof(std::thread));
   
   *nt_thread = std::thread(handler, env, stack, obj_handler);
-
+  
   void* obj_thread = env->new_pointer_object_by_name(env, stack, "Cpp::Thread", nt_thread, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
-
+  
   stack[0].oval = obj_thread;
+  
+  return 0;
+}
+
+int32_t SPVM__Go__Thread__joinable(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t e;
+  
+  void* obj_thread = stack[0].oval;
+  
+  std::thread* nt_thread = (std::thread*)env->get_pointer(env, stack, obj_thread);
+  
+  int32_t joinable = nt_thread->joinable();
+  
+  stack[0].ival = joinable;
   
   return 0;
 }
@@ -78,29 +93,17 @@ int32_t SPVM__Go__Thread__detach(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 }
 
-int32_t SPVM__Go__Thread__joinable(SPVM_ENV* env, SPVM_VALUE* stack) {
-  
-  int32_t e;
+int32_t SPVM__Go__Thread__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void* obj_thread = stack[0].oval;
   
   std::thread* nt_thread = (std::thread*)env->get_pointer(env, stack, obj_thread);
   
-  int32_t joinable = nt_thread->joinable();
-  
-  stack[0].ival = joinable;
-  
-  return 0;
-}
-
-int32_t SPVM__Go__Thread__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
-  
-  void* obj_thread = stack[0].oval;
-  
-  if (obj_thread != NULL) {
-    std::thread* nt_thread = (std::thread*)env->get_pointer(env, stack, obj_thread);
-    env->free_memory_block(env, stack, nt_thread);
+  if (nt_thread->joinable()) {
+    nt_thread->detach();
   }
+  
+  env->free_memory_block(env, stack, nt_thread);
   
   return 0;
 }
