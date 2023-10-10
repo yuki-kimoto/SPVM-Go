@@ -1,18 +1,18 @@
-package SPVM::Go::Thread::Handler;
+package SPVM::Go::Thread::Callback;
 
 1;
 
 =head1 Name
 
-SPVM::Go::Thread::Handler - Go::Thread::Handler is a SPVM module
+SPVM::Go::Thread::Callback - Go::Thread::Callback is a SPVM module
 
 =head1 Usage
 
-  use Go::Thread::Handler;
+  use Go::Thread::Callback;
   
 =head1 Description
 
-C<Go::Thread::Handler> is a L<SPVM> module.
+C<Go::Thread::Callback> is a L<SPVM> module.
 
 =head1 Fields
 

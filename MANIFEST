@@ -41,8 +41,8 @@ lib/SPVM/Go/Thread.native/include/.gitkeep
 lib/SPVM/Go/Thread.native/src/.gitkeep
 lib/SPVM/Go/Thread.pm
 lib/SPVM/Go/Thread.spvm
-lib/SPVM/Go/Thread/Handler.pm
-lib/SPVM/Go/Thread/Handler.spvm
+lib/SPVM/Go/Thread/Callback.pm
+lib/SPVM/Go/Thread/Callback.spvm
 lib/SPVM/Go/Thread/Queue.pm
 lib/SPVM/Go/Thread/Queue.spvm
 LICENSE
@@ -51,4 +51,6 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 README.md
 t/basic.t
+t/Go-Thread.t
 t/lib/SPVM/TestCase/Go.spvm
+t/lib/SPVM/TestCase/Go/Thread.spvm

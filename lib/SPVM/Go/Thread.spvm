@@ -1,8 +1,8 @@
 class Go::Thread {
-  use Go::Thread::Handler;
+  use Go::Thread::Callback;
   
   
-  native static method new : Go::Thread ($handler : Go::Thread::Handler);
+  native static method new : Go::Thread ($callback : Go::Thread::Callback);
   
   # Instance Method
   native method join : void ();
