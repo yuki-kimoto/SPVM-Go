@@ -2,5 +2,43 @@
 # MIT License
 
 class Go {
-  version "0.001";
+  use Go::Callback;
+  use Go::Channel::ReadCallback;
+  use Go::Channel;
+  
+  our $GO : Go;
+  
+  INIT {
+    $GO = new Go;
+  }
+  
+  static method instance : Go () {
+    return $GO;
+  }
+  
+  method go : void ($cb : Go::Callback) {
+    
+  }
+  
+  method make : Go::Channel ($length : int = 0) {
+    
+  }
+  
+  method read : object () {
+    
+  }
+  
+  method write : void ($data : object) {
+    
+  }
+  
+  method select : void ($cases : object[], $default : Go::Channel::ReadCallback = undef) {
+    
+  }
+  
+  method gosched : void () {
+    
+  }
+  
 }
+

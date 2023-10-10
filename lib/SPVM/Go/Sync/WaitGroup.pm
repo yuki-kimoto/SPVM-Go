@@ -1,4 +1,4 @@
-package SPVM::Go;
+package SPVM::Go::Sync::WaitGroup;
 
 
 
@@ -6,15 +6,15 @@ package SPVM::Go;
 
 =head1 Name
 
-SPVM::Go - Short Description
+SPVM::Go::Sync::WaitGroup - Short Description
 
 =head1 Description
 
-Go class of L<SPVM> has methods for someting.
+Go::Sync::WaitGroup class of L<SPVM> has methods for someting.
 
 =head1 Usage
 
-  use Go;
+  use Go::Sync::WaitGroup;
 
 =head1 Fields
 

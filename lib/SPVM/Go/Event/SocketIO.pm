@@ -1,4 +1,4 @@
-package SPVM::Go;
+package SPVM::Go::Event::SocketIO;
 
 
 
@@ -6,15 +6,15 @@ package SPVM::Go;
 
 =head1 Name
 
-SPVM::Go - Short Description
+SPVM::Go::Event::SocketIO - Short Description
 
 =head1 Description
 
-Go class of L<SPVM> has methods for someting.
+Go::Event::SocketIO class of L<SPVM> has methods for someting.
 
 =head1 Usage
 
-  use Go;
+  use Go::Event::SocketIO;
 
 =head1 Fields
 

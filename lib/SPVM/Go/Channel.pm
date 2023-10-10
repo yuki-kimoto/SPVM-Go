@@ -1,4 +1,4 @@
-package SPVM::Go;
+package SPVM::Go::Channel;
 
 
 
@@ -6,16 +6,20 @@ package SPVM::Go;
 
 =head1 Name
 
-SPVM::Go - Short Description
+SPVM::Go::Channel - Golang Compatible Channel
 
 =head1 Description
 
-Go class of L<SPVM> has methods for someting.
+Go::Channel class of L<SPVM> has methods to manipulate golang compatible channel.
 
 =head1 Usage
 
-  use Go;
-
+  use Go::Channel;
+  
+  my $channel = Go::Channel->make;
+  
+  my $channel_with_buffer = Go::Channel->make(3);
+  
 =head1 Fields
 
 

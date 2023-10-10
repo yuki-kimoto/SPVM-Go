@@ -1,4 +1,4 @@
-package SPVM::Go;
+package SPVM::Go::Event;
 
 
 
@@ -6,15 +6,15 @@ package SPVM::Go;
 
 =head1 Name
 
-SPVM::Go - Short Description
+SPVM::Go::Event - Short Description
 
 =head1 Description
 
-Go class of L<SPVM> has methods for someting.
+Go::Event class of L<SPVM> has methods for someting.
 
 =head1 Usage
 
-  use Go;
+  use Go::Event;
 
 =head1 Fields
 
