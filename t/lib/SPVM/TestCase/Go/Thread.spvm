@@ -2,27 +2,59 @@ class TestCase::Go::Thread {
   use Go::Thread;
   use Sys::Process;
   
-  our $FOO : public int;
+  our $VALUE : public int;
+  
+  our $VALUES : public int[];
   
   static method test : int () {
     
-    $TestCase::Go::Thread::FOO = 0;
+    $TestCase::Go::Thread::VALUE = 0;
     
-    my $foo = [13];
-    my $thread = Go::Thread->new([has foo : int[] = $foo] method : void () {
+    $TestCase::Go::Thread::VALUES = [0, 0];
+    
+    my $values = [0, 0];
+    
+    my $thread = Go::Thread->new([has foo : int[] = $values] method : void () {
       
-      $TestCase::Go::Thread::FOO = 1 + 2;
+      $TestCase::Go::Thread::VALUE = 1;
+      
+      $TestCase::Go::Thread::VALUES->[0] = 2;
       
       $self->{foo}[0] = 5;
     });
     
-    $thread->join;
+    my $thread2 = Go::Thread->new([has foo : int[] = $values] method : void () {
+      
+      $TestCase::Go::Thread::VALUES->[1] = 3;
+      
+      $self->{foo}[1] = 7;
+    });
     
-    unless ($FOO == 3) {
+    $thread->join;
+    $thread2->join;
+    
+    warn "\$VALUE: $VALUE";
+    unless ($VALUE == 1) {
       return 0;
     }
     
-    unless ($foo->[0] == 5) {
+    warn "\$VALUES->[0]: $VALUES->[0]";
+    unless ($VALUES->[0] == 2) {
+      return 0;
+    }
+    
+    warn "\$VALUES->[1]: $VALUES->[1]";
+    unless ($VALUES->[1] == 3) {
+      return 0;
+    }
+    
+    warn "\$values->[0]: $values->[0]";
+    unless ($values->[0] == 5) {
+      return 0;
+    }
+    
+    warn "\$values->[1]: $values->[1]";
+    unless ($values->[1] == 7) {
       return 0;
     }
     
