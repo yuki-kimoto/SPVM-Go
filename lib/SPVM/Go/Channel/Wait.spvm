@@ -1,0 +1,18 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
+class Go::Channel::Wait {
+  use Go::Channel;
+  use Go::Goroutine;
+  
+  has goroutine : Go::Goroutine;
+  
+  has prev : Go::Channel::Wait;
+  
+  has next : Go::Channel::Wait;
+  
+  has value : object;
+  
+  has channel : Go::Channel;
+  
+}
