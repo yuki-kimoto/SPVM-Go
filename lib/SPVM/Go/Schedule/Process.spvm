@@ -3,10 +3,12 @@
 
 class Go::Schedule::Process : interface_t {
   use Go::Thread;
+  use Go::Goroutine::Queue;
   
   has status : int;
   
   has thread : Go::Thread;
   
+  has goroutine_queue : Go::Goroutine::Queue;
   
 }
