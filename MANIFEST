@@ -21,12 +21,6 @@ lib/SPVM/Go/Goroutine.spvm
 lib/SPVM/Go/Goroutine/Callback.spvm
 lib/SPVM/Go/Goroutine/Queue.pm
 lib/SPVM/Go/Goroutine/Queue.spvm
-lib/SPVM/Go/Goroutine/State.c
-lib/SPVM/Go/Goroutine/State.config
-lib/SPVM/Go/Goroutine/State.native/include/.gitkeep
-lib/SPVM/Go/Goroutine/State.native/src/.gitkeep
-lib/SPVM/Go/Goroutine/State.pm
-lib/SPVM/Go/Goroutine/State.spvm
 lib/SPVM/Go/IOPoll.pm
 lib/SPVM/Go/IOPoll.spvm
 lib/SPVM/Go/Schedule.pm
