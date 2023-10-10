@@ -2,6 +2,7 @@
 # MIT License
 
 class Go {
+  use Go::Coroutine;
   use Go::Callback;
   use Go::Channel::ReadCallback;
   use Go::Channel;

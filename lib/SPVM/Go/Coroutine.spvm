@@ -2,5 +2,30 @@
 # MIT License
 
 class Go::Coroutine {
+  use Go::Callback;
+  use Go::Channel;
+  
+  enum {
+    TYPE_NORMAL,
+    TYPE_SCHEDULE,
+    TYPE_NATIVE_THREAD,
+    TYPE_CHANNEL,
+    TYPE_SOCKET,
+    TYPE_PIPE,
+  }
+  
+  has type : int;
+  
+  has runnable : byte;
+  
+  has running : byte;
+  
+  has callback : Go::Callback;
+  
+  has prev : Go::Coroutine;
+  
+  has next : Go::Coroutine;
+  
+  has channel : Go::Channel;
   
 }
