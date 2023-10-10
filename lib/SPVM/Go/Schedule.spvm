@@ -5,16 +5,13 @@ class Go::Schedule {
   use Go::Goroutine;
   use Go::Schedule::Process;
   use Go::Thread;
+  use Go::Goroutine::Queue;
+  use Go::Schedule::Process::Queue;
+  use Go::Thread::Queue;
   
-  has global_goroutine_queue_head : Go::Goroutine;
+  has goroutine_queue : Go::Goroutine::Queue;
   
-  has global_goroutine_queue_tail : Go::Goroutine;
+  has idle_process_queue : Go::Schedule::Process::Queue;
   
-  has idle_process_queue_head : Go::Schedule::Process;
-  
-  has idle_process_queue_tail : Go::Schedule::Process;
-  
-  has idle_thread_queue_head : Go::Thread;
-  
-  has idle_thread_queue_tail : Go::Thread;
+  has idle_thread_queue : Go::Thread::Queue;
 }
