@@ -5,7 +5,7 @@
 
 extern "C" {
 
-static const char* FILE_NAME = "Cpp/Thread.cpp";
+static const char* FILE_NAME = "Go/Thread.cpp";
 
 static void handler (SPVM_ENV* env, SPVM_VALUE* stack, void* obj_handler) {
   
@@ -15,6 +15,15 @@ static void handler (SPVM_ENV* env, SPVM_VALUE* stack, void* obj_handler) {
     SPVM_VALUE* thread_stack = env->new_stack(env);
     thread_stack[0].oval = obj_handler;
     env->call_instance_method_by_name(env, thread_stack, "", 0, &error_id, __func__, FILE_NAME, __LINE__);
+    
+    if (error_id) {
+      void* obj_exception = env->get_exception(env, thread_stack);
+      
+      const char* exception = env->get_chars(env, thread_stack, obj_exception);
+      
+      spvm_warn("%s", exception);
+    }
+    
     env->free_stack(env, thread_stack);
   }
   
@@ -31,7 +40,7 @@ int32_t SPVM__Go__Thread__new(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   *nt_thread = std::thread(handler, env, stack, obj_handler);
   
-  void* obj_thread = env->new_pointer_object_by_name(env, stack, "Cpp::Thread", nt_thread, &error_id, __func__, FILE_NAME, __LINE__);
+  void* obj_thread = env->new_pointer_object_by_name(env, stack, "Go::Thread", nt_thread, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
   
   stack[0].oval = obj_thread;

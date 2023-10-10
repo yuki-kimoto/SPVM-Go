@@ -11,6 +11,6 @@ class Go::Thread {
   
   native method joinable : int ();
   
-  native method DESTORY : void ();
+  native method DESTROY : void ();
   
 }

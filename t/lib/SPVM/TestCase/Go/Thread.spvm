@@ -1,0 +1,31 @@
+class TestCase::Go::Thread {
+  use Go::Thread;
+  use Sys::Process;
+  
+  our $FOO : public int;
+  
+  static method test : int () {
+    
+    $TestCase::Go::Thread::FOO = 0;
+    
+    my $foo = [13];
+    my $thread = Go::Thread->new([has foo : int[] = $foo] method : void () {
+      
+      $TestCase::Go::Thread::FOO = 1 + 2;
+      
+      $self->{foo}[0] = 5;
+    });
+    
+    $thread->join;
+    
+    unless ($FOO == 3) {
+      return 0;
+    }
+    
+    unless ($foo->[0] == 5) {
+      return 0;
+    }
+    
+    return 1;
+  }
+}
