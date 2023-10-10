@@ -1,7 +1,7 @@
 # Copyright (c) 2023 Yuki Kimoto
 # MIT License
 
-class Go::Callback : interface_t {
+class Go::Goroutine::Handler : interface_t {
   
   required method : void ();
 }

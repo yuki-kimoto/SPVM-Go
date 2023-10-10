@@ -1,6 +1,6 @@
 package SPVM::Go;
 
-
+our $VERSION = "0.001";
 
 1;
 

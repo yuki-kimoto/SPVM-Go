@@ -1,4 +1,4 @@
-package SPVM::Go::Coroutine::State;
+package SPVM::Go::Goroutine;
 
 
 
@@ -6,15 +6,15 @@ package SPVM::Go::Coroutine::State;
 
 =head1 Name
 
-SPVM::Go::Coroutine::State - Short Description
+SPVM::Go::Goroutine - Short Description
 
 =head1 Description
 
-Go::Coroutine::State class of L<SPVM> has methods for someting.
+Go::Goroutine class of L<SPVM> has methods for someting.
 
 =head1 Usage
 
-  use Go::Coroutine::State;
+  use Go::Goroutine;
 
 =head1 Fields
 

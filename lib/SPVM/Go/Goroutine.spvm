@@ -1,10 +1,11 @@
 # Copyright (c) 2023 Yuki Kimoto
 # MIT License
 
-class Go::Coroutine {
-  use Go::Callback;
+class Go::Goroutine {
+  use Go::Goroutine::Handler;
   use Go::Channel;
   
+  # Enumerations
   enum {
     TYPE_NORMAL,
     TYPE_SCHEDULE,
@@ -14,18 +15,27 @@ class Go::Coroutine {
     TYPE_PIPE,
   }
   
+  # Fields
   has type : int;
   
   has runnable : byte;
   
   has running : byte;
   
-  has callback : Go::Callback;
+  has callback : Go::Goroutine::Handler;
   
-  has prev : Go::Coroutine;
+  has prev : Go::Goroutine;
   
-  has next : Go::Coroutine;
+  has next : Go::Goroutine;
   
   has channel : Go::Channel;
+  
+  # Class Methods
+  static method new : Go::Goroutine () {
+    my $self = new Go::Goroutine;
+    
+    return $self;
+  }
+  
   
 }
