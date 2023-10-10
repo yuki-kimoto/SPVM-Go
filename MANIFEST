@@ -10,6 +10,12 @@ lib/SPVM/Go/Channel/Wait.pm
 lib/SPVM/Go/Channel/Wait.spvm
 lib/SPVM/Go/Channel/Wait/Queue.pm
 lib/SPVM/Go/Channel/Wait/Queue.spvm
+lib/SPVM/Go/Goroutine.c
+lib/SPVM/Go/Goroutine.config
+lib/SPVM/Go/Goroutine.native/include/.gitkeep
+lib/SPVM/Go/Goroutine.native/include/coro.h
+lib/SPVM/Go/Goroutine.native/src/.gitkeep
+lib/SPVM/Go/Goroutine.native/src/coro.c
 lib/SPVM/Go/Goroutine.pm
 lib/SPVM/Go/Goroutine.spvm
 lib/SPVM/Go/Goroutine/Callback.spvm
