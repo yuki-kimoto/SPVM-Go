@@ -5,7 +5,9 @@ class TestCase::Go {
   
   static method test : int () {
     
-    Go::Goroutine->test;
+    Go::Goroutine->new_beta(method : void () {
+      
+    });
     
     return 1;
   }

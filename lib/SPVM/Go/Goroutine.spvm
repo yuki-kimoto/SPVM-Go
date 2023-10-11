@@ -37,6 +37,6 @@ class Go::Goroutine {
     return $self;
   }
   
-  native static method test : void ();
+  native static method new_beta : void ($cb :  Go::Goroutine::Callback);
   
 }
