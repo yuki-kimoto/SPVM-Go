@@ -7,13 +7,13 @@ extern "C" {
 
 static const char* FILE_NAME = "Go/Thread.cpp";
 
-static void handler (SPVM_ENV* env, SPVM_VALUE* stack, void* obj_handler) {
+static void thread_handler (SPVM_ENV* env, SPVM_VALUE* stack, void* obj_callback) {
   
   int32_t error_id = 0;
   
   {
     SPVM_VALUE* thread_stack = env->new_stack(env);
-    thread_stack[0].oval = obj_handler;
+    thread_stack[0].oval = obj_callback;
     env->call_instance_method_by_name(env, thread_stack, "", 0, &error_id, __func__, FILE_NAME, __LINE__);
     
     if (error_id) {
@@ -34,11 +34,11 @@ int32_t SPVM__Go__Thread__new(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t error_id = 0;
   
-  void* obj_handler = stack[0].oval;
+  void* obj_callback = stack[0].oval;
   
   std::thread* nt_thread = (std::thread*)env->new_memory_block(env, stack, sizeof(std::thread));
   
-  *nt_thread = std::thread(handler, env, stack, obj_handler);
+  *nt_thread = std::thread(thread_handler, env, stack, obj_callback);
   
   void* obj_thread = env->new_pointer_object_by_name(env, stack, "Go::Thread", nt_thread, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
