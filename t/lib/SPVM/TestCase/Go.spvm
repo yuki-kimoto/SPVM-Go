@@ -1,6 +1,11 @@
 class TestCase::Go {
   use Go;
+  
+  use Go::Goroutine;
+  
   static method test : int () {
+    
+    Go::Goroutine->test;
     
     return 1;
   }

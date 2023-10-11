@@ -37,5 +37,6 @@ class Go::Goroutine {
     return $self;
   }
   
+  native static method test : void ();
   
 }
