@@ -21,5 +21,7 @@ int32_t SPVM__Go__Goroutine__test(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   coro_create(coro_ctx, 0, 0, 0, 0);
   
+  coro_destroy(coro_ctx);
+  
   return 0;
 }
