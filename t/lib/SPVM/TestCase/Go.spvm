@@ -5,7 +5,7 @@ class TestCase::Go {
   
   static method test : int () {
     
-    Go::Goroutine->new_beta(method : void () {
+    my $goroutine = Go::Goroutine->new(method : void () {
       
     });
     

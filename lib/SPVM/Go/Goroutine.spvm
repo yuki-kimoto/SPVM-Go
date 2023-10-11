@@ -31,12 +31,15 @@ class Go::Goroutine {
   has channel : Go::Channel;
   
   # Class Methods
-  static method new : Go::Goroutine () {
+  static method new : Go::Goroutine ($callback :  Go::Goroutine::Callback) {
+    
     my $self = new Go::Goroutine;
+    
+    $self->init_goroutine($callback);
     
     return $self;
   }
   
-  native static method new_beta : void ($callback :  Go::Goroutine::Callback);
+  native private method init_goroutine : void ($callback :  Go::Goroutine::Callback);
   
 }

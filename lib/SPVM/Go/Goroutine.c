@@ -32,9 +32,11 @@ static void goroutine_handler (void* arg) {
   return;
 }
 
-int32_t SPVM__Go__Goroutine__new_beta(SPVM_ENV* env, SPVM_VALUE* stack) {
+int32_t SPVM__Go__Goroutine__init_goroutine(SPVM_ENV* env, SPVM_VALUE* stack) {
   
-  void* obj_callback = stack[0].oval;
+  void* obj_self = stack[0].oval;
+  
+  void* obj_callback = stack[1].oval;
   
   if (!obj_callback) {
     return env->die(env, stack, "$callback must be defined.", __func__, FILE_NAME, __LINE__);
@@ -54,17 +56,11 @@ int32_t SPVM__Go__Goroutine__new_beta(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   SPVM_VALUE* goroutine_stack = env->new_stack(env);
   
-  void** args[3] = {0};
-  
-  args[0] = (void*)env;
-  args[1] = (void*)goroutine_stack;
-  args[2] = obj_callback;
-  
   struct coro_stack* coro_goroutine_stack = env->new_memory_block(env, stack, sizeof(struct coro_stack));
   
   coro_stack_alloc(coro_goroutine_stack, stack_size);
   
-  coro_create(goroutine, goroutine_handler, (void*)args, coro_goroutine_stack->sptr, coro_goroutine_stack->ssze);
+  coro_create(goroutine, goroutine_handler, obj_self, coro_goroutine_stack->sptr, coro_goroutine_stack->ssze);
   
   coro_destroy(goroutine);
   
