@@ -17,11 +17,13 @@ int32_t SPVM__Go__Goroutine__test(SPVM_ENV* env, SPVM_VALUE* stack) {
                       size_t ssze);
   */
   
-  coro_context* coro_ctx = env->new_memory_block(env, stack, sizeof(coro_context));
+  coro_context* goroutine = env->new_memory_block(env, stack, sizeof(coro_context));
   
-  coro_create(coro_ctx, 0, 0, 0, 0);
+  int32_t stack_size = sizeof(SPVM_VALUE) * 512;
   
-  coro_destroy(coro_ctx);
+  coro_create(goroutine, 0, 0, stack, stack_size);
+  
+  coro_destroy(goroutine);
   
   return 0;
 }
