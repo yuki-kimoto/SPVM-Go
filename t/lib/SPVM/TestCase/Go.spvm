@@ -5,8 +5,12 @@ class TestCase::Go {
   
   static method test : int () {
     
-    my $goroutine = Go::Goroutine->new(method : void () {
-      
+    my $goroutine0 = Go::Goroutine->new(method : void () {
+      warn("G0");
+    });
+    
+    my $goroutine1 = Go::Goroutine->new(method : void () {
+      warn("G1");
     });
     
     return 1;
