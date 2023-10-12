@@ -21,6 +21,8 @@ class TestCase::Go {
     
     $schedule->enqueue_goroutine($goroutine1);
     
+    
+    
     return 1;
   }
 }
