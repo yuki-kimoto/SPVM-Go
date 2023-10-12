@@ -13,6 +13,10 @@ class Go::Goroutine : pointer {
   # Interfaces
   interface Go::Queue::Element;
   
+  has prev : rw Go::Queue::Element;
+  
+  has next : rw Go::Queue::Element;
+  
   # Enumerations
   enum {
     TYPE_NORMAL,
@@ -24,9 +28,6 @@ class Go::Goroutine : pointer {
   }
   
   # Fields
-  has prev : rw Go::Queue::Element; # interface Go::Queue::Element
-  
-  has next : rw Go::Queue::Element; # interface Go::Queue::Element
   
   has type : int;
   

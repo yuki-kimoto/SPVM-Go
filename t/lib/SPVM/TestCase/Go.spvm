@@ -17,9 +17,9 @@ class TestCase::Go {
     
     my $schedule = Go::Schedule->new;
     
-    $schedule->enqueue($goroutine0);
+    $schedule->enqueue_goroutine($goroutine0);
     
-    $schedule->enqueue($goroutine1);
+    $schedule->enqueue_goroutine($goroutine1);
     
     return 1;
   }

@@ -6,14 +6,12 @@ class Go::Schedule {
   use Go::Schedule::Process;
   use Go::Thread;
   use Go::Queue;
-  use Go::Schedule::Process::Queue;
-  use Go::Thread::Queue;
   
   has goroutine_queue : Go::Queue of Go::Goroutine;
   
-  has idle_process_queue : Go::Schedule::Process::Queue;
+  has idle_process_queue : Go::Queue of Go::Schedule::Process;
   
-  has idle_thread_queue : Go::Thread::Queue;
+  has idle_thread_queue : Go::Queue of Go::Thread;
   
   static method new : Go::Schedule () {
     
@@ -27,14 +25,14 @@ class Go::Schedule {
   }
   
   # Instance Methods
-  method enqueue : void ($goroutine : Go::Goroutine) {
+  method enqueue_goroutine : void ($goroutine : Go::Goroutine) {
     
     my $goroutine_queue = $self->{goroutine_queue};
     
     $goroutine_queue->enqueue($goroutine);
   }
   
-  method dequeue : Go::Goroutine () {
+  method dequeue_goroutine : Go::Goroutine () {
     
     my $goroutine_queue = $self->{goroutine_queue};
     
