@@ -1,9 +1,0 @@
-# Copyright (c) 2023 Yuki Kimoto
-# MIT License
-
-class Go::Goroutine::Queue {
-  allow Go::Schedule;
-  
-  has first : Go::Goroutine;
-  has last : Go::Goroutine;
-}

@@ -1,7 +1,0 @@
-# Copyright (c) 2023 Yuki Kimoto
-# MIT License
-
-class Go::Schedule::Process::Queue {
-  has head : Go::Schedule::Process;
-  has tail : Go::Schedule::Process;
-}
