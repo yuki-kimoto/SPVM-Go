@@ -2,11 +2,16 @@
 # MIT License
 
 class Go::Goroutine : pointer {
+  allow Go::Schedule;
+  
   use Go::Goroutine::Callback;
   use Go::Channel;
   use Native;
   use Native::Stack;
   use Go::Goroutine::Argument;
+  
+  # Interfaces
+  interface Go::Queue::Element;
   
   # Enumerations
   enum {
@@ -19,15 +24,15 @@ class Go::Goroutine : pointer {
   }
   
   # Fields
+  has prev : rw Go::Queue::Element; # interface Go::Queue::Element
+  
+  has next : rw Go::Queue::Element; # interface Go::Queue::Element
+  
   has type : int;
   
   has runnable : byte;
   
   has running : byte;
-  
-  has prev : Go::Goroutine;
-  
-  has next : Go::Goroutine;
   
   has goroutine_stack : Native::Stack;
   

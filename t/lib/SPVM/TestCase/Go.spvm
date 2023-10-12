@@ -1,6 +1,7 @@
 class TestCase::Go {
   use Go;
   
+  use Go::Schedule;
   use Go::Goroutine;
   
   static method test : int () {
@@ -12,6 +13,13 @@ class TestCase::Go {
     my $goroutine1 = Go::Goroutine->new(method : void () {
       warn("G1");
     });
+    
+    
+    my $schedule = Go::Schedule->new;
+    
+    $schedule->enqueue($goroutine0);
+    
+    $schedule->enqueue($goroutine1);
     
     return 1;
   }

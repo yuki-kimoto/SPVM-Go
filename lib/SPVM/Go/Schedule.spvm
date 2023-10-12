@@ -5,13 +5,42 @@ class Go::Schedule {
   use Go::Goroutine;
   use Go::Schedule::Process;
   use Go::Thread;
-  use Go::Goroutine::Queue;
+  use Go::Queue;
   use Go::Schedule::Process::Queue;
   use Go::Thread::Queue;
   
-  has goroutine_queue : Go::Goroutine::Queue;
+  has goroutine_queue : Go::Queue of Go::Goroutine;
   
   has idle_process_queue : Go::Schedule::Process::Queue;
   
   has idle_thread_queue : Go::Thread::Queue;
+  
+  static method new : Go::Schedule () {
+    
+    my $self = new Go::Schedule;
+    
+    my $goroutine_queue = Go::Queue->new;
+    
+    $self->{goroutine_queue} = $goroutine_queue;
+    
+    return $self;
+  }
+  
+  # Instance Methods
+  method enqueue : void ($goroutine : Go::Goroutine) {
+    
+    my $goroutine_queue = $self->{goroutine_queue};
+    
+    $goroutine_queue->enqueue($goroutine);
+  }
+  
+  method dequeue : Go::Goroutine () {
+    
+    my $goroutine_queue = $self->{goroutine_queue};
+    
+    my $goroutine = $goroutine_queue->dequeue;
+    
+    return (Go::Goroutine)$goroutine;
+  }
+  
 }

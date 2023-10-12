@@ -1,7 +1,7 @@
 # Copyright (c) 2023 Yuki Kimoto
 # MIT License
 
-class Go::Schedule::Process : interface_t {
+class Go::Schedule::Process {
   use Go::Thread;
   use Go::Goroutine::Queue;
   

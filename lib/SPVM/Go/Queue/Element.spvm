@@ -1,0 +1,14 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
+class Go::Queue::Element : interface_t {
+  
+  method prev : Go::Queue::Element ();
+  
+  method set_prev : void  ($element : Go::Queue::Element);
+  
+  method next : Go::Queue::Element ();
+  
+  method set_next : void  ($element : Go::Queue::Element);
+  
+}
