@@ -6,12 +6,15 @@ class Go::Schedule {
   use Go::Schedule::Process;
   use Go::Thread;
   use Go::Queue;
+  use Go::IOPoll;
   
   has goroutine_queue : Go::Queue of Go::Goroutine;
   
   has idle_process_queue : Go::Queue of Go::Schedule::Process;
   
   has idle_thread_queue : Go::Queue of Go::Thread;
+  
+  has io_poll : Go::IOPoll;
   
   static method new : Go::Schedule () {
     
@@ -20,6 +23,10 @@ class Go::Schedule {
     my $goroutine_queue = Go::Queue->new;
     
     $self->{goroutine_queue} = $goroutine_queue;
+    
+    my $io_poll = Go::IOPoll->new;
+    
+    $self->{io_poll} = $io_poll;
     
     return $self;
   }

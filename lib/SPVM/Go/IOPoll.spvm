@@ -2,5 +2,15 @@
 # MIT License
 
 class Go::IOPoll {
+  use Go::Goroutine;
+  use Go::Queue;
   
+  has wait_goroutine_queue : Go::Queue of Go::Goroutine;
+  
+  static method new : Go::IOPoll () {
+    
+    my $self = new Go::IOPoll;
+    
+    return $self;
+  }
 }
