@@ -1,5 +1,7 @@
 .gitignore
 Changes
+coro-original/Coro_API.c
+coro-original/Coro_State.xs
 lib/SPVM/Go.pm
 lib/SPVM/Go.spvm
 lib/SPVM/Go/Channel.pm
@@ -43,8 +45,6 @@ lib/SPVM/Go/Sync/WaitGroup.pm
 lib/SPVM/Go/Sync/WaitGroup.spvm
 lib/SPVM/Go/Thread.config
 lib/SPVM/Go/Thread.cpp
-lib/SPVM/Go/Thread.native/include/.gitkeep
-lib/SPVM/Go/Thread.native/src/.gitkeep
 lib/SPVM/Go/Thread.pm
 lib/SPVM/Go/Thread.spvm
 lib/SPVM/Go/Thread/Callback.pm
