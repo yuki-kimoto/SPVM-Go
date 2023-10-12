@@ -1,7 +1,7 @@
 # Copyright (c) 2023 Yuki Kimoto
 # MIT License
 
-class Go::Goroutine {
+class Go::Goroutine : pointer {
   use Go::Goroutine::Callback;
   use Go::Channel;
   use Native;
@@ -28,8 +28,6 @@ class Go::Goroutine {
   has prev : Go::Goroutine;
   
   has next : Go::Goroutine;
-  
-  has channel : Go::Channel;
   
   has goroutine_stack : Native::Stack;
   
@@ -59,6 +57,8 @@ class Go::Goroutine {
     return $self;
   }
   
+  # Instance Methods
   native private method init_goroutine : void ($goroutine_argument : Go::Goroutine::Argument);
   
+  native private method DESTROY : void ();
 }
