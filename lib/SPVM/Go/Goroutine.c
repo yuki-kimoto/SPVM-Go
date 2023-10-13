@@ -44,8 +44,6 @@ int32_t SPVM__Go__Goroutine__init_goroutine(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void* obj_self = stack[0].oval;
   
-  void* obj_goroutine_argument = stack[1].oval;
-  
   struct coro_stack* coro_goroutine_stack = env->new_memory_block(env, stack, sizeof(struct coro_stack));
   
   int32_t stack_size;

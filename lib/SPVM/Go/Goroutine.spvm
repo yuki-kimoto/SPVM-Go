@@ -7,8 +7,6 @@ class Go::Goroutine : pointer {
   use Go::Goroutine::Callback;
   use Go::Channel;
   use Native;
-  use Native::Stack;
-  use Go::Goroutine::Argument;
   
   # Interfaces
   interface Go::Queue::Element;
@@ -35,11 +33,7 @@ class Go::Goroutine : pointer {
   
   has running : byte;
   
-  has goroutine_stack : Native::Stack;
-  
   has callback : Go::Goroutine::Callback;
-  
-  has goroutine_argument : Go::Goroutine::Argument;
   
   # Class Methods
   static method new : Go::Goroutine ($callback :  Go::Goroutine::Callback) {
@@ -48,23 +42,15 @@ class Go::Goroutine : pointer {
     
     my $env = Native->get_current_env;
     
-    my $goroutine_stack = $env->new_stack;
-    
-    $self->{goroutine_stack} = $goroutine_stack;
-    
     $self->{callback} = $callback;
     
-    my $goroutine_argument = Go::Goroutine::Argument->new($goroutine_stack, $callback);
-    
-    $self->{goroutine_argument} = $goroutine_argument;
-    
-    $self->init_goroutine($goroutine_argument);
+    $self->init_goroutine;
     
     return $self;
   }
   
   # Instance Methods
-  native private method init_goroutine : void ($goroutine_argument : Go::Goroutine::Argument);
+  native private method init_goroutine : void ();
   
   native private method DESTROY : void ();
 }

@@ -1,7 +1,9 @@
 .gitignore
 Changes
 coro-original/Coro_API.c
+coro-original/Coro_EV.xs
 coro-original/Coro_State.xs
+coro-original/EV.xs
 lib/SPVM/Go.pm
 lib/SPVM/Go.spvm
 lib/SPVM/Go/Channel.pm
@@ -20,12 +22,6 @@ lib/SPVM/Go/Goroutine.native/src/.gitkeep
 lib/SPVM/Go/Goroutine.native/src/coro.c
 lib/SPVM/Go/Goroutine.pm
 lib/SPVM/Go/Goroutine.spvm
-lib/SPVM/Go/Goroutine/Argument.c
-lib/SPVM/Go/Goroutine/Argument.config
-lib/SPVM/Go/Goroutine/Argument.native/include/.gitkeep
-lib/SPVM/Go/Goroutine/Argument.native/src/.gitkeep
-lib/SPVM/Go/Goroutine/Argument.pm
-lib/SPVM/Go/Goroutine/Argument.spvm
 lib/SPVM/Go/Goroutine/Callback.spvm
 lib/SPVM/Go/IOPoll.pm
 lib/SPVM/Go/IOPoll.spvm
