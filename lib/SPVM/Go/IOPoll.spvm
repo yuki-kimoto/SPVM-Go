@@ -5,12 +5,45 @@ class Go::IOPoll {
   use Go::Goroutine;
   use Go::Queue;
   
+  has iopoll_goroutine : Go::Goroutine;
+  
   has wait_goroutine_queue : Go::Queue of Go::Goroutine;
   
   static method new : Go::IOPoll () {
     
     my $self = new Go::IOPoll;
     
+    my $iopoll_goroutine = $self->create_iopoll_goroutine;
+    
+    $self->{iopoll_goroutine} = $iopoll_goroutine;
+    
     return $self;
   }
+  
+  method create_iopoll_goroutine : Go::Goroutine () {
+  
+    my $iopoll_callback : Callback;
+    
+    $iopoll_callback =
+      [has wait_goroutine_queue : Go::Queue of Go::Goroutine = $self->{wait_goroutine_queue}]
+      method : void () {
+      while (1) {
+        my $wait_goroutine_queue = $self->{wait_goroutine_queue};
+        
+        my $wait_goroutine = $wait_goroutine_queue->dequeue;
+        
+        if ($wait_goroutine) {
+          
+        }
+        else {
+          
+        }
+      }
+    };
+    
+    my $iopoll_goroutine = Go::Goroutine->new($iopoll_callback);
+    
+    return $iopoll_goroutine;
+  }
+  
 }
