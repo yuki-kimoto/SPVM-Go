@@ -13,7 +13,7 @@ static void goroutine_handler (void* obj_self) {
   
   void** pointer_items = (void**)SPVM_NATIVE_GET_POINTER(obj_self);
   
-  SPVM_ENV* env = pointer_items[1];
+  SPVM_ENV* env = pointer_items[2];
   
   SPVM_VALUE* goroutine_stack = env->new_stack(env);
   
@@ -44,35 +44,18 @@ int32_t SPVM__Go__Goroutine__init_goroutine(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void* obj_self = stack[0].oval;
   
-  struct coro_stack* coro_goroutine_stack = env->new_memory_block(env, stack, sizeof(struct coro_stack));
-  
-  int32_t stack_size;
-  if (sizeof(SPVM_VALUE) > sizeof(void*)) {
-    stack_size = 512 * sizeof(void*) * 2;
-  }
-  else {
-    stack_size = 512 * sizeof(void*);
-  }
-  
-  coro_stack_alloc(coro_goroutine_stack, stack_size);
-  
-  /*
-    void coro_create (coro_context *ctx,
-                      coro_func coro,
-                      void *arg,
-                      void *sptr,
-                      size_t ssze);
-  */
+  int32_t goroutine_stack_size = 512 * sizeof(void*);
+  struct coro_stack* goroutine_stack = env->new_memory_block(env, stack, goroutine_stack_size);
   
   coro_context* goroutine = env->new_memory_block(env, stack, sizeof(coro_context));
   
-  coro_create(goroutine, goroutine_handler, obj_self, coro_goroutine_stack->sptr, coro_goroutine_stack->ssze);
+  coro_create(goroutine, goroutine_handler, obj_self, goroutine_stack, goroutine_stack_size);
   
   void** pointer_items = env->new_memory_block(env, stack, sizeof(void*) * 3);
   
   pointer_items[0] = goroutine;
-  pointer_items[1] = env;
-  pointer_items[2] = coro_goroutine_stack;
+  pointer_items[1] = goroutine_stack;
+  pointer_items[2] = env;
   
   env->set_pointer(env, stack, obj_self, pointer_items);
   
@@ -87,15 +70,13 @@ int32_t SPVM__Go__Goroutine__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   coro_context* goroutine = pointer_items[0];
   
-  struct coro_stack* coro_goroutine_stack = pointer_items[2];
+  struct coro_stack* goroutine_stack = pointer_items[1];
   
   coro_destroy(goroutine);
   
-  coro_stack_free(coro_goroutine_stack);
-  
   env->free_memory_block(env, stack, goroutine);
   
-  env->free_memory_block(env, stack, coro_goroutine_stack);
+  env->free_memory_block(env, stack, goroutine_stack);
   
   env->free_memory_block(env, stack, pointer_items);
   
