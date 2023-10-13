@@ -11,6 +11,8 @@ class Go {
   
   our $GO : Go;
   
+  has schedule : Go::Schedule;
+  
   INIT {
     $GO = new Go;
   }
@@ -41,6 +43,9 @@ class Go {
   
   method gosched : void () {
     
+    my $schedule = $GO->{schedule};
+    
+    $schedule->schedule();
   }
   
 }

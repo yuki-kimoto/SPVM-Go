@@ -8,7 +8,7 @@ class Go::Schedule {
   use Go::Queue;
   use Go::IOPoll;
   
-  has goroutine_queue : Go::Queue of Go::Goroutine;
+  has wait_goroutine_queue : Go::Queue of Go::Goroutine;
   
   has idle_process_queue : Go::Queue of Go::Schedule::Process;
   
@@ -16,36 +16,76 @@ class Go::Schedule {
   
   has io_poll : Go::IOPoll;
   
+  has schedule_goroutine : Go::Goroutine;
+  
   static method new : Go::Schedule () {
     
     my $self = new Go::Schedule;
     
-    my $goroutine_queue = Go::Queue->new;
+    my $wait_goroutine_queue = Go::Queue->new;
     
-    $self->{goroutine_queue} = $goroutine_queue;
+    $self->{wait_goroutine_queue} = $wait_goroutine_queue;
     
     my $io_poll = Go::IOPoll->new;
     
     $self->{io_poll} = $io_poll;
     
+    my $schedule_goroutine = $self->create_schedule_goroutine;
+    
+    $self->{schedule_goroutine} = $schedule_goroutine;
+    
     return $self;
+  }
+  
+  method create_schedule_goroutine : Go::Goroutine () {
+  
+    my $schedule_callback : Callback;
+    
+    $schedule_callback =
+      [has wait_goroutine_queue : Go::Queue of Go::Goroutine = $self->{wait_goroutine_queue}]
+      method : void () {
+      while (1) {
+        my $wait_goroutine_queue = $self->{wait_goroutine_queue};
+        
+        my $wait_goroutine = $wait_goroutine_queue->dequeue;
+        
+        if ($wait_goroutine) {
+          
+        }
+        else {
+          
+        }
+      }
+    };
+    
+    my $schedule_goroutine = Go::Goroutine->new($schedule_callback);
+    
+    return $schedule_goroutine;
   }
   
   # Instance Methods
   method enqueue_goroutine : void ($goroutine : Go::Goroutine) {
     
-    my $goroutine_queue = $self->{goroutine_queue};
+    my $wait_goroutine_queue = $self->{wait_goroutine_queue};
     
-    $goroutine_queue->enqueue($goroutine);
+    $wait_goroutine_queue->enqueue($goroutine);
   }
   
   method dequeue_goroutine : Go::Goroutine () {
     
-    my $goroutine_queue = $self->{goroutine_queue};
+    my $wait_goroutine_queue = $self->{wait_goroutine_queue};
     
-    my $goroutine = $goroutine_queue->dequeue;
+    my $goroutine = $wait_goroutine_queue->dequeue;
     
     return (Go::Goroutine)$goroutine;
   }
   
+  method schedule : void () {
+    
+    my $schedule_goroutine = $self->{schedule_goroutine};
+    
+    my $schedule_goroutine_callback = $schedule_goroutine->{callback};
+    
+    $schedule_goroutine_callback->();
+  }
 }
