@@ -42,17 +42,27 @@ static void goroutine_handler (void* obj_self) {
 
 int32_t SPVM__Go__Goroutine__init_goroutine(SPVM_ENV* env, SPVM_VALUE* stack) {
   
+  int32_t error_id = 0;
+  
   void* obj_self = stack[0].oval;
   
-  int32_t goroutine_stack_size = 512 * sizeof(void*);
-  struct coro_stack* goroutine_stack = env->new_memory_block(env, stack, goroutine_stack_size);
+  void* obj_callback = env->get_field_object_by_name(env, stack, obj_self, "callback", &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) { return error_id; }
   
   coro_context* goroutine = env->new_memory_block(env, stack, sizeof(coro_context));
-  
-  coro_create(goroutine, goroutine_handler, obj_self, goroutine_stack, goroutine_stack_size);
+  struct coro_stack* goroutine_stack = NULL;
+  if (obj_callback) {
+    int32_t goroutine_stack_size = 512 * sizeof(void*);
+    goroutine_stack = env->new_memory_block(env, stack, goroutine_stack_size);
+    
+    coro_create(goroutine, goroutine_handler, obj_self, goroutine_stack, goroutine_stack_size);
+  }
+  else {
+    coro_create(goroutine, NULL, NULL, NULL, 0);
+  }
   
   void** pointer_items = env->new_memory_block(env, stack, sizeof(void*) * 3);
-  
+    
   pointer_items[0] = goroutine;
   pointer_items[1] = goroutine_stack;
   pointer_items[2] = env;

@@ -36,11 +36,9 @@ class Go::Goroutine : pointer {
   has callback : Go::Goroutine::Callback;
   
   # Class Methods
-  static method new : Go::Goroutine ($callback :  Go::Goroutine::Callback) {
+  static method new : Go::Goroutine ($callback :  Go::Goroutine::Callback = undef) {
     
     my $self = new Go::Goroutine;
-    
-    my $env = Native->get_current_env;
     
     $self->{callback} = $callback;
     
