@@ -56,6 +56,8 @@ int32_t SPVM__Go__Goroutine__init_goroutine(SPVM_ENV* env, SPVM_VALUE* stack) {
     goroutine_stack = env->new_memory_block(env, stack, goroutine_stack_size);
     
     coro_create(goroutine, goroutine_handler, obj_self, goroutine_stack, goroutine_stack_size);
+    
+    env->set_pointer(env, stack, obj_callback, obj_self);
   }
   else {
     coro_create(goroutine, NULL, NULL, NULL, 0);
