@@ -47,6 +47,8 @@ class Go::Goroutine : pointer {
     return $self;
   }
   
+  native static method transfer : void ($from : Go::Goroutine, $to : Go::Goroutine);
+  
   # Instance Methods
   native private method init_goroutine : void ();
   

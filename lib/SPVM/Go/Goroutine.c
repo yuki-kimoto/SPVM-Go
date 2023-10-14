@@ -49,21 +49,21 @@ int32_t SPVM__Go__Goroutine__init_goroutine(SPVM_ENV* env, SPVM_VALUE* stack) {
   void* obj_callback = env->get_field_object_by_name(env, stack, obj_self, "callback", &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
   
-  coro_context* goroutine = env->new_memory_block(env, stack, sizeof(coro_context));
+  coro_context* goroutine_context = env->new_memory_block(env, stack, sizeof(coro_context));
   struct coro_stack* goroutine_stack = NULL;
   if (obj_callback) {
     int32_t goroutine_stack_size = 512 * sizeof(void*);
     goroutine_stack = env->new_memory_block(env, stack, goroutine_stack_size);
     
-    coro_create(goroutine, goroutine_handler, obj_self, goroutine_stack, goroutine_stack_size);
+    coro_create(goroutine_context, goroutine_handler, obj_self, goroutine_stack, goroutine_stack_size);
   }
   else {
-    coro_create(goroutine, NULL, NULL, NULL, 0);
+    coro_create(goroutine_context, NULL, NULL, NULL, 0);
   }
   
   void** pointer_items = env->new_memory_block(env, stack, sizeof(void*) * 3);
     
-  pointer_items[0] = goroutine;
+  pointer_items[0] = goroutine_context;
   pointer_items[1] = goroutine_stack;
   pointer_items[2] = env;
   
@@ -72,19 +72,36 @@ int32_t SPVM__Go__Goroutine__init_goroutine(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 }
 
+int32_t SPVM__Go__Goroutine__transfer(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  void* obj_goroutine_from = stack[0].oval;
+  
+  void** goroutine_from_pointer_items = env->get_pointer(env, stack, obj_goroutine_from);
+  
+  coro_context* goroutine_from_goroutine_context = goroutine_from_pointer_items[0];
+  
+  void* obj_goroutine_to = stack[1].oval;
+  
+  void** goroutine_to_pointer_items = env->get_pointer(env, stack, obj_goroutine_to);
+  
+  coro_context* goroutine_to_goroutine_context = goroutine_to_pointer_items[0];
+  
+  coro_transfer(goroutine_from_goroutine_context, goroutine_to_goroutine_context);
+}
+
 int32_t SPVM__Go__Goroutine__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void* obj_self = stack[0].oval;
   
   void** pointer_items = env->get_pointer(env, stack, obj_self);
   
-  coro_context* goroutine = pointer_items[0];
+  coro_context* goroutine_context = pointer_items[0];
   
   struct coro_stack* goroutine_stack = pointer_items[1];
   
-  coro_destroy(goroutine);
+  coro_destroy(goroutine_context);
   
-  env->free_memory_block(env, stack, goroutine);
+  env->free_memory_block(env, stack, goroutine_context);
   
   env->free_memory_block(env, stack, goroutine_stack);
   
