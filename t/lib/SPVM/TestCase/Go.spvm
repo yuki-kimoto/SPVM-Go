@@ -6,19 +6,21 @@ class TestCase::Go {
   
   static method test : int () {
     
+    my $schedule = Go::Schedule->new;
+    
+    my $goroutine_empty = Go::Goroutine->new;
+    
+    $schedule->enqueue_goroutine($goroutine_empty);
+    
     my $goroutine0 = Go::Goroutine->new(method : void () {
       warn("G0");
     });
     
+    $schedule->enqueue_goroutine($goroutine0);
+    
     my $goroutine1 = Go::Goroutine->new(method : void () {
       warn("G1");
     });
-    
-    my $goroutine_empty = Go::Goroutine->new;
-    
-    my $schedule = Go::Schedule->new;
-    
-    $schedule->enqueue_goroutine($goroutine0);
     
     $schedule->enqueue_goroutine($goroutine1);
     
