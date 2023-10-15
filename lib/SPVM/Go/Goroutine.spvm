@@ -52,5 +52,5 @@ class Go::Goroutine : pointer {
   # Instance Methods
   native private method init_goroutine : void ();
   
-  native private method DESTROY : void ();
+  native method DESTROY : void ();
 }

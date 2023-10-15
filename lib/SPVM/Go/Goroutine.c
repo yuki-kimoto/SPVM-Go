@@ -37,6 +37,8 @@ static void goroutine_handler (void* obj_self) {
   
   warn("LINE %d", __LINE__);
   
+  warn("REF_COUNT %d %d", env->api->internal->get_ref_count(env, goroutine_stack, obj_self), error_id);
+  
   if (error_id) {
     void* obj_exception = env->get_exception(env, goroutine_stack);
     
