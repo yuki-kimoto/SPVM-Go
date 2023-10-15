@@ -15,6 +15,8 @@ class Go::Goroutine : pointer {
   
   has next : rw Go::Queue::Element;
   
+  has return_back : Go::Goroutine;
+  
   # Enumerations
   enum {
     TYPE_NORMAL,
@@ -36,11 +38,13 @@ class Go::Goroutine : pointer {
   has callback : Go::Goroutine::Callback;
   
   # Class Methods
-  static method new : Go::Goroutine ($callback :  Go::Goroutine::Callback = undef) {
+  static method new : Go::Goroutine ($callback :  Go::Goroutine::Callback = undef, $return_back : Go::Goroutine = undef) {
     
     my $self = new Go::Goroutine;
     
     $self->{callback} = $callback;
+    
+    $self->{return_back} = $return_back;
     
     $self->init_goroutine;
     

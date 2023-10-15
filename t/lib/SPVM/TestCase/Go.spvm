@@ -8,8 +8,8 @@ class TestCase::Go {
     
     my $goroutines = new Go::Goroutine[10];
     
-    my $goroutine_empty = Go::Goroutine->new;
-    $goroutines->[0] = $goroutine_empty;
+    my $goroutine_return_back = Go::Goroutine->new;
+    $goroutines->[0] = $goroutine_return_back;
     
     my $goroutine1 = (Go::Goroutine)undef;
     
@@ -20,14 +20,14 @@ class TestCase::Go {
       Go::Goroutine->transfer($self->{goroutines}[1], $self->{goroutines}[2]);
       warn("G1-1");
       Go::Goroutine->transfer($self->{goroutines}[1], $self->{goroutines}[0]);
-    });
+    }, $goroutine_return_back, );
     
     $goroutines->[1] = $goroutine1;
     
     $goroutine2 = Go::Goroutine->new([has goroutines : Go::Goroutine[] = $goroutines] method : void () {
       warn("G2-0");
       Go::Goroutine->transfer($self->{goroutines}[2], $self->{goroutines}[1]);
-    });
+    }, $goroutine_return_back);
     
     $goroutines->[2] = $goroutine2;
     
@@ -43,18 +43,13 @@ class TestCase::Go {
     $goroutines->[1] = undef;
     $goroutines->[2] = undef;
     
-    $goroutine_empty = undef;
+    $goroutine_return_back = undef;
     
     $goroutine1 = undef;
     
     $goroutine2 = undef;
     
     warn("END");
-    
-    my $goroutine_tmp = Go::Goroutine->new;
-    $goroutines->[9] = $goroutine_tmp;
-    $goroutines->[9] = undef;
-    $goroutine_tmp = undef;
     
     return 1;
   }
