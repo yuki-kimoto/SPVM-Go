@@ -7,6 +7,13 @@
 
 static const char* FILE_NAME = "Go/Goroutine.c";
 
+void coro_transfer_tmp(void* from, void* to) {
+  warn("\n");
+  
+  coro_transfer(from, to);
+  
+}
+
 static void goroutine_handler (void* obj_self) {
   
   int32_t error_id = 0;
@@ -59,9 +66,7 @@ static void goroutine_handler (void* obj_self) {
   
   coro_context* goroutine_context_return_back = goroutine_context_return_back_pointer_items[0];
   
-  warn("\n");
-  
-  coro_transfer(goroutine_context, goroutine_context_return_back);
+  coro_transfer_tmp(goroutine_context, goroutine_context_return_back);
   
   return;
 }
@@ -120,9 +125,7 @@ int32_t SPVM__Go__Goroutine__transfer(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   coro_context* goroutine_context_to = goroutine_to_pointer_items[0];
   
-  warn("\n");
-  
-  coro_transfer(goroutine_context_from, goroutine_context_to);
+  coro_transfer_tmp(goroutine_context_from, goroutine_context_to);
   
 }
 
