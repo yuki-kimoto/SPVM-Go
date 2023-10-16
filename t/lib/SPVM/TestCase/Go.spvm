@@ -6,6 +6,8 @@ class TestCase::Go {
   
   static method test_schedule : int () {
     
+    my $schedule = Go::Schedule->new;
+    
     my $goroutine_schedule_callback_ref = [(Callback)undef];
     
     my $goroutine_schedule_ref = [(Go::Goroutine)undef];
