@@ -8,10 +8,11 @@
 static const char* FILE_NAME = "Go/Goroutine.c";
 
 void coro_transfer_tmp(void* from, void* to) {
-  warn("\n");
+  
+  // TODO: coro_transfer have some errors, but this fflush call fix it. I don't understant the reason.
+  fflush(stderr);
   
   coro_transfer(from, to);
-  
 }
 
 static void goroutine_handler (void* obj_self) {
@@ -37,8 +38,6 @@ static void goroutine_handler (void* obj_self) {
   
   stack[0].oval = obj_callback;
   error_id = env->call_method(env, stack, method, 0);
-  
-  warn("LINE %d %d", __LINE__, error_id);
   
   if (error_id) {
     void* obj_exception = env->get_exception(env, stack);
