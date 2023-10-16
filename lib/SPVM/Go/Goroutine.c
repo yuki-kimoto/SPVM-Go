@@ -9,8 +9,6 @@ static const char* FILE_NAME = "Go/Goroutine.c";
 
 static void goroutine_handler (void* obj_self) {
   
-  warn("LINE %d", __LINE__);
-  
   int32_t error_id = 0;
   
   void** pointer_items = (void**)SPVM_NATIVE_GET_POINTER(obj_self);
@@ -25,39 +23,23 @@ static void goroutine_handler (void* obj_self) {
     
     const char* exception = env->get_chars(env, stack, obj_exception);
     
-    warn("LINE %d", __LINE__);
-    
     spvm_warn("%s", exception);
   }
-  
-  warn("LINE %d", __LINE__);
   
   stack[0].oval = obj_callback;
   env->call_instance_method_by_name(env, stack, "", 0, &error_id, __func__, FILE_NAME, __LINE__);
   
-  warn("LINE %d", __LINE__);
-  
-  warn("REF_COUNT %d %d", env->api->internal->get_ref_count(env, stack, obj_self), error_id);
-  
   if (error_id) {
     void* obj_exception = env->get_exception(env, stack);
     
     const char* exception = env->get_chars(env, stack, obj_exception);
     
-    warn("LINE %d", __LINE__);
-    
     spvm_warn("%s", exception);
     
-    warn("LINE %d", __LINE__);
-    
   }
-  
-  warn("LINE %d", __LINE__);
   
   void* obj_return_back = env->get_field_object_by_name(env, stack, obj_self, "return_back", &error_id, __func__, FILE_NAME, __LINE__);
   
-  warn("LINE %d", __LINE__);
-  
   if (error_id) {
   
     warn("LINE %d", __LINE__);
@@ -66,31 +48,21 @@ static void goroutine_handler (void* obj_self) {
     
     const char* exception = env->get_chars(env, stack, obj_exception);
     
-    warn("LINE %d", __LINE__);
-    
     spvm_warn("%s", exception);
   }
-  
-  warn("LINE %d", __LINE__);
   
   coro_context* goroutine_context = pointer_items[0];
   
   coro_context* goroutine_context_return_back = env->get_pointer(env, stack, obj_return_back);
-  
-  warn("LINE %d %p %p", __LINE__, goroutine_context, goroutine_context_return_back);
   
   stack[0].oval = obj_self;
   stack[1].oval = obj_return_back;
   env->call_class_method_by_name(env, stack, "Go::Goroutine", "transfer", 2, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) {
   
-    warn("LINE %d", __LINE__);
-  
     void* obj_exception = env->get_exception(env, stack);
     
     const char* exception = env->get_chars(env, stack, obj_exception);
-    
-    warn("LINE %d", __LINE__);
     
     spvm_warn("%s", exception);
   }
@@ -154,17 +126,13 @@ int32_t SPVM__Go__Goroutine__transfer(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   coro_context* goroutine_to_goroutine_context = goroutine_to_pointer_items[0];
   
-  warn("transfer LINE %d", __LINE__);
+  warn("\n");
   
   coro_transfer(goroutine_from_goroutine_context, goroutine_to_goroutine_context);
-  
-  warn("transfer LINE %d", __LINE__);
   
 }
 
 int32_t SPVM__Go__Goroutine__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
-  
-  warn("DESTROY %d", __LINE__);
   
   void* obj_self = stack[0].oval;
   
