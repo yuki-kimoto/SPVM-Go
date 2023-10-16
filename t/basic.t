@@ -14,6 +14,8 @@ use SPVM 'Fn';
 
 ok(SPVM::TestCase::Go->test);
 
+ok(SPVM::TestCase::Go->test_schedule);
+
 # Version
 {
   my $version_string = SPVM::Fn->get_version_string("Go");
