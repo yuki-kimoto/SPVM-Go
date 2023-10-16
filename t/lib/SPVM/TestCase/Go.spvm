@@ -14,15 +14,15 @@ class TestCase::Go {
     
     my $goroutines = new Go::Goroutine[10];
     
-    $goroutine_schedule_callback_ref->[0] = [has goroutine_schedule_ref : Go::Goroutine[] = $goroutine_schedule_ref, has goroutines : Go::Goroutine[] = $goroutines, has goroutine_schedule_callback_ref : Callback[] = $goroutine_schedule_callback_ref] method : void () {
+    $goroutine_schedule_callback_ref->[0] = [has schedule : Go::Schedule = $schedule, has goroutines : Go::Goroutine[] = $goroutines, has goroutine_schedule_callback_ref : Callback[] = $goroutine_schedule_callback_ref] method : void () {
+      
+      my $shcedule = $self->{schedule};
+      
+      my $goroutine_schedule = $shcedule->schedule_goroutine;
       
       # die "Foo";
       
       my $goroutines = $self->{goroutines};
-      
-      my $goroutine_schedule_ref = $self->{goroutine_schedule_ref};
-      
-      my $goroutine_schedule = $goroutine_schedule_ref->[0];
       
       warn("GS-A");
       
@@ -73,7 +73,8 @@ class TestCase::Go {
     }, $goroutine_schedule);
     
     $goroutines->[0] = $goroutine0;
-      
+    $schedule->enqueue_goroutine($goroutine0);
+    
     $goroutine_schedule_callback_ref->[0]->();
     
     if ($goroutines->[0]->exception) {
