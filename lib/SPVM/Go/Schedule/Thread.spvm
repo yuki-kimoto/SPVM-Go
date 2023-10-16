@@ -1,0 +1,21 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
+class Go::Schedule::Thread {
+  use Go::Thread;
+  use Go::Coroutine;
+  use Go::Thread::Callback;
+  
+  # Interfaces
+  interface Go::Queue::Element;
+  
+  # Fields
+  has thread : Go::Thread;
+  
+  has coroutine : Go::Coroutine;
+  
+  has prev : rw Go::Queue::Element;
+  
+  has next : rw Go::Queue::Element;
+  
+}

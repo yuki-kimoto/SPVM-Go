@@ -1,17 +1,7 @@
 class Go::Thread {
-  use Go::Coroutine;
-  use Go::Thread::Callback;
+  use Callback;
   
-  # Interfaces
-  interface Go::Queue::Element;
-  
-  has coroutine : Go::Coroutine;
-  
-  has prev : rw Go::Queue::Element;
-  
-  has next : rw Go::Queue::Element;
-  
-  native static method new : Go::Thread ($callback : Go::Thread::Callback);
+  native static method new : Go::Thread ($callback : Callback);
   
   # Instance Method
   native method join : void ();
