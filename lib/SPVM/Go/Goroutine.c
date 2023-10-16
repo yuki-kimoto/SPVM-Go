@@ -1,8 +1,9 @@
 // Copyright (c) 2023 Yuki Kimoto
 // MIT License
 
-#include "spvm_native.h"
+#include <assert.h>
 
+#include "spvm_native.h"
 #include "coro.h"
 
 static const char* FILE_NAME = "Go/Goroutine.c";
@@ -25,45 +26,14 @@ static void goroutine_handler (void* obj_self) {
   
   SPVM_VALUE* stack = env->new_stack(env);
   
-  env->set_field_int_by_name(env, stack, obj_self, "finished", 0, &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) {
-    
-    void* obj_exception = env->get_exception(env, stack);
-    
-    const char* exception = env->get_chars(env, stack, obj_exception);
-    
-    spvm_warn("%s", exception);
-  }
-  
   env->set_field_object_by_name(env, stack, obj_self, "exception", NULL, &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) {
-    
-    void* obj_exception = env->get_exception(env, stack);
-    
-    const char* exception = env->get_chars(env, stack, obj_exception);
-    
-    spvm_warn("%s", exception);
-  }
+  assert(error_id == 0);
   
   env->set_field_int_by_name(env, stack, obj_self, "error_id", 0, &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) {
-    
-    void* obj_exception = env->get_exception(env, stack);
-    
-    const char* exception = env->get_chars(env, stack, obj_exception);
-    
-    spvm_warn("%s", exception);
-  }
+  assert(error_id == 0);
   
   void* obj_callback = env->get_field_object_by_name(env, stack, obj_self, "callback", &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) {
-    
-    void* obj_exception = env->get_exception(env, stack);
-    
-    const char* exception = env->get_chars(env, stack, obj_exception);
-    
-    spvm_warn("%s", exception);
-  }
+  assert(error_id == 0);
   
   void* method = env->get_instance_method(env, stack, obj_callback, "");
   
@@ -71,24 +41,9 @@ static void goroutine_handler (void* obj_self) {
   error_id = env->call_method(env, stack, method, 0);
   
   if (error_id) {
-    warn("LINE %d", __LINE__);
     
     void* obj_exception = env->get_exception(env, stack);
     const char* exception = env->get_chars(env, stack, obj_exception);
-    
-    spvm_warn("%s", exception);
-    
-  }
-  
-  void* obj_return_back = env->get_field_object_by_name(env, stack, obj_self, "return_back", &error_id, __func__, FILE_NAME, __LINE__);
-  
-  if (error_id) {
-  
-    void* obj_exception = env->get_exception(env, stack);
-    
-    const char* exception = env->get_chars(env, stack, obj_exception);
-    
-    spvm_warn("%d %s", error_id, exception);
     
     env->set_field_object_by_name(env, stack, obj_self, "exception", obj_exception, &error_id, __func__, FILE_NAME, __LINE__);
     if (error_id) {
@@ -109,23 +64,18 @@ static void goroutine_handler (void* obj_self) {
       
       spvm_warn("%s", exception);
     }
+    
   }
+  
+  void* obj_return_back = env->get_field_object_by_name(env, stack, obj_self, "return_back", &error_id, __func__, FILE_NAME, __LINE__);
+  assert(error_id == 0);
   
   coro_context* goroutine_context = pointer_items[0];
   
   void** goroutine_context_return_back_pointer_items = env->get_pointer(env, stack, obj_return_back);
   
   coro_context* goroutine_context_return_back = goroutine_context_return_back_pointer_items[0];
-  
-  env->set_field_int_by_name(env, stack, obj_self, "finished", 1, &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) {
-    
-    void* obj_exception = env->get_exception(env, stack);
-    
-    const char* exception = env->get_chars(env, stack, obj_exception);
-    
-    spvm_warn("%s", exception);
-  }
+  assert(error_id == 0);
   
   coro_transfer_tmp(goroutine_context, goroutine_context_return_back);
   

@@ -41,8 +41,6 @@ class Go::Goroutine : pointer {
   
   has error_id : ro int;
   
-  has finished : ro int;
-  
   # Class Methods
   static method new : Go::Goroutine ($callback :  Go::Goroutine::Callback = undef, $return_back : Go::Goroutine = undef) {
     
