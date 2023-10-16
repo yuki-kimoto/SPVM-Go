@@ -19,7 +19,6 @@ class Go::Queue {
     if ($self->{first}) {
       my $next = $self->{first};
       $element->set_next($next);
-      $next->set_prev($element);
       $self->{first} = $element;
     }
     else {
@@ -43,7 +42,6 @@ class Go::Queue {
     }
     
     if ($element) {
-      $element->set_prev(undef);
       $element->set_next(undef);
     }
     

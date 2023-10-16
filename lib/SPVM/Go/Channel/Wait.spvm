@@ -5,14 +5,12 @@ class Go::Channel::Wait {
   use Go::Channel;
   use Go::Coroutine;
   
+  has channel : Go::Channel;
+  
   has coroutine : Go::Coroutine;
   
-  has prev : Go::Channel::Wait;
+  has data : object;
   
   has next : Go::Channel::Wait;
-  
-  has value : object;
-  
-  has channel : Go::Channel;
   
 }

@@ -14,8 +14,6 @@ lib/SPVM/Go/Channel/ReadCallback.pm
 lib/SPVM/Go/Channel/ReadCallback.spvm
 lib/SPVM/Go/Channel/Wait.pm
 lib/SPVM/Go/Channel/Wait.spvm
-lib/SPVM/Go/Channel/Wait/Queue.pm
-lib/SPVM/Go/Channel/Wait/Queue.spvm
 lib/SPVM/Go/Coroutine.c
 lib/SPVM/Go/Coroutine.config
 lib/SPVM/Go/Coroutine.native/include/.gitkeep

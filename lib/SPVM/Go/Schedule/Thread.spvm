@@ -14,8 +14,6 @@ class Go::Schedule::Thread {
   
   has coroutine : Go::Coroutine;
   
-  has prev : rw Go::Queue::Element;
-  
   has next : rw Go::Queue::Element;
   
 }

@@ -4,8 +4,9 @@
 class Go::Channel {
   
   use Hash;
+  use Go::Channel::Wait;
   use Go::Channel::ReadCallback;
-  use Go::Channel::Wait::Queue;
+  use Go::Queue;
   
   private enum {
     READABLE_STATE_NONE,
@@ -20,7 +21,7 @@ class Go::Channel {
   
   has length : int;
   
-  has values_in_buffer : object[];
+  has values : object[];
   
   has closed : int;
   
@@ -28,11 +29,11 @@ class Go::Channel {
   
   has read_index : int;
   
-  has read_queue : Go::Channel::Wait::Queue;
+  has read_queue : Go::Queue of Go::Channel::Wait;
   
   has write_index : int;
   
-  has write_queue : Go::Channel::Wait::Queue;
+  has write_queue : Go::Queue of Go::Channel::Wait;
   
   # Class Methods
   static method new : Go::Channel ($options : object[] = undef) {
@@ -50,8 +51,8 @@ class Go::Channel {
       die "The \"capacity\" option must be greater than or equal to 0.";
     }
     
-    my $values_in_buffer = new object[$capacity];
-    $self->{values_in_buffer} = $values_in_buffer;
+    my $values = new object[$capacity];
+    $self->{values} = $values;
     
     return $self;
   }

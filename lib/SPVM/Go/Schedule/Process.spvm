@@ -14,8 +14,6 @@ class Go::Schedule::Process {
   
   has thread : Go::Schedule::Thread;
   
-  has prev : rw Go::Queue::Element;
-  
   has next : rw Go::Queue::Element;
   
 }

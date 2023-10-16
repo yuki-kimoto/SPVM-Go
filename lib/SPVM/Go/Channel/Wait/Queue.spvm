@@ -1,8 +1,0 @@
-# Copyright (c) 2023 Yuki Kimoto
-# MIT License
-
-class Go::Channel::Wait::Queue {
-  use Go::Channel::Wait;
-  has head : Go::Channel::Wait;
-  has tail : Go::Channel::Wait;
-}

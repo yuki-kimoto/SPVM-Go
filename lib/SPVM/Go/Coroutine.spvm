@@ -11,12 +11,6 @@ class Go::Coroutine : pointer {
   # Interfaces
   interface Go::Queue::Element;
   
-  has prev : rw Go::Queue::Element;
-  
-  has next : rw Go::Queue::Element;
-  
-  has return_back : Go::Coroutine;
-  
   # Enumerations
   enum {
     TYPE_NORMAL,
@@ -28,6 +22,7 @@ class Go::Coroutine : pointer {
   }
   
   # Fields
+  has return_back : Go::Coroutine;
   
   has type : int;
   
@@ -40,6 +35,8 @@ class Go::Coroutine : pointer {
   has exception : ro string;
   
   has error_id : ro int;
+  
+  has next : rw Go::Queue::Element;
   
   # Class Methods
   static method new : Go::Coroutine ($callback :  Go::Coroutine::Callback = undef, $return_back : Go::Coroutine = undef) {
