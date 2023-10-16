@@ -3,9 +3,9 @@
 
 class Go::Channel::Wait {
   use Go::Channel;
-  use Go::Goroutine;
+  use Go::Coroutine;
   
-  has goroutine : Go::Goroutine;
+  has coroutine : Go::Coroutine;
   
   has prev : Go::Channel::Wait;
   

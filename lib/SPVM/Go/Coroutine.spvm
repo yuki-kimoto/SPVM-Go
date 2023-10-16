@@ -1,10 +1,10 @@
 # Copyright (c) 2023 Yuki Kimoto
 # MIT License
 
-class Go::Goroutine : pointer {
+class Go::Coroutine : pointer {
   allow Go::Schedule;
   
-  use Go::Goroutine::Callback;
+  use Go::Coroutine::Callback;
   use Go::Channel;
   use Native;
   
@@ -15,7 +15,7 @@ class Go::Goroutine : pointer {
   
   has next : rw Go::Queue::Element;
   
-  has return_back : Go::Goroutine;
+  has return_back : Go::Coroutine;
   
   # Enumerations
   enum {
@@ -35,30 +35,30 @@ class Go::Goroutine : pointer {
   
   has running : byte;
   
-  has callback : Go::Goroutine::Callback;
+  has callback : Go::Coroutine::Callback;
   
   has exception : ro string;
   
   has error_id : ro int;
   
   # Class Methods
-  static method new : Go::Goroutine ($callback :  Go::Goroutine::Callback = undef, $return_back : Go::Goroutine = undef) {
+  static method new : Go::Coroutine ($callback :  Go::Coroutine::Callback = undef, $return_back : Go::Coroutine = undef) {
     
-    my $self = new Go::Goroutine;
+    my $self = new Go::Coroutine;
     
     $self->{callback} = $callback;
     
     $self->{return_back} = $return_back;
     
-    $self->init_goroutine;
+    $self->init_coroutine;
     
     return $self;
   }
   
-  native static method transfer : void ($from : Go::Goroutine, $to : Go::Goroutine);
+  native static method transfer : void ($from : Go::Coroutine, $to : Go::Coroutine);
   
   # Instance Methods
-  native private method init_goroutine : void ();
+  native private method init_coroutine : void ();
   
   native method DESTROY : void ();
 }

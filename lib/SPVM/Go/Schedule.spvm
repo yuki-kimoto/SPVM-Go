@@ -2,13 +2,13 @@
 # MIT License
 
 class Go::Schedule {
-  use Go::Goroutine;
+  use Go::Coroutine;
   use Go::Schedule::Process;
   use Go::Thread;
   use Go::Queue;
   use Go::IOPoll;
   
-  has wait_goroutine_queue : Go::Queue of Go::Goroutine;
+  has wait_coroutine_queue : Go::Queue of Go::Coroutine;
   
   has idle_process_queue : Go::Queue of Go::Schedule::Process;
   
@@ -16,42 +16,42 @@ class Go::Schedule {
   
   has io_poll : Go::IOPoll;
   
-  has schedule_goroutine : rw Go::Goroutine;
+  has schedule_coroutine : rw Go::Coroutine;
   
-  has current_goroutine : rw Go::Goroutine;
+  has current_coroutine : rw Go::Coroutine;
   
   static method new : Go::Schedule () {
     
     my $self = new Go::Schedule;
     
-    my $wait_goroutine_queue = Go::Queue->new;
+    my $wait_coroutine_queue = Go::Queue->new;
     
-    $self->{wait_goroutine_queue} = $wait_goroutine_queue;
+    $self->{wait_coroutine_queue} = $wait_coroutine_queue;
     
     my $io_poll = Go::IOPoll->new;
     
     $self->{io_poll} = $io_poll;
     
-    my $schedule_goroutine = $self->create_schedule_goroutine;
+    my $schedule_coroutine = $self->create_schedule_coroutine;
     
-    $self->{schedule_goroutine} = $schedule_goroutine;
+    $self->{schedule_coroutine} = $schedule_coroutine;
     
     return $self;
   }
   
-  method create_schedule_goroutine : Go::Goroutine () {
+  method create_schedule_coroutine : Go::Coroutine () {
   
     my $schedule_callback : Callback;
     
     $schedule_callback =
-      [has wait_goroutine_queue : Go::Queue of Go::Goroutine = $self->{wait_goroutine_queue}]
+      [has wait_coroutine_queue : Go::Queue of Go::Coroutine = $self->{wait_coroutine_queue}]
       method : void () {
       while (1) {
-        my $wait_goroutine_queue = $self->{wait_goroutine_queue};
+        my $wait_coroutine_queue = $self->{wait_coroutine_queue};
         
-        my $wait_goroutine = $wait_goroutine_queue->dequeue;
+        my $wait_coroutine = $wait_coroutine_queue->dequeue;
         
-        if ($wait_goroutine) {
+        if ($wait_coroutine) {
           
         }
         else {
@@ -60,34 +60,34 @@ class Go::Schedule {
       }
     };
     
-    my $schedule_goroutine = Go::Goroutine->new($schedule_callback);
+    my $schedule_coroutine = Go::Coroutine->new($schedule_callback);
     
-    return $schedule_goroutine;
+    return $schedule_coroutine;
   }
   
   # Instance Methods
-  method enqueue_goroutine : void ($goroutine : Go::Goroutine) {
+  method enqueue_coroutine : void ($coroutine : Go::Coroutine) {
     
-    my $wait_goroutine_queue = $self->{wait_goroutine_queue};
+    my $wait_coroutine_queue = $self->{wait_coroutine_queue};
     
-    $wait_goroutine_queue->enqueue($goroutine);
+    $wait_coroutine_queue->enqueue($coroutine);
   }
   
-  method dequeue_goroutine : Go::Goroutine () {
+  method dequeue_coroutine : Go::Coroutine () {
     
-    my $wait_goroutine_queue = $self->{wait_goroutine_queue};
+    my $wait_coroutine_queue = $self->{wait_coroutine_queue};
     
-    my $goroutine = $wait_goroutine_queue->dequeue;
+    my $coroutine = $wait_coroutine_queue->dequeue;
     
-    return (Go::Goroutine)$goroutine;
+    return (Go::Coroutine)$coroutine;
   }
   
   method schedule : void () {
     
-    my $schedule_goroutine = $self->{schedule_goroutine};
+    my $schedule_coroutine = $self->{schedule_coroutine};
     
-    my $schedule_goroutine_callback = $schedule_goroutine->{callback};
+    my $schedule_coroutine_callback = $schedule_coroutine->{callback};
     
-    $schedule_goroutine_callback->();
+    $schedule_coroutine_callback->();
   }
 }

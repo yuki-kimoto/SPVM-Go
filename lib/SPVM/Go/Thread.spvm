@@ -1,11 +1,11 @@
 class Go::Thread {
-  use Go::Goroutine;
+  use Go::Coroutine;
   use Go::Thread::Callback;
   
   # Interfaces
   interface Go::Queue::Element;
   
-  has goroutine : Go::Goroutine;
+  has coroutine : Go::Coroutine;
   
   has prev : rw Go::Queue::Element;
   

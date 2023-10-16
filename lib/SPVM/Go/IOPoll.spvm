@@ -2,37 +2,37 @@
 # MIT License
 
 class Go::IOPoll {
-  use Go::Goroutine;
+  use Go::Coroutine;
   use Go::Queue;
   
-  has iopoll_goroutine : Go::Goroutine;
+  has iopoll_coroutine : Go::Coroutine;
   
-  has wait_goroutine_queue : Go::Queue of Go::Goroutine;
+  has wait_coroutine_queue : Go::Queue of Go::Coroutine;
   
   static method new : Go::IOPoll () {
     
     my $self = new Go::IOPoll;
     
-    my $iopoll_goroutine = $self->create_iopoll_goroutine;
+    my $iopoll_coroutine = $self->create_iopoll_coroutine;
     
-    $self->{iopoll_goroutine} = $iopoll_goroutine;
+    $self->{iopoll_coroutine} = $iopoll_coroutine;
     
     return $self;
   }
   
-  method create_iopoll_goroutine : Go::Goroutine () {
+  method create_iopoll_coroutine : Go::Coroutine () {
   
     my $iopoll_callback : Callback;
     
     $iopoll_callback =
-      [has wait_goroutine_queue : Go::Queue of Go::Goroutine = $self->{wait_goroutine_queue}]
+      [has wait_coroutine_queue : Go::Queue of Go::Coroutine = $self->{wait_coroutine_queue}]
       method : void () {
       while (1) {
-        my $wait_goroutine_queue = $self->{wait_goroutine_queue};
+        my $wait_coroutine_queue = $self->{wait_coroutine_queue};
         
-        my $wait_goroutine = $wait_goroutine_queue->dequeue;
+        my $wait_coroutine = $wait_coroutine_queue->dequeue;
         
-        if ($wait_goroutine) {
+        if ($wait_coroutine) {
           
         }
         else {
@@ -41,9 +41,9 @@ class Go::IOPoll {
       }
     };
     
-    my $iopoll_goroutine = Go::Goroutine->new($iopoll_callback);
+    my $iopoll_coroutine = Go::Coroutine->new($iopoll_callback);
     
-    return $iopoll_goroutine;
+    return $iopoll_coroutine;
   }
   
 }

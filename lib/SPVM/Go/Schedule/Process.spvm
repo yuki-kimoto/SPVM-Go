@@ -17,6 +17,6 @@ class Go::Schedule::Process {
   
   has thread : Go::Thread;
   
-  has goroutine_queue : Go::Queue of Go::Goroutine;
+  has coroutine_queue : Go::Queue of Go::Coroutine;
   
 }
