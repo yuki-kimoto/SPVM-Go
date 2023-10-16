@@ -20,18 +20,23 @@ class TestCase::Go {
       
       # die "Foo";
       
-      my $goroutine = $shcedule->dequeue_goroutine;
-      
-      $shcedule->set_current_goroutine($goroutine);
-      
-      if ($goroutine) {
-        warn("[Start]Transfer Schedule to other");
+      while (1) {
         
-        Go::Goroutine->transfer($goroutine_schedule, $goroutine);
+        my $goroutine = $shcedule->dequeue_goroutine;
         
-        warn("[End]Transfer Schedule to other");
+        $shcedule->set_current_goroutine($goroutine);
+        
+        if ($goroutine) {
+          warn("[Start]Transfer Schedule to other");
+          
+          Go::Goroutine->transfer($goroutine_schedule, $goroutine);
+          
+          warn("[End]Transfer Schedule to other");
+        }
+        else {
+          last;
+        }
       }
-      
     };
     
     my $goroutine_schedule = Go::Goroutine->new($goroutine_schedule_callback);
@@ -56,7 +61,7 @@ class TestCase::Go {
       warn("G1-CallMethodEnd");
       
       my $current_goroutine = $shcedule->current_goroutine;
-      
+      $shcedule->enqueue_goroutine($current_goroutine);
       Go::Goroutine->transfer($current_goroutine, $goroutine_schedule);
       
       warn("G1-B");

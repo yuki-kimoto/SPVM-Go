@@ -42,8 +42,10 @@ class Go::Queue {
       }
     }
     
-    $element->set_prev(undef);
-    $element->set_next(undef);
+    if ($element) {
+      $element->set_prev(undef);
+      $element->set_next(undef);
+    }
     
     return $element;
   }
