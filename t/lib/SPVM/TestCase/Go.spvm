@@ -24,20 +24,22 @@ class TestCase::Go {
       
       my $goroutines = $self->{goroutines};
       
+      my $goroutine = $goroutines->[0];
+      
       warn("GS-A");
       
-      Go::Goroutine->transfer($goroutine_schedule, $goroutines->[0]);
+      Go::Goroutine->transfer($goroutine_schedule, $goroutine);
       
-      if ($goroutines->[0]->exception) {
-        die $goroutines->[0]->exception;
+      if ($goroutine->exception) {
+        die $goroutine->exception;
       }
       
       warn("GS-B");
       
-      Go::Goroutine->transfer($goroutine_schedule, $goroutines->[0]);
+      Go::Goroutine->transfer($goroutine_schedule, $goroutine);
       
-      if ($goroutines->[0]->exception) {
-        die $goroutines->[0]->exception;
+      if ($goroutine->exception) {
+        die $goroutine->exception;
       }
       
       warn("GS-C");
