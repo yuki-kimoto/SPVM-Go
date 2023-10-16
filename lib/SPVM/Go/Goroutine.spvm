@@ -37,11 +37,11 @@ class Go::Goroutine : pointer {
   
   has callback : Go::Goroutine::Callback;
   
-  has excetpion : string;
+  has exception : ro string;
   
-  has error_id : int;
+  has error_id : ro int;
   
-  has finished : int;
+  has finished : ro int;
   
   # Class Methods
   static method new : Go::Goroutine ($callback :  Go::Goroutine::Callback = undef, $return_back : Go::Goroutine = undef) {

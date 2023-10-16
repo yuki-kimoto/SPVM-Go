@@ -74,7 +74,6 @@ static void goroutine_handler (void* obj_self) {
     warn("LINE %d", __LINE__);
     
     void* obj_exception = env->get_exception(env, stack);
-    
     const char* exception = env->get_chars(env, stack, obj_exception);
     
     spvm_warn("%s", exception);
