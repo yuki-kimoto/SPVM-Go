@@ -8,19 +8,27 @@ class TestCase::Go {
     
     my $goroutine_schedule_callback_ref = [(Callback)undef];
     
+    my $goroutine_schedule_ref = [(Go::Goroutine)undef];
+    
     my $goroutines = new Go::Goroutine[10];
       
-    $goroutine_schedule_callback_ref->[0] = [has goroutines : Go::Goroutine[] = $goroutines, has goroutine_schedule_callback_ref : Callback[] = $goroutine_schedule_callback_ref] method : void () {
+    $goroutine_schedule_callback_ref->[0] = [has goroutine_schedule_ref : Go::Goroutine[] = $goroutine_schedule_ref, has goroutines : Go::Goroutine[] = $goroutines, has goroutine_schedule_callback_ref : Callback[] = $goroutine_schedule_callback_ref] method : void () {
       
       # die "Foo";
       
       my $goroutines = $self->{goroutines};
       
-      my $goroutine_schedule = $goroutines->[0];
+      my $goroutine_schedule_ref = $self->{goroutine_schedule_ref};
+      
+      my $goroutine_schedule = $goroutine_schedule_ref->[0];
       
       my $goroutine1 = (Go::Goroutine)undef;
       
-      $goroutine1 = Go::Goroutine->new([has goroutines : Go::Goroutine[] = $goroutines] method : void () {
+      $goroutine1 = Go::Goroutine->new([has goroutine_schedule_ref : Go::Goroutine[] = $goroutine_schedule_ref, has goroutines : Go::Goroutine[] = $goroutines] method : void () {
+        my $goroutine_schedule_ref = $self->{goroutine_schedule_ref};
+        
+        my $goroutine_schedule = $goroutine_schedule_ref->[0];
+      
         
         # die "Foo";
         
@@ -30,36 +38,37 @@ class TestCase::Go {
         TestCase::Go->foo();
         warn("G1-CallMethodEnd");
         
-        Go::Goroutine->transfer($self->{goroutines}[1], $self->{goroutines}[0]);
+        Go::Goroutine->transfer($self->{goroutines}[1], $goroutine_schedule);
         
         warn("G1-B");
       }, $goroutine_schedule);
       
       $goroutines->[1] = $goroutine1;
       
-      warn("G0-A");
+      warn("GS-A");
       
-      Go::Goroutine->transfer($goroutines->[0], $goroutines->[1]);
-      
-      if ($goroutines->[1]->exception) {
-        die $goroutines->[1]->exception;
-      }
-      
-      warn("G0-B");
-      
-      Go::Goroutine->transfer($goroutines->[0], $goroutines->[1]);
+      Go::Goroutine->transfer($goroutine_schedule, $goroutines->[1]);
       
       if ($goroutines->[1]->exception) {
         die $goroutines->[1]->exception;
       }
       
-      warn("G0-C");
+      warn("GS-B");
+      
+      Go::Goroutine->transfer($goroutine_schedule, $goroutines->[1]);
+      
+      if ($goroutines->[1]->exception) {
+        die $goroutines->[1]->exception;
+      }
+      
+      warn("GS-C");
       
     };
     
     my $goroutine_schedule_callback = $goroutine_schedule_callback_ref->[0];
     my $goroutine_schedule = Go::Goroutine->new($goroutine_schedule_callback);
     $goroutines->[0] = $goroutine_schedule;
+    $goroutine_schedule_ref->[0] = $goroutine_schedule;
       
     $goroutine_schedule_callback_ref->[0]->();
     
