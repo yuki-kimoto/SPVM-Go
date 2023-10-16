@@ -114,7 +114,7 @@ int32_t SPVM__Go__Goroutine__transfer(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void** goroutine_from_pointer_items = env->get_pointer(env, stack, obj_goroutine_from);
   
-  coro_context* goroutine_from_goroutine_context = goroutine_from_pointer_items[0];
+  coro_context* goroutine_context_from = goroutine_from_pointer_items[0];
   
   void* obj_goroutine_to = stack[1].oval;
   
@@ -124,11 +124,11 @@ int32_t SPVM__Go__Goroutine__transfer(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void** goroutine_to_pointer_items = env->get_pointer(env, stack, obj_goroutine_to);
   
-  coro_context* goroutine_to_goroutine_context = goroutine_to_pointer_items[0];
+  coro_context* goroutine_context_to = goroutine_to_pointer_items[0];
   
-  warn("\n");
+  warn("");
   
-  coro_transfer(goroutine_from_goroutine_context, goroutine_to_goroutine_context);
+  coro_transfer(goroutine_context_from, goroutine_context_to);
   
 }
 
