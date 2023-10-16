@@ -22,6 +22,9 @@ class TestCase::Go {
       
       $goroutine1 = Go::Goroutine->new([has goroutines : Go::Goroutine[] = $goroutines] method : void () {
         warn("G1-A");
+        
+        TestCase::Go->foo();
+        
         Go::Goroutine->transfer($self->{goroutines}[1], $self->{goroutines}[0]);
         warn("G1-B");
       }, $goroutine_start);
@@ -43,5 +46,9 @@ class TestCase::Go {
     $goroutine_start_callback_ref->[0]->();
     
     return 1;
+  }
+  
+  static method foo : void () {
+    warn "Call a method";
   }
 }
