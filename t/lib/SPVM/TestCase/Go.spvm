@@ -12,6 +12,8 @@ class TestCase::Go {
       
     $goroutine_start_callback_ref->[0] = [has goroutines : Go::Goroutine[] = $goroutines, has goroutine_start_callback_ref : Callback[] = $goroutine_start_callback_ref] method : void () {
       
+      # die "Foo";
+      
       my $goroutines = $self->{goroutines};
       
       my $goroutine_start_callback = $self->{goroutine_start_callback_ref}->[0];
@@ -21,6 +23,8 @@ class TestCase::Go {
       my $goroutine1 = (Go::Goroutine)undef;
       
       $goroutine1 = Go::Goroutine->new([has goroutines : Go::Goroutine[] = $goroutines] method : void () {
+        
+        # die "Foo";
         
         warn("G1-A");
         
@@ -40,7 +44,7 @@ class TestCase::Go {
       Go::Goroutine->transfer($goroutines->[0], $goroutines->[1]);
       
       if ($goroutines->[1]->exception) {
-        return;
+        die $goroutines->[1]->exception;
       }
       
       warn("G0-B");
@@ -48,7 +52,7 @@ class TestCase::Go {
       Go::Goroutine->transfer($goroutines->[0], $goroutines->[1]);
       
       if ($goroutines->[1]->exception) {
-        return;
+        die $goroutines->[1]->exception;
       }
       
       warn("G0-C");
@@ -58,7 +62,7 @@ class TestCase::Go {
     $goroutine_start_callback_ref->[0]->();
     
     if ($goroutines->[0]->exception) {
-      return 1;
+      die $goroutines->[0]->exception;
     }
     warn("END");
     
