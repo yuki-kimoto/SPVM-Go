@@ -29,6 +29,8 @@ static void goroutine_handler (void* obj_self) {
   stack[0].oval = obj_callback;
   env->call_instance_method_by_name(env, stack, "", 0, &error_id, __func__, FILE_NAME, __LINE__);
   
+  warn("LINE %d %d", __LINE__, error_id);
+  
   if (error_id) {
     void* obj_exception = env->get_exception(env, stack);
     
@@ -42,8 +44,6 @@ static void goroutine_handler (void* obj_self) {
   
   if (error_id) {
   
-    warn("LINE %d", __LINE__);
-  
     void* obj_exception = env->get_exception(env, stack);
     
     const char* exception = env->get_chars(env, stack, obj_exception);
@@ -53,21 +53,13 @@ static void goroutine_handler (void* obj_self) {
   
   coro_context* goroutine_context = pointer_items[0];
   
-  coro_context* goroutine_context_return_back = env->get_pointer(env, stack, obj_return_back);
+  void** goroutine_context_return_back_pointer_items = env->get_pointer(env, stack, obj_return_back);
   
-  stack[0].oval = obj_self;
-  stack[1].oval = obj_return_back;
-  env->call_class_method_by_name(env, stack, "Go::Goroutine", "transfer", 2, &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) {
+  coro_context* goroutine_context_return_back = goroutine_context_return_back_pointer_items[0];
   
-    void* obj_exception = env->get_exception(env, stack);
-    
-    const char* exception = env->get_chars(env, stack, obj_exception);
-    
-    spvm_warn("%s", exception);
-  }
-   
-  // coro_transfer(goroutine_context, goroutine_context_return_back);
+  warn("\n");
+  
+  coro_transfer(goroutine_context, goroutine_context_return_back);
   
   return;
 }
@@ -84,7 +76,7 @@ int32_t SPVM__Go__Goroutine__init_goroutine(SPVM_ENV* env, SPVM_VALUE* stack) {
   coro_context* goroutine_context = env->new_memory_block(env, stack, sizeof(coro_context));
   struct coro_stack* goroutine_stack = NULL;
   if (obj_callback) {
-    int32_t goroutine_stack_size = 512 * sizeof(void*);
+    int32_t goroutine_stack_size = 1000 * sizeof(void*);
     goroutine_stack = env->new_memory_block(env, stack, goroutine_stack_size);
     
     coro_create(goroutine_context, goroutine_handler, obj_self, goroutine_stack, goroutine_stack_size);
@@ -126,7 +118,7 @@ int32_t SPVM__Go__Goroutine__transfer(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   coro_context* goroutine_context_to = goroutine_to_pointer_items[0];
   
-  warn("");
+  warn("\n");
   
   coro_transfer(goroutine_context_from, goroutine_context_to);
   
