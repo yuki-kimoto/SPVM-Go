@@ -26,8 +26,10 @@ static void goroutine_handler (void* obj_self) {
     spvm_warn("%s", exception);
   }
   
+  void* method = env->get_instance_method(env, stack, obj_callback, "");
+  
   stack[0].oval = obj_callback;
-  env->call_instance_method_by_name(env, stack, "", 0, &error_id, __func__, FILE_NAME, __LINE__);
+  error_id = env->call_method(env, stack, method, 0);
   
   warn("LINE %d %d", __LINE__, error_id);
   
