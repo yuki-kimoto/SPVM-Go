@@ -14,7 +14,7 @@ class TestCase::Go {
     
     my $goroutines = new Go::Goroutine[10];
     
-    $goroutine_schedule_callback_ref->[0] = [has schedule : Go::Schedule = $schedule, has goroutines : Go::Goroutine[] = $goroutines, has goroutine_schedule_callback_ref : Callback[] = $goroutine_schedule_callback_ref] method : void () {
+    $goroutine_schedule_callback_ref->[0] = [has schedule : Go::Schedule = $schedule, has goroutines : Go::Goroutine[] = $goroutines] method : void () {
       
       my $shcedule = $self->{schedule};
       
