@@ -25,23 +25,11 @@ class TestCase::Go {
       $shcedule->set_current_goroutine($goroutine);
       
       if ($goroutine) {
-        warn("GS-A");
+        warn("[Start]Transfer Schedule to other");
         
         Go::Goroutine->transfer($goroutine_schedule, $goroutine);
         
-        if ($goroutine->exception) {
-          die $goroutine->exception;
-        }
-        
-        warn("GS-B");
-        
-        Go::Goroutine->transfer($goroutine_schedule, $goroutine);
-        
-        if ($goroutine->exception) {
-          die $goroutine->exception;
-        }
-        
-        warn("GS-C");
+        warn("[End]Transfer Schedule to other");
       }
       
     };
