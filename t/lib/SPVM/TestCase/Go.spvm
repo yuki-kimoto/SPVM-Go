@@ -12,9 +12,7 @@ class TestCase::Go {
     
     my $goroutine_schedule_ref = [(Go::Goroutine)undef];
     
-    my $goroutines = new Go::Goroutine[10];
-    
-    $goroutine_schedule_callback = [has schedule : Go::Schedule = $schedule, has goroutines : Go::Goroutine[] = $goroutines] method : void () {
+    $goroutine_schedule_callback = [has schedule : Go::Schedule = $schedule] method : void () {
       
       my $shcedule = $self->{schedule};
       
@@ -22,9 +20,9 @@ class TestCase::Go {
       
       # die "Foo";
       
-      my $goroutines = $self->{goroutines};
-      
       my $goroutine = $shcedule->dequeue_goroutine;
+      
+      $shcedule->set_current_goroutine($goroutine);
       
       if ($goroutine) {
         warn("GS-A");
@@ -49,14 +47,13 @@ class TestCase::Go {
     };
     
     my $goroutine_schedule = Go::Goroutine->new($goroutine_schedule_callback);
-    $goroutines->[0] = $goroutine_schedule;
     $goroutine_schedule_ref->[0] = $goroutine_schedule;
     
     $schedule->set_schedule_goroutine($goroutine_schedule);
     
     my $goroutine0 = (Go::Goroutine)undef;
     
-    $goroutine0 = Go::Goroutine->new([has schedule : Go::Schedule = $schedule, has goroutines : Go::Goroutine[] = $goroutines] method : void () {
+    $goroutine0 = Go::Goroutine->new([has schedule : Go::Schedule = $schedule] method : void () {
       
       my $shcedule = $self->{schedule};
       
@@ -70,18 +67,19 @@ class TestCase::Go {
       TestCase::Go->foo();
       warn("G1-CallMethodEnd");
       
-      Go::Goroutine->transfer($self->{goroutines}[0], $goroutine_schedule);
+      my $current_goroutine = $shcedule->current_goroutine;
+      
+      Go::Goroutine->transfer($current_goroutine, $goroutine_schedule);
       
       warn("G1-B");
     }, $goroutine_schedule);
     
-    $goroutines->[0] = $goroutine0;
     $schedule->enqueue_goroutine($goroutine0);
     
     $goroutine_schedule_callback->();
     
-    if ($goroutines->[0]->exception) {
-      die $goroutines->[0]->exception;
+    if ($goroutine0->exception) {
+      die $goroutine0->exception;
     }
     warn("END");
     

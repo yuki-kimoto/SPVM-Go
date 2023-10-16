@@ -18,6 +18,8 @@ class Go::Schedule {
   
   has schedule_goroutine : rw Go::Goroutine;
   
+  has current_goroutine : rw Go::Goroutine;
+  
   static method new : Go::Schedule () {
     
     my $self = new Go::Schedule;
