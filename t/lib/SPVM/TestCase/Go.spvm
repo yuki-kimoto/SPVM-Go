@@ -24,29 +24,6 @@ class TestCase::Go {
       
       my $goroutine_schedule = $goroutine_schedule_ref->[0];
       
-      my $goroutine0 = (Go::Goroutine)undef;
-      
-      $goroutine0 = Go::Goroutine->new([has goroutine_schedule_ref : Go::Goroutine[] = $goroutine_schedule_ref, has goroutines : Go::Goroutine[] = $goroutines] method : void () {
-        my $goroutine_schedule_ref = $self->{goroutine_schedule_ref};
-        
-        my $goroutine_schedule = $goroutine_schedule_ref->[0];
-      
-        
-        # die "Foo";
-        
-        warn("G1-A");
-        
-        warn("G1-CallMethodStart");
-        TestCase::Go->foo();
-        warn("G1-CallMethodEnd");
-        
-        Go::Goroutine->transfer($self->{goroutines}[0], $goroutine_schedule);
-        
-        warn("G1-B");
-      }, $goroutine_schedule);
-      
-      $goroutines->[0] = $goroutine0;
-      
       warn("GS-A");
       
       Go::Goroutine->transfer($goroutine_schedule, $goroutines->[0]);
@@ -71,6 +48,29 @@ class TestCase::Go {
     my $goroutine_schedule = Go::Goroutine->new($goroutine_schedule_callback);
     $goroutines->[0] = $goroutine_schedule;
     $goroutine_schedule_ref->[0] = $goroutine_schedule;
+    
+    my $goroutine0 = (Go::Goroutine)undef;
+    
+    $goroutine0 = Go::Goroutine->new([has goroutine_schedule_ref : Go::Goroutine[] = $goroutine_schedule_ref, has goroutines : Go::Goroutine[] = $goroutines] method : void () {
+      my $goroutine_schedule_ref = $self->{goroutine_schedule_ref};
+      
+      my $goroutine_schedule = $goroutine_schedule_ref->[0];
+    
+      
+      # die "Foo";
+      
+      warn("G1-A");
+      
+      warn("G1-CallMethodStart");
+      TestCase::Go->foo();
+      warn("G1-CallMethodEnd");
+      
+      Go::Goroutine->transfer($self->{goroutines}[0], $goroutine_schedule);
+      
+      warn("G1-B");
+    }, $goroutine_schedule);
+    
+    $goroutines->[0] = $goroutine0;
       
     $goroutine_schedule_callback_ref->[0]->();
     
