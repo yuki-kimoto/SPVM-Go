@@ -17,13 +17,13 @@ static void goroutine_handler (void* obj_self) {
   
   SPVM_ENV* env = pointer_items[2];
   
-  SPVM_VALUE* goroutine_stack = env->new_stack(env);
+  SPVM_VALUE* stack = env->new_stack(env);
   
-  void* obj_callback = env->get_field_object_by_name(env, goroutine_stack, obj_self, "callback", &error_id, __func__, FILE_NAME, __LINE__);
+  void* obj_callback = env->get_field_object_by_name(env, stack, obj_self, "callback", &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) {
-    void* obj_exception = env->get_exception(env, goroutine_stack);
+    void* obj_exception = env->get_exception(env, stack);
     
-    const char* exception = env->get_chars(env, goroutine_stack, obj_exception);
+    const char* exception = env->get_chars(env, stack, obj_exception);
     
     warn("LINE %d", __LINE__);
     
@@ -32,17 +32,17 @@ static void goroutine_handler (void* obj_self) {
   
   warn("LINE %d", __LINE__);
   
-  goroutine_stack[0].oval = obj_callback;
-  env->call_instance_method_by_name(env, goroutine_stack, "", 0, &error_id, __func__, FILE_NAME, __LINE__);
+  stack[0].oval = obj_callback;
+  env->call_instance_method_by_name(env, stack, "", 0, &error_id, __func__, FILE_NAME, __LINE__);
   
   warn("LINE %d", __LINE__);
   
-  warn("REF_COUNT %d %d", env->api->internal->get_ref_count(env, goroutine_stack, obj_self), error_id);
+  warn("REF_COUNT %d %d", env->api->internal->get_ref_count(env, stack, obj_self), error_id);
   
   if (error_id) {
-    void* obj_exception = env->get_exception(env, goroutine_stack);
+    void* obj_exception = env->get_exception(env, stack);
     
-    const char* exception = env->get_chars(env, goroutine_stack, obj_exception);
+    const char* exception = env->get_chars(env, stack, obj_exception);
     
     warn("LINE %d", __LINE__);
     
@@ -51,6 +51,51 @@ static void goroutine_handler (void* obj_self) {
     warn("LINE %d", __LINE__);
     
   }
+  
+  warn("LINE %d", __LINE__);
+  
+  void* obj_return_back = env->get_field_object_by_name(env, stack, obj_self, "return_back", &error_id, __func__, FILE_NAME, __LINE__);
+  
+  warn("LINE %d", __LINE__);
+  
+  if (error_id) {
+  
+    warn("LINE %d", __LINE__);
+  
+    void* obj_exception = env->get_exception(env, stack);
+    
+    const char* exception = env->get_chars(env, stack, obj_exception);
+    
+    warn("LINE %d", __LINE__);
+    
+    spvm_warn("%s", exception);
+  }
+  
+  warn("LINE %d", __LINE__);
+  
+  coro_context* goroutine_context = pointer_items[0];
+  
+  coro_context* goroutine_context_return_back = env->get_pointer(env, stack, obj_return_back);
+  
+  warn("LINE %d %p %p", __LINE__, goroutine_context, goroutine_context_return_back);
+  
+  stack[0].oval = obj_self;
+  stack[1].oval = obj_return_back;
+  env->call_class_method_by_name(env, stack, "Go::Goroutine", "transfer", 2, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) {
+  
+    warn("LINE %d", __LINE__);
+  
+    void* obj_exception = env->get_exception(env, stack);
+    
+    const char* exception = env->get_chars(env, stack, obj_exception);
+    
+    warn("LINE %d", __LINE__);
+    
+    spvm_warn("%s", exception);
+  }
+   
+  // coro_transfer(goroutine_context, goroutine_context_return_back);
   
   return;
 }

@@ -19,8 +19,7 @@ class TestCase::Go {
       warn("G1-0");
       Go::Goroutine->transfer($self->{goroutines}[1], $self->{goroutines}[2]);
       warn("G1-1");
-      Go::Goroutine->transfer($self->{goroutines}[1], $self->{goroutines}[0]);
-    }, $goroutine_return_back, );
+    }, $goroutine_return_back);
     
     $goroutines->[1] = $goroutine1;
     
@@ -33,9 +32,7 @@ class TestCase::Go {
     
     Go::Goroutine->transfer($goroutines->[0], $goroutines->[1]);
     
-    # Retrun back
-    
-    Go::Goroutine->transfer($goroutines->[0], $goroutines->[1]);
+    Go::Goroutine->transfer($goroutines->[0], $goroutines->[2]);
     
     warn("DESTROY");
     
