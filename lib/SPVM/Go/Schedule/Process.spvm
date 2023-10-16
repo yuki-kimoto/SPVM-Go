@@ -2,18 +2,17 @@
 # MIT License
 
 class Go::Schedule::Process {
-  use Go::Thread;
   use Go::Queue;
+  use Go::Coroutine;
+  use Go::Schedule::Thread;
   
   # Interfaces
   interface Go::Queue::Element;
   
   # Fields
-  has status : int;
-  
   has coroutine_queue : Go::Queue of Go::Coroutine;
   
-  has thread : Go::Shcdule::Thread;
+  has thread : Go::Schedule::Thread;
   
   has prev : rw Go::Queue::Element;
   
