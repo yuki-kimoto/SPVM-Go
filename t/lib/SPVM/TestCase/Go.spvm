@@ -6,19 +6,19 @@ class TestCase::Go {
   
   static method test_schedule : int () {
     
-    my $goroutine_start_callback_ref = [(Callback)undef];
+    my $goroutine_schedule_callback_ref = [(Callback)undef];
     
     my $goroutines = new Go::Goroutine[10];
       
-    $goroutine_start_callback_ref->[0] = [has goroutines : Go::Goroutine[] = $goroutines, has goroutine_start_callback_ref : Callback[] = $goroutine_start_callback_ref] method : void () {
+    $goroutine_schedule_callback_ref->[0] = [has goroutines : Go::Goroutine[] = $goroutines, has goroutine_schedule_callback_ref : Callback[] = $goroutine_schedule_callback_ref] method : void () {
       
       # die "Foo";
       
       my $goroutines = $self->{goroutines};
       
-      my $goroutine_start_callback = $self->{goroutine_start_callback_ref}->[0];
-      my $goroutine_start = Go::Goroutine->new($goroutine_start_callback);
-      $goroutines->[0] = $goroutine_start;
+      my $goroutine_schedule_callback = $self->{goroutine_schedule_callback_ref}->[0];
+      my $goroutine_schedule = Go::Goroutine->new($goroutine_schedule_callback);
+      $goroutines->[0] = $goroutine_schedule;
       
       my $goroutine1 = (Go::Goroutine)undef;
       
@@ -35,7 +35,7 @@ class TestCase::Go {
         Go::Goroutine->transfer($self->{goroutines}[1], $self->{goroutines}[0]);
         
         warn("G1-B");
-      }, $goroutine_start);
+      }, $goroutine_schedule);
       
       $goroutines->[1] = $goroutine1;
       
@@ -59,7 +59,7 @@ class TestCase::Go {
       
     };
     
-    $goroutine_start_callback_ref->[0]->();
+    $goroutine_schedule_callback_ref->[0]->();
     
     if ($goroutines->[0]->exception) {
       die $goroutines->[0]->exception;
