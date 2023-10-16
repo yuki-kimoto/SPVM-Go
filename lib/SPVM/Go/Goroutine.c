@@ -25,8 +25,29 @@ static void goroutine_handler (void* obj_self) {
   
   SPVM_VALUE* stack = env->new_stack(env);
   
+  env->set_field_object_by_name(env, stack, obj_self, "exception", NULL, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) {
+    
+    void* obj_exception = env->get_exception(env, stack);
+    
+    const char* exception = env->get_chars(env, stack, obj_exception);
+    
+    spvm_warn("%s", exception);
+  }
+  
+  env->set_field_int_by_name(env, stack, obj_self, "error_id", 0, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) {
+    
+    void* obj_exception = env->get_exception(env, stack);
+    
+    const char* exception = env->get_chars(env, stack, obj_exception);
+    
+    spvm_warn("%s", exception);
+  }
+  
   void* obj_callback = env->get_field_object_by_name(env, stack, obj_self, "callback", &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) {
+    
     void* obj_exception = env->get_exception(env, stack);
     
     const char* exception = env->get_chars(env, stack, obj_exception);
@@ -40,6 +61,8 @@ static void goroutine_handler (void* obj_self) {
   error_id = env->call_method(env, stack, method, 0);
   
   if (error_id) {
+    warn("LINE %d", __LINE__);
+    
     void* obj_exception = env->get_exception(env, stack);
     
     const char* exception = env->get_chars(env, stack, obj_exception);
@@ -56,7 +79,27 @@ static void goroutine_handler (void* obj_self) {
     
     const char* exception = env->get_chars(env, stack, obj_exception);
     
-    spvm_warn("%s", exception);
+    spvm_warn("%d %s", error_id, exception);
+    
+    env->set_field_object_by_name(env, stack, obj_self, "exception", obj_exception, &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) {
+      
+      void* obj_exception = env->get_exception(env, stack);
+      
+      const char* exception = env->get_chars(env, stack, obj_exception);
+      
+      spvm_warn("%s", exception);
+    }
+    
+    env->set_field_int_by_name(env, stack, obj_self, "error_id", error_id, &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) {
+      
+      void* obj_exception = env->get_exception(env, stack);
+      
+      const char* exception = env->get_chars(env, stack, obj_exception);
+      
+      spvm_warn("%s", exception);
+    }
   }
   
   coro_context* goroutine_context = pointer_items[0];

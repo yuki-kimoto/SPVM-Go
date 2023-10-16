@@ -19,6 +19,7 @@ class TestCase::Go {
       my $goroutine1 = (Go::Goroutine)undef;
       
       $goroutine1 = Go::Goroutine->new([has goroutines : Go::Goroutine[] = $goroutines] method : void () {
+      
         warn("G1-A");
         
         warn("G1-CallMethodStart");
