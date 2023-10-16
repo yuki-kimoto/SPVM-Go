@@ -13,7 +13,7 @@ class TestCase::Go {
     my $goroutine_schedule_ref = [(Go::Goroutine)undef];
     
     my $goroutines = new Go::Goroutine[10];
-      
+    
     $goroutine_schedule_callback_ref->[0] = [has goroutine_schedule_ref : Go::Goroutine[] = $goroutine_schedule_ref, has goroutines : Go::Goroutine[] = $goroutines, has goroutine_schedule_callback_ref : Callback[] = $goroutine_schedule_callback_ref] method : void () {
       
       # die "Foo";
@@ -53,11 +53,11 @@ class TestCase::Go {
     
     my $goroutine0 = (Go::Goroutine)undef;
     
-    $goroutine0 = Go::Goroutine->new([has goroutine_schedule_ref : Go::Goroutine[] = $goroutine_schedule_ref, has goroutines : Go::Goroutine[] = $goroutines] method : void () {
-      my $goroutine_schedule_ref = $self->{goroutine_schedule_ref};
+    $goroutine0 = Go::Goroutine->new([has schedule : Go::Schedule = $schedule, has goroutines : Go::Goroutine[] = $goroutines] method : void () {
       
-      my $goroutine_schedule = $goroutine_schedule_ref->[0];
-    
+      my $shcedule = $self->{schedule};
+      
+      my $goroutine_schedule = $shcedule->schedule_goroutine;
       
       # die "Foo";
       
