@@ -8,15 +8,15 @@ class Go::Schedule::Process {
   # Interfaces
   interface Go::Queue::Element;
   
-  has prev : rw Go::Queue::Element;
-  
-  has next : rw Go::Queue::Element;
-  
   # Fields
   has status : int;
   
-  has thread : Go::Thread;
-  
   has coroutine_queue : Go::Queue of Go::Coroutine;
+  
+  has thread : Go::Shcdule::Thread;
+  
+  has prev : rw Go::Queue::Element;
+  
+  has next : rw Go::Queue::Element;
   
 }
