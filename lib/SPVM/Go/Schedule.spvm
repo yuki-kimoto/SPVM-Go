@@ -16,9 +16,7 @@ class Go::Schedule {
   
   has io_poll : Go::IOPoll;
   
-  has schedule_goroutine : Go::Goroutine;
-  
-  has current_goroutine : rw Go::Goroutine;
+  has schedule_goroutine : rw Go::Goroutine;
   
   static method new : Go::Schedule () {
     
