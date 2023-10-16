@@ -18,14 +18,15 @@ class TestCase::Go {
       
       my $goroutine1 = (Go::Goroutine)undef;
       
-      my $goroutine2 = (Go::Goroutine)undef;
-      
       $goroutine1 = Go::Goroutine->new([has goroutines : Go::Goroutine[] = $goroutines] method : void () {
         warn("G1-A");
         
+        warn("G1-CallMethodStart");
         TestCase::Go->foo();
+        warn("G1-CallMethodEnd");
         
         Go::Goroutine->transfer($self->{goroutines}[1], $self->{goroutines}[0]);
+        
         warn("G1-B");
       }, $goroutine_start);
       
@@ -49,6 +50,6 @@ class TestCase::Go {
   }
   
   static method foo : void () {
-    warn "Call a method";
+    warn "G1-CallMethod";
   }
 }
