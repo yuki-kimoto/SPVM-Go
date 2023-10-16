@@ -24,9 +24,9 @@ class TestCase::Go {
       
       my $goroutine_schedule = $goroutine_schedule_ref->[0];
       
-      my $goroutine1 = (Go::Goroutine)undef;
+      my $goroutine0 = (Go::Goroutine)undef;
       
-      $goroutine1 = Go::Goroutine->new([has goroutine_schedule_ref : Go::Goroutine[] = $goroutine_schedule_ref, has goroutines : Go::Goroutine[] = $goroutines] method : void () {
+      $goroutine0 = Go::Goroutine->new([has goroutine_schedule_ref : Go::Goroutine[] = $goroutine_schedule_ref, has goroutines : Go::Goroutine[] = $goroutines] method : void () {
         my $goroutine_schedule_ref = $self->{goroutine_schedule_ref};
         
         my $goroutine_schedule = $goroutine_schedule_ref->[0];
@@ -45,7 +45,7 @@ class TestCase::Go {
         warn("G1-B");
       }, $goroutine_schedule);
       
-      $goroutines->[0] = $goroutine1;
+      $goroutines->[0] = $goroutine0;
       
       warn("GS-A");
       
