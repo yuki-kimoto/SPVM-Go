@@ -16,9 +16,7 @@ class TestCase::Go {
       
       my $goroutines = $self->{goroutines};
       
-      my $goroutine_schedule_callback = $self->{goroutine_schedule_callback_ref}->[0];
-      my $goroutine_schedule = Go::Goroutine->new($goroutine_schedule_callback);
-      $goroutines->[0] = $goroutine_schedule;
+      my $goroutine_schedule = $goroutines->[0];
       
       my $goroutine1 = (Go::Goroutine)undef;
       
@@ -59,6 +57,10 @@ class TestCase::Go {
       
     };
     
+    my $goroutine_schedule_callback = $goroutine_schedule_callback_ref->[0];
+    my $goroutine_schedule = Go::Goroutine->new($goroutine_schedule_callback);
+    $goroutines->[0] = $goroutine_schedule;
+      
     $goroutine_schedule_callback_ref->[0]->();
     
     if ($goroutines->[0]->exception) {
