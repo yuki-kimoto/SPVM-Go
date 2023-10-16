@@ -38,27 +38,27 @@ class TestCase::Go {
         TestCase::Go->foo();
         warn("G1-CallMethodEnd");
         
-        Go::Goroutine->transfer($self->{goroutines}[1], $goroutine_schedule);
+        Go::Goroutine->transfer($self->{goroutines}[0], $goroutine_schedule);
         
         warn("G1-B");
       }, $goroutine_schedule);
       
-      $goroutines->[1] = $goroutine1;
+      $goroutines->[0] = $goroutine1;
       
       warn("GS-A");
       
-      Go::Goroutine->transfer($goroutine_schedule, $goroutines->[1]);
+      Go::Goroutine->transfer($goroutine_schedule, $goroutines->[0]);
       
-      if ($goroutines->[1]->exception) {
-        die $goroutines->[1]->exception;
+      if ($goroutines->[0]->exception) {
+        die $goroutines->[0]->exception;
       }
       
       warn("GS-B");
       
-      Go::Goroutine->transfer($goroutine_schedule, $goroutines->[1]);
+      Go::Goroutine->transfer($goroutine_schedule, $goroutines->[0]);
       
-      if ($goroutines->[1]->exception) {
-        die $goroutines->[1]->exception;
+      if ($goroutines->[0]->exception) {
+        die $goroutines->[0]->exception;
       }
       
       warn("GS-C");
