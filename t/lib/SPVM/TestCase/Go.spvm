@@ -22,41 +22,22 @@ class TestCase::Go {
       
       $goroutine1 = Go::Goroutine->new([has goroutines : Go::Goroutine[] = $goroutines] method : void () {
         warn("G1-A");
-        Go::Goroutine->transfer($self->{goroutines}[1], $self->{goroutines}[2]);
+        Go::Goroutine->transfer($self->{goroutines}[1], $self->{goroutines}[0]);
         warn("G1-B");
       }, $goroutine_start);
       
       $goroutines->[1] = $goroutine1;
       
-      $goroutine2 = Go::Goroutine->new([has goroutines : Go::Goroutine[] = $goroutines] method : void () {
-        warn("G2-A");
-        Go::Goroutine->transfer($self->{goroutines}[2], $self->{goroutines}[1]);
-        warn("G2-B");
-      }, $goroutine_start);
-      
-      $goroutines->[2] = $goroutine2;
+      warn("G0-A");
       
       Go::Goroutine->transfer($goroutines->[0], $goroutines->[1]);
       
-      Go::Goroutine->transfer($goroutines->[0], $goroutines->[2]);
+      warn("G0-B");
       
-      warn("DESTROY");
-
-=pod
-
-      $goroutines->[0] = undef;
-      $goroutines->[1] = undef;
-      $goroutines->[2] = undef;
+      Go::Goroutine->transfer($goroutines->[0], $goroutines->[1]);
       
-      $goroutine_start = undef;
+      warn("G0-C");
       
-      $goroutine1 = undef;
-      
-      $goroutine2 = undef;
-
-=cut
-
-      warn("END");
     };
     
     $goroutine_start_callback_ref->[0]->();
