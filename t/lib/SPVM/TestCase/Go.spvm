@@ -24,25 +24,27 @@ class TestCase::Go {
       
       my $goroutines = $self->{goroutines};
       
-      my $goroutine = $goroutines->[0];
+      my $goroutine = $shcedule->dequeue_goroutine;
       
-      warn("GS-A");
-      
-      Go::Goroutine->transfer($goroutine_schedule, $goroutine);
-      
-      if ($goroutine->exception) {
-        die $goroutine->exception;
+      if ($goroutine) {
+        warn("GS-A");
+        
+        Go::Goroutine->transfer($goroutine_schedule, $goroutine);
+        
+        if ($goroutine->exception) {
+          die $goroutine->exception;
+        }
+        
+        warn("GS-B");
+        
+        Go::Goroutine->transfer($goroutine_schedule, $goroutine);
+        
+        if ($goroutine->exception) {
+          die $goroutine->exception;
+        }
+        
+        warn("GS-C");
       }
-      
-      warn("GS-B");
-      
-      Go::Goroutine->transfer($goroutine_schedule, $goroutine);
-      
-      if ($goroutine->exception) {
-        die $goroutine->exception;
-      }
-      
-      warn("GS-C");
       
     };
     
