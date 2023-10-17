@@ -27,8 +27,6 @@ class TestCase::Go {
       
       my $coroutine_schedule = $shcedule->schedule_coroutine;
       
-      # die "Foo";
-      
       while (1) {
         
         my $coroutine_tmp = (Go::Coroutine)$shcedule->coroutine_queue->dequeue;

@@ -52,6 +52,12 @@ class Go::Schedule {
     
     $self->{idle_thread_queue} = Go::Queue->new;
     
+    for (my $i = 0; $i < $processes_max; $i++) {
+      my $process = Go::Schedule::Process->new;
+      
+      $self->process_queue->enqueue($process);
+    }
+    
     return $self;
   }
   
