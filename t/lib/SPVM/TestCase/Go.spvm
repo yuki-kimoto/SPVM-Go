@@ -40,11 +40,7 @@ class TestCase::Go {
         $thread->set_coroutine($coroutine);
         
         if ($coroutine) {
-          warn("[Start]Transfer Schedule to other");
-          
           Go::Coroutine->transfer($coroutine_schedule, $coroutine);
-          
-          warn("[End]Transfer Schedule to other");
         }
         else {
           last;
