@@ -1,0 +1,28 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
+class Go::Schedule::Monitor::Callback {
+  use Go::Schedule::Machine;
+  
+  static method new : Go::Schedule::Monitor::Callback () {
+    
+    my $self = new Go::Schedule::Monitor::Callback;
+    
+    return $self;
+  }
+  
+  method : void () {
+    
+    while (1) {
+      my $machine = $self->{machine};
+      
+      unless ($machine) {
+        next;
+      }
+      
+      
+    }
+  }
+  
+  has machine : rw Go::Schedule::Machine;
+}

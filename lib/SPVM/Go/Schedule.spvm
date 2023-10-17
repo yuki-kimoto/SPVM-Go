@@ -5,6 +5,7 @@ class Go::Schedule {
   use Go::Coroutine;
   use Go::Schedule::Process;
   use Go::Schedule::Machine;
+  use Go::Schedule::Monitor;
   use Go::Queue;
   use Go::Poll;
   
@@ -19,6 +20,8 @@ class Go::Schedule {
   has idle_thread_queue : rw Go::Queue of Go::Schedule::Machine;
   
   has poll : rw Go::Poll;
+  
+  has monitor : rw Go::Schedule::Monitor;
   
   static method new : Go::Schedule () {
     
@@ -51,6 +54,8 @@ class Go::Schedule {
       
       $self->process_queue->enqueue($process);
     }
+    
+    $self->{monitor} = Go::Schedule::Monitor->new;
     
     return $self;
   }

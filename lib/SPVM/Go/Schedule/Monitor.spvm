@@ -1,0 +1,12 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
+class Go::Schedule::Monitor {
+  # Class Methods
+  static method new : Go::Schedule::Monitor () {
+    
+    my $self = new Go::Schedule::Monitor;
+    
+    return $self;
+  }
+}
