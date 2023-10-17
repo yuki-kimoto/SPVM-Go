@@ -33,10 +33,10 @@ lib/SPVM/Go/Schedule.pm
 lib/SPVM/Go/Schedule.spvm
 lib/SPVM/Go/Schedule/Callback.pm
 lib/SPVM/Go/Schedule/Callback.spvm
+lib/SPVM/Go/Schedule/Machine.pm
+lib/SPVM/Go/Schedule/Machine.spvm
 lib/SPVM/Go/Schedule/Process.pm
 lib/SPVM/Go/Schedule/Process.spvm
-lib/SPVM/Go/Schedule/Thread.pm
-lib/SPVM/Go/Schedule/Thread.spvm
 lib/SPVM/Go/Sync/RWMutex.c
 lib/SPVM/Go/Sync/RWMutex.config
 lib/SPVM/Go/Sync/RWMutex.pm

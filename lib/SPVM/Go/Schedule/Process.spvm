@@ -4,7 +4,7 @@
 class Go::Schedule::Process {
   use Go::Queue;
   use Go::Coroutine;
-  use Go::Schedule::Thread;
+  use Go::Schedule::Machine;
   use Go::Schedule;
   
   # Interfaces
@@ -15,7 +15,7 @@ class Go::Schedule::Process {
   
   has coroutine_queue : rw Go::Queue of Go::Coroutine;
   
-  has thread : Go::Schedule::Thread;
+  has machine : Go::Schedule::Machine;
   
   has next : rw Go::Queue::Element;
   
@@ -30,9 +30,9 @@ class Go::Schedule::Process {
     
     $self->{coroutine_queue} = $coroutine_queue;
     
-    my $thread = Go::Schedule::Thread->new;
+    my $machine = Go::Schedule::Machine->new;
     
-    $self->{thread} = $thread;
+    $self->{machine} = $machine;
     
     return $self;
   }

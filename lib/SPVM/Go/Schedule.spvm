@@ -4,7 +4,7 @@
 class Go::Schedule {
   use Go::Coroutine;
   use Go::Schedule::Process;
-  use Go::Schedule::Thread;
+  use Go::Schedule::Machine;
   use Go::Queue;
   use Go::IOPoll;
   
@@ -16,7 +16,7 @@ class Go::Schedule {
   
   has processes_max : rw int;
   
-  has idle_thread_queue : rw Go::Queue of Go::Schedule::Thread;
+  has idle_thread_queue : rw Go::Queue of Go::Schedule::Machine;
   
   has io_poll : rw Go::IOPoll;
   

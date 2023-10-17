@@ -1,4 +1,4 @@
-package SPVM::Go::Schedule::Thread;
+package SPVM::Go::Schedule::Machine;
 
 
 
@@ -6,15 +6,15 @@ package SPVM::Go::Schedule::Thread;
 
 =head1 Name
 
-SPVM::Go::Schedule::Thread - Short Description
+SPVM::Go::Schedule::Machine - Short Description
 
 =head1 Description
 
-Go::Schedule::Thread class of L<SPVM> has methods for someting.
+Go::Schedule::Machine class of L<SPVM> has methods for someting.
 
 =head1 Usage
 
-  use Go::Schedule::Thread;
+  use Go::Schedule::Machine;
 
 =head1 Fields
 

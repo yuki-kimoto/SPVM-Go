@@ -2,7 +2,7 @@
 # MIT License
 
 class Go::Schedule::Callback {
-  use Go::Schedule::Thread;
+  use Go::Schedule::Machine;
   
   static method new : Go::Schedule::Callback () {
     
@@ -14,13 +14,13 @@ class Go::Schedule::Callback {
   method : void () {
     
     while (1) {
-      my $thread = $self->{thread};
+      my $machine = $self->{machine};
       
-      unless ($thread) {
+      unless ($machine) {
         next;
       }
       
-      my $process = $thread->process;
+      my $process = $machine->process;
       
       my $shcedule = $process->schedule;
       
@@ -32,7 +32,7 @@ class Go::Schedule::Callback {
       
       my $coroutine = (Go::Coroutine)$process->coroutine_queue->dequeue;
       
-      $thread->set_coroutine($coroutine);
+      $machine->set_coroutine($coroutine);
       
       if ($coroutine) {
         Go::Coroutine->transfer($coroutine_schedule, $coroutine);
@@ -43,5 +43,5 @@ class Go::Schedule::Callback {
     }
   }
   
-  has thread : rw Go::Schedule::Thread;
+  has machine : rw Go::Schedule::Machine;
 }
