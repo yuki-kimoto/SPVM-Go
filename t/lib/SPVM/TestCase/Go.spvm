@@ -57,7 +57,6 @@ class TestCase::Go {
     };
     
     my $coroutine_schedule = Go::Coroutine->new($coroutine_schedule_callback);
-    $coroutine_schedule_ref->[0] = $coroutine_schedule;
     
     $schedule->set_schedule_coroutine($coroutine_schedule);
     
