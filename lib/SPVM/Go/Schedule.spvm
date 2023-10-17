@@ -8,17 +8,17 @@ class Go::Schedule {
   use Go::Queue;
   use Go::IOPoll;
   
-  has coroutine_queue : Go::Queue of Go::Coroutine;
+  has coroutine_queue : rw Go::Queue of Go::Coroutine;
   
-  has process_queue : Go::Queue of Go::Schedule::Process;
+  has process_queue : rw Go::Queue of Go::Schedule::Process;
   
-  has idle_process_queue : Go::Queue of Go::Schedule::Process;
+  has idle_process_queue : rw Go::Queue of Go::Schedule::Process;
   
   has processes_max : rw int;
   
-  has idle_thread_queue : Go::Queue of Go::Schedule::Thread;
+  has idle_thread_queue : rw Go::Queue of Go::Schedule::Thread;
   
-  has io_poll : Go::IOPoll;
+  has io_poll : rw Go::IOPoll;
   
   has schedule_coroutine : rw Go::Coroutine;
   
@@ -82,22 +82,6 @@ class Go::Schedule {
   }
   
   # Instance Methods
-  method enqueue_coroutine : void ($coroutine : Go::Coroutine) {
-    
-    my $coroutine_queue = $self->{coroutine_queue};
-    
-    $coroutine_queue->enqueue($coroutine);
-  }
-  
-  method dequeue_coroutine : Go::Coroutine () {
-    
-    my $coroutine_queue = $self->{coroutine_queue};
-    
-    my $coroutine = $coroutine_queue->dequeue;
-    
-    return (Go::Coroutine)$coroutine;
-  }
-  
   method schedule : void () {
     
     my $schedule_coroutine = $self->{schedule_coroutine};

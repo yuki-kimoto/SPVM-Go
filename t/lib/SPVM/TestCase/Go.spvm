@@ -31,7 +31,7 @@ class TestCase::Go {
       
       while (1) {
         
-        my $coroutine = $shcedule->dequeue_coroutine;
+        my $coroutine = (Go::Coroutine)$shcedule->coroutine_queue->dequeue;
         
         $thread->set_coroutine($coroutine);
         
@@ -72,13 +72,13 @@ class TestCase::Go {
       warn("G1-CallMethodEnd");
       
       my $current_coroutine = $thread->coroutine;
-      $shcedule->enqueue_coroutine($current_coroutine);
+      $shcedule->coroutine_queue->enqueue($current_coroutine);
       Go::Coroutine->transfer($current_coroutine, $coroutine_schedule);
       
       warn("G1-B");
     }, $coroutine_schedule);
     
-    $schedule->enqueue_coroutine($coroutine0);
+    $schedule->coroutine_queue->enqueue($coroutine0);
     
     $coroutine_schedule_callback->();
     
