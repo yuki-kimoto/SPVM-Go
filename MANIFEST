@@ -35,6 +35,10 @@ lib/SPVM/Go/Schedule/Callback.pm
 lib/SPVM/Go/Schedule/Callback.spvm
 lib/SPVM/Go/Schedule/Machine.pm
 lib/SPVM/Go/Schedule/Machine.spvm
+lib/SPVM/Go/Schedule/Monitor.pm
+lib/SPVM/Go/Schedule/Monitor.spvm
+lib/SPVM/Go/Schedule/Monitor/Callback.pm
+lib/SPVM/Go/Schedule/Monitor/Callback.spvm
 lib/SPVM/Go/Schedule/Process.pm
 lib/SPVM/Go/Schedule/Process.spvm
 lib/SPVM/Go/Sync/RWMutex.c
@@ -49,6 +53,8 @@ lib/SPVM/Go/Thread.pm
 lib/SPVM/Go/Thread.spvm
 lib/SPVM/Go/Thread/Callback.pm
 lib/SPVM/Go/Thread/Callback.spvm
+lib/SPVM/Go/Timer.pm
+lib/SPVM/Go/Timer.spvm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
