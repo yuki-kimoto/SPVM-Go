@@ -16,4 +16,11 @@ class Go::Schedule::Process {
   
   has next : rw Go::Queue::Element;
   
+  # Class Methods
+  static method new : Go::Schedule::Process () {
+    
+    my $self = new Go::Schedule::Process;
+    
+    return $self;
+  }
 }

@@ -8,11 +8,15 @@ class Go::Schedule {
   use Go::Queue;
   use Go::IOPoll;
   
-  has wait_coroutine_queue : Go::Queue of Go::Coroutine;
+  has coroutine_queue : Go::Queue of Go::Coroutine;
+  
+  has process_queue : Go::Queue of Go::Schedule::Process;
   
   has idle_process_queue : Go::Queue of Go::Schedule::Process;
   
-  has idle_thread_queue : Go::Queue of Go::Thread;
+  has processes_max : rw int;
+  
+  has idle_thread_queue : Go::Queue of Go::Schedule::Thread;
   
   has io_poll : Go::IOPoll;
   
@@ -24,9 +28,9 @@ class Go::Schedule {
     
     my $self = new Go::Schedule;
     
-    my $wait_coroutine_queue = Go::Queue->new;
+    my $coroutine_queue = Go::Queue->new;
     
-    $self->{wait_coroutine_queue} = $wait_coroutine_queue;
+    $self->{coroutine_queue} = $coroutine_queue;
     
     my $io_poll = Go::IOPoll->new;
     
@@ -36,6 +40,20 @@ class Go::Schedule {
     
     $self->{schedule_coroutine} = $schedule_coroutine;
     
+    my $processes_max = 1;
+    
+    $self->{processes_max} = $processes_max;
+    
+    my $process = Go::Schedule::Process->new;
+    
+    $self->{process_queue} = Go::Queue->new;
+    
+    $self->{process_queue}->enqueue($process);
+    
+    $self->{idle_process_queue} = Go::Queue->new;
+    
+    $self->{idle_thread_queue} = Go::Queue->new;
+    
     return $self;
   }
   
@@ -44,12 +62,12 @@ class Go::Schedule {
     my $schedule_callback : Callback;
     
     $schedule_callback =
-      [has wait_coroutine_queue : Go::Queue of Go::Coroutine = $self->{wait_coroutine_queue}]
+      [has coroutine_queue : Go::Queue of Go::Coroutine = $self->{coroutine_queue}]
       method : void () {
       while (1) {
-        my $wait_coroutine_queue = $self->{wait_coroutine_queue};
+        my $coroutine_queue = $self->{coroutine_queue};
         
-        my $wait_coroutine = $wait_coroutine_queue->dequeue;
+        my $wait_coroutine = $coroutine_queue->dequeue;
         
         if ($wait_coroutine) {
           
@@ -68,16 +86,16 @@ class Go::Schedule {
   # Instance Methods
   method enqueue_coroutine : void ($coroutine : Go::Coroutine) {
     
-    my $wait_coroutine_queue = $self->{wait_coroutine_queue};
+    my $coroutine_queue = $self->{coroutine_queue};
     
-    $wait_coroutine_queue->enqueue($coroutine);
+    $coroutine_queue->enqueue($coroutine);
   }
   
   method dequeue_coroutine : Go::Coroutine () {
     
-    my $wait_coroutine_queue = $self->{wait_coroutine_queue};
+    my $coroutine_queue = $self->{coroutine_queue};
     
-    my $coroutine = $wait_coroutine_queue->dequeue;
+    my $coroutine = $coroutine_queue->dequeue;
     
     return (Go::Coroutine)$coroutine;
   }
