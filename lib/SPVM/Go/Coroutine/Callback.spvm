@@ -2,7 +2,12 @@
 # MIT License
 
 class Go::Coroutine::Callback : interface_t {
+  use Go::Schedule::Thread;
   
   required method : void ();
+  
+  method thread : Go::Schedule::Thread ();
+  
+  method set_thread : void ($thread : Go::Schedule::Thread);
   
 }
