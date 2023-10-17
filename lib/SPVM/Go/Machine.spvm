@@ -21,7 +21,7 @@ class Go::Machine {
   
   has process : rw Go::Process;
   
-  has native_thread : rw Go::Thread;
+  has thread : rw Go::Thread;
   
   has coroutine : rw Go::Coroutine;
   
