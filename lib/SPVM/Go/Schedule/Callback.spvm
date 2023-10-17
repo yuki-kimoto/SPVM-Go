@@ -13,15 +13,18 @@ class Go::Schedule::Callback {
   
   method : void () {
     
-    my $thread = $self->{thread};
-    
-    my $process = $thread->process;
-    
-    my $shcedule =$process->schedule;
-    
-    my $coroutine_schedule = $shcedule->schedule_coroutine;
-    
     while (1) {
+      my $thread = $self->{thread};
+      
+      unless ($thread) {
+        next;
+      }
+      
+      my $process = $thread->process;
+      
+      my $shcedule = $process->schedule;
+      
+      my $coroutine_schedule = $shcedule->schedule_coroutine;
       
       my $coroutine_tmp = (Go::Coroutine)$shcedule->coroutine_queue->dequeue;
       

@@ -13,7 +13,7 @@ class Go::Schedule::Thread {
   # Fields
   has process : rw Go::Schedule::Process;
   
-  has thread : rw Go::Thread;
+  has native_thread : rw Go::Thread;
   
   has coroutine : rw Go::Coroutine;
   
