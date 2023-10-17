@@ -19,6 +19,8 @@ class Go::Schedule::Process {
   
   has next : rw Go::Queue::Element;
   
+  has schedule_coroutine : rw Go::Coroutine;
+  
   # Class Methods
   static method new : Go::Schedule::Process () {
     

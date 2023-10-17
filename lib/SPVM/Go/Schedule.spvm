@@ -34,10 +34,6 @@ class Go::Schedule {
     
     $self->{io_poll} = $io_poll;
     
-    my $schedule_coroutine = $self->create_schedule_coroutine;
-    
-    $self->{schedule_coroutine} = $schedule_coroutine;
-    
     my $processes_max = 1;
     
     $self->{processes_max} = $processes_max;
@@ -59,32 +55,6 @@ class Go::Schedule {
     }
     
     return $self;
-  }
-  
-  method create_schedule_coroutine : Go::Coroutine () {
-  
-    my $schedule_callback : Callback;
-    
-    $schedule_callback =
-      [has coroutine_queue : Go::Queue of Go::Coroutine = $self->{coroutine_queue}]
-      method : void () {
-      while (1) {
-        my $coroutine_queue = $self->{coroutine_queue};
-        
-        my $wait_coroutine = $coroutine_queue->dequeue;
-        
-        if ($wait_coroutine) {
-          
-        }
-        else {
-          
-        }
-      }
-    };
-    
-    my $schedule_coroutine = Go::Coroutine->new($schedule_callback);
-    
-    return $schedule_coroutine;
   }
   
   # Instance Methods
