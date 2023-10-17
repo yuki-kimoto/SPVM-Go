@@ -24,7 +24,7 @@ class Go::Schedule::Callback {
       
       my $shcedule = $process->schedule;
       
-      my $coroutine_schedule = $shcedule->schedule_coroutine;
+      my $coroutine_schedule = $process->schedule_coroutine;
       
       my $coroutine_tmp = (Go::Coroutine)$shcedule->coroutine_queue->dequeue;
       

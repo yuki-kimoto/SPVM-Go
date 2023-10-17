@@ -20,8 +20,6 @@ class Go::Schedule {
   
   has io_poll : rw Go::IOPoll;
   
-  has schedule_coroutine : rw Go::Coroutine;
-  
   static method new : Go::Schedule () {
     
     my $self = new Go::Schedule;
