@@ -7,10 +7,18 @@ class Go::Machine {
   use Go::Coroutine;
   use Callback;
   
+  enum {
+    TYPE_PROCESS_TASK,
+    TYPE_MONITOR_TASK,
+    TYPE_GENERAL_TASK,
+  }
+  
   # Interfaces
   interface Go::Queue::Element;
   
   # Fields
+  has type : int;
+  
   has process : rw Go::Process;
   
   has native_thread : rw Go::Thread;
