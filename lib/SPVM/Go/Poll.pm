@@ -1,4 +1,4 @@
-package SPVM::Go::IOPoll;
+package SPVM::Go::Poll;
 
 
 
@@ -6,15 +6,15 @@ package SPVM::Go::IOPoll;
 
 =head1 Name
 
-SPVM::Go::IOPoll - Short Description
+SPVM::Go::Poll - Short Description
 
 =head1 Description
 
-Go::IOPoll class of L<SPVM> has methods for someting.
+Go::Poll class of L<SPVM> has methods for someting.
 
 =head1 Usage
 
-  use Go::IOPoll;
+  use Go::Poll;
 
 =head1 Fields
 

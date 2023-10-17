@@ -23,8 +23,8 @@ lib/SPVM/Go/Coroutine.native/src/coro.c
 lib/SPVM/Go/Coroutine.pm
 lib/SPVM/Go/Coroutine.spvm
 lib/SPVM/Go/Coroutine/Callback.spvm
-lib/SPVM/Go/IOPoll.pm
-lib/SPVM/Go/IOPoll.spvm
+lib/SPVM/Go/Poll.pm
+lib/SPVM/Go/Poll.spvm
 lib/SPVM/Go/Queue.pm
 lib/SPVM/Go/Queue.spvm
 lib/SPVM/Go/Queue/Element.pm

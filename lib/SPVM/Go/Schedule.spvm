@@ -6,7 +6,7 @@ class Go::Schedule {
   use Go::Schedule::Process;
   use Go::Schedule::Machine;
   use Go::Queue;
-  use Go::IOPoll;
+  use Go::Poll;
   
   has coroutine_queue : rw Go::Queue of Go::Coroutine;
   
@@ -18,7 +18,7 @@ class Go::Schedule {
   
   has idle_thread_queue : rw Go::Queue of Go::Schedule::Machine;
   
-  has io_poll : rw Go::IOPoll;
+  has poll : rw Go::Poll;
   
   static method new : Go::Schedule () {
     
@@ -28,9 +28,9 @@ class Go::Schedule {
     
     $self->{coroutine_queue} = $coroutine_queue;
     
-    my $io_poll = Go::IOPoll->new;
+    my $poll = Go::Poll->new;
     
-    $self->{io_poll} = $io_poll;
+    $self->{poll} = $poll;
     
     my $processes_max = 1;
     
