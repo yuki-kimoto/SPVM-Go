@@ -3,25 +3,25 @@
 
 class Go::Schedule {
   use Go::Coroutine;
-  use Go::Schedule::Process;
-  use Go::Schedule::Machine;
-  use Go::Schedule::Monitor;
+  use Go::Process;
+  use Go::Machine;
+  use Go::Monitor;
   use Go::Queue;
   use Go::Poll;
   
   has coroutine_queue : rw Go::Queue of Go::Coroutine;
   
-  has process_queue : rw Go::Queue of Go::Schedule::Process;
+  has process_queue : rw Go::Queue of Go::Process;
   
-  has idle_process_queue : rw Go::Queue of Go::Schedule::Process;
+  has idle_process_queue : rw Go::Queue of Go::Process;
   
   has processes_max : rw int;
   
-  has idle_thread_queue : rw Go::Queue of Go::Schedule::Machine;
+  has idle_thread_queue : rw Go::Queue of Go::Machine;
   
   has poll : rw Go::Poll;
   
-  has monitor : rw Go::Schedule::Monitor;
+  has monitor : rw Go::Monitor;
   
   static method new : Go::Schedule () {
     
@@ -39,7 +39,7 @@ class Go::Schedule {
     
     $self->{processes_max} = $processes_max;
     
-    my $process = Go::Schedule::Process->new;
+    my $process = Go::Process->new;
     
     $self->{process_queue} = Go::Queue->new;
     
@@ -50,12 +50,12 @@ class Go::Schedule {
     $self->{idle_thread_queue} = Go::Queue->new;
     
     for (my $i = 0; $i < $processes_max; $i++) {
-      my $process = Go::Schedule::Process->new;
+      my $process = Go::Process->new;
       
       $self->process_queue->enqueue($process);
     }
     
-    $self->{monitor} = Go::Schedule::Monitor->new;
+    $self->{monitor} = Go::Monitor->new;
     
     return $self;
   }

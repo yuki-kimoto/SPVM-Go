@@ -1,4 +1,4 @@
-package SPVM::Go::Schedule::Monitor;
+package SPVM::Go::Monitor::Callback;
 
 
 
@@ -6,15 +6,15 @@ package SPVM::Go::Schedule::Monitor;
 
 =head1 Name
 
-SPVM::Go::Schedule::Monitor - Short Description
+SPVM::Go::Monitor::Callback - Short Description
 
 =head1 Description
 
-Go::Schedule::Monitor class of L<SPVM> has methods for someting.
+Go::Monitor::Callback class of L<SPVM> has methods for someting.
 
 =head1 Usage
 
-  use Go::Schedule::Monitor;
+  use Go::Monitor::Callback;
 
 =head1 Fields
 

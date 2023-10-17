@@ -1,10 +1,10 @@
 # Copyright (c) 2023 Yuki Kimoto
 # MIT License
 
-class Go::Schedule::Process {
+class Go::Process {
   use Go::Queue;
   use Go::Coroutine;
-  use Go::Schedule::Machine;
+  use Go::Machine;
   use Go::Schedule;
   
   # Interfaces
@@ -15,22 +15,22 @@ class Go::Schedule::Process {
   
   has coroutine_queue : rw Go::Queue of Go::Coroutine;
   
-  has machine : Go::Schedule::Machine;
+  has machine : Go::Machine;
   
   has next : rw Go::Queue::Element;
   
   has schedule_coroutine : rw Go::Coroutine;
   
   # Class Methods
-  static method new : Go::Schedule::Process () {
+  static method new : Go::Process () {
     
-    my $self = new Go::Schedule::Process;
+    my $self = new Go::Process;
     
     my $coroutine_queue = Go::Queue->new;
     
     $self->{coroutine_queue} = $coroutine_queue;
     
-    my $machine = Go::Schedule::Machine->new;
+    my $machine = Go::Machine->new;
     
     $self->{machine} = $machine;
     

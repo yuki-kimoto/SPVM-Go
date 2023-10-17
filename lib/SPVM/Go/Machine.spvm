@@ -1,9 +1,9 @@
 # Copyright (c) 2023 Yuki Kimoto
 # MIT License
 
-class Go::Schedule::Machine {
+class Go::Machine {
   use Go::Thread;
-  use Go::Schedule::Process;
+  use Go::Process;
   use Go::Coroutine;
   use Go::Thread::Callback;
   
@@ -11,7 +11,7 @@ class Go::Schedule::Machine {
   interface Go::Queue::Element;
   
   # Fields
-  has process : rw Go::Schedule::Process;
+  has process : rw Go::Process;
   
   has native_thread : rw Go::Thread;
   
@@ -20,9 +20,9 @@ class Go::Schedule::Machine {
   has next : rw Go::Queue::Element;
   
   # Class Methods
-  static method new : Go::Schedule::Machine () {
+  static method new : Go::Machine () {
     
-    my $self = new Go::Schedule::Machine;
+    my $self = new Go::Machine;
     
     return $self;
   }

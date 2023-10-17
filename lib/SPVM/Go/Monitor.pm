@@ -1,4 +1,4 @@
-package SPVM::Go::Schedule::Machine;
+package SPVM::Go::Monitor;
 
 
 
@@ -6,15 +6,15 @@ package SPVM::Go::Schedule::Machine;
 
 =head1 Name
 
-SPVM::Go::Schedule::Machine - Short Description
+SPVM::Go::Monitor - Short Description
 
 =head1 Description
 
-Go::Schedule::Machine class of L<SPVM> has methods for someting.
+Go::Monitor class of L<SPVM> has methods for someting.
 
 =head1 Usage
 
-  use Go::Schedule::Machine;
+  use Go::Monitor;
 
 =head1 Fields
 

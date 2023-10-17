@@ -1,12 +1,12 @@
 # Copyright (c) 2023 Yuki Kimoto
 # MIT License
 
-class Go::Schedule::Callback {
-  use Go::Schedule::Machine;
+class Go::Callback {
+  use Go::Machine;
   
-  static method new : Go::Schedule::Callback () {
+  static method new : Go::Callback () {
     
-    my $self = new Go::Schedule::Callback;
+    my $self = new Go::Callback;
     
     return $self;
   }
@@ -39,5 +39,5 @@ class Go::Schedule::Callback {
     }
   }
   
-  has machine : rw Go::Schedule::Machine;
+  has machine : rw Go::Machine;
 }

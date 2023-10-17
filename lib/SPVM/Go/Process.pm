@@ -1,4 +1,4 @@
-package SPVM::Go::Schedule::Process;
+package SPVM::Go::Process;
 
 
 
@@ -6,15 +6,15 @@ package SPVM::Go::Schedule::Process;
 
 =head1 Name
 
-SPVM::Go::Schedule::Process - Short Description
+SPVM::Go::Process - Short Description
 
 =head1 Description
 
-Go::Schedule::Process interface of L<SPVM> has interface methods for someting.
+Go::Process interface of L<SPVM> has interface methods for someting.
 
 =head1 Usage
 
-  interface Go::Schedule::Process;
+  interface Go::Process;
 
 =head1 Interface Methods
 
