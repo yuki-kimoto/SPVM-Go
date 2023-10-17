@@ -16,4 +16,11 @@ class Go::Schedule::Thread {
   
   has next : rw Go::Queue::Element;
   
+  # Class Methods
+  static method new : Go::Schedule::Thread () {
+    
+    my $self = new Go::Schedule::Thread;
+    
+    return $self;
+  }
 }

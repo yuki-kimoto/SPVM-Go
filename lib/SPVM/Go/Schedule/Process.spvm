@@ -21,6 +21,14 @@ class Go::Schedule::Process {
     
     my $self = new Go::Schedule::Process;
     
+    my $coroutine_queue = Go::Queue->new;
+    
+    $self->{coroutine_queue} = $coroutine_queue;
+    
+    my $thread = Go::Schedule::Thread->new;
+    
+    $self->{thread} = $thread;
+    
     return $self;
   }
 }
