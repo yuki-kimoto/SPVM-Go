@@ -2,6 +2,7 @@ class TestCase::Go {
   use Go;
   
   use Go::Schedule;
+  use Go::Schedule::Thread;
   use Go::Coroutine;
   
   static method test_schedule : int () {
@@ -12,9 +13,15 @@ class TestCase::Go {
     
     my $coroutine_schedule_ref = [(Go::Coroutine)undef];
     
-    $coroutine_schedule_callback = [has schedule : Go::Schedule = $schedule] method : void () {
+    my $thread = Go::Schedule::Thread->new;
+    
+    $thread->set_schedule($schedule);
+    
+    $coroutine_schedule_callback = [has thread : Go::Schedule::Thread = $thread] method : void () {
       
-      my $shcedule = $self->{schedule};
+      my $thread = $self->{thread};
+      
+      my $shcedule = $thread->schedule;
       
       my $coroutine_schedule = $shcedule->schedule_coroutine;
       
@@ -23,6 +30,8 @@ class TestCase::Go {
       while (1) {
         
         my $coroutine = $shcedule->dequeue_coroutine;
+        
+        $thread->set_coroutine($coroutine);
         
         $shcedule->set_current_coroutine($coroutine);
         
@@ -46,9 +55,11 @@ class TestCase::Go {
     
     my $coroutine0 = (Go::Coroutine)undef;
     
-    $coroutine0 = Go::Coroutine->new([has schedule : Go::Schedule = $schedule] method : void () {
+    $coroutine0 = Go::Coroutine->new([has thread : Go::Schedule::Thread = $thread] method : void () {
       
-      my $shcedule = $self->{schedule};
+      my $thread = $self->{thread};
+      
+      my $shcedule = $thread->schedule;
       
       my $coroutine_schedule = $shcedule->schedule_coroutine;
       
@@ -60,7 +71,7 @@ class TestCase::Go {
       TestCase::Go->foo();
       warn("G1-CallMethodEnd");
       
-      my $current_coroutine = $shcedule->current_coroutine;
+      my $current_coroutine = $thread->coroutine;
       $shcedule->enqueue_coroutine($current_coroutine);
       Go::Coroutine->transfer($current_coroutine, $coroutine_schedule);
       
