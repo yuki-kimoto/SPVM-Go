@@ -17,7 +17,7 @@ class Go::Schedule::Callback {
     
     my $process = $thread->process;
     
-    my $shcedule = $thread->schedule;
+    my $shcedule =$process->schedule;
     
     my $coroutine_schedule = $shcedule->schedule_coroutine;
     

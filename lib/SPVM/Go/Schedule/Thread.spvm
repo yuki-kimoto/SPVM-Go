@@ -11,8 +11,6 @@ class Go::Schedule::Thread {
   interface Go::Queue::Element;
   
   # Fields
-  has schedule : rw Go::Schedule;
-  
   has process : rw Go::Schedule::Process;
   
   has thread : rw Go::Thread;
