@@ -4,4 +4,5 @@
 class Go::Coroutine::Callback : interface_t {
   
   required method : void ();
+  
 }

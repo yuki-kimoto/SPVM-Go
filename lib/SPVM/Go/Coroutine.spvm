@@ -30,7 +30,7 @@ class Go::Coroutine : pointer {
   
   has running : byte;
   
-  has callback : Go::Coroutine::Callback;
+  has callback : rw Go::Coroutine::Callback;
   
   has exception : ro string;
   

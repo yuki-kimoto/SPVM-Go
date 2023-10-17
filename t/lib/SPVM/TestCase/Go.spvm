@@ -3,6 +3,7 @@ class TestCase::Go {
   
   use Go::Schedule;
   use Go::Schedule::Thread;
+  use Go::Schedule::Callback;
   use Go::Coroutine;
   
   static method test_schedule : int () {
@@ -17,35 +18,8 @@ class TestCase::Go {
     
     $thread->set_process($process);
     
-    my $coroutine_schedule_callback = [has thread : Go::Schedule::Thread] method : void () {
-      
-      my $thread = $self->{thread};
-      
-      my $process = $thread->process;
-      
-      my $shcedule = $thread->schedule;
-      
-      my $coroutine_schedule = $shcedule->schedule_coroutine;
-      
-      while (1) {
-        
-        my $coroutine_tmp = (Go::Coroutine)$shcedule->coroutine_queue->dequeue;
-        
-        $process->coroutine_queue->enqueue($coroutine_tmp);
-        
-        my $coroutine = (Go::Coroutine)$process->coroutine_queue->dequeue;
-        
-        $thread->set_coroutine($coroutine);
-        
-        if ($coroutine) {
-          Go::Coroutine->transfer($coroutine_schedule, $coroutine);
-        }
-        else {
-          last;
-        }
-      }
-    };
-    $coroutine_schedule_callback->{thread} = $thread;
+    my $coroutine_schedule_callback = Go::Schedule::Callback->new;
+    $coroutine_schedule_callback->set_thread($thread);
     
     my $coroutine_schedule = Go::Coroutine->new($coroutine_schedule_callback);
     

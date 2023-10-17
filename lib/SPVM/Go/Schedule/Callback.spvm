@@ -1,0 +1,44 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
+class Go::Schedule::Callback {
+  use Go::Schedule::Thread;
+  
+  static method new : Go::Schedule::Callback () {
+    
+    my $self = new Go::Schedule::Callback;
+    
+    return $self;
+  }
+  
+  method : void () {
+    
+    my $thread = $self->{thread};
+    
+    my $process = $thread->process;
+    
+    my $shcedule = $thread->schedule;
+    
+    my $coroutine_schedule = $shcedule->schedule_coroutine;
+    
+    while (1) {
+      
+      my $coroutine_tmp = (Go::Coroutine)$shcedule->coroutine_queue->dequeue;
+      
+      $process->coroutine_queue->enqueue($coroutine_tmp);
+      
+      my $coroutine = (Go::Coroutine)$process->coroutine_queue->dequeue;
+      
+      $thread->set_coroutine($coroutine);
+      
+      if ($coroutine) {
+        Go::Coroutine->transfer($coroutine_schedule, $coroutine);
+      }
+      else {
+        last;
+      }
+    }
+  }
+  
+  has thread : rw Go::Schedule::Thread;
+}
