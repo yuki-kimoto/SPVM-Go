@@ -4,9 +4,9 @@
 class Go::Queue {
   use Go::Queue::Element;
   
-  has first : Go::Queue::Element;
+  has first : rw Go::Queue::Element;
   
-  has last : Go::Queue::Element;
+  has last : rw Go::Queue::Element;
   
   static method new : Go::Queue () {
     
