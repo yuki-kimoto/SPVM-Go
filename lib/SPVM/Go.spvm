@@ -45,7 +45,6 @@ class Go {
     
     my $schedule = $GO->{schedule};
     
-    $schedule->schedule();
   }
   
 }

@@ -23,6 +23,8 @@ class TestCase::Go {
     
     my $coroutine_schedule = Go::Coroutine->new($coroutine_schedule_callback);
     
+    $process->set_schedule_coroutine($coroutine_schedule);
+    
     $schedule->set_schedule_coroutine($coroutine_schedule);
     
     my $coroutine0 = (Go::Coroutine)undef;
@@ -54,7 +56,7 @@ class TestCase::Go {
     
     $schedule->coroutine_queue->enqueue($coroutine0);
     
-    $coroutine_schedule_callback->();
+    $process->start_schedule;
     
     if ($coroutine0->exception) {
       die $coroutine0->exception;

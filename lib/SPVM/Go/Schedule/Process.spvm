@@ -36,4 +36,14 @@ class Go::Schedule::Process {
     
     return $self;
   }
+  
+  # Instance Methods
+  method start_schedule : void () {
+    
+    my $schedule_coroutine = $self->{schedule_coroutine};
+    
+    my $schedule_coroutine_callback = $schedule_coroutine->callback;
+    
+    $schedule_coroutine_callback->();
+  }
 }
