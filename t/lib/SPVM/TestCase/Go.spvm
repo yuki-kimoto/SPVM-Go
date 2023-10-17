@@ -9,8 +9,6 @@ class TestCase::Go {
     
     my $schedule = Go::Schedule->new;
     
-    my $coroutine_schedule_callback = (Callback)undef;
-    
     my $thread = Go::Schedule::Thread->new;
     
     $thread->set_schedule($schedule);
@@ -19,7 +17,7 @@ class TestCase::Go {
     
     $thread->set_process($process);
     
-    $coroutine_schedule_callback = [has thread : Go::Schedule::Thread = $thread] method : void () {
+    my $coroutine_schedule_callback = [has thread : Go::Schedule::Thread = $thread] method : void () {
       
       my $thread = $self->{thread};
       
