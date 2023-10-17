@@ -11,8 +11,6 @@ class TestCase::Go {
     
     my $coroutine_schedule_callback = (Callback)undef;
     
-    my $coroutine_schedule_ref = [(Go::Coroutine)undef];
-    
     my $thread = Go::Schedule::Thread->new;
     
     $thread->set_schedule($schedule);
