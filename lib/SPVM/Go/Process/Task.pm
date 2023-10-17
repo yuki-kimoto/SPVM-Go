@@ -1,4 +1,4 @@
-package SPVM::Go::Callback;
+package SPVM::Go::Process::Task;
 
 
 
@@ -6,15 +6,15 @@ package SPVM::Go::Callback;
 
 =head1 Name
 
-SPVM::Go::Callback - Short Description
+SPVM::Go::Process::Task - Short Description
 
 =head1 Description
 
-Go::Callback class of L<SPVM> has methods for someting.
+Go::Process::Task class of L<SPVM> has methods for someting.
 
 =head1 Usage
 
-  use Go::Callback;
+  use Go::Process::Task;
 
 =head1 Fields
 

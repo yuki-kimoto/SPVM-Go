@@ -8,8 +8,6 @@ coro-original/Coro_State.xs
 coro-original/EV.xs
 lib/SPVM/Go.pm
 lib/SPVM/Go.spvm
-lib/SPVM/Go/Callback.pm
-lib/SPVM/Go/Callback.spvm
 lib/SPVM/Go/Channel.pm
 lib/SPVM/Go/Channel.spvm
 lib/SPVM/Go/Channel/ReadCallback.pm
@@ -35,6 +33,8 @@ lib/SPVM/Go/Poll.pm
 lib/SPVM/Go/Poll.spvm
 lib/SPVM/Go/Process.pm
 lib/SPVM/Go/Process.spvm
+lib/SPVM/Go/Process/Task.pm
+lib/SPVM/Go/Process/Task.spvm
 lib/SPVM/Go/Queue.pm
 lib/SPVM/Go/Queue.spvm
 lib/SPVM/Go/Queue/Element.pm
@@ -51,8 +51,6 @@ lib/SPVM/Go/Thread.config
 lib/SPVM/Go/Thread.cpp
 lib/SPVM/Go/Thread.pm
 lib/SPVM/Go/Thread.spvm
-lib/SPVM/Go/Thread/Callback.pm
-lib/SPVM/Go/Thread/Callback.spvm
 lib/SPVM/Go/Timer.pm
 lib/SPVM/Go/Timer.spvm
 LICENSE
