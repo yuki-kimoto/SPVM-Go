@@ -3,7 +3,7 @@ class TestCase::Go {
   
   use Go::Schedule;
   use Go::Machine;
-  use Go::Callback;
+  use Go::Process::Task;
   use Go::Coroutine;
   
   static method test_schedule : int () {
@@ -18,12 +18,12 @@ class TestCase::Go {
     
     $machine->set_process($process);
     
-    my $schedule_coroutine_callback = Go::Callback->new;
-    $schedule_coroutine_callback->set_machine($machine);
+    my $process_task_callback = Go::Process::Task->new;
+    $process_task_callback->set_machine($machine);
     
-    my $schedule_coroutine = Go::Coroutine->new($schedule_coroutine_callback);
+    my $process_task_coroutine = Go::Coroutine->new($process_task_callback);
     
-    $process->set_schedule_coroutine($schedule_coroutine);
+    $process->set_task_coroutine($process_task_coroutine);
     
     my $coroutine0 = (Go::Coroutine)undef;
     
@@ -35,7 +35,7 @@ class TestCase::Go {
       
       my $shcedule = $process->schedule;
       
-      my $schedule_coroutine = $process->schedule_coroutine;
+      my $process_task_coroutine = $process->task_coroutine;
       
       # die "Foo";
       
@@ -47,14 +47,14 @@ class TestCase::Go {
       
       my $current_coroutine = $machine->coroutine;
       $process->coroutine_queue->enqueue($current_coroutine);
-      Go::Coroutine->transfer($current_coroutine, $schedule_coroutine);
+      Go::Coroutine->transfer($current_coroutine, $process_task_coroutine);
       
       warn("G1-B");
-    }, $schedule_coroutine);
+    }, $process_task_coroutine);
     
     $process->coroutine_queue->enqueue($coroutine0);
     
-    $process->start_schedule;
+    $process->start;
     
     if ($coroutine0->exception) {
       die $coroutine0->exception;

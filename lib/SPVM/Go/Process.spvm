@@ -19,7 +19,7 @@ class Go::Process {
   
   has next : rw Go::Queue::Element;
   
-  has schedule_coroutine : rw Go::Coroutine;
+  has task_coroutine : rw Go::Coroutine;
   
   # Class Methods
   static method new : Go::Process () {
@@ -38,12 +38,12 @@ class Go::Process {
   }
   
   # Instance Methods
-  method start_schedule : void () {
+  method start : void () {
     
-    my $schedule_coroutine = $self->{schedule_coroutine};
+    my $task_coroutine = $self->{task_coroutine};
     
-    my $schedule_coroutine_callback = $schedule_coroutine->callback;
+    my $task_callback = $task_coroutine->callback;
     
-    $schedule_coroutine_callback->();
+    $task_callback->();
   }
 }

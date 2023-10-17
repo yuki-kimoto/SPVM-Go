@@ -24,14 +24,14 @@ class Go::Process::Task {
       
       my $shcedule = $process->schedule;
       
-      my $schedule_coroutine = $process->schedule_coroutine;
+      my $task_coroutine = $process->task_coroutine;
       
       my $coroutine = (Go::Coroutine)$process->coroutine_queue->dequeue;
       
       $machine->set_coroutine($coroutine);
       
       if ($coroutine) {
-        Go::Coroutine->transfer($schedule_coroutine, $coroutine);
+        Go::Coroutine->transfer($task_coroutine, $coroutine);
       }
       else {
         last;
