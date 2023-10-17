@@ -17,6 +17,10 @@ class TestCase::Go {
     
     $thread->set_schedule($schedule);
     
+    my $process = Go::Schedule::Process->new;
+    
+    $thread->set_process($process);
+    
     $coroutine_schedule_callback = [has thread : Go::Schedule::Thread = $thread] method : void () {
       
       my $thread = $self->{thread};
@@ -31,7 +35,11 @@ class TestCase::Go {
       
       while (1) {
         
-        my $coroutine = (Go::Coroutine)$shcedule->coroutine_queue->dequeue;
+        my $coroutine_tmp = (Go::Coroutine)$shcedule->coroutine_queue->dequeue;
+        
+        $process->coroutine_queue->enqueue($coroutine_tmp);
+        
+        my $coroutine = (Go::Coroutine)$process->coroutine_queue->dequeue;
         
         $thread->set_coroutine($coroutine);
         
