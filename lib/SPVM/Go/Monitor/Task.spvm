@@ -1,12 +1,12 @@
 # Copyright (c) 2023 Yuki Kimoto
 # MIT License
 
-class Go::Monitor::Callback {
+class Go::Monitor::Task {
   use Go::Machine;
   
-  static method new : Go::Monitor::Callback () {
+  static method new : Go::Monitor::Task () {
     
-    my $self = new Go::Monitor::Callback;
+    my $self = new Go::Monitor::Task;
     
     return $self;
   }

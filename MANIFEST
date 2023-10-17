@@ -29,8 +29,8 @@ lib/SPVM/Go/Machine.pm
 lib/SPVM/Go/Machine.spvm
 lib/SPVM/Go/Monitor.pm
 lib/SPVM/Go/Monitor.spvm
-lib/SPVM/Go/Monitor/Callback.pm
-lib/SPVM/Go/Monitor/Callback.spvm
+lib/SPVM/Go/Monitor/Task.pm
+lib/SPVM/Go/Monitor/Task.spvm
 lib/SPVM/Go/Poll.pm
 lib/SPVM/Go/Poll.spvm
 lib/SPVM/Go/Process.pm
