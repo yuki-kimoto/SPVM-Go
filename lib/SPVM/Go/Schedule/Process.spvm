@@ -5,11 +5,14 @@ class Go::Schedule::Process {
   use Go::Queue;
   use Go::Coroutine;
   use Go::Schedule::Thread;
+  use Go::Schedule;
   
   # Interfaces
   interface Go::Queue::Element;
   
   # Fields
+  has schedule : rw Go::Schedule;
+  
   has coroutine_queue : Go::Queue of Go::Coroutine;
   
   has thread : Go::Schedule::Thread;

@@ -3,6 +3,7 @@
 
 class Go::Schedule::Thread {
   use Go::Thread;
+  use Go::Schedule::Process;
   use Go::Coroutine;
   use Go::Thread::Callback;
   
@@ -10,6 +11,10 @@ class Go::Schedule::Thread {
   interface Go::Queue::Element;
   
   # Fields
+  has schedule : rw Go::Schedule;
+  
+  has process : rw Go::Schedule::Process;
+  
   has thread : Go::Thread;
   
   has coroutine : Go::Coroutine;
