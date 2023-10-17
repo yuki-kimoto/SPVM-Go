@@ -21,6 +21,8 @@ class TestCase::Go {
       
       my $thread = $self->{thread};
       
+      my $process = $thread->process;
+      
       my $shcedule = $thread->schedule;
       
       my $coroutine_schedule = $shcedule->schedule_coroutine;
@@ -32,8 +34,6 @@ class TestCase::Go {
         my $coroutine = $shcedule->dequeue_coroutine;
         
         $thread->set_coroutine($coroutine);
-        
-        $shcedule->set_current_coroutine($coroutine);
         
         if ($coroutine) {
           warn("[Start]Transfer Schedule to other");

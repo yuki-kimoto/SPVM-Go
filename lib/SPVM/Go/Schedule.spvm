@@ -22,8 +22,6 @@ class Go::Schedule {
   
   has schedule_coroutine : rw Go::Coroutine;
   
-  has current_coroutine : rw Go::Coroutine;
-  
   static method new : Go::Schedule () {
     
     my $self = new Go::Schedule;
