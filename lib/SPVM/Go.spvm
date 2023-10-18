@@ -10,39 +10,14 @@ class Go {
   use Go::Channel;
   use Go::Schedule;
   
+  our $GO : Go;
+  
   has schedule : rw Go::Schedule;
   
   has process : rw Go::Process;
   
-  static method new : Go () {
-    
-    my $self = new Go;
-    
-    $self->init;
-    
-    return $self;
-  }
-  
-  method init : void () {
-    
-    my $schedule = Go::Schedule->new;
-    
-    $self->{schedule} = $schedule;
-    
-    my $process = (Go::Process)$schedule->process_queue->first;
-    
-    $process->set_schedule($schedule);
-    
-    $self->{process} = $process;
-    
-    my $process_task = Go::Process::Task->new;
-    
-    $process_task->set_process($process);
-    
-    my $process_task_coroutine = Go::Coroutine->new($process_task);
-    
-    $process->set_task_coroutine($process_task_coroutine);
-    
+  INIT {
+    $GO = new Go;
   }
   
   method go : void ($cb : Go::Coroutine::Task) {

@@ -7,18 +7,24 @@ class TestCase::Go {
   
   static method test_schedule : int () {
     
-    my $go = Go->new;
+    my $schedule = Go::Schedule->new;
     
-    my $process = $go->process;
+    my $process = (Go::Process)$schedule->process_queue->first;
     
-    my $process_task_coroutine = $process->task_coroutine;
+    $process->set_schedule($schedule);
     
-    my $process_task = $process->task_coroutine->callback;
+    my $process_task = Go::Process::Task->new;
+    
+    $process_task->set_process($process);
+    
+    my $process_task_coroutine = Go::Coroutine->new($process_task);
+    
+    $process->set_task_coroutine($process_task_coroutine);
     
     {
       my $machine_process_task = Go::Machine::ProcessTask->new;
       
-      $go->schedule->machine_queue->enqueue($machine_process_task);
+      $schedule->machine_queue->enqueue($machine_process_task);
       
       $machine_process_task->set_task($process_task);
       
@@ -27,7 +33,7 @@ class TestCase::Go {
       $machine_process_task->set_process($process);
     }
     
-    my $machine_process_task = (Go::Machine::ProcessTask)$go->schedule->machine_queue->first;
+    my $machine_process_task = (Go::Machine::ProcessTask)$schedule->machine_queue->first;
     
     my $coroutine0 = (Go::Coroutine)undef;
     
@@ -71,8 +77,6 @@ class TestCase::Go {
   }
   
   static method test : int () {
-    
-    my $go = Go->new;
     
     my $coroutine_start_callback_ref = [(Go::Task)undef];
     
