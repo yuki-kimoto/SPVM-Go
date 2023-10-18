@@ -2,6 +2,7 @@
 # MIT License
 
 class Go::Monitor::Task {
+  use Go;
   use Go::Machine;
   
   static method new : Go::Monitor::Task () {
@@ -11,7 +12,7 @@ class Go::Monitor::Task {
     return $self;
   }
   
-  method : void () {
+  method : void ($go : Go) {
     
     while (1) {
       my $machine = $self->{machine};

@@ -3,8 +3,9 @@
 
 class Go::Coroutine::Callback : interface_t {
   use Go::Machine;
+  use Go;
   
-  required method : void ();
+  required method : void ($go : Go);
   
   method thread : Go::Machine ();
   

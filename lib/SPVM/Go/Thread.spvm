@@ -1,7 +1,7 @@
 class Go::Thread {
-  use Callback;
+  use Go::Callback;
   
-  native static method new : Go::Thread ($callback : Callback);
+  native static method new : Go::Thread ($task : Go::Callback, $go : Go = undef);
   
   # Instance Method
   native method join : void ();
