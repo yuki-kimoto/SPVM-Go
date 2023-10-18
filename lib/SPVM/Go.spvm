@@ -5,7 +5,7 @@ class Go {
   version "0.001";
   
   use Go::Coroutine;
-  use Go::Coroutine::Callback;
+  use Go::Coroutine::Task;
   use Go::Channel::ReadCallback;
   use Go::Channel;
   use Go::Schedule;
@@ -44,7 +44,7 @@ class Go {
     
   }
   
-  method go : void ($cb : Go::Coroutine::Callback) {
+  method go : void ($cb : Go::Coroutine::Task) {
     
   }
   

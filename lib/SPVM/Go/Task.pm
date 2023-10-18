@@ -1,4 +1,4 @@
-package SPVM::Go::Callback;
+package SPVM::Go::Task;
 
 
 
@@ -6,15 +6,15 @@ package SPVM::Go::Callback;
 
 =head1 Name
 
-SPVM::Go::Callback - Short Description
+SPVM::Go::Task - Short Description
 
 =head1 Description
 
-Go::Callback interface of L<SPVM> has interface methods for someting.
+Go::Task interface of L<SPVM> has interface methods for someting.
 
 =head1 Usage
 
-  interface Go::Callback;
+  interface Go::Task;
 
 =head1 Interface Methods
 

@@ -1,7 +1,7 @@
 # Copyright (c) 2023 Yuki Kimoto
 # MIT License
 
-class Go::Coroutine::Callback : interface_t {
+class Go::Coroutine::Task : interface_t {
   use Go::Machine;
   use Go;
   

@@ -8,8 +8,6 @@ coro-original/Coro_State.xs
 coro-original/EV.xs
 lib/SPVM/Go.pm
 lib/SPVM/Go.spvm
-lib/SPVM/Go/Callback.pm
-lib/SPVM/Go/Callback.spvm
 lib/SPVM/Go/Channel.pm
 lib/SPVM/Go/Channel.spvm
 lib/SPVM/Go/Channel/ReadCallback.pm
@@ -24,7 +22,7 @@ lib/SPVM/Go/Coroutine.native/src/.gitkeep
 lib/SPVM/Go/Coroutine.native/src/coro.c
 lib/SPVM/Go/Coroutine.pm
 lib/SPVM/Go/Coroutine.spvm
-lib/SPVM/Go/Coroutine/Callback.spvm
+lib/SPVM/Go/Coroutine/Task.spvm
 lib/SPVM/Go/Global.pm
 lib/SPVM/Go/Global.spvm
 lib/SPVM/Go/Machine.pm
@@ -55,6 +53,8 @@ lib/SPVM/Go/Sync/RWMutex.pm
 lib/SPVM/Go/Sync/RWMutex.spvm
 lib/SPVM/Go/Sync/WaitGroup.pm
 lib/SPVM/Go/Sync/WaitGroup.spvm
+lib/SPVM/Go/Task.pm
+lib/SPVM/Go/Task.spvm
 lib/SPVM/Go/Thread.config
 lib/SPVM/Go/Thread.cpp
 lib/SPVM/Go/Thread.pm

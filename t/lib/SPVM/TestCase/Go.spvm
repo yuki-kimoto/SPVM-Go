@@ -62,11 +62,11 @@ class TestCase::Go {
     
     my $go = Go->new;
     
-    my $coroutine_start_callback_ref = [(Go::Callback)undef];
+    my $coroutine_start_callback_ref = [(Go::Task)undef];
     
     my $coroutines = new Go::Coroutine[10];
       
-    $coroutine_start_callback_ref->[0] = [has coroutines : Go::Coroutine[] = $coroutines, has coroutine_start_callback_ref : Go::Callback[] = $coroutine_start_callback_ref] method : void ($go : Go) {
+    $coroutine_start_callback_ref->[0] = [has coroutines : Go::Coroutine[] = $coroutines, has coroutine_start_callback_ref : Go::Task[] = $coroutine_start_callback_ref] method : void ($go : Go) {
       
       # die "Foo";
       

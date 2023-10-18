@@ -5,7 +5,7 @@ class Go::Machine {
   use Go::Thread;
   use Go::Process;
   use Go::Coroutine;
-  use Go::Callback;
+  use Go::Task;
   
   # Interfaces
   interface Go::Queue::Element;
@@ -15,7 +15,7 @@ class Go::Machine {
   
   has next : rw Go::Queue::Element;
   
-  has task : rw Go::Callback;
+  has task : rw Go::Task;
   
   # Instance Method
   method start : void () {
