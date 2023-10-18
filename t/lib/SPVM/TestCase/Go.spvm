@@ -15,13 +15,23 @@ class TestCase::Go {
     
     my $process_task = $process->task_coroutine->callback;
     
+    my $machine_process_task = Go::Machine::ProcessTask->new;
+    
+    $machine_process_task->set_task($process_task);
+    
+    $machine_process_task->set_schedule($process->schedule);
+    
+    $machine_process_task->set_process($process);
+    
     my $coroutine0 = (Go::Coroutine)undef;
     
-    $coroutine0 = Go::Coroutine->new([has process : Go::Process = $process] method : void () {
+    $coroutine0 = Go::Coroutine->new([has machine : Go::Machine = $machine_process_task] method : void () {
       
-      my $process = $self->{process};
+      my $machine = $self->{machine};
       
-      my $shcedule = $process->schedule;
+      my $shcedule = $machine->schedule;
+      
+      my $process = $machine->process;
       
       my $process_task_coroutine = $process->task_coroutine;
       
@@ -41,10 +51,6 @@ class TestCase::Go {
     }, $process_task_coroutine);
     
     $process->coroutine_queue->enqueue($coroutine0);
-    
-    my $machine_process_task = Go::Machine::ProcessTask->new;
-    
-    $machine_process_task->set_task($process_task);
     
     $machine_process_task->start;
     
