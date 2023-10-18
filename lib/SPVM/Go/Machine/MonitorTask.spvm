@@ -2,8 +2,5 @@
 # MIT License
 
 class Go::Machine::MonitorTask {
-  # Instance Method
-  method start : void () {
-    die "Not implemented.";
-  }
+  
 }

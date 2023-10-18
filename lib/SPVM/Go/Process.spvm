@@ -35,13 +35,4 @@ class Go::Process {
     return $self;
   }
   
-  # Instance Methods
-  method start : void () {
-    
-    my $task_coroutine = $self->{task_coroutine};
-    
-    my $task_callback = $task_coroutine->callback;
-    
-    $task_callback->();
-  }
 }

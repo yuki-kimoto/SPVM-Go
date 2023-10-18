@@ -15,8 +15,13 @@ class Go::Machine {
   
   has next : rw Go::Queue::Element;
   
+  has task : rw Callback;
+  
   # Instance Method
   method start : void () {
-    die "Not implemented.";
+    
+    my $task = $self->{task};
+    
+    $task->();
   }
 }

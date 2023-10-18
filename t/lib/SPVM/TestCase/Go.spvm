@@ -51,7 +51,9 @@ class TestCase::Go {
     
     my $machine_process_task = Go::Machine::ProcessTask->new;
     
-    $process->start;
+    $machine_process_task->set_task($process_task_callback);
+    
+    $machine_process_task->start;
     
     if ($coroutine0->exception) {
       die $coroutine0->exception;

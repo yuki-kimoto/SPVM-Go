@@ -11,8 +11,4 @@ class Go::Machine::ProcessTask extends Go::Machine {
     return $self;
   }
   
-  # Instance Method
-  method start : void () {
-    die "Not implemented.";
-  }
 }
