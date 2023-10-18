@@ -14,8 +14,6 @@ class Go {
   
   has schedule : rw Go::Schedule;
   
-  has process : rw Go::Process;
-  
   INIT {
     $GO = new Go;
   }
@@ -41,7 +39,19 @@ class Go {
   }
   
   method gosched : void () {
+    my $schedule = $self->{schedule};
     
+    my $machine = (Go::Machine::ProcessTask)$schedule->machine_queue->first;
+    
+    my $process = $machine->process;
+    
+    my $current_coroutine = $process->current_coroutine;
+    
+    $process->coroutine_queue->enqueue($current_coroutine);
+    
+    my $process_task_coroutine = $process->task_coroutine;
+    
+    Go::Coroutine->transfer($current_coroutine, $process_task_coroutine);
   }
   
 }
