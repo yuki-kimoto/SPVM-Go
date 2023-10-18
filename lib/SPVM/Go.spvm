@@ -8,6 +8,7 @@ class Go {
   use Go::Coroutine::Callback;
   use Go::Channel::ReadCallback;
   use Go::Channel;
+  use Go::Schedule;
   
   our $INITIALIZED : int;
   
@@ -15,7 +16,7 @@ class Go {
   
   has schedule : Go::Schedule;
   
-  has process : Go::Process;
+  has process : rw Go::Process;
   
   static method instance : Go () {
     
@@ -33,6 +34,14 @@ class Go {
   }
   
   method init : void () {
+    
+    my $schedule = Go::Schedule->new;
+    
+    my $process = (Go::Process)$schedule->process_queue->first;
+    
+    $process->set_schedule($schedule);
+    
+    $self->{process} = $process;
     
   }
   

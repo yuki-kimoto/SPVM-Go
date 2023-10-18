@@ -1,18 +1,15 @@
 class TestCase::Go {
   use Go;
   use Sys;
-  use Go::Schedule;
   use Go::Machine::ProcessTask;
   use Go::Process::Task;
   use Go::Coroutine;
   
   static method test_schedule : int () {
     
-    my $schedule = Go::Schedule->new;
+    my $go = Go->instance;
     
-    my $process = (Go::Process)$schedule->process_queue->first;
-    
-    $process->set_schedule($schedule);
+    my $process = $go->process;
     
     my $process_task_callback = Go::Process::Task->new;
     
