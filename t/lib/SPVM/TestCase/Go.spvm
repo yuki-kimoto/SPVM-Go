@@ -10,13 +10,9 @@ class TestCase::Go {
     
     my $schedule = Go::Schedule->new;
     
-    my $machine = Go::Machine->new(Go::Machine->TYPE_PROCESS_TASK);
-    
     my $process = (Go::Process)$schedule->process_queue->first;
     
     $process->set_schedule($schedule);
-    
-    $machine->set_process($process);
     
     my $process_task_callback = Go::Process::Task->new;
     
@@ -50,6 +46,10 @@ class TestCase::Go {
     }, $process_task_coroutine);
     
     $process->coroutine_queue->enqueue($coroutine0);
+    
+    my $machine = Go::Machine->new(Go::Machine->TYPE_PROCESS_TASK);
+    
+    $machine->set_process($process);
     
     $process_task_callback->set_machine($machine);
     
