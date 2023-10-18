@@ -9,16 +9,31 @@ class Go {
   use Go::Channel::ReadCallback;
   use Go::Channel;
   
+  our $INITIALIZED : int;
+  
   our $GO : Go;
   
   has schedule : Go::Schedule;
   
-  INIT {
-    $GO = new Go;
-  }
+  has process : Go::Process;
   
   static method instance : Go () {
+    
+    unless ($INITIALIZED) {
+      my $go = new Go;
+      
+      $go->init;
+      
+      $GO = $go;
+      
+      $INITIALIZED = 1;
+    }
+    
     return $GO;
+  }
+  
+  method init : void () {
+    
   }
   
   method go : void ($cb : Go::Coroutine::Callback) {
@@ -42,8 +57,6 @@ class Go {
   }
   
   method gosched : void () {
-    
-    my $schedule = $GO->{schedule};
     
   }
   
