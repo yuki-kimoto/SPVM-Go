@@ -11,13 +11,9 @@ class TestCase::Go {
     
     my $process = $go->process;
     
-    my $process_task_callback = Go::Process::Task->new;
+    my $process_task_coroutine = $process->task_coroutine;
     
-    $process_task_callback->set_process($process);
-    
-    my $process_task_coroutine = Go::Coroutine->new($process_task_callback);
-    
-    $process->set_task_coroutine($process_task_coroutine);
+    my $process_task_callback = $process->task_coroutine->callback;
     
     my $coroutine0 = (Go::Coroutine)undef;
     
