@@ -1,0 +1,18 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
+class Go::Machine::ProcessTask extends Go::Machine {
+  
+  # Class Methods
+  static method new : Go::Machine () {
+    
+    my $self = new Go::Machine::ProcessTask;
+    
+    return $self;
+  }
+  
+  # Instance Method
+  method start : void () {
+    die "Not implemented.";
+  }
+}

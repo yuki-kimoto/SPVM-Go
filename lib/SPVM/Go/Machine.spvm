@@ -7,26 +7,16 @@ class Go::Machine {
   use Go::Coroutine;
   use Callback;
   
-  enum {
-    TYPE_PROCESS_TASK,
-    TYPE_MONITOR_TASK,
-  }
-  
   # Interfaces
   interface Go::Queue::Element;
   
   # Fields
-  has type : int;
-  
   has thread : rw Go::Thread;
   
   has next : rw Go::Queue::Element;
   
-  # Class Methods
-  static method new : Go::Machine ($type : int) {
-    
-    my $self = new Go::Machine;
-    
-    return $self;
+  # Instance Method
+  method start : void () {
+    die "Not implemented.";
   }
 }

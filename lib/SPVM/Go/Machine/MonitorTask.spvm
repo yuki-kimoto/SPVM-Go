@@ -1,0 +1,9 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
+class Go::Machine::MonitorTask {
+  # Instance Method
+  method start : void () {
+    die "Not implemented.";
+  }
+}

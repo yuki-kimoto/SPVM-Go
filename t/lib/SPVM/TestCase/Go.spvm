@@ -2,7 +2,7 @@ class TestCase::Go {
   use Go;
   
   use Go::Schedule;
-  use Go::Machine;
+  use Go::Machine::ProcessTask;
   use Go::Process::Task;
   use Go::Coroutine;
   
@@ -49,7 +49,7 @@ class TestCase::Go {
     
     $process->coroutine_queue->enqueue($coroutine0);
     
-    my $machine = Go::Machine->new(Go::Machine->TYPE_PROCESS_TASK);
+    my $machine_process_task = Go::Machine::ProcessTask->new;
     
     $process->start;
     
