@@ -2,7 +2,6 @@
 # MIT License
 
 class Go::Task : interface_t {
-  use Go;
   
-  method : void ($go : Go);
+  method : void ();
 }

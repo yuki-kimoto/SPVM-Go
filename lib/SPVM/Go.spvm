@@ -9,7 +9,6 @@ class Go {
   use Go::Channel::ReadCallback;
   use Go::Channel;
   use Go::Schedule;
-  use Go::Process::Task;
   
   has schedule : Go::Schedule;
   

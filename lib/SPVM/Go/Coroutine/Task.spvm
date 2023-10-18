@@ -3,9 +3,8 @@
 
 class Go::Coroutine::Task : interface_t {
   use Go::Machine;
-  use Go;
   
-  required method : void ($go : Go);
+  required method : void ();
   
   method thread : Go::Machine ();
   

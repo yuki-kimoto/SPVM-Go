@@ -17,7 +17,7 @@ class TestCase::Go {
     
     my $coroutine0 = (Go::Coroutine)undef;
     
-    $coroutine0 = Go::Coroutine->new([has process : Go::Process = $process] method : void ($go : Go) {
+    $coroutine0 = Go::Coroutine->new([has process : Go::Process = $process] method : void () {
       
       my $process = $self->{process};
       
@@ -66,7 +66,7 @@ class TestCase::Go {
     
     my $coroutines = new Go::Coroutine[10];
       
-    $coroutine_start_callback_ref->[0] = [has coroutines : Go::Coroutine[] = $coroutines, has coroutine_start_callback_ref : Go::Task[] = $coroutine_start_callback_ref] method : void ($go : Go) {
+    $coroutine_start_callback_ref->[0] = [has coroutines : Go::Coroutine[] = $coroutines, has coroutine_start_callback_ref : Go::Task[] = $coroutine_start_callback_ref] method : void () {
       
       # die "Foo";
       
@@ -78,7 +78,7 @@ class TestCase::Go {
       
       my $coroutine1 = (Go::Coroutine)undef;
       
-      $coroutine1 = Go::Coroutine->new([has coroutines : Go::Coroutine[] = $coroutines] method : void ($go : Go) {
+      $coroutine1 = Go::Coroutine->new([has coroutines : Go::Coroutine[] = $coroutines] method : void () {
         
         # die "Foo";
         
@@ -115,7 +115,7 @@ class TestCase::Go {
       
     };
     
-    $coroutine_start_callback_ref->[0]->($go);
+    $coroutine_start_callback_ref->[0]->();
     
     if ($coroutines->[0]->exception) {
       die $coroutines->[0]->exception;

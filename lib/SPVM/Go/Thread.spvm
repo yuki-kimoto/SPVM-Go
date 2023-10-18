@@ -1,7 +1,7 @@
 class Go::Thread {
   use Go::Task;
   
-  native static method new : Go::Thread ($task : Go::Task, $go : Go = undef);
+  native static method new : Go::Thread ($task : Go::Task);
   
   # Instance Method
   native method join : void ();
