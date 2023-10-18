@@ -14,15 +14,8 @@ class Go::Process::Task {
   method : void () {
     
     while (1) {
-      my $machine = $self->{machine};
       
-      unless ($machine) {
-        next;
-      }
-      
-      my $process = $machine->process;
-      
-      my $shcedule = $process->schedule;
+      my $process = $self->{process};
       
       my $process_task_coroutine = $process->task_coroutine;
       
@@ -39,5 +32,5 @@ class Go::Process::Task {
     }
   }
   
-  has machine : rw Go::Machine;
+  has process : rw Go::Process;
 }

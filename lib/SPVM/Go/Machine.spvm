@@ -18,8 +18,6 @@ class Go::Machine {
   # Fields
   has type : int;
   
-  has process : rw Go::Process;
-  
   has thread : rw Go::Thread;
   
   has next : rw Go::Queue::Element;
