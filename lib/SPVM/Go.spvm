@@ -34,11 +34,11 @@ class Go {
     
     $self->{process} = $process;
     
-    my $process_task_callback = Go::Process::Task->new;
+    my $process_task = Go::Process::Task->new;
     
-    $process_task_callback->set_process($process);
+    $process_task->set_process($process);
     
-    my $process_task_coroutine = Go::Coroutine->new($process_task_callback);
+    my $process_task_coroutine = Go::Coroutine->new($process_task);
     
     $process->set_task_coroutine($process_task_coroutine);
     
