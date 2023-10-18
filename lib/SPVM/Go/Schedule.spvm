@@ -17,7 +17,9 @@ class Go::Schedule {
   
   has processes_max : rw int;
   
-  has idle_thread_queue : rw Go::Queue of Go::Machine;
+  has machine_queue : rw Go::Queue of Go::Machine;
+  
+  has idle_machine_queue : rw Go::Queue of Go::Machine;
   
   has poll : rw Go::Poll;
   
@@ -47,7 +49,9 @@ class Go::Schedule {
     
     $self->{idle_process_queue} = Go::Queue->new;
     
-    $self->{idle_thread_queue} = Go::Queue->new;
+    $self->{machine_queue} = Go::Queue->new;
+    
+    $self->{idle_machine_queue} = Go::Queue->new;
     
     for (my $i = 0; $i < $processes_max; $i++) {
       my $process = Go::Process->new;
