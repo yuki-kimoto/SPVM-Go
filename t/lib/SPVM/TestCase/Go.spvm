@@ -55,7 +55,7 @@ class TestCase::Go {
     
     $machine_process_task->start;
     
-    Sys->sleep(1);
+    $machine_process_task->thread->join;
     
     if ($coroutine0->exception) {
       die $coroutine0->exception;
