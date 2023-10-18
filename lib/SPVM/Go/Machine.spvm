@@ -22,6 +22,8 @@ class Go::Machine {
     
     my $task = $self->{task};
     
-    $task->();
+    my $thread = Go::Thread->new($task);
+    
+    $self->{thread} = $thread;
   }
 }

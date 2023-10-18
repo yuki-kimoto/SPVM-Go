@@ -1,6 +1,6 @@
 class TestCase::Go {
   use Go;
-  
+  use Sys;
   use Go::Schedule;
   use Go::Machine::ProcessTask;
   use Go::Process::Task;
@@ -54,6 +54,8 @@ class TestCase::Go {
     $machine_process_task->set_task($process_task_callback);
     
     $machine_process_task->start;
+    
+    Sys->sleep(1);
     
     if ($coroutine0->exception) {
       die $coroutine0->exception;
