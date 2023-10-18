@@ -10,36 +10,42 @@ class Go {
   use Go::Channel;
   use Go::Schedule;
   
-  our $GO : Go;
+  our $GO : rw Go;
   
   has schedule : rw Go::Schedule;
   
   INIT {
-    $GO = new Go;
+    my $go = new Go;
+    
+    my $schedule = Go::Schedule->new;
+    
+    $go->set_schedule($schedule);
+    
+    $GO = $go;
   }
   
-  method go : void ($cb : Go::Coroutine::Task) {
+  static method go : void ($cb : Go::Coroutine::Task) {
     
   }
   
-  method make : Go::Channel ($length : int = 0) {
+  static method make : Go::Channel ($length : int = 0) {
     
   }
   
-  method read : object () {
+  static method read : object () {
     
   }
   
-  method write : void ($data : object) {
+  static method write : void ($data : object) {
     
   }
   
-  method select : void ($cases : object[], $default : Go::Channel::ReadCallback = undef) {
+  static method select : void ($cases : object[], $default : Go::Channel::ReadCallback = undef) {
     
   }
   
-  method gosched : void () {
-    my $schedule = $self->{schedule};
+  static method gosched : void () {
+    my $schedule = $GO->{schedule};
     
     my $machine = (Go::Machine::ProcessTask)$schedule->machine_queue->first;
     

@@ -7,7 +7,7 @@ class TestCase::Go {
   
   static method test_schedule : int () {
     
-    my $schedule = Go::Schedule->new;
+    my $schedule = Go->GO->schedule;
     
     my $process = (Go::Process)$schedule->process_queue->first;
     
@@ -37,15 +37,7 @@ class TestCase::Go {
     
     my $coroutine0 = (Go::Coroutine)undef;
     
-    $coroutine0 = Go::Coroutine->new([has machine : Go::Machine = $machine_process_task] method : void () {
-      
-      my $machine = $self->{machine};
-      
-      my $shcedule = $machine->schedule;
-      
-      my $process = $machine->process;
-      
-      my $process_task_coroutine = $process->task_coroutine;
+    $coroutine0 = Go::Coroutine->new(method : void () {
       
       # die "Foo";
       
@@ -55,9 +47,7 @@ class TestCase::Go {
       TestCase::Go->foo();
       warn("G1-CallMethodEnd");
       
-      my $current_coroutine = $process->current_coroutine;
-      $process->coroutine_queue->enqueue($current_coroutine);
-      Go::Coroutine->transfer($current_coroutine, $process_task_coroutine);
+      Go->gosched;
       
       warn("G1-B");
     }, $process_task_coroutine);
