@@ -20,19 +20,15 @@ class TestCase::Go {
     
     my $process_task_callback = Go::Process::Task->new;
     
-    $process_task_callback->set_machine($machine);
-    
     my $process_task_coroutine = Go::Coroutine->new($process_task_callback);
     
     $process->set_task_coroutine($process_task_coroutine);
     
     my $coroutine0 = (Go::Coroutine)undef;
     
-    $coroutine0 = Go::Coroutine->new([has machine : Go::Machine = $machine] method : void () {
+    $coroutine0 = Go::Coroutine->new([has process : Go::Process = $process] method : void () {
       
-      my $machine = $self->{machine};
-      
-      my $process = $machine->process;
+      my $process = $self->{process};
       
       my $shcedule = $process->schedule;
       
@@ -46,7 +42,7 @@ class TestCase::Go {
       TestCase::Go->foo();
       warn("G1-CallMethodEnd");
       
-      my $current_coroutine = $machine->coroutine;
+      my $current_coroutine = $process->current_coroutine;
       $process->coroutine_queue->enqueue($current_coroutine);
       Go::Coroutine->transfer($current_coroutine, $process_task_coroutine);
       
@@ -54,6 +50,8 @@ class TestCase::Go {
     }, $process_task_coroutine);
     
     $process->coroutine_queue->enqueue($coroutine0);
+    
+    $process_task_callback->set_machine($machine);
     
     $process->start;
     

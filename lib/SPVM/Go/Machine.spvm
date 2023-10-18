@@ -23,8 +23,6 @@ class Go::Machine {
   
   has thread : rw Go::Thread;
   
-  has coroutine : rw Go::Coroutine;
-  
   has next : rw Go::Queue::Element;
   
   # Class Methods
