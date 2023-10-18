@@ -3,6 +3,7 @@
 
 class Go::Machine {
   use Go::Thread;
+  use Go::Schedule;
   use Go::Process;
   use Go::Coroutine;
   use Go::Task;
@@ -16,6 +17,8 @@ class Go::Machine {
   has next : rw Go::Queue::Element;
   
   has task : rw Go::Task;
+  
+  has schedule : rw Go::Schedule;
   
   has process : rw Go::Process;
   
