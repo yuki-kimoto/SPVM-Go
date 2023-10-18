@@ -10,27 +10,17 @@ class Go {
   use Go::Channel;
   use Go::Schedule;
   
-  our $INITIALIZED : int;
-  
-  our $GO : Go;
-  
   has schedule : Go::Schedule;
   
   has process : rw Go::Process;
   
-  static method instance : Go () {
+  static method new : Go () {
     
-    unless ($INITIALIZED) {
-      my $go = new Go;
-      
-      $go->init;
-      
-      $GO = $go;
-      
-      $INITIALIZED = 1;
-    }
+    my $self = new Go;
     
-    return $GO;
+    $self->init;
+    
+    return $self;
   }
   
   method init : void () {

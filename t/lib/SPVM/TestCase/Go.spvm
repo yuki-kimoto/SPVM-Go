@@ -7,7 +7,7 @@ class TestCase::Go {
   
   static method test_schedule : int () {
     
-    my $go = Go->instance;
+    my $go = Go->new;
     
     my $process = $go->process;
     
