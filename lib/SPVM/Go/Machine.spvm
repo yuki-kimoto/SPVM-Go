@@ -28,7 +28,7 @@ class Go::Machine {
   has next : rw Go::Queue::Element;
   
   # Class Methods
-  static method new : Go::Machine () {
+  static method new : Go::Machine ($type : int) {
     
     my $self = new Go::Machine;
     
