@@ -17,6 +17,8 @@ class Go::Machine {
   
   has task : rw Go::Task;
   
+  has process : rw Go::Process;
+  
   # Instance Method
   method start : void () {
     
