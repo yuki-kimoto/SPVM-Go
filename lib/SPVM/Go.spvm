@@ -10,7 +10,7 @@ class Go {
   use Go::Channel;
   use Go::Schedule;
   
-  has schedule : Go::Schedule;
+  has schedule : rw Go::Schedule;
   
   has process : rw Go::Process;
   
@@ -26,6 +26,8 @@ class Go {
   method init : void () {
     
     my $schedule = Go::Schedule->new;
+    
+    $self->{schedule} = $schedule;
     
     my $process = (Go::Process)$schedule->process_queue->first;
     

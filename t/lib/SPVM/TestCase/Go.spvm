@@ -15,13 +15,19 @@ class TestCase::Go {
     
     my $process_task = $process->task_coroutine->callback;
     
-    my $machine_process_task = Go::Machine::ProcessTask->new;
+    {
+      my $machine_process_task = Go::Machine::ProcessTask->new;
+      
+      $go->schedule->machine_queue->enqueue($machine_process_task);
+      
+      $machine_process_task->set_task($process_task);
+      
+      $machine_process_task->set_schedule($process->schedule);
+      
+      $machine_process_task->set_process($process);
+    }
     
-    $machine_process_task->set_task($process_task);
-    
-    $machine_process_task->set_schedule($process->schedule);
-    
-    $machine_process_task->set_process($process);
+    my $machine_process_task = (Go::Machine::ProcessTask)$go->schedule->machine_queue->first;
     
     my $coroutine0 = (Go::Coroutine)undef;
     
