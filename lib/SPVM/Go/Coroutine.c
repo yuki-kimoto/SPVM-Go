@@ -64,6 +64,7 @@ static void coroutine_handler (void* obj_self) {
   assert(error_id == 0);
   
   coro_transfer_tmp(coroutine_context, coroutine_context_return_back);
+  assert(0);
   
   return;
 }
