@@ -4,14 +4,11 @@
 class Go {
   version "0.001";
   
-  use Go;
-  use Go::Coroutine;
   use Go::Coroutine::Task;
   use Go::Channel::ReadCallback;
   use Go::Channel;
   use Go::Schedule;
   use Go::Machine::ProcessTask;
-  use Go::Process::Task;
   
   our $GO : Go;
   

@@ -8,6 +8,7 @@ class Go::Schedule {
   use Go::Monitor;
   use Go::Queue;
   use Go::Poll;
+  use Go::Process::Task;
   
   has finished : rw byte;
   
