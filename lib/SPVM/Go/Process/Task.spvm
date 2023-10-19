@@ -14,8 +14,6 @@ class Go::Process::Task {
   
   method : void () {
     
-    Sys->sleep(1);
-    
     while (1) {
       
       my $process = $self->{process};
@@ -28,9 +26,6 @@ class Go::Process::Task {
       
       if ($coroutine) {
         Go::Coroutine->transfer($process_task_coroutine, $coroutine);
-      }
-      else {
-        last;
       }
     }
   }
