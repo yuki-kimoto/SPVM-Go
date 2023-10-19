@@ -11,10 +11,6 @@ class TestCase::Go {
     
     my $machine_process_task = (Go::Machine::ProcessTask)$schedule->machine_queue->first;
     
-    my $process = $machine_process_task->process;
-    
-    my $process_task_coroutine = $process->task_coroutine;
-    
     Go->go(method : void () {
       
       # die "Foo";
