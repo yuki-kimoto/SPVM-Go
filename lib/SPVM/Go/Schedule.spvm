@@ -110,4 +110,17 @@ class Go::Schedule {
     
     Go::Coroutine->transfer($current_coroutine, $process_task_coroutine);
   }
+  
+  method add_task : void ($task : Go::Coroutine::Task) {
+    
+    my $machine = (Go::Machine::ProcessTask)$self->machine_queue->first;
+    
+    my $process = $machine->process;
+    
+    my $process_task_coroutine = $process->task_coroutine;
+    
+    my $coroutine = Go::Coroutine->new($task, $process_task_coroutine);
+    
+    $process->coroutine_queue->enqueue($coroutine);
+  }
 }

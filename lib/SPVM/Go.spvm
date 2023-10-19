@@ -31,15 +31,7 @@ class Go {
     
     my $schedule = $GO->{schedule};
     
-    my $machine = (Go::Machine::ProcessTask)$schedule->machine_queue->first;
-    
-    my $process = $machine->process;
-    
-    my $process_task_coroutine = $process->task_coroutine;
-    
-    my $coroutine = Go::Coroutine->new($task, $process_task_coroutine);
-    
-    $process->coroutine_queue->enqueue($coroutine);
+    $schedule->add_task($task);
   }
   
   static method make : Go::Channel ($length : int = 0) {
