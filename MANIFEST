@@ -47,10 +47,6 @@ lib/SPVM/Go/Queue/Element.pm
 lib/SPVM/Go/Queue/Element.spvm
 lib/SPVM/Go/Schedule.pm
 lib/SPVM/Go/Schedule.spvm
-lib/SPVM/Go/Sync/RWMutex.c
-lib/SPVM/Go/Sync/RWMutex.config
-lib/SPVM/Go/Sync/RWMutex.pm
-lib/SPVM/Go/Sync/RWMutex.spvm
 lib/SPVM/Go/Sync/WaitGroup.pm
 lib/SPVM/Go/Sync/WaitGroup.spvm
 lib/SPVM/Go/Task.pm
