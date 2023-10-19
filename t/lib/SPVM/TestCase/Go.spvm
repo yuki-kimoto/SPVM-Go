@@ -7,12 +7,6 @@ class TestCase::Go {
   
   static method test_schedule : int () {
     
-    my $schedule = Go->GO->schedule;
-    
-    my $machine_process_task = (Go::Machine::ProcessTask)$schedule->machine_queue->first;
-    
-    $machine_process_task->start;
-    
     Go->go(method : void () {
       
       # die "Foo";

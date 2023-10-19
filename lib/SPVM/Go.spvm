@@ -46,6 +46,11 @@ class Go {
     $go->set_schedule($schedule);
     
     $GO = $go;
+    
+    my $machine_process_task = (Go::Machine::ProcessTask)$schedule->machine_queue->first;
+    
+    $machine_process_task->start;
+    
   }
   
   static method go : void ($task : Go::Coroutine::Task) {

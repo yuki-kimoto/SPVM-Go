@@ -3,6 +3,7 @@
 
 class Go::Process::Task {
   use Go::Machine;
+  use Sys;
   
   static method new : Go::Process::Task () {
     
@@ -12,6 +13,8 @@ class Go::Process::Task {
   }
   
   method : void () {
+    
+    Sys->sleep(1);
     
     while (1) {
       
