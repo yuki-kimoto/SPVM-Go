@@ -2,5 +2,10 @@
 # MIT License
 
 class Go::Timer {
+  use Go::Coroutine;
+  
+  has after : int;
+  
+  has coroutine : Go::Coroutine;
   
 }
