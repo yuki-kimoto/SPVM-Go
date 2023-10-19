@@ -11,6 +11,8 @@ class TestCase::Go {
     
     my $machine_process_task = (Go::Machine::ProcessTask)$schedule->machine_queue->first;
     
+    $machine_process_task->start;
+    
     Go->go(method : void () {
       
       # die "Foo";
@@ -41,9 +43,9 @@ class TestCase::Go {
       warn("G1-B");
     });
     
-    $machine_process_task->start;
+    Sys->sleep(1);
     
-    $machine_process_task->thread->join;
+    # $machine_process_task->thread->join;
     
     warn("END");
     
