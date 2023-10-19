@@ -1,0 +1,72 @@
+class TestCase::Go::Coroutine {
+  use Go::Coroutine;
+  
+  static method transfer : int () {
+    
+    my $coroutine_start_task_ref = [(Go::Task)undef];
+    
+    my $coroutines = new Go::Coroutine[10];
+      
+    $coroutine_start_task_ref->[0] = [has coroutines : Go::Coroutine[] = $coroutines, has coroutine_start_task_ref : Go::Task[] = $coroutine_start_task_ref] method : void () {
+      
+      # die "Foo";
+      
+      my $coroutines = $self->{coroutines};
+      
+      my $coroutine_start_task = $self->{coroutine_start_task_ref}->[0];
+      my $coroutine_start = Go::Coroutine->new($coroutine_start_task);
+      $coroutines->[0] = $coroutine_start;
+      
+      my $coroutine1 = (Go::Coroutine)undef;
+      
+      $coroutine1 = Go::Coroutine->new([has coroutines : Go::Coroutine[] = $coroutines] method : void () {
+        
+        # die "Foo";
+        
+        warn("G1-A");
+        
+        warn("G1-CallMethodStart");
+        TestCase::Go::Coroutine->foo();
+        warn("G1-CallMethodEnd");
+        
+        Go::Coroutine->transfer($self->{coroutines}[1], $self->{coroutines}[0]);
+        
+        warn("G1-B");
+      }, $coroutine_start);
+      
+      $coroutines->[1] = $coroutine1;
+      
+      warn("G0-A");
+      
+      Go::Coroutine->transfer($coroutines->[0], $coroutines->[1]);
+      
+      if ($coroutines->[1]->exception) {
+        die $coroutines->[1]->exception;
+      }
+      
+      warn("G0-B");
+      
+      Go::Coroutine->transfer($coroutines->[0], $coroutines->[1]);
+      
+      if ($coroutines->[1]->exception) {
+        die $coroutines->[1]->exception;
+      }
+      
+      warn("G0-C");
+      
+    };
+    
+    $coroutine_start_task_ref->[0]->();
+    
+    if ($coroutines->[0]->exception) {
+      die $coroutines->[0]->exception;
+    }
+    warn("END");
+    
+    return 1;
+  }
+  
+  static method foo : void () {
+    warn "G1-CallMethod";
+  }
+}

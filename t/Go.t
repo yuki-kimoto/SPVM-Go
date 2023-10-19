@@ -12,9 +12,7 @@ use SPVM 'Go';
 use SPVM::Go;
 use SPVM 'Fn';
 
-ok(SPVM::TestCase::Go->test);
-
-ok(SPVM::TestCase::Go->test_schedule);
+ok(SPVM::TestCase::Go->go);
 
 # Version
 {
