@@ -15,9 +15,7 @@ class TestCase::Go {
     
     my $process_task_coroutine = $process->task_coroutine;
     
-    my $coroutine0 = (Go::Coroutine)undef;
-    
-    $coroutine0 = Go::Coroutine->new(method : void () {
+    my $coroutine0 = Go::Coroutine->new(method : void () {
       
       # die "Foo";
       
@@ -33,9 +31,7 @@ class TestCase::Go {
     }, $process_task_coroutine);
     $process->coroutine_queue->enqueue($coroutine0);
     
-    my $coroutine1 = (Go::Coroutine)undef;
-    
-    $coroutine1 = Go::Coroutine->new(method : void () {
+    my $coroutine1 = Go::Coroutine->new(method : void () {
       
       # die "Foo";
       
