@@ -9,31 +9,11 @@ class TestCase::Go {
     
     my $schedule = Go->GO->schedule;
     
-    my $process = (Go::Process)$schedule->process_queue->first;
-    
-    $process->set_schedule($schedule);
-    
-    my $process_task = Go::Process::Task->new;
-    
-    $process_task->set_process($process);
-    
-    my $process_task_coroutine = Go::Coroutine->new($process_task);
-    
-    $process->set_task_coroutine($process_task_coroutine);
-    
-    {
-      my $machine_process_task = Go::Machine::ProcessTask->new;
-      
-      $schedule->machine_queue->enqueue($machine_process_task);
-      
-      $machine_process_task->set_task($process_task);
-      
-      $machine_process_task->set_schedule($process->schedule);
-      
-      $machine_process_task->set_process($process);
-    }
-    
     my $machine_process_task = (Go::Machine::ProcessTask)$schedule->machine_queue->first;
+    
+    my $process = $machine_process_task->process;
+    
+    my $process_task_coroutine = $process->task_coroutine;
     
     my $coroutine0 = (Go::Coroutine)undef;
     
