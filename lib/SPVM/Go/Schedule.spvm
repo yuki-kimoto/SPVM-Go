@@ -95,4 +95,19 @@ class Go::Schedule {
   method DESTROY : void () {
     # $machine_process_task->thread->join;
   }
+  
+  method schedule : void () {
+    
+    my $machine = (Go::Machine::ProcessTask)$self->machine_queue->first;
+    
+    my $process = $machine->process;
+    
+    my $current_coroutine = $process->current_coroutine;
+    
+    $process->coroutine_queue->enqueue($current_coroutine);
+    
+    my $process_task_coroutine = $process->task_coroutine;
+    
+    Go::Coroutine->transfer($current_coroutine, $process_task_coroutine);
+  }
 }
