@@ -48,8 +48,19 @@ class Go {
     $GO = $go;
   }
   
-  static method go : void ($cb : Go::Coroutine::Task) {
+  static method go : void ($task : Go::Coroutine::Task) {
     
+    my $schedule = $GO->{schedule};
+    
+    my $machine = (Go::Machine::ProcessTask)$schedule->machine_queue->first;
+    
+    my $process = $machine->process;
+    
+    my $process_task_coroutine = $process->task_coroutine;
+    
+    my $coroutine = Go::Coroutine->new($task, $process_task_coroutine);
+    
+    $process->coroutine_queue->enqueue($coroutine);
   }
   
   static method make : Go::Channel ($length : int = 0) {
