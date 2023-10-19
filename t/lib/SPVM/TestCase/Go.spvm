@@ -39,10 +39,6 @@ class TestCase::Go {
     
     Sys->sleep(1);
     
-    Go->GO->schedule->set_finished(1);
-    
-    Go->GO->schedule->machine_queue->first->(Go::Machine::ProcessTask)->thread->join;
-    
     warn("END");
     
     return 1;

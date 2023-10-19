@@ -4,6 +4,7 @@
 class Go {
   version "0.001";
   
+  use Go;
   use Go::Coroutine;
   use Go::Coroutine::Task;
   use Go::Channel::ReadCallback;
@@ -100,5 +101,12 @@ class Go {
     Go::Coroutine->transfer($current_coroutine, $process_task_coroutine);
   }
   
+  method DESTROY : void () {
+    
+    $self->schedule->set_finished(1);
+    
+    $self->schedule->machine_queue->first->(Go::Machine::ProcessTask)->thread->join;
+    
+  }
 }
 
