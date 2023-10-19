@@ -9,6 +9,8 @@ class Go::Schedule {
   use Go::Queue;
   use Go::Poll;
   
+  has finished : rw byte;
+  
   has coroutine_queue : rw Go::Queue of Go::Coroutine;
   
   has process_queue : rw Go::Queue of Go::Process;

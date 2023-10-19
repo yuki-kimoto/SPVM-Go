@@ -18,6 +18,12 @@ class Go::Process::Task {
       
       my $process = $self->{process};
       
+      my $schedule = $process->schedule;
+      
+      if ($schedule->finished) {
+        last;
+      }
+      
       my $process_task_coroutine = $process->task_coroutine;
       
       my $coroutine = (Go::Coroutine)$process->coroutine_queue->dequeue;
@@ -28,6 +34,7 @@ class Go::Process::Task {
         Go::Coroutine->transfer($process_task_coroutine, $coroutine);
       }
     }
+    
   }
   
   has process : rw Go::Process;
