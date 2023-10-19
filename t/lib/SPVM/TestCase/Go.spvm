@@ -39,8 +39,6 @@ class TestCase::Go {
     
     Sys->sleep(1);
     
-    # $machine_process_task->thread->join;
-    
     warn("END");
     
     return 1;
