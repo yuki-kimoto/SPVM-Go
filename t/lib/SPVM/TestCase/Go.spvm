@@ -85,18 +85,18 @@ class TestCase::Go {
   
   static method test : int () {
     
-    my $coroutine_start_callback_ref = [(Go::Task)undef];
+    my $coroutine_start_task_ref = [(Go::Task)undef];
     
     my $coroutines = new Go::Coroutine[10];
       
-    $coroutine_start_callback_ref->[0] = [has coroutines : Go::Coroutine[] = $coroutines, has coroutine_start_callback_ref : Go::Task[] = $coroutine_start_callback_ref] method : void () {
+    $coroutine_start_task_ref->[0] = [has coroutines : Go::Coroutine[] = $coroutines, has coroutine_start_task_ref : Go::Task[] = $coroutine_start_task_ref] method : void () {
       
       # die "Foo";
       
       my $coroutines = $self->{coroutines};
       
-      my $coroutine_start_callback = $self->{coroutine_start_callback_ref}->[0];
-      my $coroutine_start = Go::Coroutine->new($coroutine_start_callback);
+      my $coroutine_start_task = $self->{coroutine_start_task_ref}->[0];
+      my $coroutine_start = Go::Coroutine->new($coroutine_start_task);
       $coroutines->[0] = $coroutine_start;
       
       my $coroutine1 = (Go::Coroutine)undef;
@@ -138,7 +138,7 @@ class TestCase::Go {
       
     };
     
-    $coroutine_start_callback_ref->[0]->();
+    $coroutine_start_task_ref->[0]->();
     
     if ($coroutines->[0]->exception) {
       die $coroutines->[0]->exception;

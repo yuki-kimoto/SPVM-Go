@@ -30,7 +30,7 @@ class Go::Coroutine : pointer {
   
   has running : byte;
   
-  has callback : rw Go::Coroutine::Task;
+  has task : rw Go::Coroutine::Task;
   
   has exception : ro string;
   
@@ -39,11 +39,11 @@ class Go::Coroutine : pointer {
   has next : rw Go::Queue::Element;
   
   # Class Methods
-  static method new : Go::Coroutine ($callback :  Go::Coroutine::Task = undef, $return_back : Go::Coroutine = undef) {
+  static method new : Go::Coroutine ($task :  Go::Coroutine::Task = undef, $return_back : Go::Coroutine = undef) {
     
     my $self = new Go::Coroutine;
     
-    $self->{callback} = $callback;
+    $self->{task} = $task;
     
     $self->{return_back} = $return_back;
     

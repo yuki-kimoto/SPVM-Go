@@ -32,12 +32,12 @@ static void coroutine_handler (void* obj_self) {
   env->set_field_int_by_name(env, stack, obj_self, "error_id", 0, &error_id, __func__, FILE_NAME, __LINE__);
   assert(error_id == 0);
   
-  void* obj_callback = env->get_field_object_by_name(env, stack, obj_self, "callback", &error_id, __func__, FILE_NAME, __LINE__);
+  void* obj_task = env->get_field_object_by_name(env, stack, obj_self, "task", &error_id, __func__, FILE_NAME, __LINE__);
   assert(error_id == 0);
   
-  void* method = env->get_instance_method(env, stack, obj_callback, "");
+  void* method = env->get_instance_method(env, stack, obj_task, "");
   
-  stack[0].oval = obj_callback;
+  stack[0].oval = obj_task;
   error_id = env->call_method(env, stack, method, 0);
   
   if (error_id) {
@@ -75,12 +75,12 @@ int32_t SPVM__Go__Coroutine__init_coroutine(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void* obj_self = stack[0].oval;
   
-  void* obj_callback = env->get_field_object_by_name(env, stack, obj_self, "callback", &error_id, __func__, FILE_NAME, __LINE__);
+  void* obj_task = env->get_field_object_by_name(env, stack, obj_self, "task", &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
   
   coro_context* coroutine_context = env->new_memory_block(env, stack, sizeof(coro_context));
   struct coro_stack* coroutine_stack = NULL;
-  if (obj_callback) {
+  if (obj_task) {
     int32_t coroutine_stack_size = 1024 * sizeof(void*);
     coroutine_stack = env->new_memory_block(env, stack, coroutine_stack_size);
     
