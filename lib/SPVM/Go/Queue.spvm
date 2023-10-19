@@ -16,10 +16,9 @@ class Go::Queue {
   }
   
   method enqueue : void ($element : Go::Queue::Element) {
-    if ($self->{first}) {
-      my $next = $self->{first};
-      $element->set_next($next);
-      $self->{first} = $element;
+    if (my $last = $self->{last}) {
+      $last->set_next($element);
+      $self->{last} = $element;
     }
     else {
       $self->{first} = $element;
