@@ -15,14 +15,14 @@ class Go {
   
   our $GO : rw Go;
   
-  has schedule : rw Go::Schedule;
+  has schedule : Go::Schedule;
   
   INIT {
     my $go = new Go;
     
     my $schedule = Go::Schedule->new;
     
-    $go->set_schedule($schedule);
+    $go->{schedule} = $schedule;
     
     $GO = $go;
   }
@@ -59,9 +59,11 @@ class Go {
   
   method DESTROY : void () {
     
-    $self->schedule->set_finished(1);
+    my $schedule = $self->{schedule};
     
-    $self->schedule->machine_queue->first->(Go::Machine::ProcessTask)->thread->join;
+    $schedule->set_finished(1);
+    
+    $schedule->machine_queue->first->(Go::Machine::ProcessTask)->thread->join;
     
   }
 }
