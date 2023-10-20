@@ -5,7 +5,11 @@ class TestCase::Go {
   
   static method go : int () {
     
-    Go->go(method : void () {
+    my $wg = Go::Sync::WaitGroup->new;
+    
+    $wg->add(2);
+    
+    Go->go([has wg : Go::Sync::WaitGroup = $wg] method : void () {
       
       # die "Foo";
       
@@ -18,9 +22,11 @@ class TestCase::Go {
       Go->gosched;
       
       warn("G0-B");
+      
+      $self->{wg}->done;
     });
     
-    Go->go(method : void () {
+    Go->go([has wg : Go::Sync::WaitGroup = $wg] method : void () {
       
       # die "Foo";
       
@@ -33,8 +39,11 @@ class TestCase::Go {
       Go->gosched;
       
       warn("G1-B");
+      
+      $self->{wg}->done;
     });
     
+    # $wg->wait;
     Sys->sleep(1);
     
     warn("END");

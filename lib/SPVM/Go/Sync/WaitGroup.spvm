@@ -52,10 +52,15 @@ class Go::Sync::WaitGroup {
       my $state = $self->{state};
       
       if ($state == 0) {
+        
         return;
       }
       
+      warn;
+      
       Go->gosched;
+      
+      warn;
     }
   }
 }
