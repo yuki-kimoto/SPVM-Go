@@ -6,7 +6,6 @@ class Go::Process {
   use Go::Coroutine;
   use Go::Machine;
   use Go::Schedule;
-  use Go::Timer;
   
   # Interfaces
   interface Go::Queue::Element;
@@ -23,8 +22,6 @@ class Go::Process {
   has next : rw Go::Queue::Element;
   
   has task_coroutine : rw Go::Coroutine;
-  
-  has timer_queue : Go::Queue of Go::Timer;
   
   # Class Methods
   static method new : Go::Process () {
