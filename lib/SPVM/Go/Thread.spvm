@@ -1,15 +1,15 @@
 class Go::Thread : pointer {
-  use Go::Task;
+  use Callback;
   
   # Fields
   has exception : ro string;
   
   has error_id : ro int;
   
-  has task : Go::Task;
+  has task : Callback;
   
   # Class Methods
-  static method new : Go::Thread ($task : Go::Task) {
+  static method new : Go::Thread ($task : Callback) {
     
     my $self = new Go::Thread;
     
