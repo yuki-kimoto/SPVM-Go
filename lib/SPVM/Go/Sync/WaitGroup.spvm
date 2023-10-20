@@ -2,18 +2,19 @@
 # MIT License
 
 class Go::Sync::WaitGroup {
-  use Go::Sync::RWMutex;
+  use Go;
+  use Sync::Mutex;
   
   has state : int;
   
-  has mutex : Go::Sync::RWMutex;
+  has mutex : Sync::Mutex;
   
   # Class Methods
   static method new : Go::Sync::WaitGroup () {
     
     my $self = new Go::Sync::WaitGroup;
     
-    $self->{mutex} = Go::Sync::RWMutex->new;
+    $self->{mutex} = Sync::Mutex->new;
     
     return $self;
   }
@@ -41,16 +42,20 @@ class Go::Sync::WaitGroup {
   }
   
   method done : void () {
+    
     $self->add(-1);
   }
   
   method wait : void () {
     while (1) {
+      
       my $state = $self->{state};
       
       if ($state == 0) {
         return;
       }
+      
+      Go->gosched;
     }
   }
 }
