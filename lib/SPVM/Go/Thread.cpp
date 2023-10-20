@@ -1,5 +1,7 @@
 #include "spvm_native.h"
 
+#include <assert.h>
+
 #include <iostream>
 #include <thread>
 
@@ -7,43 +9,46 @@ extern "C" {
 
 static const char* FILE_NAME = "Go/Thread.cpp";
 
-static void thread_handler (SPVM_ENV* env, void* obj_task) {
+static void thread_handler (SPVM_ENV* env, void* obj_self, void* obj_task) {
   
   int32_t error_id = 0;
   
-  {
-    SPVM_VALUE* stack = env->new_stack(env);
-    stack[0].oval = obj_task;
-    env->call_instance_method_by_name(env, stack, "", 1, &error_id, __func__, FILE_NAME, __LINE__);
+  SPVM_VALUE* stack = env->new_stack(env);
+  
+  stack[0].oval = obj_task;
+  env->call_instance_method_by_name(env, stack, "", 1, &error_id, __func__, FILE_NAME, __LINE__);
+  
+  if (error_id) {
     
-    if (error_id) {
-      void* obj_exception = env->get_exception(env, stack);
-      
-      const char* exception = env->get_chars(env, stack, obj_exception);
-      
-      spvm_warn("%s", exception);
-    }
+    void* obj_exception = env->get_exception(env, stack);
+    const char* exception = env->get_chars(env, stack, obj_exception);
     
-    env->free_stack(env, stack);
+    env->set_field_object_by_name(env, stack, obj_self, "exception", obj_exception, &error_id, __func__, FILE_NAME, __LINE__);
+    assert(error_id == 0);
+    
+    env->set_field_int_by_name(env, stack, obj_self, "error_id", error_id, &error_id, __func__, FILE_NAME, __LINE__);
+    assert(error_id == 0);
   }
+  
+  env->free_stack(env, stack);
   
   return;
 }
 
-int32_t SPVM__Go__Thread__new(SPVM_ENV* env, SPVM_VALUE* stack) {
+int32_t SPVM__Go__Thread__create(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t error_id = 0;
   
-  void* obj_task = stack[0].oval;
+  void* obj_self = stack[0].oval;
+  
+  void* obj_task = env->get_field_object_by_name(env, stack, obj_self, "task", &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) { return error_id; }
   
   std::thread* nt_thread = (std::thread*)env->new_memory_block(env, stack, sizeof(std::thread));
   
-  *nt_thread = std::thread(thread_handler, env, obj_task);
+  *nt_thread = std::thread(thread_handler, env, obj_self, obj_task);
   
-  void* obj_thread = env->new_pointer_object_by_name(env, stack, "Go::Thread", nt_thread, &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) { return error_id; }
-  
-  stack[0].oval = obj_thread;
+  env->set_pointer(env, stack, obj_self, nt_thread);
   
   return 0;
 }

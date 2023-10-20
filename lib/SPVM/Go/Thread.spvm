@@ -1,4 +1,4 @@
-class Go::Thread {
+class Go::Thread : pointer {
   use Go::Task;
   
   # Fields
@@ -6,10 +6,23 @@ class Go::Thread {
   
   has error_id : ro int;
   
+  has task : Go::Task;
+  
   # Class Methods
-  native static method new : Go::Thread ($task : Go::Task);
+  static method new : Go::Thread ($task : Go::Task) {
+    
+    my $self = new Go::Thread;
+    
+    $self->{task} = $task;
+    
+    $self->create;
+    
+    return $self;
+  }
   
   # Instance Methods
+  native private method create : void ();
+
   native method join : void ();
   
   native method detach : void ();

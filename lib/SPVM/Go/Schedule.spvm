@@ -9,6 +9,7 @@ class Go::Schedule {
   use Go::Queue;
   use Go::Poll;
   use Go::Process::Task;
+  use Go::Machine::ProcessTask;
   
   has finished : rw byte;
   
