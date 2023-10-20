@@ -1,9 +1,15 @@
 class Go::Thread {
   use Go::Task;
   
+  # Fields
+  has exception : ro string;
+  
+  has error_id : ro int;
+  
+  # Class Methods
   native static method new : Go::Thread ($task : Go::Task);
   
-  # Instance Method
+  # Instance Methods
   native method join : void ();
   
   native method detach : void ();
