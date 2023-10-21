@@ -54,14 +54,5 @@ class Go {
     $schedule->schedule;
   }
   
-  method DESTROY : void () {
-    
-    my $schedule = $self->{schedule};
-    
-    $schedule->set_finished(1);
-    
-    $schedule->machine_queue->first->(Go::Machine::ProcessTask)->thread->join;
-    
-  }
 }
 

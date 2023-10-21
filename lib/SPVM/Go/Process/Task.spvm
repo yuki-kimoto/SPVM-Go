@@ -20,18 +20,17 @@ class Go::Process::Task {
       
       my $schedule = $process->schedule;
       
-      if ($schedule->finished) {
-        last;
-      }
-      
       my $process_task_coroutine = $process->task_coroutine;
       
       my $coroutine = (Go::Coroutine)$process->coroutine_queue->dequeue;
       
-      $process->set_current_coroutine($coroutine);
-      
       if ($coroutine) {
+        $process->set_current_coroutine($coroutine);
         Go::Coroutine->transfer($process_task_coroutine, $coroutine);
+      }
+      else {
+        my $main_coroutine = $schedule->main_coroutine;
+        Go::Coroutine->transfer($process_task_coroutine, $main_coroutine);
       }
     }
     

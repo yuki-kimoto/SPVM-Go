@@ -2,7 +2,6 @@
 # MIT License
 
 class Go::Machine {
-  use Go::Thread;
   use Go::Schedule;
   use Go::Process;
   use Go::Coroutine;
@@ -12,8 +11,6 @@ class Go::Machine {
   interface Go::Queue::Element;
   
   # Fields
-  has thread : rw Go::Thread;
-  
   has next : rw Go::Queue::Element;
   
   has task : rw Go::Task;
@@ -21,14 +18,4 @@ class Go::Machine {
   has schedule : rw Go::Schedule;
   
   has process : rw Go::Process;
-  
-  # Instance Method
-  method start : void () {
-    
-    my $task = $self->{task};
-    
-    my $thread = Go::Thread->new($task);
-    
-    $self->{thread} = $thread;
-  }
 }

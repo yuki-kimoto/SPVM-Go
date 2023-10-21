@@ -44,9 +44,9 @@ class TestCase::Go {
     });
     
     # $wg->wait;
-    Sys->sleep(1);
+    # Sys->sleep(1);
     
-    warn("END");
+    Go->gosched;
     
     return 1;
   }

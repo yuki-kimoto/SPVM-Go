@@ -9,19 +9,13 @@ class Go::Schedule {
   use Go::Process::Task;
   use Go::Machine::ProcessTask;
   
-  has finished : rw byte;
-  
   has coroutine_queue : rw Go::Queue of Go::Coroutine;
   
   has process_queue : rw Go::Queue of Go::Process;
   
-  has idle_process_queue : rw Go::Queue of Go::Process;
-  
-  has processes_max : rw int;
-  
   has machine_queue : rw Go::Queue of Go::Machine;
   
-  has idle_machine_queue : rw Go::Queue of Go::Machine;
+  has main_coroutine : rw Go::Coroutine;
   
   static method new : Go::Schedule () {
     
@@ -31,27 +25,15 @@ class Go::Schedule {
     
     $self->{coroutine_queue} = $coroutine_queue;
     
-    my $processes_max = 1;
-    
-    $self->{processes_max} = $processes_max;
-    
     my $process = Go::Process->new;
     
     $self->{process_queue} = Go::Queue->new;
     
     $self->{process_queue}->enqueue($process);
     
-    $self->{idle_process_queue} = Go::Queue->new;
-    
     $self->{machine_queue} = Go::Queue->new;
     
-    $self->{idle_machine_queue} = Go::Queue->new;
-    
-    for (my $i = 0; $i < $processes_max; $i++) {
-      my $process = Go::Process->new;
-      
-      $self->process_queue->enqueue($process);
-    }
+    $self->process_queue->enqueue($process);
     
     $process->set_schedule($self);
     
@@ -75,15 +57,7 @@ class Go::Schedule {
       $machine_process_task->set_process($process);
     }
     
-    my $machine_process_task = (Go::Machine::ProcessTask)$self->machine_queue->first;
-    
-    $machine_process_task->start;
-    
     return $self;
-  }
-  
-  method DESTROY : void () {
-    # $machine_process_task->thread->join;
   }
   
   method schedule : void () {
@@ -94,7 +68,20 @@ class Go::Schedule {
     
     my $current_coroutine = $process->current_coroutine;
     
-    $process->coroutine_queue->enqueue($current_coroutine);
+    if ($current_coroutine) {
+      $process->coroutine_queue->enqueue($current_coroutine);
+    }
+    else {
+      $current_coroutine = Go::Coroutine->new;
+      
+      my $main_coroutine = $self->main_coroutine;
+      
+      if ($main_coroutine) {
+        die "A main coroutine already exists.";
+      }
+      
+      $self->set_main_coroutine($current_coroutine);
+    }
     
     my $process_task_coroutine = $process->task_coroutine;
     
