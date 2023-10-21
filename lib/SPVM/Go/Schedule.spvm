@@ -6,7 +6,6 @@ class Go::Schedule {
   use Go::Process;
   use Go::Machine;
   use Go::Queue;
-  use Go::Poll;
   use Go::Process::Task;
   use Go::Machine::ProcessTask;
   
@@ -24,10 +23,6 @@ class Go::Schedule {
   
   has idle_machine_queue : rw Go::Queue of Go::Machine;
   
-  has poll : rw Go::Poll;
-  
-  has monitor : rw Go::Monitor;
-  
   static method new : Go::Schedule () {
     
     my $self = new Go::Schedule;
@@ -35,10 +30,6 @@ class Go::Schedule {
     my $coroutine_queue = Go::Queue->new;
     
     $self->{coroutine_queue} = $coroutine_queue;
-    
-    my $poll = Go::Poll->new;
-    
-    $self->{poll} = $poll;
     
     my $processes_max = 1;
     
@@ -61,8 +52,6 @@ class Go::Schedule {
       
       $self->process_queue->enqueue($process);
     }
-    
-    $self->{monitor} = Go::Monitor->new;
     
     $process->set_schedule($self);
     

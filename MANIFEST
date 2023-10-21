@@ -27,8 +27,6 @@ lib/SPVM/Go/Global.pm
 lib/SPVM/Go/Global.spvm
 lib/SPVM/Go/Machine.pm
 lib/SPVM/Go/Machine.spvm
-lib/SPVM/Go/Machine/MonitorTask.pm
-lib/SPVM/Go/Machine/MonitorTask.spvm
 lib/SPVM/Go/Machine/ProcessTask.pm
 lib/SPVM/Go/Machine/ProcessTask.spvm
 lib/SPVM/Go/Process.pm
