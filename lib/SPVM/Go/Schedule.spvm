@@ -5,7 +5,6 @@ class Go::Schedule {
   use Go::Coroutine;
   use Go::Process;
   use Go::Machine;
-  use Go::Monitor;
   use Go::Queue;
   use Go::Poll;
   use Go::Process::Task;

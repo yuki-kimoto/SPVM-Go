@@ -31,12 +31,6 @@ lib/SPVM/Go/Machine/MonitorTask.pm
 lib/SPVM/Go/Machine/MonitorTask.spvm
 lib/SPVM/Go/Machine/ProcessTask.pm
 lib/SPVM/Go/Machine/ProcessTask.spvm
-lib/SPVM/Go/Monitor.pm
-lib/SPVM/Go/Monitor.spvm
-lib/SPVM/Go/Monitor/Task.pm
-lib/SPVM/Go/Monitor/Task.spvm
-lib/SPVM/Go/Poll.pm
-lib/SPVM/Go/Poll.spvm
 lib/SPVM/Go/Process.pm
 lib/SPVM/Go/Process.spvm
 lib/SPVM/Go/Process/Task.pm
