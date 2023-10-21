@@ -5,46 +5,48 @@ class TestCase::Go {
   
   static method go : int () {
     
-    my $wg = Go::Sync::WaitGroup->new;
-    
-    $wg->add(2);
-    
-    Go->go([has wg : Go::Sync::WaitGroup = $wg] method : void () {
+    Go->go(method : void () {
+      my $wg = Go::Sync::WaitGroup->new;
       
-      # die "Foo";
+      $wg->add(2);
       
-      warn("G0-A");
+      Go->go([has wg : Go::Sync::WaitGroup = $wg] method : void () {
+        
+        # die "Foo";
+        
+        warn("G0-A");
+        
+        warn("G0-CallMethodStart");
+        TestCase::Go->foo();
+        warn("G0-CallMethodEnd");
+        
+        Go->gosched;
+        
+        warn("G0-B");
+        
+        $self->{wg}->done;
+      });
       
-      warn("G0-CallMethodStart");
-      TestCase::Go->foo();
-      warn("G0-CallMethodEnd");
+      Go->go([has wg : Go::Sync::WaitGroup = $wg] method : void () {
+        
+        # die "Foo";
+        
+        warn("G1-A");
+        
+        warn("G1-CallMethodStart");
+        TestCase::Go->foo();
+        warn("G1-CallMethodEnd");
+        
+        Go->gosched;
+        
+        warn("G1-B");
+        
+        $self->{wg}->done;
+      });
       
-      Go->gosched;
-      
-      warn("G0-B");
-      
-      $self->{wg}->done;
+      # $wg->wait;
+      # Sys->sleep(1);
     });
-    
-    Go->go([has wg : Go::Sync::WaitGroup = $wg] method : void () {
-      
-      # die "Foo";
-      
-      warn("G1-A");
-      
-      warn("G1-CallMethodStart");
-      TestCase::Go->foo();
-      warn("G1-CallMethodEnd");
-      
-      Go->gosched;
-      
-      warn("G1-B");
-      
-      $self->{wg}->done;
-    });
-    
-    # $wg->wait;
-    # Sys->sleep(1);
     
     Go->gosched;
     
