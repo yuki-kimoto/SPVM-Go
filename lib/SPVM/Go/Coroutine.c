@@ -24,7 +24,7 @@ static void coroutine_handler (void* obj_self) {
   
   SPVM_ENV* env = pointer_items[2];
   
-  SPVM_VALUE* stack = env->new_stack(env);
+  SPVM_VALUE* stack = pointer_items[3];
   
   env->set_field_object_by_name(env, stack, obj_self, "exception", NULL, &error_id, __func__, FILE_NAME, __LINE__);
   assert(error_id == 0);
@@ -90,11 +90,12 @@ int32_t SPVM__Go__Coroutine__init_coroutine(SPVM_ENV* env, SPVM_VALUE* stack) {
     coro_create(coroutine_context, NULL, NULL, NULL, 0);
   }
   
-  void** pointer_items = env->new_memory_block(env, stack, sizeof(void*) * 3);
+  void** pointer_items = env->new_memory_block(env, stack, sizeof(void*) * 4);
     
   pointer_items[0] = coroutine_context;
   pointer_items[1] = coroutine_stack;
   pointer_items[2] = env;
+  pointer_items[3] = stack;
   
   env->set_pointer(env, stack, obj_self, pointer_items);
   
