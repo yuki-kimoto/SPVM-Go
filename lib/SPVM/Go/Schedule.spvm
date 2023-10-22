@@ -11,9 +11,9 @@ class Go::Schedule {
   
   has coroutine_queue : rw Go::Queue of Go::Coroutine;
   
-  has process_queue : rw Go::Queue of Go::Process;
+  has process : rw Go::Process;
   
-  has machine_queue : rw Go::Queue of Go::Machine;
+  has machine : rw Go::Machine;
   
   has main_coroutine : rw Go::Coroutine;
   
@@ -27,13 +27,7 @@ class Go::Schedule {
     
     my $process = Go::Process->new;
     
-    $self->{process_queue} = Go::Queue->new;
-    
-    $self->{process_queue}->enqueue($process);
-    
-    $self->{machine_queue} = Go::Queue->new;
-    
-    $self->process_queue->enqueue($process);
+    $self->{process} = $process;
     
     $process->set_schedule($self);
     
@@ -45,24 +39,22 @@ class Go::Schedule {
     
     $process->set_task_coroutine($process_task_coroutine);
     
-    {
-      my $machine_process_task = Go::Machine::ProcessTask->new;
-      
-      $self->machine_queue->enqueue($machine_process_task);
-      
-      $machine_process_task->set_task($process_task);
-      
-      $machine_process_task->set_schedule($process->schedule);
-      
-      $machine_process_task->set_process($process);
-    }
+    my $machine_process_task = Go::Machine::ProcessTask->new;
+    
+    $self->set_machine($machine_process_task);
+    
+    $machine_process_task->set_task($process_task);
+    
+    $machine_process_task->set_schedule($process->schedule);
+    
+    $machine_process_task->set_process($process);
     
     return $self;
   }
   
   method schedule : void () {
     
-    my $machine = (Go::Machine::ProcessTask)$self->machine_queue->first;
+    my $machine = $self->machine;
     
     my $process = $machine->process;
     
@@ -90,7 +82,7 @@ class Go::Schedule {
   
   method add_task : void ($task : Go::Coroutine::Task) {
     
-    my $machine = (Go::Machine::ProcessTask)$self->machine_queue->first;
+    my $machine = $self->machine;
     
     my $process = $machine->process;
     
