@@ -4,11 +4,11 @@
 class Go {
   version "0.001";
   
-  use Go::Coroutine::Task;
   use Go::Channel::ReadCallback;
   use Go::Channel;
   use Go::Schedule;
   use Go::Machine::ProcessTask;
+  use Callback;
   
   our $GO : Go;
   
@@ -24,7 +24,7 @@ class Go {
     $GO = $go;
   }
   
-  static method go : void ($task : Go::Coroutine::Task) {
+  static method go : void ($task : Callback) {
     
     my $schedule = $GO->{schedule};
     

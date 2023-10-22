@@ -80,7 +80,7 @@ class Go::Schedule {
     Go::Coroutine->transfer($current_coroutine, $process_task_coroutine);
   }
   
-  method add_task : void ($task : Go::Coroutine::Task) {
+  method add_task : void ($task : Callback) {
     
     my $machine = $self->machine;
     

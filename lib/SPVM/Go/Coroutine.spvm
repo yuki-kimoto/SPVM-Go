@@ -4,7 +4,6 @@
 class Go::Coroutine : pointer {
   allow Go::Schedule;
   
-  use Go::Coroutine::Task;
   use Go::Channel;
   use Native;
   
@@ -30,7 +29,7 @@ class Go::Coroutine : pointer {
   
   has running : byte;
   
-  has task : rw Go::Coroutine::Task;
+  has task : rw Callback;
   
   has exception : ro string;
   
@@ -39,7 +38,7 @@ class Go::Coroutine : pointer {
   has next : rw Go::Queue::Element;
   
   # Class Methods
-  static method new : Go::Coroutine ($task :  Go::Coroutine::Task = undef, $return_back : Go::Coroutine = undef) {
+  static method new : Go::Coroutine ($task :  Callback = undef, $return_back : Go::Coroutine = undef) {
     
     my $self = new Go::Coroutine;
     

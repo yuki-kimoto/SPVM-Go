@@ -22,7 +22,6 @@ lib/SPVM/Go/Coroutine.native/src/.gitkeep
 lib/SPVM/Go/Coroutine.native/src/coro.c
 lib/SPVM/Go/Coroutine.pm
 lib/SPVM/Go/Coroutine.spvm
-lib/SPVM/Go/Coroutine/Task.spvm
 lib/SPVM/Go/Global.pm
 lib/SPVM/Go/Global.spvm
 lib/SPVM/Go/Machine.pm
