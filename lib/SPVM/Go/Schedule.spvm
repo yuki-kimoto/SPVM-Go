@@ -2,16 +2,24 @@
 # MIT License
 
 class Go::Schedule {
+  allow Go::Process::Task;
+  
   use Go::Coroutine;
   use Go::Process;
   use Go::Queue;
   use Go::Process::Task;
+  
+  has coroutine_queue : Go::Queue of Go::Coroutine;
   
   has current_process : Go::Process;
   
   static method new : Go::Schedule () {
     
     my $self = new Go::Schedule;
+    
+    my $coroutine_queue = Go::Queue->new;
+    
+    $self->{coroutine_queue} = $coroutine_queue;
     
     my $process = Go::Process->new;
     
@@ -37,7 +45,7 @@ class Go::Schedule {
     my $current_coroutine = $process->{current_coroutine};
     
     if ($current_coroutine) {
-      $process->{coroutine_queue}->enqueue($current_coroutine);
+      $self->{coroutine_queue}->enqueue($current_coroutine);
     }
     else {
       $current_coroutine = Go::Coroutine->new;
@@ -67,7 +75,7 @@ class Go::Schedule {
     
     my $coroutine = Go::Coroutine->new($task, $process_task_coroutine);
     
-    $process->{coroutine_queue}->enqueue($coroutine);
+    $self->{coroutine_queue}->enqueue($coroutine);
   }
   
   method DESTROY : void () {

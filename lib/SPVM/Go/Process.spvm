@@ -12,8 +12,6 @@ class Go::Process {
   # Fields
   has schedule : Go::Schedule;
   
-  has coroutine_queue : Go::Queue of Go::Coroutine;
-  
   has current_coroutine : Go::Coroutine;
   
   has task_coroutine : Go::Coroutine;
@@ -24,10 +22,6 @@ class Go::Process {
   private static method new : Go::Process () {
     
     my $self = new Go::Process;
-    
-    my $coroutine_queue = Go::Queue->new;
-    
-    $self->{coroutine_queue} = $coroutine_queue;
     
     return $self;
   }
