@@ -14,8 +14,6 @@ class Go::Process {
   
   has current_coroutine : rw Go::Coroutine;
   
-  has machine : Go::Machine;
-  
   has task_coroutine : rw Go::Coroutine;
   
   has return_back : rw Go::Coroutine;
