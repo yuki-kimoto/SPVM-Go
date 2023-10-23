@@ -27,15 +27,15 @@ class Go::Schedule {
     
     $process->{task_coroutine} = $process_task_coroutine;
     
-    my $machine_process_task = Go::Machine::ProcessTask->new;
+    my $machine = Go::Machine::ProcessTask->new;
     
-    $machine_process_task->{task} = $process_task;
+    $machine->{task} = $process_task;
     
-    $machine_process_task->{schedule} = $process->{schedule};
+    $machine->{schedule} = $process->{schedule};
     
-    $machine_process_task->{process} = $process;
+    $machine->{process} = $process;
     
-    $self->{current_machine} = $machine_process_task;
+    $self->{current_machine} = $machine;
     
     return $self;
   }
@@ -66,6 +66,8 @@ class Go::Schedule {
     my $process_task_coroutine = $process->{task_coroutine};
     
     Go::Coroutine->transfer($current_coroutine, $process_task_coroutine);
+    
+    $process->{current_coroutine} = undef;
   }
   
   method add_task : void ($task : Callback) {
@@ -79,5 +81,9 @@ class Go::Schedule {
     my $coroutine = Go::Coroutine->new($task, $process_task_coroutine);
     
     $process->{coroutine_queue}->enqueue($coroutine);
+  }
+  
+  method DESTROY : void () {
+    warn "DESTROY";
   }
 }
