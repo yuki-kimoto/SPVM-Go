@@ -1,13 +1,14 @@
 class TestCase::Go::Coroutine {
   use Go::Coroutine;
+  use Callback;
   
   static method transfer : int () {
     
-    my $coroutine_start_task_ref = [(Go::Task)undef];
+    my $coroutine_start_task_ref = [(Callback)undef];
     
     my $coroutines = new Go::Coroutine[10];
       
-    $coroutine_start_task_ref->[0] = [has coroutines : Go::Coroutine[] = $coroutines, has coroutine_start_task_ref : Go::Task[] = $coroutine_start_task_ref] method : void () {
+    $coroutine_start_task_ref->[0] = [has coroutines : Go::Coroutine[] = $coroutines, has coroutine_start_task_ref : Callback[] = $coroutine_start_task_ref] method : void () {
       
       # die "Foo";
       

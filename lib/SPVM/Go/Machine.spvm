@@ -4,11 +4,10 @@
 class Go::Machine {
   use Go::Schedule;
   use Go::Process;
-  use Go::Coroutine;
-  use Go::Task;
+  use Callback;
   
   # Fields
-  has task : rw Go::Task;
+  has task : rw Callback;
   
   has schedule : rw Go::Schedule;
   
