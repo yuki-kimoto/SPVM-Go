@@ -133,6 +133,8 @@ int32_t SPVM__Go__Coroutine__transfer(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 int32_t SPVM__Go__Coroutine__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
   
+  warn("LINE %d", __LINE__);
+  
   void* obj_self = stack[0].oval;
   
   void** pointer_items = env->get_pointer(env, stack, obj_self);

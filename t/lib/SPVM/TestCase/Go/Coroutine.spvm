@@ -62,6 +62,11 @@ class TestCase::Go::Coroutine {
     if ($coroutines->[0]->exception) {
       die $coroutines->[0]->exception;
     }
+    
+    $coroutine_start_task_ref->[0] = undef;
+    $coroutines->[0] = undef;
+    $coroutines->[1] = undef;
+    
     warn("END");
     
     return 1;
