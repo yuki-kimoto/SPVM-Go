@@ -19,7 +19,7 @@ class Go::Process::Task {
       
       my $schedule = $process->{schedule};
       
-      my $process_task_coroutine = $process->{task_coroutine};
+      my $process_task_coroutine = $schedule->{task_coroutine};
       
       my $coroutine = (Go::Coroutine)$schedule->{coroutine_queue}->dequeue;
       

@@ -15,6 +15,8 @@ class Go::Schedule {
   
   has current_coroutine : Go::Coroutine;
   
+  has task_coroutine : Go::Coroutine;
+  
   static method new : Go::Schedule () {
     
     my $self = new Go::Schedule;
@@ -33,7 +35,7 @@ class Go::Schedule {
     
     my $process_task_coroutine = Go::Coroutine->new($process_task);
     
-    $process->{task_coroutine} = $process_task_coroutine;
+    $self->{task_coroutine} = $process_task_coroutine;
     
     $self->{current_process} = $process;
     
@@ -61,7 +63,7 @@ class Go::Schedule {
       $process->{return_back} = $current_coroutine;
     }
     
-    my $process_task_coroutine = $process->{task_coroutine};
+    my $process_task_coroutine = $self->{task_coroutine};
     
     Go::Coroutine->transfer($current_coroutine, $process_task_coroutine);
     
@@ -73,7 +75,7 @@ class Go::Schedule {
     
     my $process = $self->{current_process};
     
-    my $process_task_coroutine = $process->{task_coroutine};
+    my $process_task_coroutine = $self->{task_coroutine};
     
     my $coroutine = Go::Coroutine->new($task, $process_task_coroutine);
     
