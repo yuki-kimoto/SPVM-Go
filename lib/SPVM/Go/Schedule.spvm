@@ -29,8 +29,6 @@ class Go::Schedule {
     
     my $machine = Go::Machine::ProcessTask->new;
     
-    $machine->{task} = $process_task;
-    
     $machine->{process} = $process;
     
     $self->{current_machine} = $machine;

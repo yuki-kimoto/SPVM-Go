@@ -4,12 +4,8 @@
 class Go::Machine {
   allow Go::Schedule;
   
-  use Go::Schedule;
   use Go::Process;
-  use Callback;
   
   # Fields
-  has task : Callback;
-  
   has process : Go::Process;
 }
