@@ -15,9 +15,7 @@ class Go::Process::Task {
     
     while (1) {
       
-      my $process = $self->{process};
-      
-      my $schedule = $process->{schedule};
+      my $schedule = $self->{schedule};
       
       my $process_task_coroutine = $schedule->{task_coroutine};
       
@@ -30,7 +28,7 @@ class Go::Process::Task {
       else {
         my $return_back = $schedule->{return_back};
         
-        $self->{process} = undef;
+        $self->{schedule} = undef;
         
         Go::Coroutine->transfer($process_task_coroutine, $return_back);
       }
@@ -38,5 +36,5 @@ class Go::Process::Task {
     
   }
   
-  has process : Go::Process;
+  has schedule : Go::Schedule;
 }

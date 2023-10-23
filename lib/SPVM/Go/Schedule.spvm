@@ -33,7 +33,7 @@ class Go::Schedule {
     
     my $process_task = Go::Process::Task->new;
     
-    $process_task->{process} = $process;
+    $process_task->{schedule} = $self;
     
     my $process_task_coroutine = Go::Coroutine->new($process_task);
     
