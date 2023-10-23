@@ -9,8 +9,6 @@ class Go::Schedule {
   use Go::Process::Task;
   use Go::Machine::ProcessTask;
   
-  has coroutine_queue : rw Go::Queue of Go::Coroutine;
-  
   has process : rw Go::Process;
   
   has machine : rw Go::Machine;
@@ -18,10 +16,6 @@ class Go::Schedule {
   static method new : Go::Schedule () {
     
     my $self = new Go::Schedule;
-    
-    my $coroutine_queue = Go::Queue->new;
-    
-    $self->{coroutine_queue} = $coroutine_queue;
     
     my $process = Go::Process->new;
     
