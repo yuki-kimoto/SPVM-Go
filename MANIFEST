@@ -40,8 +40,6 @@ lib/SPVM/Go/Schedule.pm
 lib/SPVM/Go/Schedule.spvm
 lib/SPVM/Go/Sync/WaitGroup.pm
 lib/SPVM/Go/Sync/WaitGroup.spvm
-lib/SPVM/Go/Task.pm
-lib/SPVM/Go/Task.spvm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files

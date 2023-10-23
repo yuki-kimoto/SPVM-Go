@@ -1,7 +1,0 @@
-# Copyright (c) 2023 Yuki Kimoto
-# MIT License
-
-class Go::Task : interface_t {
-  
-  method : void ();
-}
