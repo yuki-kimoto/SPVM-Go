@@ -11,7 +11,5 @@ class Go::Machine {
   # Fields
   has task : Callback;
   
-  has schedule : Go::Schedule;
-  
   has process : Go::Process;
 }

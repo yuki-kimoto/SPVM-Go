@@ -31,8 +31,6 @@ class Go::Schedule {
     
     $machine->{task} = $process_task;
     
-    $machine->{schedule} = $process->{schedule};
-    
     $machine->{process} = $process;
     
     $self->{current_machine} = $machine;
@@ -68,6 +66,7 @@ class Go::Schedule {
     Go::Coroutine->transfer($current_coroutine, $process_task_coroutine);
     
     $process->{current_coroutine} = undef;
+    
   }
   
   method add_task : void ($task : Callback) {
