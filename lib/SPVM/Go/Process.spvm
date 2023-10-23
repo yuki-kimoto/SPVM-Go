@@ -7,9 +7,6 @@ class Go::Process {
   use Go::Machine;
   use Go::Schedule;
   
-  # Interfaces
-  interface Go::Queue::Element;
-  
   # Fields
   has schedule : rw Go::Schedule;
   
@@ -18,8 +15,6 @@ class Go::Process {
   has current_coroutine : rw Go::Coroutine;
   
   has machine : Go::Machine;
-  
-  has next : rw Go::Queue::Element;
   
   has task_coroutine : rw Go::Coroutine;
   

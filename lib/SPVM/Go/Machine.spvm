@@ -7,12 +7,7 @@ class Go::Machine {
   use Go::Coroutine;
   use Go::Task;
   
-  # Interfaces
-  interface Go::Queue::Element;
-  
   # Fields
-  has next : rw Go::Queue::Element;
-  
   has task : rw Go::Task;
   
   has schedule : rw Go::Schedule;
