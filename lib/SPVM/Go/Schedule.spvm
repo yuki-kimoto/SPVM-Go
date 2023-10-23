@@ -9,7 +9,7 @@ class Go::Schedule {
   use Go::Process::Task;
   use Go::Machine::ProcessTask;
   
-  has machine : rw Go::Machine;
+  has current_machine : rw Go::Machine;
   
   static method new : Go::Schedule () {
     
@@ -29,7 +29,7 @@ class Go::Schedule {
     
     my $machine_process_task = Go::Machine::ProcessTask->new;
     
-    $self->set_machine($machine_process_task);
+    $self->set_current_machine($machine_process_task);
     
     $machine_process_task->set_task($process_task);
     
@@ -42,7 +42,7 @@ class Go::Schedule {
   
   method schedule : void () {
     
-    my $machine = $self->machine;
+    my $machine = $self->current_machine;
     
     my $process = $machine->process;
     
@@ -70,7 +70,7 @@ class Go::Schedule {
   
   method add_task : void ($task : Callback) {
     
-    my $machine = $self->machine;
+    my $machine = $self->current_machine;
     
     my $process = $machine->process;
     
