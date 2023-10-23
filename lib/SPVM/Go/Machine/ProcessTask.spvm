@@ -2,9 +2,10 @@
 # MIT License
 
 class Go::Machine::ProcessTask extends Go::Machine {
+  allow Go::Schedule;
   
   # Class Methods
-  static method new : Go::Machine () {
+  private static method new : Go::Machine () {
     
     my $self = new Go::Machine::ProcessTask;
     

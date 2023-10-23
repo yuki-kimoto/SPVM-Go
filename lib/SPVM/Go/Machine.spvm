@@ -2,14 +2,16 @@
 # MIT License
 
 class Go::Machine {
+  allow Go::Schedule;
+  
   use Go::Schedule;
   use Go::Process;
   use Callback;
   
   # Fields
-  has task : rw Callback;
+  has task : Callback;
   
-  has schedule : rw Go::Schedule;
+  has schedule : Go::Schedule;
   
-  has process : rw Go::Process;
+  has process : Go::Process;
 }

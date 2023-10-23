@@ -29,11 +29,11 @@ class Go::Schedule {
     
     my $machine_process_task = Go::Machine::ProcessTask->new;
     
-    $machine_process_task->set_task($process_task);
+    $machine_process_task->{task} = $process_task;
     
-    $machine_process_task->set_schedule($process->schedule);
+    $machine_process_task->{schedule} = $process->schedule;
     
-    $machine_process_task->set_process($process);
+    $machine_process_task->{process} = $process;
     
     $self->{current_machine} = $machine_process_task;
     
@@ -44,7 +44,7 @@ class Go::Schedule {
     
     my $machine = $self->{current_machine};
     
-    my $process = $machine->process;
+    my $process = $machine->{process};
     
     my $current_coroutine = $process->current_coroutine;
     
@@ -72,7 +72,7 @@ class Go::Schedule {
     
     my $machine = $self->{current_machine};
     
-    my $process = $machine->process;
+    my $process = $machine->{process};
     
     my $process_task_coroutine = $process->task_coroutine;
     
