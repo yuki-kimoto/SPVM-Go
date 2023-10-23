@@ -2,24 +2,27 @@
 # MIT License
 
 class Go::Process {
+  allow Go::Schedule;
+  allow Go::Process::Task;
+  
   use Go::Queue;
   use Go::Coroutine;
   use Go::Machine;
   use Go::Schedule;
   
   # Fields
-  has schedule : rw Go::Schedule;
+  has schedule : Go::Schedule;
   
-  has coroutine_queue : rw Go::Queue of Go::Coroutine;
+  has coroutine_queue : Go::Queue of Go::Coroutine;
   
-  has current_coroutine : rw Go::Coroutine;
+  has current_coroutine : Go::Coroutine;
   
-  has task_coroutine : rw Go::Coroutine;
+  has task_coroutine : Go::Coroutine;
   
-  has return_back : rw Go::Coroutine;
+  has return_back : Go::Coroutine;
   
   # Class Methods
-  static method new : Go::Process () {
+  private static method new : Go::Process () {
     
     my $self = new Go::Process;
     

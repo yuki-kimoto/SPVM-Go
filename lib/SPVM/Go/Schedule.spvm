@@ -17,7 +17,7 @@ class Go::Schedule {
     
     my $process = Go::Process->new;
     
-    $process->set_schedule($self);
+    $process->{schedule} = $self;
     
     my $process_task = Go::Process::Task->new;
     
@@ -25,13 +25,13 @@ class Go::Schedule {
     
     my $process_task_coroutine = Go::Coroutine->new($process_task);
     
-    $process->set_task_coroutine($process_task_coroutine);
+    $process->{task_coroutine} = $process_task_coroutine;
     
     my $machine_process_task = Go::Machine::ProcessTask->new;
     
     $machine_process_task->{task} = $process_task;
     
-    $machine_process_task->{schedule} = $process->schedule;
+    $machine_process_task->{schedule} = $process->{schedule};
     
     $machine_process_task->{process} = $process;
     
@@ -46,24 +46,24 @@ class Go::Schedule {
     
     my $process = $machine->{process};
     
-    my $current_coroutine = $process->current_coroutine;
+    my $current_coroutine = $process->{current_coroutine};
     
     if ($current_coroutine) {
-      $process->coroutine_queue->enqueue($current_coroutine);
+      $process->{coroutine_queue}->enqueue($current_coroutine);
     }
     else {
       $current_coroutine = Go::Coroutine->new;
       
-      my $return_back = $process->return_back;
+      my $return_back = $process->{return_back};
       
       if ($return_back) {
         die "A main coroutine already exists.";
       }
       
-      $process->set_return_back($current_coroutine);
+      $process->{return_back} = $current_coroutine;
     }
     
-    my $process_task_coroutine = $process->task_coroutine;
+    my $process_task_coroutine = $process->{task_coroutine};
     
     Go::Coroutine->transfer($current_coroutine, $process_task_coroutine);
   }
@@ -74,10 +74,10 @@ class Go::Schedule {
     
     my $process = $machine->{process};
     
-    my $process_task_coroutine = $process->task_coroutine;
+    my $process_task_coroutine = $process->{task_coroutine};
     
     my $coroutine = Go::Coroutine->new($task, $process_task_coroutine);
     
-    $process->coroutine_queue->enqueue($coroutine);
+    $process->{coroutine_queue}->enqueue($coroutine);
   }
 }
