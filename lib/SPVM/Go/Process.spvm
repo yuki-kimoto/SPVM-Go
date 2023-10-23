@@ -12,8 +12,6 @@ class Go::Process {
   # Fields
   has schedule : Go::Schedule;
   
-  has return_back : Go::Coroutine;
-  
   # Class Methods
   private static method new : Go::Process () {
     
