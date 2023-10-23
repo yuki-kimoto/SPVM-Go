@@ -12,7 +12,7 @@ class Go::Schedule {
   
   has current_coroutine : Go::Coroutine;
   
-  has task_coroutine : Go::Coroutine;
+  has schedule_task_coroutine : Go::Coroutine;
   
   has return_back : Go::Coroutine;
   
@@ -24,13 +24,13 @@ class Go::Schedule {
     
     $self->{coroutine_queue} = $coroutine_queue;
     
-    my $process_task = Go::Schedule::Task->new;
+    my $schedule_task = Go::Schedule::Task->new;
     
-    $process_task->{schedule} = $self;
+    $schedule_task->{schedule} = $self;
     
-    my $process_task_coroutine = Go::Coroutine->new($process_task);
+    my $schedule_task_coroutine = Go::Coroutine->new($schedule_task);
     
-    $self->{task_coroutine} = $process_task_coroutine;
+    $self->{schedule_task_coroutine} = $schedule_task_coroutine;
     
     return $self;
   }
@@ -54,9 +54,9 @@ class Go::Schedule {
       $self->{return_back} = $current_coroutine;
     }
     
-    my $process_task_coroutine = $self->{task_coroutine};
+    my $schedule_task_coroutine = $self->{schedule_task_coroutine};
     
-    Go::Coroutine->transfer($current_coroutine, $process_task_coroutine);
+    Go::Coroutine->transfer($current_coroutine, $schedule_task_coroutine);
     
     $self->{current_coroutine} = undef;
     
@@ -64,9 +64,9 @@ class Go::Schedule {
   
   method add_task : void ($task : Callback) {
     
-    my $process_task_coroutine = $self->{task_coroutine};
+    my $schedule_task_coroutine = $self->{schedule_task_coroutine};
     
-    my $coroutine = Go::Coroutine->new($task, $process_task_coroutine);
+    my $coroutine = Go::Coroutine->new($task, $schedule_task_coroutine);
     
     $self->{coroutine_queue}->enqueue($coroutine);
   }
