@@ -29,13 +29,13 @@ class Go::Schedule {
     
     my $machine_process_task = Go::Machine::ProcessTask->new;
     
-    $self->set_current_machine($machine_process_task);
-    
     $machine_process_task->set_task($process_task);
     
     $machine_process_task->set_schedule($process->schedule);
     
     $machine_process_task->set_process($process);
+    
+    $self->set_current_machine($machine_process_task);
     
     return $self;
   }
