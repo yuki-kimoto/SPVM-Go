@@ -12,7 +12,7 @@ class Go::Coroutine : pointer {
   # Fields
   has return_back : Go::Coroutine;
   
-  has task : rw Callback;
+  has task : Callback;
   
   has exception : ro string;
   
