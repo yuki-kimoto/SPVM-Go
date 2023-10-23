@@ -1,12 +1,12 @@
 # Copyright (c) 2023 Yuki Kimoto
 # MIT License
 
-class Go::Process::Task {
+class Go::Schedule::Task {
   allow Go::Schedule;
   
-  private static method new : Go::Process::Task () {
+  private static method new : Go::Schedule::Task () {
     
-    my $self = new Go::Process::Task;
+    my $self = new Go::Schedule::Task;
     
     return $self;
   }

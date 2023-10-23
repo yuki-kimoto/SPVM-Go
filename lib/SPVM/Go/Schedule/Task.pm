@@ -1,4 +1,4 @@
-package SPVM::Go::Process::Task;
+package SPVM::Go::Schedule::Task;
 
 
 
@@ -6,15 +6,15 @@ package SPVM::Go::Process::Task;
 
 =head1 Name
 
-SPVM::Go::Process::Task - Short Description
+SPVM::Go::Schedule::Task - Short Description
 
 =head1 Description
 
-Go::Process::Task class of L<SPVM> has methods for someting.
+Go::Schedule::Task class of L<SPVM> has methods for someting.
 
 =head1 Usage
 
-  use Go::Process::Task;
+  use Go::Schedule::Task;
 
 =head1 Fields
 

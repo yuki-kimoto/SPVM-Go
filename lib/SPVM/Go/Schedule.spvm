@@ -2,16 +2,13 @@
 # MIT License
 
 class Go::Schedule {
-  allow Go::Process::Task;
+  allow Go::Schedule::Task;
   
   use Go::Coroutine;
-  use Go::Process;
   use Go::Queue;
-  use Go::Process::Task;
+  use Go::Schedule::Task;
   
   has coroutine_queue : Go::Queue of Go::Coroutine;
-  
-  has current_process : Go::Process;
   
   has current_coroutine : Go::Coroutine;
   
@@ -27,11 +24,7 @@ class Go::Schedule {
     
     $self->{coroutine_queue} = $coroutine_queue;
     
-    my $process = Go::Process->new;
-    
-    $process->{schedule} = $self;
-    
-    my $process_task = Go::Process::Task->new;
+    my $process_task = Go::Schedule::Task->new;
     
     $process_task->{schedule} = $self;
     
@@ -39,14 +32,10 @@ class Go::Schedule {
     
     $self->{task_coroutine} = $process_task_coroutine;
     
-    $self->{current_process} = $process;
-    
     return $self;
   }
   
   method schedule : void () {
-    
-    my $process = $self->{current_process};
     
     my $current_coroutine = $self->{current_coroutine};
     
@@ -74,8 +63,6 @@ class Go::Schedule {
   }
   
   method add_task : void ($task : Callback) {
-    
-    my $process = $self->{current_process};
     
     my $process_task_coroutine = $self->{task_coroutine};
     
