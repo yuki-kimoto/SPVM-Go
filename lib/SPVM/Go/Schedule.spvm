@@ -57,7 +57,7 @@ class Go::Schedule {
       my $return_back = $process->{return_back};
       
       if ($return_back) {
-        die "A main coroutine already exists.";
+        die "A return back already exists.";
       }
       
       $process->{return_back} = $current_coroutine;
