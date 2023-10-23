@@ -9,8 +9,6 @@ class Go::Schedule {
   use Go::Process::Task;
   use Go::Machine::ProcessTask;
   
-  has process : rw Go::Process;
-  
   has machine : rw Go::Machine;
   
   static method new : Go::Schedule () {
@@ -18,8 +16,6 @@ class Go::Schedule {
     my $self = new Go::Schedule;
     
     my $process = Go::Process->new;
-    
-    $self->{process} = $process;
     
     $process->set_schedule($self);
     
