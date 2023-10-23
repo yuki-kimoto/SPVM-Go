@@ -7,7 +7,6 @@ class Go::Process {
   
   use Go::Queue;
   use Go::Coroutine;
-  use Go::Machine;
   use Go::Schedule;
   
   # Fields

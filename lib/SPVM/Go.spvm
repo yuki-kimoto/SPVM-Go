@@ -7,7 +7,6 @@ class Go {
   use Go::Channel::ReadCallback;
   use Go::Channel;
   use Go::Schedule;
-  use Go::Machine::ProcessTask;
   use Callback;
   
   our $GO : Go;
