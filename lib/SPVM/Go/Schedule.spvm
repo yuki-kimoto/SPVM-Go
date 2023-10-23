@@ -13,6 +13,8 @@ class Go::Schedule {
   
   has current_process : Go::Process;
   
+  has current_coroutine : Go::Coroutine;
+  
   static method new : Go::Schedule () {
     
     my $self = new Go::Schedule;
@@ -42,7 +44,7 @@ class Go::Schedule {
     
     my $process = $self->{current_process};
     
-    my $current_coroutine = $process->{current_coroutine};
+    my $current_coroutine = $self->{current_coroutine};
     
     if ($current_coroutine) {
       $self->{coroutine_queue}->enqueue($current_coroutine);
@@ -63,7 +65,7 @@ class Go::Schedule {
     
     Go::Coroutine->transfer($current_coroutine, $process_task_coroutine);
     
-    $process->{current_coroutine} = undef;
+    $self->{current_coroutine} = undef;
     
   }
   

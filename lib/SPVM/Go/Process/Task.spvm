@@ -24,7 +24,7 @@ class Go::Process::Task {
       my $coroutine = (Go::Coroutine)$schedule->{coroutine_queue}->dequeue;
       
       if ($coroutine) {
-        $process->{current_coroutine} = $coroutine;
+        $schedule->{current_coroutine} = $coroutine;
         Go::Coroutine->transfer($process_task_coroutine, $coroutine);
       }
       else {

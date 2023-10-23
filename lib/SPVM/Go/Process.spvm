@@ -12,8 +12,6 @@ class Go::Process {
   # Fields
   has schedule : Go::Schedule;
   
-  has current_coroutine : Go::Coroutine;
-  
   has task_coroutine : Go::Coroutine;
   
   has return_back : Go::Coroutine;
