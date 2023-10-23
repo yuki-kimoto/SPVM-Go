@@ -15,7 +15,7 @@ class Go::Schedule {
   
   has machine : rw Go::Machine;
   
-  has main_coroutine : rw Go::Coroutine;
+  has return_back : rw Go::Coroutine;
   
   static method new : Go::Schedule () {
     
@@ -66,13 +66,13 @@ class Go::Schedule {
     else {
       $current_coroutine = Go::Coroutine->new;
       
-      my $main_coroutine = $self->main_coroutine;
+      my $return_back = $self->return_back;
       
-      if ($main_coroutine) {
+      if ($return_back) {
         die "A main coroutine already exists.";
       }
       
-      $self->set_main_coroutine($current_coroutine);
+      $self->set_return_back($current_coroutine);
     }
     
     my $process_task_coroutine = $process->task_coroutine;
