@@ -21,7 +21,7 @@ class Go::Schedule {
     
     my $process_task = Go::Process::Task->new;
     
-    $process_task->set_process($process);
+    $process_task->{process} = $process;
     
     my $process_task_coroutine = Go::Coroutine->new($process_task);
     

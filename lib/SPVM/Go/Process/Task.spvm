@@ -2,8 +2,9 @@
 # MIT License
 
 class Go::Process::Task {
+  allow Go::Schedule;
   
-  static method new : Go::Process::Task () {
+  private static method new : Go::Process::Task () {
     
     my $self = new Go::Process::Task;
     
@@ -34,5 +35,5 @@ class Go::Process::Task {
     
   }
   
-  has process : rw Go::Process;
+  has process : Go::Process;
 }
