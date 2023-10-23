@@ -2,8 +2,6 @@
 # MIT License
 
 class Go::Process::Task {
-  use Go::Machine;
-  use Sys;
   
   static method new : Go::Process::Task () {
     
