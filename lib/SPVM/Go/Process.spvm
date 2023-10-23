@@ -23,6 +23,8 @@ class Go::Process {
   
   has task_coroutine : rw Go::Coroutine;
   
+  has return_back : rw Go::Coroutine;
+  
   # Class Methods
   static method new : Go::Process () {
     
