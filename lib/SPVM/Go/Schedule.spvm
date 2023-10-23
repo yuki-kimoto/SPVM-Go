@@ -4,12 +4,10 @@
 class Go::Schedule {
   use Go::Coroutine;
   use Go::Process;
-  use Go::Machine;
   use Go::Queue;
   use Go::Process::Task;
-  use Go::Machine::ProcessTask;
   
-  has current_machine : Go::Machine;
+  has current_process : Go::Process;
   
   static method new : Go::Schedule () {
     
@@ -27,20 +25,14 @@ class Go::Schedule {
     
     $process->{task_coroutine} = $process_task_coroutine;
     
-    my $machine = Go::Machine::ProcessTask->new;
-    
-    $machine->{process} = $process;
-    
-    $self->{current_machine} = $machine;
+    $self->{current_process} = $process;
     
     return $self;
   }
   
   method schedule : void () {
     
-    my $machine = $self->{current_machine};
-    
-    my $process = $machine->{process};
+    my $process = $self->{current_process};
     
     my $current_coroutine = $process->{current_coroutine};
     
@@ -69,9 +61,7 @@ class Go::Schedule {
   
   method add_task : void ($task : Callback) {
     
-    my $machine = $self->{current_machine};
-    
-    my $process = $machine->{process};
+    my $process = $self->{current_process};
     
     my $process_task_coroutine = $process->{task_coroutine};
     
