@@ -30,7 +30,9 @@ class Go::Schedule {
     my $current_coroutine = $self->{current_coroutine};
     
     if ($current_coroutine) {
-      $self->{coroutine_queue}->enqueue($current_coroutine);
+      unless ($current_coroutine->{finished}) {
+        $self->{coroutine_queue}->enqueue($current_coroutine);
+      }
       
       my $schedule_task_coroutine = $self->{schedule_task_coroutine};
       

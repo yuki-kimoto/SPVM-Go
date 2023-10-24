@@ -63,6 +63,9 @@ static void coroutine_handler (void* obj_self) {
   coro_context* coroutine_context_return_back = coroutine_context_return_back_pointer_items[0];
   assert(error_id == 0);
   
+  env->set_field_byte_by_name(env, stack, obj_self, "finished", 1, &error_id, __func__, FILE_NAME, __LINE__);
+  assert(error_id == 0);
+  
   coro_transfer_tmp(coroutine_context, coroutine_context_return_back);
   assert(0);
   

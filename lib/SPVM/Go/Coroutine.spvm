@@ -19,6 +19,8 @@ class Go::Coroutine : pointer {
   
   has error_id : ro int;
   
+  has finished : byte;
+  
   has next : rw Go::Queue::Element;
   
   # Class Methods
