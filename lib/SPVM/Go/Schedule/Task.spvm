@@ -23,7 +23,11 @@ class Go::Schedule::Task {
       
       if ($coroutine) {
         $schedule->{current_coroutine} = $coroutine;
-        Go::Coroutine->transfer($schedule_task_coroutine, $coroutine);
+        
+        unless ($coroutine->{finished}) {
+          $schedule->{coroutine_queue}->enqueue($coroutine);
+          Go::Coroutine->transfer($schedule_task_coroutine, $coroutine);
+        }
       }
       else {
         my $return_back = $schedule_task_coroutine->{return_back};
@@ -31,7 +35,6 @@ class Go::Schedule::Task {
         Go::Coroutine->transfer($schedule_task_coroutine, $return_back);
       }
     }
-    
   }
   
   has schedule : Go::Schedule;
