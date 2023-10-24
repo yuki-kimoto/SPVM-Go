@@ -8,7 +8,7 @@
 
 static const char* FILE_NAME = "Go/Coroutine.c";
 
-void coro_transfer_tmp(void* from, void* to) {
+void coro_transfer_fix(void* from, void* to) {
   
   // TODO: coro_transfer have some errors, but this fflush call fix it. I don't understant the reason.
   fflush(stderr);
@@ -66,7 +66,7 @@ static void coroutine_handler (void* obj_self) {
   env->set_field_byte_by_name(env, stack, obj_self, "finished", 1, &error_id, __func__, FILE_NAME, __LINE__);
   assert(error_id == 0);
   
-  coro_transfer_tmp(coroutine_context, coroutine_context_return_back);
+  coro_transfer_fix(coroutine_context, coroutine_context_return_back);
   assert(0);
   
   return;
@@ -130,7 +130,7 @@ int32_t SPVM__Go__Coroutine__transfer(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   coro_context* coroutine_context_to = coroutine_to_pointer_items[0];
   
-  coro_transfer_tmp(coroutine_context_from, coroutine_context_to);
+  coro_transfer_fix(coroutine_context_from, coroutine_context_to);
   
 }
 
