@@ -5,6 +5,10 @@ class TestCase::Go {
   
   static method go : int () {
     
+    Go->go(method : void () {});
+    
+    Go->gosched;
+    
     Go->go(method : void () {
       my $wg = Go::Sync::WaitGroup->new;
       
