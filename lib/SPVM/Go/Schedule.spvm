@@ -43,15 +43,11 @@ class Go::Schedule {
       $self->{coroutine_queue}->enqueue($current_coroutine);
     }
     else {
-      $current_coroutine = Go::Coroutine->new;
+      my $return_back = Go::Coroutine->new;
       
-      my $return_back = $self->{return_back};
+      $self->{return_back} = $return_back;
       
-      if ($return_back) {
-        die "A return back already exists.";
-      }
-      
-      $self->{return_back} = $current_coroutine;
+      $current_coroutine = $return_back;
     }
     
     my $schedule_task_coroutine = $self->{schedule_task_coroutine};
