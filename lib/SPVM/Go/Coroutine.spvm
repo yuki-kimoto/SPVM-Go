@@ -5,6 +5,7 @@ class Go::Coroutine : pointer {
   use Callback;
   
   allow Go::Schedule;
+  allow Go::Schedule::Task;
   
   # Interfaces
   interface Go::Queue::Element;

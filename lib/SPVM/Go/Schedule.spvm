@@ -14,8 +14,6 @@ class Go::Schedule {
   
   has schedule_task_coroutine : Go::Coroutine;
   
-  has return_back : Go::Coroutine;
-  
   static method new : Go::Schedule () {
     
     my $self = new Go::Schedule;
@@ -42,8 +40,6 @@ class Go::Schedule {
     }
     else {
       my $return_back = Go::Coroutine->new;
-      
-      $self->{return_back} = $return_back;
       
       my $schedule_task = Go::Schedule::Task->new;
       

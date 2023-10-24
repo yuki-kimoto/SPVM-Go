@@ -17,20 +17,20 @@ class Go::Schedule::Task {
       
       my $schedule = $self->{schedule};
       
-      my $process_task_coroutine = $schedule->{schedule_task_coroutine};
+      my $schedule_task_coroutine = $schedule->{schedule_task_coroutine};
       
       my $coroutine = (Go::Coroutine)$schedule->{coroutine_queue}->dequeue;
       
       if ($coroutine) {
         $schedule->{current_coroutine} = $coroutine;
-        Go::Coroutine->transfer($process_task_coroutine, $coroutine);
+        Go::Coroutine->transfer($schedule_task_coroutine, $coroutine);
       }
       else {
-        my $return_back = $schedule->{return_back};
+        my $return_back = $schedule_task_coroutine->{return_back};
         
         $self->{schedule} = undef;
         
-        Go::Coroutine->transfer($process_task_coroutine, $return_back);
+        Go::Coroutine->transfer($schedule_task_coroutine, $return_back);
       }
     }
     
