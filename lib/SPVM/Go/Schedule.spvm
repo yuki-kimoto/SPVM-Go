@@ -2,6 +2,7 @@
 # MIT License
 
 class Go::Schedule {
+  allow Go;
   allow Go::Schedule::Task;
   
   use Go::Coroutine;
@@ -14,7 +15,7 @@ class Go::Schedule {
   
   has schedule_task_coroutine : Go::Coroutine;
   
-  static method new : Go::Schedule () {
+  private static method new : Go::Schedule () {
     
     my $self = new Go::Schedule;
     
@@ -25,7 +26,7 @@ class Go::Schedule {
     return $self;
   }
   
-  method schedule : void () {
+  private method schedule : void () {
     
     my $current_coroutine = $self->{current_coroutine};
     
@@ -63,13 +64,11 @@ class Go::Schedule {
     }
   }
   
-  method add_task : void ($task : Callback) {
+  private method add_task : void ($task : Callback) {
     
     my $coroutine = Go::Coroutine->new($task);
     
     $self->{coroutine_queue}->enqueue($coroutine);
   }
   
-  method DESTROY : void () {
-  }
 }
