@@ -4,6 +4,8 @@
 class Go::Schedule::Task {
   allow Go::Schedule;
   
+  has schedule : Go::Schedule;
+  
   private static method new : Go::Schedule::Task () {
     
     my $self = new Go::Schedule::Task;
@@ -11,7 +13,7 @@ class Go::Schedule::Task {
     return $self;
   }
   
-  method : void () {
+  private method : void () {
     
     while (1) {
       
@@ -42,8 +44,4 @@ class Go::Schedule::Task {
     }
   }
   
-  has schedule : Go::Schedule;
-  
-  method DESTROY : void () {
-  }
 }
