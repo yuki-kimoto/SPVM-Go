@@ -30,17 +30,14 @@ class Go::Schedule::Task {
           $coroutine->{return_back} = $schedule_task_coroutine;
           
           $schedule->{current_coroutine} = $coroutine;
-        
+          
           $schedule->{coroutine_queue}->enqueue($coroutine);
-      
+          
           Go::Coroutine->transfer($schedule_task_coroutine, $coroutine);
         }
-      
       }
       else {
-        my $return_back = $schedule_task_coroutine->{return_back};
-        
-        Go::Coroutine->transfer($schedule_task_coroutine, $return_back);
+        last;
       }
     }
   }
