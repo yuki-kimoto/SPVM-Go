@@ -24,14 +24,6 @@ class Go::Schedule {
     
     $self->{coroutine_queue} = $coroutine_queue;
     
-    my $schedule_task = Go::Schedule::Task->new;
-    
-    $schedule_task->{schedule} = $self;
-    
-    my $schedule_task_coroutine = Go::Coroutine->new($schedule_task);
-    
-    $self->{schedule_task_coroutine} = $schedule_task_coroutine;
-    
     return $self;
   }
   
@@ -44,7 +36,7 @@ class Go::Schedule {
       
       my $schedule_task_coroutine = $self->{schedule_task_coroutine};
       
-      $current_coroutine->{return_back} = $self->{schedule_task_coroutine};
+      $current_coroutine->{return_back} = $schedule_task_coroutine;
       
       Go::Coroutine->transfer($current_coroutine, $schedule_task_coroutine);
     }
@@ -53,13 +45,21 @@ class Go::Schedule {
       
       $self->{return_back} = $return_back;
       
-      $current_coroutine = $return_back;
+      my $schedule_task = Go::Schedule::Task->new;
       
-      my $schedule_task_coroutine = $self->{schedule_task_coroutine};
+      $schedule_task->{schedule} = $self;
       
-      $current_coroutine->{return_back} = $self->{schedule_task_coroutine};
+      my $schedule_task_coroutine = Go::Coroutine->new($schedule_task);
       
-      Go::Coroutine->transfer($current_coroutine, $schedule_task_coroutine);
+      $schedule_task_coroutine->{return_back} = $return_back;
+      
+      $self->{schedule_task_coroutine} = $schedule_task_coroutine;
+      
+      Go::Coroutine->transfer($return_back, $schedule_task_coroutine);
+      
+      $self->{schedule_task_coroutine} = undef;
+      
+      $self->{current_coroutine} = undef;
     }
   }
   
