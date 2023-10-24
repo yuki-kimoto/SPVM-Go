@@ -28,8 +28,6 @@ class Go::Schedule::Task {
       else {
         my $return_back = $schedule_task_coroutine->{return_back};
         
-        $self->{schedule} = undef;
-        
         Go::Coroutine->transfer($schedule_task_coroutine, $return_back);
       }
     }

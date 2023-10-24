@@ -53,6 +53,8 @@ class Go::Schedule {
       
       Go::Coroutine->transfer($return_back, $schedule_task_coroutine);
       
+      $schedule_task->{schedule} = undef;
+      
       $self->{schedule_task_coroutine} = undef;
       
       $self->{current_coroutine} = undef;
