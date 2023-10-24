@@ -22,12 +22,20 @@ class Go::Schedule::Task {
       my $coroutine = (Go::Coroutine)$schedule->{coroutine_queue}->dequeue;
       
       if ($coroutine) {
-        $schedule->{current_coroutine} = $coroutine;
+        if ($coroutine->{finished}) {
+          $schedule->{current_coroutine} = undef;
+        }
+        else {
+          
+          $coroutine->{return_back} = $schedule_task_coroutine;
+          
+          $schedule->{current_coroutine} = $coroutine;
         
-        unless ($coroutine->{finished}) {
           $schedule->{coroutine_queue}->enqueue($coroutine);
+      
           Go::Coroutine->transfer($schedule_task_coroutine, $coroutine);
         }
+      
       }
       else {
         my $return_back = $schedule_task_coroutine->{return_back};
@@ -38,4 +46,7 @@ class Go::Schedule::Task {
   }
   
   has schedule : Go::Schedule;
+  
+  method DESTROY : void () {
+  }
 }

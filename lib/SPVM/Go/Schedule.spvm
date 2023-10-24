@@ -30,13 +30,13 @@ class Go::Schedule {
     my $current_coroutine = $self->{current_coroutine};
     
     if ($current_coroutine) {
-      my $schedule_task_coroutine = $self->{schedule_task_coroutine};
       
-      $current_coroutine->{return_back} = $schedule_task_coroutine;
+      my $schedule_task_coroutine = $self->{schedule_task_coroutine};
       
       Go::Coroutine->transfer($current_coroutine, $schedule_task_coroutine);
     }
     else {
+      
       my $return_back = Go::Coroutine->new;
       
       my $schedule_task = Go::Schedule::Task->new;
@@ -56,6 +56,10 @@ class Go::Schedule {
       $self->{schedule_task_coroutine} = undef;
       
       $self->{current_coroutine} = undef;
+      
+      $schedule_task = undef;
+      
+      $schedule_task_coroutine->{task} = undef;
     }
   }
   
@@ -67,6 +71,5 @@ class Go::Schedule {
   }
   
   method DESTROY : void () {
-    warn "DESTROY";
   }
 }
