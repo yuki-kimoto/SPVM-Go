@@ -24,8 +24,6 @@ lib/SPVM/Go/Coroutine.pm
 lib/SPVM/Go/Coroutine.spvm
 lib/SPVM/Go/Global.pm
 lib/SPVM/Go/Global.spvm
-lib/SPVM/Go/Process.pm
-lib/SPVM/Go/Process.spvm
 lib/SPVM/Go/Queue.pm
 lib/SPVM/Go/Queue.spvm
 lib/SPVM/Go/Queue/Element.pm
