@@ -25,7 +25,9 @@ class Go::Schedule::Task {
       
       my $schedule = $self->{schedule};
       
-      my $finshed = !$schedule->{coroutine_queue}->first;
+      my $poll = $schedule->{poll};
+      
+      my $finshed = !$schedule->{coroutine_queue}->first && !$poll->{read_coroutine_queue}->first &&  !$poll->{write_coroutine_queue}->first;
       
       if ($finshed) {
         last;
