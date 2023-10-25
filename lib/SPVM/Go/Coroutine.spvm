@@ -21,6 +21,8 @@ class Go::Coroutine : pointer {
   
   has finished : byte;
   
+  has after_usec : long; # Micro seconds
+  
   has next : rw Go::Queue::Element;
   
   # Class Methods

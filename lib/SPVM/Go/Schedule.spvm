@@ -26,13 +26,15 @@ class Go::Schedule {
     return $self;
   }
   
-  private method schedule : void () {
+  private method schedule : void ($after_usec : long = 0) {
     
     my $current_coroutine = $self->{current_coroutine};
     
     if ($current_coroutine) {
       
       my $schedule_task_coroutine = $self->{schedule_task_coroutine};
+      
+      $schedule_task_coroutine->{after_usec} = $after_usec;
       
       Go::Coroutine->transfer($current_coroutine, $schedule_task_coroutine);
     }
