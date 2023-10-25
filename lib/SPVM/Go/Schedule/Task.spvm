@@ -25,7 +25,7 @@ class Go::Schedule::Task {
       
       my $schedule = $self->{schedule};
       
-      my $finshed = !(Go::Coroutine)$schedule->{coroutine_queue}->first;
+      my $finshed = !$schedule->{coroutine_queue}->first;
       
       if ($finshed) {
         last;
