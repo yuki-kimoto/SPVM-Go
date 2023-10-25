@@ -5,11 +5,17 @@ class Go::Poll {
   use Go::Coroutine;
   use Go::Queue;
   
-  has coroutine_queue : Go::Queue of Go::Coroutine;
+  has read_coroutine_queue : Go::Queue of Go::Coroutine;
+  
+  has write_coroutine_queue : Go::Queue of Go::Coroutine;
   
   static method new : Go::Poll () {
     
     my $self = new Go::Poll;
+    
+    $self->{read_coroutine_queue} = Go::Queue->new;
+    
+    $self->{write_coroutine_queue} = Go::Queue->new;
     
     return $self;
   }

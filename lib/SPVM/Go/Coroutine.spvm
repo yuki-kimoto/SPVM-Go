@@ -25,6 +25,10 @@ class Go::Coroutine : pointer {
   
   has deadline : Sys::Time::Timespec;
   
+  has fd : int;
+  
+  has is_write : byte;
+  
   has next : rw Go::Queue::Element;
   
   # Class Methods
@@ -37,6 +41,8 @@ class Go::Coroutine : pointer {
     $self->{return_back} = $return_back;
     
     $self->init_coroutine;
+    
+    $self->{fd} = -1;
     
     return $self;
   }

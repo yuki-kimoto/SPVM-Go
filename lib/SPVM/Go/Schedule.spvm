@@ -34,7 +34,7 @@ class Go::Schedule {
     return $self;
   }
   
-  private method schedule : void ($after : double = 0) {
+  private method schedule : void ($after : double = 0, $fd : int = -1, $is_write : int = 0) {
     
     my $current_coroutine = $self->{current_coroutine};
     
@@ -74,11 +74,15 @@ class Go::Schedule {
         $current_coroutine->{deadline} = $deadline_ts;
       }
       
+      $current_coroutine->{fd} = $fd;
+      
+      $current_coroutine->{is_write} = (byte)$is_write;
+      
       Go::Coroutine->transfer($current_coroutine, $schedule_task_coroutine);
     }
     else {
       if ($after > 0) {
-        die "The \$after must be given in a coroutine.";
+        die "\$after(or \$timeout) must be given in a goroutine.";
       }
       
       my $return_back = Go::Coroutine->new;

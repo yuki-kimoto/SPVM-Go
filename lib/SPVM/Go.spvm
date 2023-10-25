@@ -53,6 +53,24 @@ class Go {
     $schedule->schedule($after);
   }
   
+  static method gosched_io_read : void ($fd : int, $timeout : double = 0) {
+    
+    my $schedule = $GO->{schedule};
+    
+    my $is_write = 0;
+    
+    $schedule->schedule($timeout, $fd, $is_write);
+  }
+  
+  static method gosched_io_write : void ($fd : int, $timeout : double = 0) {
+    
+    my $schedule = $GO->{schedule};
+    
+    my $is_write = 1;
+    
+    $schedule->schedule($timeout, $fd, $is_write);
+  }
+  
   method DESTROY : void () {
     
     my $schedule = $self->{schedule};
