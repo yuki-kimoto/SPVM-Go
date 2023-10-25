@@ -11,12 +11,15 @@ class Go::Schedule {
   use Sys::Time;
   use Sys::Time::Timeval;
   use Sys::Time::Timespec;
+  use Go::Poll;
   
   has coroutine_queue : Go::Queue of Go::Coroutine;
   
   has current_coroutine : Go::Coroutine;
   
   has schedule_task_coroutine : Go::Coroutine;
+  
+  has poll : Go::Poll;
   
   private static method new : Go::Schedule () {
     
@@ -25,6 +28,8 @@ class Go::Schedule {
     my $coroutine_queue = Go::Queue->new;
     
     $self->{coroutine_queue} = $coroutine_queue;
+    
+    $self->{poll} = Go::Poll->new;
     
     return $self;
   }
