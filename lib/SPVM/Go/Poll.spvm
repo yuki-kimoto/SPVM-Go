@@ -1,0 +1,17 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
+class Go::Poll {
+  use Go::Coroutine;
+  use Go::Queue;
+  
+  has coroutine_queue : Go::Queue of Go::Coroutine;
+  
+  static method new : Go::Poll () {
+    
+    my $self = new Go::Poll;
+    
+    return $self;
+  }
+  
+}
