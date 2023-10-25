@@ -16,6 +16,10 @@ class TestCase::Go {
       Go->gosched($after);
       
       warn "Sleep 1.5 seconds";
+      
+      Go->gosched(0.5);
+      
+      warn "Sleep 0.5 seconds";
     });
     
     Go->go(method : void () {
