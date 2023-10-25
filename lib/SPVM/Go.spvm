@@ -46,11 +46,11 @@ class Go {
     
   }
   
-  static method gosched : void ($after_usec : long = 0) {
+  static method gosched : void ($after : double = 0) {
     
     my $schedule = $GO->{schedule};
     
-    $schedule->schedule($after_usec);
+    $schedule->schedule($after);
   }
   
   method DESTROY : void () {
