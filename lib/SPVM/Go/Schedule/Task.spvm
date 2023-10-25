@@ -6,6 +6,7 @@ class Go::Schedule::Task {
   
   use Sys::Time;
   use Sys::Time::Timeval;
+  use Sys::Time::Timespec;
   
   has schedule : Go::Schedule;
   
@@ -34,13 +35,21 @@ class Go::Schedule::Task {
         }
         else {
           
-          my $deadline = $coroutine->{deadline};
-          if ($deadline > 0) {
+          my $deadline_ts = $coroutine->{deadline};
+          if ($deadline_ts) {
+            
+            my $now_sec = $now_tv->tv_sec;
+            my $now_nsec = 1000 * $now_tv->tv_usec;
+            
+            my $deadline_sec = $deadline_ts->tv_sec;
+            my $deadline_nsec = $deadline_ts->tv_nsec;
+            
             Sys::Time->gettimeofday($now_tv, undef);
             
-            my $now = $now_tv->tv_sec + 0.000001 * $now_tv->tv_usec;
-            
-            unless ($now > $deadline) {
+            if ($now_sec > $deadline_sec || ($now_sec == $deadline_sec && $deadline_nsec > $deadline_nsec)) {
+              $coroutine->{deadline} = undef;
+            }
+            else {
               $schedule->{coroutine_queue}->enqueue($coroutine);
               next;
             }

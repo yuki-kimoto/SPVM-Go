@@ -4,6 +4,8 @@
 class Go::Coroutine : pointer {
   use Callback;
   
+  use Sys::Time::Timespec;
+  
   allow Go::Schedule;
   allow Go::Schedule::Task;
   
@@ -21,7 +23,7 @@ class Go::Coroutine : pointer {
   
   has finished : byte;
   
-  has deadline : double;
+  has deadline : Sys::Time::Timespec;
   
   has next : rw Go::Queue::Element;
   

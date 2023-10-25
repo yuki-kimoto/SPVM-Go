@@ -9,6 +9,8 @@ class Go::Schedule {
   use Go::Queue;
   use Go::Schedule::Task;
   use Sys::Time;
+  use Sys::Time::Timeval;
+  use Sys::Time::Timespec;
   
   has coroutine_queue : Go::Queue of Go::Coroutine;
   
@@ -35,22 +37,44 @@ class Go::Schedule {
       
       my $schedule_task_coroutine = $self->{schedule_task_coroutine};
       
-      unless ($after > 0) {
+      if ($after > 0) {
         
         my $now_tv = Sys::Time::Timeval->new;
         
         Sys::Time->gettimeofday($now_tv, undef);
         
-        my $now = $now_tv->tv_sec + 0.000001 * $now_tv->tv_usec;
+        my $now_sec = $now_tv->tv_sec;
         
-        my $deadline = $now + $after;
+        my $now_nsec = 1000 * $now_tv->tv_sec;
         
-        $schedule_task_coroutine->{deadline} = $deadline;
+        my $after_sec = (int)$after;
+        
+        my $after_nsec = (int)(($after - $after_sec) * 1_000_000_000);
+        
+        my $deadline_sec = $now_sec + $after_sec;
+        
+        my $deadline_nsec = $now_nsec + $after_nsec;
+        
+        if ($deadline_nsec >= 1_000_000_000) {
+          $deadline_sec += 1;
+          $deadline_nsec -= 1_000_000_000;
+        }
+        
+        my $deadline_ts = Sys::Time::Timespec->new;
+        
+        $deadline_ts->set_tv_sec($deadline_sec);
+        
+        $deadline_ts->set_tv_nsec($deadline_nsec);
+        
+        $current_coroutine->{deadline} = $deadline_ts;
       }
       
       Go::Coroutine->transfer($current_coroutine, $schedule_task_coroutine);
     }
     else {
+      if ($after > 0) {
+        die "The \$after must be given in a coroutine.";
+      }
       
       my $return_back = Go::Coroutine->new;
       
