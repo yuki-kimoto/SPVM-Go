@@ -36,6 +36,8 @@ class Go::Schedule::Task {
       
       my $coroutine = (Go::Coroutine)$schedule->{coroutine_queue}->dequeue;
       
+      my $check_io = $loop_count % 60 || !$coroutine;
+      
       if ($coroutine->{finished}) {
         $schedule->{current_coroutine} = undef;
       }
