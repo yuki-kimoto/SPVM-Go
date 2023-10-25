@@ -35,6 +35,8 @@ class Go::Schedule::Task {
         }
         else {
           
+          my $over_deadline = 1;
+          
           my $deadline_ts = $coroutine->{deadline};
           if ($deadline_ts) {
             
@@ -51,8 +53,12 @@ class Go::Schedule::Task {
             }
             else {
               $schedule->{coroutine_queue}->enqueue($coroutine);
-              next;
+              $over_deadline = 0;
             }
+          }
+          
+          unless ($over_deadline) {
+            next;
           }
           
           $schedule->{coroutine_queue}->enqueue($coroutine);
