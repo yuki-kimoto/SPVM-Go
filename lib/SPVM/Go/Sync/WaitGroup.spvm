@@ -3,13 +3,18 @@
 
 class Go::Sync::WaitGroup {
   use Go;
+  use Sync::Mutex;
   
   has state : int;
+  
+  has mutex : Sync::Mutex;
   
   # Class Methods
   static method new : Go::Sync::WaitGroup () {
     
     my $self = new Go::Sync::WaitGroup;
+    
+    $self->{mutex} = Sync::Mutex->new;
     
     return $self;
   }
@@ -17,11 +22,17 @@ class Go::Sync::WaitGroup {
   # Instance Methods
   method add : void ($delta : int = 1) {
     
+    my $mutex = $self->{mutex};
+    
+    $mutex->lock;
+    
     my $state = $self->{state};
     
     $state += $delta;
     
     $self->{state} = $state;
+    
+    $mutex->unlock;
     
     my $state_is_negative = $self->{state} < 0;
     
