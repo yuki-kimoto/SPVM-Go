@@ -4,6 +4,9 @@
 class Go::Schedule::Task {
   allow Go::Schedule;
   
+  use Sys::Time;
+  use Sys::Time::Timeval;
+  
   has schedule : Go::Schedule;
   
   private static method new : Go::Schedule::Task () {
@@ -14,6 +17,8 @@ class Go::Schedule::Task {
   }
   
   private method : void () {
+    
+    my $now_tv = Sys::Time::Timeval->new;
     
     while (1) {
       
@@ -29,11 +34,23 @@ class Go::Schedule::Task {
         }
         else {
           
+          my $deadline = $coroutine->{deadline};
+          if ($deadline > 0) {
+            Sys::Time->gettimeofday($now_tv, undef);
+            
+            my $now = $now_tv->tv_sec + 0.000001 * $now_tv->tv_usec;
+            
+            unless ($now > $deadline) {
+              $schedule->{coroutine_queue}->enqueue($coroutine);
+              next;
+            }
+          }
+          
+          $schedule->{coroutine_queue}->enqueue($coroutine);
+          
           $coroutine->{return_back} = $schedule_task_coroutine;
           
           $schedule->{current_coroutine} = $coroutine;
-          
-          $schedule->{coroutine_queue}->enqueue($coroutine);
           
           Go::Coroutine->transfer($schedule_task_coroutine, $coroutine);
         }

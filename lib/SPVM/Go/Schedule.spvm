@@ -8,6 +8,7 @@ class Go::Schedule {
   use Go::Coroutine;
   use Go::Queue;
   use Go::Schedule::Task;
+  use Sys::Time;
   
   has coroutine_queue : Go::Queue of Go::Coroutine;
   
@@ -26,7 +27,7 @@ class Go::Schedule {
     return $self;
   }
   
-  private method schedule : void ($after_usec : long = 0) {
+  private method schedule : void ($after : double = 0) {
     
     my $current_coroutine = $self->{current_coroutine};
     
@@ -34,7 +35,18 @@ class Go::Schedule {
       
       my $schedule_task_coroutine = $self->{schedule_task_coroutine};
       
-      $schedule_task_coroutine->{after_usec} = $after_usec;
+      unless ($after > 0) {
+        
+        my $now_tv = Sys::Time::Timeval->new;
+        
+        Sys::Time->gettimeofday($now_tv, undef);
+        
+        my $now = $now_tv->tv_sec + 0.000001 * $now_tv->tv_usec;
+        
+        my $deadline = $now + $after;
+        
+        $schedule_task_coroutine->{deadline} = $deadline;
+      }
       
       Go::Coroutine->transfer($current_coroutine, $schedule_task_coroutine);
     }
