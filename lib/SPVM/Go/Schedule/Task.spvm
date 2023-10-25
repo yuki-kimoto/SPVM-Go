@@ -25,65 +25,66 @@ class Go::Schedule::Task {
       
       my $schedule = $self->{schedule};
       
+      my $finshed = !(Go::Coroutine)$schedule->{coroutine_queue}->first;
+      
+      if ($finshed) {
+        last;
+      }
+      
       my $coroutine = (Go::Coroutine)$schedule->{coroutine_queue}->dequeue;
       
-      if ($coroutine) {
-        if ($coroutine->{finished}) {
-          $schedule->{current_coroutine} = undef;
-        }
-        else {
-          my $over_deadline = 1;
-          
-          my $deadline_ts = $coroutine->{deadline};
-          if ($deadline_ts) {
-            
-            my $now_sec = $now_tv->tv_sec;
-            my $now_nsec = 1000 * $now_tv->tv_usec;
-            
-            my $deadline_sec = $deadline_ts->tv_sec;
-            my $deadline_nsec = $deadline_ts->tv_nsec;
-            
-            Sys::Time->gettimeofday($now_tv, undef);
-            
-            if ($now_sec > $deadline_sec || ($now_sec == $deadline_sec && $deadline_nsec > $deadline_nsec)) {
-              $coroutine->{deadline} = undef;
-            }
-            else {
-              $schedule->{coroutine_queue}->enqueue($coroutine);
-              $over_deadline = 0;
-            }
-          }
-          
-          
-          my $fd = $coroutine->{fd};
-          if ($fd >= 0) {
-            my $is_write = $coroutine->{is_write};
-            
-            if ($is_write) {
-              $schedule->{poll}->{write_coroutine_queue}->enqueue($coroutine);
-            }
-            else {
-              $schedule->{poll}->{read_coroutine_queue}->enqueue($coroutine);
-            }
-          }
-          else {
-            if ($over_deadline) {
-              
-              my $schedule_task_coroutine = $schedule->{schedule_task_coroutine};
-              
-              $schedule->{coroutine_queue}->enqueue($coroutine);
-              
-              $coroutine->{return_back} = $schedule_task_coroutine;
-              
-              $schedule->{current_coroutine} = $coroutine;
-              
-              Go::Coroutine->transfer($schedule_task_coroutine, $coroutine);
-            }
-          }
-        }
+      if ($coroutine->{finished}) {
+        $schedule->{current_coroutine} = undef;
       }
       else {
-        last;
+        my $over_deadline = 1;
+        
+        my $deadline_ts = $coroutine->{deadline};
+        if ($deadline_ts) {
+          
+          my $now_sec = $now_tv->tv_sec;
+          my $now_nsec = 1000 * $now_tv->tv_usec;
+          
+          my $deadline_sec = $deadline_ts->tv_sec;
+          my $deadline_nsec = $deadline_ts->tv_nsec;
+          
+          Sys::Time->gettimeofday($now_tv, undef);
+          
+          if ($now_sec > $deadline_sec || ($now_sec == $deadline_sec && $deadline_nsec > $deadline_nsec)) {
+            $coroutine->{deadline} = undef;
+          }
+          else {
+            $schedule->{coroutine_queue}->enqueue($coroutine);
+            $over_deadline = 0;
+          }
+        }
+        
+        
+        my $fd = $coroutine->{fd};
+        if ($fd >= 0) {
+          my $is_write = $coroutine->{is_write};
+          
+          if ($is_write) {
+            $schedule->{poll}->{write_coroutine_queue}->enqueue($coroutine);
+          }
+          else {
+            $schedule->{poll}->{read_coroutine_queue}->enqueue($coroutine);
+          }
+        }
+        else {
+          if ($over_deadline) {
+            
+            my $schedule_task_coroutine = $schedule->{schedule_task_coroutine};
+            
+            $schedule->{coroutine_queue}->enqueue($coroutine);
+            
+            $coroutine->{return_back} = $schedule_task_coroutine;
+            
+            $schedule->{current_coroutine} = $coroutine;
+            
+            Go::Coroutine->transfer($schedule_task_coroutine, $coroutine);
+          }
+        }
       }
     }
   }
