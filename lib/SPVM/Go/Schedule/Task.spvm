@@ -34,7 +34,6 @@ class Go::Schedule::Task {
           $schedule->{current_coroutine} = undef;
         }
         else {
-          
           my $over_deadline = 1;
           
           my $deadline_ts = $coroutine->{deadline};
@@ -57,17 +56,30 @@ class Go::Schedule::Task {
             }
           }
           
-          unless ($over_deadline) {
-            next;
+          
+          my $fd = $coroutine->{fd};
+          if ($fd >= 0) {
+            my $is_write = $coroutine->{is_write};
+            
+            if ($is_write) {
+              $schedule->{poll}->{write_coroutine_queue}->enqueue($coroutine);
+            }
+            else {
+              $schedule->{poll}->{read_coroutine_queue}->enqueue($coroutine);
+            }
           }
-          
-          $schedule->{coroutine_queue}->enqueue($coroutine);
-          
-          $coroutine->{return_back} = $schedule_task_coroutine;
-          
-          $schedule->{current_coroutine} = $coroutine;
-          
-          Go::Coroutine->transfer($schedule_task_coroutine, $coroutine);
+          else {
+            if ($over_deadline) {
+              
+              $schedule->{coroutine_queue}->enqueue($coroutine);
+              
+              $coroutine->{return_back} = $schedule_task_coroutine;
+              
+              $schedule->{current_coroutine} = $coroutine;
+              
+              Go::Coroutine->transfer($schedule_task_coroutine, $coroutine);
+            }
+          }
         }
       }
       else {
