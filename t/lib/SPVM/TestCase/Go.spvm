@@ -29,6 +29,10 @@ class TestCase::Go {
       
       Go->go([has wg : Go::Sync::WaitGroup = $wg] method : void () {
         
+        Fn->defer([has wg : Go::Sync::WaitGroup = $self->{wg}] method : void () {
+          $self->{wg}->done;
+        });
+        
         # die "Foo";
         
         warn("G0-A");
@@ -40,11 +44,12 @@ class TestCase::Go {
         Go->gosched;
         
         warn("G0-B");
-        
-        $self->{wg}->done;
       });
       
       Go->go([has wg : Go::Sync::WaitGroup = $wg] method : void () {
+        Fn->defer([has wg : Go::Sync::WaitGroup = $self->{wg}] method : void () {
+          $self->{wg}->done;
+        });
         
         # die "Foo";
         
@@ -57,8 +62,6 @@ class TestCase::Go {
         Go->gosched;
         
         warn("G1-B");
-        
-        $self->{wg}->done;
       });
       
       $wg->wait;
