@@ -13,7 +13,7 @@ class Go::Poll {
     
     my $self = new Go::Poll;
     
-    $self->{coroutines} = List->new;
+    $self->{coroutines} = List->new(new Go::Coroutine[0]);
     
     return $self;
   }

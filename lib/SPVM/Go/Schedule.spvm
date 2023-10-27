@@ -25,7 +25,7 @@ class Go::Schedule {
     
     my $self = new Go::Schedule;
     
-    my $coroutines = List->new;
+    my $coroutines = List->new(new Go::Coroutine[0]);;
     
     $self->{coroutines} = $coroutines;
     
