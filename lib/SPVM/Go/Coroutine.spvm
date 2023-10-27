@@ -9,9 +9,6 @@ class Go::Coroutine : pointer {
   allow Go::Schedule;
   allow Go::Schedule::Task;
   
-  # Interfaces
-  interface Go::Queue::Element;
-  
   # Fields
   has return_back : Go::Coroutine;
   
@@ -28,8 +25,6 @@ class Go::Coroutine : pointer {
   has fd : int;
   
   has is_write : byte;
-  
-  has next : rw Go::Queue::Element;
   
   # Class Methods
   static method new : Go::Coroutine ($task :  Callback = undef, $return_back : Go::Coroutine = undef) {

@@ -22,10 +22,8 @@ lib/SPVM/Go/Coroutine.native/src/.gitkeep
 lib/SPVM/Go/Coroutine.native/src/coro.c
 lib/SPVM/Go/Coroutine.pm
 lib/SPVM/Go/Coroutine.spvm
-lib/SPVM/Go/Queue.pm
-lib/SPVM/Go/Queue.spvm
-lib/SPVM/Go/Queue/Element.pm
-lib/SPVM/Go/Queue/Element.spvm
+lib/SPVM/Go/Poll.pm
+lib/SPVM/Go/Poll.spvm
 lib/SPVM/Go/Schedule.pm
 lib/SPVM/Go/Schedule.spvm
 lib/SPVM/Go/Schedule/Task.pm

@@ -5,15 +5,15 @@ class Go::Poll {
   allow Go::Schedule::Task;
   
   use Go::Coroutine;
-  use Go::Queue;
+  use List;
   
-  has coroutine_queue : Go::Queue of Go::Coroutine;
+  has coroutines : List of Go::Coroutine;
   
   static method new : Go::Poll () {
     
     my $self = new Go::Poll;
     
-    $self->{coroutine_queue} = Go::Queue->new;
+    $self->{coroutines} = List->new;
     
     return $self;
   }

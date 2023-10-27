@@ -28,7 +28,7 @@ class Go::Schedule::Task {
       
       my $poll = $schedule->{poll};
       
-      my $finshed = !$schedule->{coroutine_queue}->first && !$poll->{coroutine_queue}->first;
+      my $finshed = !$schedule->{coroutines}->length && !$poll->{coroutines}->length;
       
       if ($finshed) {
         last;
@@ -36,7 +36,7 @@ class Go::Schedule::Task {
       
       my $check_io = 0;
       
-      if ($loop_count % 60 == 0 || !$schedule->{coroutine_queue}->first) {
+      if ($loop_count % 60 == 0 || !$schedule->{coroutines}->length) {
         $check_io = 1;
       }
       
@@ -44,7 +44,11 @@ class Go::Schedule::Task {
         # TODO
       }
       else {
-        my $coroutine = (Go::Coroutine)$schedule->{coroutine_queue}->dequeue;
+        my $coroutine = (Go::Coroutine)undef;
+        
+        if ($schedule->{coroutines}->length > 0) {
+          $coroutine = (Go::Coroutine)$schedule->{coroutines}->shift;
+        }
         
         if ($coroutine->{finished}) {
           $schedule->{current_coroutine} = undef;
@@ -67,7 +71,7 @@ class Go::Schedule::Task {
               $coroutine->{deadline} = undef;
             }
             else {
-              $schedule->{coroutine_queue}->enqueue($coroutine);
+              $schedule->{coroutines}->push($coroutine);
               $over_deadline = 0;
             }
           }
@@ -75,14 +79,14 @@ class Go::Schedule::Task {
           
           my $fd = $coroutine->{fd};
           if ($fd >= 0) {
-            $schedule->{poll}->{coroutine_queue}->enqueue($coroutine);
+            $schedule->{poll}->{coroutines}->push($coroutine);
           }
           else {
             if ($over_deadline) {
               
               my $schedule_task_coroutine = $schedule->{schedule_task_coroutine};
               
-              $schedule->{coroutine_queue}->enqueue($coroutine);
+              $schedule->{coroutines}->push($coroutine);
               
               $coroutine->{return_back} = $schedule_task_coroutine;
               

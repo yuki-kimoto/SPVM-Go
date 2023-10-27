@@ -6,7 +6,6 @@ class Go::Channel {
   use Hash;
   use Go::Channel::Wait;
   use Go::Channel::ReadCallback;
-  use Go::Queue;
   
   private enum {
     READABLE_STATE_NONE,
@@ -29,11 +28,11 @@ class Go::Channel {
   
   has read_index : int;
   
-  has read_queue : Go::Queue of Go::Channel::Wait;
+  has read_queue : List of Go::Channel::Wait;
   
   has write_index : int;
   
-  has write_queue : Go::Queue of Go::Channel::Wait;
+  has write_queue : List of Go::Channel::Wait;
   
   # Class Methods
   static method new : Go::Channel ($options : object[] = undef) {
