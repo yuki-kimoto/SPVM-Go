@@ -44,74 +44,9 @@ class Go::Schedule::Task {
       }
       
       if ($check_io) {
-        
-        my $poll_coroutines_h = $poll->{coroutines_h};
-        
-        my $poll_coroutines_length = $poll_coroutines_h->keys_length;
-        
-        if ($poll_coroutines_length > 0) {
-          my $poll_fd_array = Sys::Poll::PollfdArray->new($poll_coroutines_length);
-          
-          my $poll_coroutine_addresses = $poll_coroutines_h->keys;
-          
-          my $poll_index = 0;
-          for my $address (@$poll_coroutine_addresses) {
-            
-            my $poll_coroutine = (Go::Coroutine)$poll_coroutines_h->get($address);
-            
-            my $fd = $poll_coroutine->{fd};
-            
-            $poll_fd_array->set_fd($poll_index, $fd);
-            
-            my $is_write = $poll_coroutine->{is_write};
-            
-            if ($is_write) {
-              $poll_fd_array->set_events($poll_index, POLL->POLLOUT);
-            }
-            else {
-              $poll_fd_array->set_events($poll_index, POLL->POLLIN);
-            }
-            
-            $poll_coroutine->{poll_index} = $poll_index;
-            
-            $poll_index++;
-          }
-          
-          my $status = Sys::Poll->poll($poll_fd_array, $poll_coroutines_length, 0);
-          
-          my $ready_coroutines_list = List->new(new Go::Coroutine[0]);
-          
-          for my $address (@$poll_coroutine_addresses) {
-            my $poll_coroutine = (Go::Coroutine)$poll_coroutines_h->get($address);
-            
-            my $poll_index = $poll_coroutine->{poll_index};
-            
-            my $revent = $poll_fd_array->revents($poll_index);
-            my $ready = 0;
-            if ($revent & (POLL->POLLPRI | POLL->POLLNVAL | POLL->POLLHUP | POLL->POLLERR)) {
-              $ready = 1;
-            }
-            elsif ($revent & POLL->POLLIN) {
-              unless ($poll_coroutine->{is_write}) {
-                $ready = 1;
-              }
-            }
-            elsif ($revent & POLL->POLLOUT) {
-              if ($poll_coroutine->{is_write}) {
-                $ready = 1;
-              }
-            }
-            
-            if ($ready) {
-              my $ready_coroutine = $poll_coroutines_h->delete($address);
-              $ready_coroutines_list->push($address);
-            }
-          }
-          
-          my $ready_coroutines = $ready_coroutines_list->to_array;
-          for my $ready_coroutine (@$ready_coroutines) {
-            $schedule->{coroutines}->push($ready_coroutine);
-          }
+        my $ready_coroutines = $poll->get_ready_coroutines;
+        for my $ready_coroutine (@$ready_coroutines) {
+          $schedule->{coroutines}->push($ready_coroutine);
         }
       }
       else {
