@@ -79,7 +79,7 @@ class Go::Schedule::Task {
           
           my $status = Sys::Poll->poll($poll_fd_array, $poll_coroutines_length, 0);
           
-          my $ready_coroutine_addresses_list = StringList->new;
+          my $ready_coroutines_list = List->new(new Go::Coroutine[0]);
           
           for my $address (@$poll_coroutine_addresses) {
             my $poll_coroutine = (Go::Coroutine)$poll_coroutines_h->get($address);
@@ -103,15 +103,13 @@ class Go::Schedule::Task {
             }
             
             if ($ready) {
-              $ready_coroutine_addresses_list->push($address);
+              my $ready_coroutine = $poll_coroutines_h->delete($address);
+              $ready_coroutines_list->push($address);
             }
           }
           
-          
-          my $ready_coroutine_addresses = $ready_coroutine_addresses_list->to_array;
-          for my $address (@$ready_coroutine_addresses) {
-            my $ready_coroutine = $poll_coroutines_h->delete($address);
-            
+          my $ready_coroutines = $ready_coroutines_list->to_array;
+          for my $ready_coroutine (@$ready_coroutines) {
             $schedule->{coroutines}->push($ready_coroutine);
           }
         }
