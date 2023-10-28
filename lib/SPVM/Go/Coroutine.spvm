@@ -2,6 +2,8 @@
 # MIT License
 
 class Go::Coroutine : pointer {
+  allow Go::Poll;
+  
   use Callback;
   
   use Sys::Time::Timespec;
