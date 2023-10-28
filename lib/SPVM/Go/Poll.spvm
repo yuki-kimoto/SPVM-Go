@@ -7,13 +7,13 @@ class Go::Poll {
   use Go::Coroutine;
   use List;
   
-  has coroutines : List of Go::Coroutine;
+  has coroutines_h : Hash of Go::Coroutine;
   
   static method new : Go::Poll () {
     
     my $self = new Go::Poll;
     
-    $self->{coroutines} = List->new(new Go::Coroutine[0]);
+    $self->{coroutines_h} = Hash->new;
     
     return $self;
   }

@@ -26,6 +26,8 @@ class Go::Coroutine : pointer {
   
   has is_write : byte;
   
+  has poll_index : int;
+  
   # Class Methods
   static method new : Go::Coroutine ($task :  Callback = undef, $return_back : Go::Coroutine = undef) {
     
