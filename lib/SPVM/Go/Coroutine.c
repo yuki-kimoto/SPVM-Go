@@ -26,6 +26,10 @@ static void coroutine_handler (void* obj_self) {
   
   SPVM_VALUE* stack = pointer_items[3];
   
+  int32_t s = env->get_memory_blocks_count(env, stack);
+  
+  int32_t scope_id = env->enter_scope(env, stack);
+  
   env->set_field_object_by_name(env, stack, obj_self, "exception", NULL, &error_id, __func__, FILE_NAME, __LINE__);
   assert(error_id == 0);
   
@@ -51,6 +55,9 @@ static void coroutine_handler (void* obj_self) {
     env->set_field_int_by_name(env, stack, obj_self, "error_id", error_id, &error_id, __func__, FILE_NAME, __LINE__);
     assert(error_id == 0);
     
+    fprintf(env->api->runtime->get_spvm_stderr(env->runtime), "[An exception is converted to a warning at the end of a Go coroutine]\n");
+    
+    env->print_stderr(env, stack, obj_exception);
   }
   
   void* obj_return_back = env->get_field_object_by_name(env, stack, obj_self, "return_back", &error_id, __func__, FILE_NAME, __LINE__);
@@ -65,6 +72,14 @@ static void coroutine_handler (void* obj_self) {
   
   env->set_field_byte_by_name(env, stack, obj_self, "finished", 1, &error_id, __func__, FILE_NAME, __LINE__);
   assert(error_id == 0);
+  
+  env->leave_scope(env, stack, scope_id);
+  
+  env->set_exception(env, stack, NULL);
+  
+  int32_t e = env->get_memory_blocks_count(env, stack);
+  
+  spvm_warn("%d %d", s, e);
   
   coro_transfer_fix(coroutine_context, coroutine_context_return_back);
   assert(0);
@@ -97,11 +112,16 @@ int32_t SPVM__Go__Coroutine__init_coroutine(SPVM_ENV* env, SPVM_VALUE* stack) {
   }
   
   void** pointer_items = env->new_memory_block(env, stack, sizeof(void*) * 4);
-    
+  
+  void* obj_spvm_stack = env->get_field_object_by_name(env, stack, obj_self, "stack", &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) { return error_id; }
+  
+  SPVM_VALUE* spvm_stack = env->get_pointer(env, stack, obj_spvm_stack);
+  
   pointer_items[0] = coroutine_context;
   pointer_items[1] = coroutine_stack;
   pointer_items[2] = env;
-  pointer_items[3] = stack;
+  pointer_items[3] = spvm_stack;
   
   env->set_pointer(env, stack, obj_self, pointer_items);
   
