@@ -8,6 +8,10 @@ class Go::Coroutine : pointer {
   
   use Sys::Time::Timespec;
   
+  use Native::Stack;
+  
+  use Native;
+  
   allow Go::Schedule;
   allow Go::Schedule::Task;
   
@@ -30,6 +34,8 @@ class Go::Coroutine : pointer {
   
   has poll_index : int;
   
+  has stack : Native::Stack;
+  
   # Class Methods
   static method new : Go::Coroutine ($task :  Callback = undef, $return_back : Go::Coroutine = undef) {
     
@@ -42,6 +48,10 @@ class Go::Coroutine : pointer {
     $self->init_coroutine;
     
     $self->{fd} = -1;
+    
+    my $env = Native->get_current_env;
+    
+    $self->{stack} = $env->new_stack;
     
     return $self;
   }
