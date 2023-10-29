@@ -2,6 +2,7 @@ class TestCase::Go {
   use Go;
   use Sys;
   use Go::Sync::WaitGroup;
+  use Point;
   
   static method go : int () {
     
@@ -77,6 +78,9 @@ class TestCase::Go {
   }
   
   static method foo : void () {
+    
+    my $foo = Point->new;
+    
     warn "G1-CallMethod";
   }
 }
