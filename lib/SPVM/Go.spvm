@@ -53,11 +53,11 @@ class Go {
     return $status;
   }
   
-  static method gosched_timer : int ($after : double = 0) {
+  static method sleep : int ($seconds : double = 0) {
     
     my $schedule = $GO->{schedule};
     
-    my $status = $schedule->schedule_timer($after);
+    my $status = $schedule->schedule($seconds);
     
     return $status;
   }

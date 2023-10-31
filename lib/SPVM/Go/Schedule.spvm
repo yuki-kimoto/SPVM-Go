@@ -37,13 +37,6 @@ class Go::Schedule {
     return $self;
   }
   
-  method schedule_timer : int ($after : double = 0) {
-    
-    my $status = $self->schedule($after);
-    
-    return $status;
-  }
-  
   method schedule_io_read : int ($fd : int, $timeout : double = 0) {
     
     my $is_write = 0;

@@ -26,13 +26,13 @@ class TestCase::Go {
     
     Go->go(method : void () {
       
-      my $after = 1.5;
+      my $seconds = 1.5;
       
-      Go->gosched_timer($after);
+      Go->sleep($seconds);
       
       warn "Sleep 1.5 seconds";
       
-      Go->gosched_timer(0.5);
+      Go->sleep(0.5);
       
       warn "Sleep 0.5 seconds";
     });
