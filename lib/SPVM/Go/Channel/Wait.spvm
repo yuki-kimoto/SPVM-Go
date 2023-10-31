@@ -9,8 +9,5 @@ class Go::Channel::Wait {
   
   has coroutine : Go::Coroutine;
   
-  has data : object;
-  
-  has next : Go::Channel::Wait;
-  
+  has value : object;
 }

@@ -15,7 +15,9 @@ class Go::Channel {
   
   has closed : int;
   
-  has coroutines_h : Hash of Go::Coroutine;
+  has read_waiters : List of Go::Channel::Wait;
+  
+  has write_waiters : List of Go::Channel::Wait;
   
   # Class Methods
   static method new : Go::Channel ($options : object[] = undef) {
@@ -37,7 +39,9 @@ class Go::Channel {
     
     $self->{buffer} = $buffer;
     
-    $self->{coroutines_h} = Hash->new;
+    $self->{read_waiters} = List->new(new Go::Channel::Wait[0]);
+    
+    $self->{write_waiters} = List->new(new Go::Channel::Wait[0]);
     
     return $self;
   }
@@ -74,6 +78,12 @@ class Go::Channel {
       return undef;
     }
     
+    my $value = $self->{value};
+    
+    $self->{value} = undef;
+    
+    
+    return $value;
   }
   
   method write : void ($object : object) {
