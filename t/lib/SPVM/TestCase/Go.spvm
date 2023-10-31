@@ -4,6 +4,31 @@ class TestCase::Go {
   use Go::Sync::WaitGroup;
   use Point;
   
+  static method channel : int () {
+    
+    Go->go(method : void () {
+      
+      my $ch = Go->make;
+      
+      Go->go([has ch : Go::Channel = $ch] method : void () {
+        
+        my $ch = $self->{ch};
+        
+        $ch->write(1);
+      });
+      
+      my $ok = 0;
+      
+      my $value = (int)$ch->read(\$ok);
+      
+      warn $value;
+    });
+    
+    Go->gosched;
+    
+    return 1;
+  }
+  
   static method go : int () {
     
     Go->go(method : void () {});

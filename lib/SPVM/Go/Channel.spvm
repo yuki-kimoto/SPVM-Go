@@ -113,7 +113,7 @@ class Go::Channel {
             
             my $value = $write_wait->{value};
             
-            $write_wait->{read_finish};
+            $write_wait->{read_finish} = 1;
             
             my $write_wait_coroutine = $write_wait->{coroutine};
             
