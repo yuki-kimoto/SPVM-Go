@@ -3,6 +3,7 @@
 
 class Go::Channel {
   allow Go::Schedule;
+  allow Go;
   
   use Hash;
   use Go::Channel::Wait;
@@ -21,7 +22,7 @@ class Go::Channel {
   has schedule : Go::Schedule;
   
   # Class Methods
-  static method new : Go::Channel ($options : object[] = undef) {
+  private static method new : Go::Channel ($options : object[] = undef) {
     
     &check_option_names($options, ["capacity", "schedule"]);
     
@@ -71,14 +72,14 @@ class Go::Channel {
   }
   
   # Instance Methods
-  method read : object ($error_ref : int*) {
+  method read : object ($ok_ref : int*) {
     
-    $$error_ref = 0;
+    $$ok_ref = 1;
     
     my $closed = $self->{closed};
     
-    if ($closed) {
-      $$error_ref = 1;
+    if ($closed && $self->{write_waits}->length == 0) {
+      $$ok_ref = 0;
       return undef;
     }
     
