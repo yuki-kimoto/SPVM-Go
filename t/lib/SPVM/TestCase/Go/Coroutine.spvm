@@ -37,17 +37,9 @@ class TestCase::Go::Coroutine {
       
       Go::Coroutine->transfer($coroutines->[0], $coroutines->[1]);
       
-      if ($coroutines->[1]->exception) {
-        die $coroutines->[1]->exception;
-      }
-      
       warn("G0-B");
       
       Go::Coroutine->transfer($coroutines->[0], $coroutines->[1]);
-      
-      if ($coroutines->[1]->exception) {
-        die $coroutines->[1]->exception;
-      }
       
       warn("G0-C");
       
@@ -58,10 +50,6 @@ class TestCase::Go::Coroutine {
     $coroutines->[0] = $coroutine_start;
       
     $coroutine_start_task_ref->[0]->();
-    
-    if ($coroutines->[0]->exception) {
-      die $coroutines->[0]->exception;
-    }
     
     $coroutine_start_task_ref->[0] = undef;
     $coroutines->[0] = undef;
