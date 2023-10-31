@@ -33,8 +33,6 @@ class Go::Coroutine : pointer {
   
   has stack : Native::Stack;
   
-  has channels_h : Hash of Go::Channel;
-  
   # Class Methods
   static method new : Go::Coroutine ($task :  Callback = undef, $return_back : Go::Coroutine = undef) {
     
@@ -51,8 +49,6 @@ class Go::Coroutine : pointer {
     $self->init_coroutine;
     
     $self->{fd} = -1;
-    
-    $self->{channels_h} = Hash->new;
     
     return $self;
   }
