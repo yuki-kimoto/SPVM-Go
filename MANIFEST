@@ -10,8 +10,6 @@ lib/SPVM/Go.pm
 lib/SPVM/Go.spvm
 lib/SPVM/Go/Channel.pm
 lib/SPVM/Go/Channel.spvm
-lib/SPVM/Go/Channel/ReadCallback.pm
-lib/SPVM/Go/Channel/ReadCallback.spvm
 lib/SPVM/Go/Channel/Wait.pm
 lib/SPVM/Go/Channel/Wait.spvm
 lib/SPVM/Go/Coroutine.c
