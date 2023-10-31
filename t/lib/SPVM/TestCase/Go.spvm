@@ -28,11 +28,11 @@ class TestCase::Go {
       
       my $after = 1.5;
       
-      Go->gosched($after);
+      Go->gosched_timer($after);
       
       warn "Sleep 1.5 seconds";
       
-      Go->gosched(0.5);
+      Go->gosched_timer(0.5);
       
       warn "Sleep 0.5 seconds";
     });

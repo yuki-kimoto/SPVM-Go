@@ -49,7 +49,16 @@ class Go {
     
   }
   
-  static method gosched : int ($after : double = 0) {
+  static method gosched : int () {
+    
+    my $schedule = $GO->{schedule};
+    
+    my $status = $schedule->schedule;
+    
+    return $status;
+  }
+  
+  static method gosched_timer : int ($after : double = 0) {
     
     my $schedule = $GO->{schedule};
     
