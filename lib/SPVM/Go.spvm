@@ -4,7 +4,6 @@
 class Go {
   version "0.001";
   
-  use Go::Channel::ReadCallback;
   use Go::Channel;
   use Go::Schedule;
   use Callback;
@@ -42,10 +41,6 @@ class Go {
   }
   
   static method write : void ($data : object) {
-    
-  }
-  
-  static method select : void ($cases : object[], $default : Go::Channel::ReadCallback = undef) {
     
   }
   
