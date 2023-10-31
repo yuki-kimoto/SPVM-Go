@@ -21,7 +21,135 @@ class TestCase::Go {
       
       my $value = (int)$ch->read(\$ok);
       
-      warn $value;
+      warn "No Buffer Channel:$value";
+    });
+    
+    Go->go(method : void () {
+      
+      my $ch = Go->make(1);
+      
+      Go->go([has ch : Go::Channel = $ch] method : void () {
+        
+        my $ch = $self->{ch};
+        
+        $ch->write(2);
+        
+        warn "Buffer 1";
+      });
+      
+      my $ok = 0;
+      
+      my $value = (int)$ch->read(\$ok);
+      
+      warn "Buffer 1 Channel:$value";
+    });
+    
+    Go->go(method : void () {
+      
+      my $ch = Go->make(2);
+      
+      Go->go([has ch : Go::Channel = $ch] method : void () {
+        
+        my $ch = $self->{ch};
+        
+        my $len1 = $ch->len;
+        
+        $ch->write(3);
+        
+        my $len2 = $ch->len;
+        
+        $ch->write(4);
+        
+        my $len3 = $ch->len;
+        
+        warn "Buffer 3";
+        
+        $ch->write(5);
+        
+        my $len4 = $ch->len;
+        
+        warn "Write len: $len1 $len2 $len3 $len4";
+      });
+      
+      Go->gosched;
+      
+      Go->sleep(0.1);
+      
+      my $ok = 0;
+      
+      my $len1 = $ch->len;
+      
+      my $value1 = (int)$ch->read(\$ok);
+      
+      my $len2 = $ch->len;
+      
+      my $value2 = (int)$ch->read(\$ok);
+      
+      my $len3 = $ch->len;
+      
+      my $value3 = (int)$ch->read(\$ok);
+      
+      my $len4 = $ch->len;
+      
+      my $cap = $ch->cap;
+      
+      warn "Buffer 3 Channel:$value1 $value2 $value3";
+
+      warn "Read len: $len1 $len2 $len3 $len4";
+      
+      warn "cap: $cap";
+    });
+    
+    Go->go(method : void () {
+      
+      my $ch = Go->make(2);
+      
+      Go->go([has ch : Go::Channel = $ch] method : void () {
+        
+        my $ch = $self->{ch};
+        
+        my $len1 = $ch->len;
+        
+        $ch->write(3);
+        
+        my $len2 = $ch->len;
+        
+        $ch->write(4);
+        
+        my $len3 = $ch->len;
+        
+        warn "Buffer 3";
+        
+        $ch->write(5);
+        
+        my $len4 = $ch->len;
+        
+        warn "Write len: $len1 $len2 $len3 $len4";
+      });
+      
+      my $ok = 0;
+      
+      my $len1 = $ch->len;
+      
+      my $value1 = (int)$ch->read(\$ok);
+      
+      my $len2 = $ch->len;
+      
+      my $value2 = (int)$ch->read(\$ok);
+      
+      my $len3 = $ch->len;
+      
+      my $value3 = (int)$ch->read(\$ok);
+      
+      my $len4 = $ch->len;
+      
+      my $cap = $ch->cap;
+      
+      warn "Buffer 3 Channel:$value1 $value2 $value3";
+
+      warn "Read len: $len1 $len2 $len3 $len4";
+      
+      warn "cap: $cap";
     });
     
     Go->gosched;
