@@ -62,7 +62,7 @@ class Go {
     
     my $schedule = $GO->{schedule};
     
-    my $status = $schedule->schedule($after);
+    my $status = $schedule->schedule_timer($after);
     
     return $status;
   }
@@ -71,9 +71,7 @@ class Go {
     
     my $schedule = $GO->{schedule};
     
-    my $is_write = 0;
-    
-    my $status = $schedule->schedule($timeout, $fd, $is_write);
+    my $status = $schedule->schedule_io_read($fd, $timeout);
     
     return $status;
   }
@@ -82,9 +80,7 @@ class Go {
     
     my $schedule = $GO->{schedule};
     
-    my $is_write = 1;
-    
-    my $status = $schedule->schedule($timeout, $fd, $is_write);
+    my $status = $schedule->schedule_io_write($fd, $timeout);
     
     return $status;
   }
