@@ -20,10 +20,6 @@ class Go::Coroutine : pointer {
   
   has task : Callback;
   
-  has exception : ro string;
-  
-  has error_id : ro int;
-  
   has finished : byte;
   
   has deadline : Sys::Time::Timespec;

@@ -26,12 +26,6 @@ static void coroutine_handler (void* obj_self) {
   
   SPVM_VALUE* stack = env->new_stack(env);
   
-  env->set_field_object_by_name(env, stack, obj_self, "exception", NULL, &error_id, __func__, FILE_NAME, __LINE__);
-  assert(error_id == 0);
-  
-  env->set_field_int_by_name(env, stack, obj_self, "error_id", 0, &error_id, __func__, FILE_NAME, __LINE__);
-  assert(error_id == 0);
-  
   void* obj_task = env->get_field_object_by_name(env, stack, obj_self, "task", &error_id, __func__, FILE_NAME, __LINE__);
   assert(error_id == 0);
   
@@ -44,12 +38,6 @@ static void coroutine_handler (void* obj_self) {
     
     void* obj_exception = env->get_exception(env, stack);
     const char* exception = env->get_chars(env, stack, obj_exception);
-    
-    env->set_field_object_by_name(env, stack, obj_self, "exception", obj_exception, &error_id, __func__, FILE_NAME, __LINE__);
-    assert(error_id == 0);
-    
-    env->set_field_int_by_name(env, stack, obj_self, "error_id", error_id, &error_id, __func__, FILE_NAME, __LINE__);
-    assert(error_id == 0);
     
     fprintf(env->api->runtime->get_spvm_stderr(env->runtime), "[An exception is converted to a warning at the end of a Go coroutine]\n");
     
