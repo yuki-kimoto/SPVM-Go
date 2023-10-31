@@ -8,6 +8,16 @@ class TestCase::Go {
     
     Go->go(method : void () {});
     
+    Go->go(method : void () {
+      die "Exception!.";
+    });
+    
+    Go->go(method : void () {
+      eval {
+        die "Exception!.";
+      }
+    });
+    
     Go->gosched;
     
     Go->go(method : void () {
