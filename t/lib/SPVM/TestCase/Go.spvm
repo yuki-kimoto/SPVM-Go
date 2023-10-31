@@ -18,6 +18,10 @@ class TestCase::Go {
       }
     });
     
+    Go->go(method : void () {
+      TestCase::Go->error();
+    });
+    
     Go->gosched;
     
     Go->go(method : void () {
@@ -92,5 +96,10 @@ class TestCase::Go {
     my $foo = Point->new;
     
     warn "G1-CallMethod";
+  }
+  
+  static method error : void () {
+    
+    die "Error Method";
   }
 }
