@@ -3,6 +3,7 @@
 
 class Go::Channel::Wait {
   allow Go::Schedule;
+  allow Go::Channel;
   
   use Go::Coroutine;
   

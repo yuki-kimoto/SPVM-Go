@@ -76,11 +76,28 @@ class Go::Channel {
     return undef;
   }
   
-  method write : void ($object : object) {
+  method write : void ($value : object) {
     my $closed = $self->{closed};
     
     if ($closed) {
       die "This channel is closed.";
+    }
+    
+    my $length = $self->{length};
+    
+    my $capacity = $self->{capacity};
+    
+    if ($length < $capacity) {
+      my $wait = Go::Channel::Wait->new;
+      
+      $wait->{value} = $value;
+      
+      $self->{write_waiters}->push($wait);
+      
+      $self->{length}++;
+    }
+    else {
+      Go->gosched_channel_write($self, $value);
     }
   }
   
