@@ -33,6 +33,8 @@ class Go::Coroutine : pointer {
   
   has stack : Native::Stack;
   
+  has disable : byte;
+  
   # Class Methods
   static method new : Go::Coroutine ($task :  Callback = undef, $return_back : Go::Coroutine = undef) {
     

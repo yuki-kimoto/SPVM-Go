@@ -2,9 +2,19 @@
 # MIT License
 
 class Go::Channel::Wait {
+  allow Go::Schedule;
+  
   use Go::Coroutine;
   
   has coroutine : Go::Coroutine;
   
   has value : object;
+  
+  # Class Methods
+  static method new : Go::Channel::Wait () {
+    
+    my $self = new Go::Channel::Wait;
+    
+    return $self;
+  }
 }
