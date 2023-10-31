@@ -26,8 +26,6 @@ static void coroutine_handler (void* obj_self) {
   
   SPVM_VALUE* stack = env->new_stack(env);
   
-  int32_t scope_id = env->enter_scope(env, stack);
-  
   env->set_field_object_by_name(env, stack, obj_self, "exception", NULL, &error_id, __func__, FILE_NAME, __LINE__);
   assert(error_id == 0);
   
@@ -70,8 +68,6 @@ static void coroutine_handler (void* obj_self) {
   
   env->set_field_byte_by_name(env, stack, obj_self, "finished", 1, &error_id, __func__, FILE_NAME, __LINE__);
   assert(error_id == 0);
-  
-  env->leave_scope(env, stack, scope_id);
   
   env->set_exception(env, stack, NULL);
   
