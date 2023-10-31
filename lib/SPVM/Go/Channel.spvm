@@ -9,9 +9,7 @@ class Go::Channel {
   # Fields
   has capacity : int;
   
-  has buffer : List;
-  
-  has value : object;
+  has length : int;
   
   has closed : int;
   
@@ -34,10 +32,6 @@ class Go::Channel {
     unless ($capacity >= 0) {
       die "The \"capacity\" option must be greater than or equal to 0.";
     }
-    
-    my $buffer = List->new;
-    
-    $self->{buffer} = $buffer;
     
     $self->{read_waiters} = List->new(new Go::Channel::Wait[0]);
     
@@ -78,12 +72,7 @@ class Go::Channel {
       return undef;
     }
     
-    my $value = $self->{value};
-    
-    $self->{value} = undef;
-    
-    
-    return $value;
+    return undef;
   }
   
   method write : void ($object : object) {
@@ -109,7 +98,7 @@ class Go::Channel {
   }
   
   method len : int () {
-    return $self->{buffer}->length;
+    return $self->{length};
   }
   
 }
