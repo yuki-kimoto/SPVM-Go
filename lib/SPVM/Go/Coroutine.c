@@ -24,9 +24,7 @@ static void coroutine_handler (void* obj_self) {
   
   SPVM_ENV* env = pointer_items[2];
   
-  SPVM_VALUE* stack = pointer_items[3];
-  
-  int32_t s = env->get_memory_blocks_count(env, stack);
+  SPVM_VALUE* stack = env->new_stack(env);
   
   int32_t scope_id = env->enter_scope(env, stack);
   
@@ -77,9 +75,7 @@ static void coroutine_handler (void* obj_self) {
   
   env->set_exception(env, stack, NULL);
   
-  int32_t e = env->get_memory_blocks_count(env, stack);
-  
-  spvm_warn("%d %d", s, e);
+  env->free_stack(env, stack);
   
   coro_transfer_fix(coroutine_context, coroutine_context_return_back);
   assert(0);
@@ -121,7 +117,6 @@ int32_t SPVM__Go__Coroutine__init_coroutine(SPVM_ENV* env, SPVM_VALUE* stack) {
   pointer_items[0] = coroutine_context;
   pointer_items[1] = coroutine_stack;
   pointer_items[2] = env;
-  pointer_items[3] = spvm_stack;
   
   env->set_pointer(env, stack, obj_self, pointer_items);
   
