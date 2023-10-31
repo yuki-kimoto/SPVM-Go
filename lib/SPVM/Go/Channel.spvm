@@ -5,34 +5,15 @@ class Go::Channel {
   
   use Hash;
   use Go::Channel::Wait;
-  use Go::Channel::ReadCallback;
-  
-  private enum {
-    READABLE_STATE_NONE,
-    READABLE_STATE_EXISTS,
-    READABLE_STATE_FINISHED,
-  }
   
   # Fields
   has capacity : int;
   
-  has base_offset : int;
+  has buffer : List;
   
-  has length : int;
-  
-  has values : object[];
+  has value : object;
   
   has closed : int;
-  
-  has read_cb : rw Go::Channel::ReadCallback;
-  
-  has read_index : int;
-  
-  has read_queue : List of Go::Channel::Wait;
-  
-  has write_index : int;
-  
-  has write_queue : List of Go::Channel::Wait;
   
   has coroutines_h : Hash of Go::Coroutine;
   
@@ -52,16 +33,11 @@ class Go::Channel {
       die "The \"capacity\" option must be greater than or equal to 0.";
     }
     
-    my $values = new object[$capacity];
-    $self->{values} = $values;
+    my $buffer = List->new;
+    
+    $self->{buffer} = $buffer;
     
     $self->{coroutines_h} = Hash->new;
-    
-    return $self;
-  }
-  
-  static method make : Go::Channel ($capacity : int = 0) {
-    my $self = &new({capacity => $capacity});
     
     return $self;
   }
@@ -123,7 +99,7 @@ class Go::Channel {
   }
   
   method len : int () {
-    return $self->{length};
+    return $self->{buffer}->length;
   }
   
 }

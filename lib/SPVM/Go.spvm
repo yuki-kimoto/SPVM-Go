@@ -30,8 +30,11 @@ class Go {
     $schedule->add_task($task);
   }
   
-  static method make : Go::Channel ($length : int = 0) {
+  static method make : Go::Channel ($capacity : int = 0) {
     
+    my $channel = Go::Channel->new({capacity => $capacity});
+    
+    return $channel;
   }
   
   static method read : object () {
