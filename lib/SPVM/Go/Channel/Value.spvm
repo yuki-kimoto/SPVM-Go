@@ -1,11 +1,8 @@
 # Copyright (c) 2023 Yuki Kimoto
 # MIT License
 
-class Go::Channel::Wait {
-  use Go::Channel;
+class Go::Channel::Value {
   use Go::Coroutine;
-  
-  has channel : Go::Channel;
   
   has coroutine : Go::Coroutine;
   

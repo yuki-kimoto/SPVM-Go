@@ -1,4 +1,4 @@
-package SPVM::Go::Channel::Wait;
+package SPVM::Go::Channel::Value;
 
 
 
@@ -6,15 +6,15 @@ package SPVM::Go::Channel::Wait;
 
 =head1 Name
 
-SPVM::Go::Channel::Wait - Short Description
+SPVM::Go::Channel::Value - Short Description
 
 =head1 Description
 
-Go::Channel::Wait class of L<SPVM> has methods for someting.
+Go::Channel::Value class of L<SPVM> has methods for someting.
 
 =head1 Usage
 
-  use Go::Channel::Wait;
+  use Go::Channel::Value;
 
 =head1 Fields
 

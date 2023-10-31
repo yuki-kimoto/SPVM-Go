@@ -4,7 +4,7 @@
 class Go::Channel {
   
   use Hash;
-  use Go::Channel::Wait;
+  use Go::Channel::Value;
   
   # Fields
   has capacity : int;
@@ -13,9 +13,9 @@ class Go::Channel {
   
   has closed : int;
   
-  has read_waiters : List of Go::Channel::Wait;
+  has read_stream : List of Go::Channel::Value;
   
-  has write_waiters : List of Go::Channel::Wait;
+  has write_stream : List of Go::Channel::Value;
   
   # Class Methods
   static method new : Go::Channel ($options : object[] = undef) {
@@ -33,9 +33,9 @@ class Go::Channel {
       die "The \"capacity\" option must be greater than or equal to 0.";
     }
     
-    $self->{read_waiters} = List->new(new Go::Channel::Wait[0]);
+    $self->{read_stream} = List->new(new Go::Channel::Value[0]);
     
-    $self->{write_waiters} = List->new(new Go::Channel::Wait[0]);
+    $self->{write_stream} = List->new(new Go::Channel::Value[0]);
     
     return $self;
   }
