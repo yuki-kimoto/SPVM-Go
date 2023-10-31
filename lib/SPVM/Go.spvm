@@ -94,11 +94,11 @@ class Go {
     return $status;
   }
   
-  static method gosched_channel_write : int ($channel : Go::Channel) {
+  static method gosched_channel_write : int ($channel : Go::Channel, $value : object) {
     
     my $schedule = $GO->{schedule};
     
-    my $status = $schedule->schedule_channel_write($channel);
+    my $status = $schedule->schedule_channel_write($channel, $value);
     
     return $status;
   }

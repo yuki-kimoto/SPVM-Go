@@ -69,16 +69,16 @@ class Go::Schedule {
     return $status;
   }
   
-  method schedule_channel_write : int ($channel : Go::Channel) {
+  method schedule_channel_write : int ($channel : Go::Channel, $value : object) {
     
     my $is_write = 1;
     
-    my $status = $self->schedule(0, $channel, -1, $is_write);
+    my $status = $self->schedule(0, $channel, -1, $is_write, $value);
     
     return $status;
   }
   
-  private method schedule : int ($after : double = 0, $channel : Go::Channel = undef, $fd : int = -1, $is_write : int = 0) {
+  private method schedule : int ($after : double = 0, $channel : Go::Channel = undef, $fd : int = -1, $is_write : int = 0, $value : object = undef) {
     
     my $status = 0;
     
