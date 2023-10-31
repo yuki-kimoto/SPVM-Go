@@ -12,6 +12,7 @@ class Go::Schedule {
   use Sys::Time::Timeval;
   use Sys::Time::Timespec;
   use Go::Poll;
+  use Go::Channel;
   
   has coroutines : List of Go::Coroutine;
   
@@ -45,7 +46,7 @@ class Go::Schedule {
     
     my $is_write = 0;
     
-    my $status = $self->schedule($timeout, $fd, $is_write);
+    my $status = $self->schedule($timeout, undef, $fd, $is_write);
     
     return $status;
   }
@@ -54,12 +55,12 @@ class Go::Schedule {
     
     my $is_write = 1;
     
-    my $status = $self->schedule($timeout, $fd, $is_write);
+    my $status = $self->schedule($timeout, undef, $fd, $is_write);
     
     return $status;
   }
   
-  private method schedule : int ($after : double = 0, $fd : int = -1, $is_write : int = 0) {
+  private method schedule : int ($after : double = 0, $channel : Go::Channel = undef, $fd : int = -1, $is_write : int = 0) {
     
     my $status = 0;
     
