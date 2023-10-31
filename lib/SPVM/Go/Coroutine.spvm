@@ -5,6 +5,7 @@ class Go::Coroutine : pointer {
   allow Go::Poll;
   allow Go::Schedule;
   allow Go::Schedule::Task;
+  allow Go::Channel;
   
   use Callback;
   

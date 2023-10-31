@@ -73,6 +73,21 @@ class Go::Channel {
       return undef;
     }
     
+    if ($self->{write_waiters}->length) {
+      my $wait = (Go::Channel::Wait)$self->{write_waiters}->shift;
+      
+      my $coroutine = $wait->{coroutine};
+      
+      $coroutine->{disable} = 0;
+      
+      my $value = $wait->{value};
+      
+      return $value;
+    }
+    else {
+      Go->gosched_channel_read($self);
+    }
+    
     return undef;
   }
   
