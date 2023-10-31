@@ -10,8 +10,8 @@ lib/SPVM/Go.pm
 lib/SPVM/Go.spvm
 lib/SPVM/Go/Channel.pm
 lib/SPVM/Go/Channel.spvm
-lib/SPVM/Go/Channel/Value.pm
-lib/SPVM/Go/Channel/Value.spvm
+lib/SPVM/Go/Channel/Wait.pm
+lib/SPVM/Go/Channel/Wait.spvm
 lib/SPVM/Go/Coroutine.c
 lib/SPVM/Go/Coroutine.config
 lib/SPVM/Go/Coroutine.native/include/.gitkeep
