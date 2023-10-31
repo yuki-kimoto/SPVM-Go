@@ -54,6 +54,8 @@ static void coroutine_handler (void* obj_self) {
     fprintf(env->api->runtime->get_spvm_stderr(env->runtime), "[An exception is converted to a warning at the end of a Go coroutine]\n");
     
     env->print_stderr(env, stack, obj_exception);
+    
+    fprintf(env->api->runtime->get_spvm_stderr(env->runtime), "\n");
   }
   
   void* obj_return_back = env->get_field_object_by_name(env, stack, obj_self, "return_back", &error_id, __func__, FILE_NAME, __LINE__);
