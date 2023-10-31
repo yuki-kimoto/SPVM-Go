@@ -23,7 +23,7 @@ class Go::Channel {
   # Class Methods
   static method new : Go::Channel ($options : object[] = undef) {
     
-    &check_option_names($options, ["capacity"]);
+    &check_option_names($options, ["capacity", "schedule"]);
     
     my $options_h = Hash->new($options);
     
@@ -34,6 +34,13 @@ class Go::Channel {
     
     unless ($capacity >= 0) {
       die "The \"capacity\" option must be greater than or equal to 0.";
+    }
+    
+    my $schedule = (Go::Schedule)$options_h->delete_or_default("schedule", undef);
+    $self->{schedule} = $schedule;
+    
+    unless ($schedule) {
+      die "The \"schedule\" option must be defined.";
     }
     
     $self->{read_waits} = List->new(new Go::Channel::Wait[0]);

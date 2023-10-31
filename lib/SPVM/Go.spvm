@@ -31,7 +31,9 @@ class Go {
   
   static method make : Go::Channel ($capacity : int = 0) {
     
-    my $channel = Go::Channel->new({capacity => $capacity});
+    my $schedule = $GO->{schedule};
+    
+    my $channel = Go::Channel->new({schedule => $schedule, capacity => $capacity});
     
     return $channel;
   }
