@@ -14,9 +14,9 @@ class Go::Channel {
   
   has closed : int;
   
-  has read_waiters : List of Go::Channel::Wait;
+  has read_waits : List of Go::Channel::Wait;
   
-  has write_waiters : List of Go::Channel::Wait;
+  has write_waits : List of Go::Channel::Wait;
   
   has schedule : Go::Schedule;
   
@@ -36,9 +36,9 @@ class Go::Channel {
       die "The \"capacity\" option must be greater than or equal to 0.";
     }
     
-    $self->{read_waiters} = List->new(new Go::Channel::Wait[0]);
+    $self->{read_waits} = List->new(new Go::Channel::Wait[0]);
     
-    $self->{write_waiters} = List->new(new Go::Channel::Wait[0]);
+    $self->{write_waits} = List->new(new Go::Channel::Wait[0]);
     
     return $self;
   }
@@ -75,8 +75,10 @@ class Go::Channel {
       return undef;
     }
     
-    if ($self->{write_waiters}->length) {
-      my $wait = (Go::Channel::Wait)$self->{write_waiters}->shift;
+    if ($self->{write_waits}->length) {
+      my $wait = (Go::Channel::Wait)$self->{write_waits}->shift;
+      
+      $wait->{read_finish} = 1;
       
       my $coroutine = $wait->{coroutine};
       
@@ -91,17 +93,37 @@ class Go::Channel {
     else {
       my $wait = Go::Channel::Wait->new;
       
-      my $shcedule = $self->{schedule};
+      $self->{read_waits}->push($wait);
       
-      my $current_coroutine = $shcedule->{current_coroutine};
+      my $schedule = $self->{schedule};
       
-      $current_coroutine->{disable} = 1;
-      
-      $wait->{coroutine} = $current_coroutine;
-      
-      $self->{read_waiters}->push($wait);
-      
-      $shcedule->schedule;
+      while (1) {
+        
+        if ($self->{write_waits}->length) {
+          if ($wait == $self->{read_waits}->get(0)) {
+            my $write_wait = (Go::Channel::Wait)$self->{write_waits}->shift;
+            
+            my $value = $write_wait->{value};
+            
+            $write_wait->{read_finish};
+            
+            my $write_wait_coroutine = $write_wait->{coroutine};
+            
+            if ($write_wait_coroutine) {
+              $write_wait_coroutine->{disable} = 0;
+            }
+            else {
+              $self->{length}--;
+            }
+            
+            $self->{read_waits}->shift;
+            
+            return $value;
+          }
+        }
+        
+        $schedule->schedule;
+      }
     }
     
     return undef;
@@ -118,16 +140,20 @@ class Go::Channel {
     
     my $capacity = $self->{capacity};
     
-    my $wait = Go::Channel::Wait->new;
-    
-    $wait->{value} = $value;
-    
-    $self->{write_waiters}->push($wait);
-    
     if ($length < $capacity) {
+      my $wait = Go::Channel::Wait->new;
+      
+      $wait->{value} = $value;
+      
+      $self->{write_waits}->push($wait);
+      
       $self->{length}++;
     }
     else {
+      my $wait = Go::Channel::Wait->new;
+      
+      $wait->{value} = $value;
+      
       my $shcedule = $self->{schedule};
       
       my $current_coroutine = $shcedule->{current_coroutine};
@@ -136,7 +162,18 @@ class Go::Channel {
       
       $wait->{coroutine} = $current_coroutine;
       
-      $shcedule->schedule;
+      $self->{write_waits}->push($wait);
+      
+      while (1) {
+        
+        my $read_finish = $wait->{read_finish};
+        
+        if ($read_finish) {
+          return;
+        }
+        
+        $shcedule->schedule;
+      }
     }
   }
   

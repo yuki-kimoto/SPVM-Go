@@ -11,6 +11,8 @@ class Go::Channel::Wait {
   
   has value : object;
   
+  has read_finish : byte;
+  
   # Class Methods
   static method new : Go::Channel::Wait () {
     

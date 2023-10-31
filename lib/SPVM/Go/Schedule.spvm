@@ -115,25 +115,7 @@ class Go::Schedule {
         $current_coroutine->{deadline} = $deadline_ts;
       }
       
-      if ($channel) {
-        my $channel_wait = Go::Channel::Wait->new;
-        
-        $channel_wait->{value} = $value;
-        
-        $current_coroutine->{disable} = 1;
-        
-        $channel_wait->{coroutine} = $current_coroutine;
-        
-        if ($is_write) {
-          $channel->{write_waiters}->push($channel_wait);
-        }
-        else {
-          $channel->{read_waiters}->push($channel_wait);
-        }
-      }
-      elsif ($fd > -1) {
-        $current_coroutine->{fd} = $fd;
-      }
+      $current_coroutine->{fd} = $fd;
       
       $current_coroutine->{is_write} = (byte)$is_write;
       
