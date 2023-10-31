@@ -18,6 +18,8 @@ class Go::Channel {
   
   has write_waiters : List of Go::Channel::Wait;
   
+  has schedule : Go::Schedule;
+  
   # Class Methods
   static method new : Go::Channel ($options : object[] = undef) {
     
@@ -78,14 +80,28 @@ class Go::Channel {
       
       my $coroutine = $wait->{coroutine};
       
-      $coroutine->{disable} = 0;
+      if ($coroutine) {
+        $coroutine->{disable} = 0;
+      }
       
       my $value = $wait->{value};
       
       return $value;
     }
     else {
-      Go->gosched_channel_read($self);
+      my $wait = Go::Channel::Wait->new;
+      
+      my $shcedule = $self->{schedule};
+      
+      my $current_coroutine = $shcedule->{current_coroutine};
+      
+      $current_coroutine->{disable} = 1;
+      
+      $wait->{coroutine} = $current_coroutine;
+      
+      $self->{read_waiters}->push($wait);
+      
+      $shcedule->schedule;
     }
     
     return undef;
@@ -102,17 +118,25 @@ class Go::Channel {
     
     my $capacity = $self->{capacity};
     
+    my $wait = Go::Channel::Wait->new;
+    
+    $wait->{value} = $value;
+    
+    $self->{write_waiters}->push($wait);
+    
     if ($length < $capacity) {
-      my $wait = Go::Channel::Wait->new;
-      
-      $wait->{value} = $value;
-      
-      $self->{write_waiters}->push($wait);
-      
       $self->{length}++;
     }
     else {
-      Go->gosched_channel_write($self, $value);
+      my $shcedule = $self->{schedule};
+      
+      my $current_coroutine = $shcedule->{current_coroutine};
+      
+      $current_coroutine->{disable} = 1;
+      
+      $wait->{coroutine} = $current_coroutine;
+      
+      $shcedule->schedule;
     }
   }
   

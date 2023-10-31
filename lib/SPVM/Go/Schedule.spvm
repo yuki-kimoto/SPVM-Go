@@ -4,6 +4,7 @@
 class Go::Schedule {
   allow Go;
   allow Go::Schedule::Task;
+  allow Go::Channel;
   
   use Go::Coroutine;
   use List;
