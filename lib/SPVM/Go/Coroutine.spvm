@@ -3,6 +3,8 @@
 
 class Go::Coroutine : pointer {
   allow Go::Poll;
+  allow Go::Schedule;
+  allow Go::Schedule::Task;
   
   use Callback;
   
@@ -11,9 +13,6 @@ class Go::Coroutine : pointer {
   use Native::Stack;
   
   use Native;
-  
-  allow Go::Schedule;
-  allow Go::Schedule::Task;
   
   # Fields
   has return_back : Go::Coroutine;
