@@ -102,24 +102,24 @@ class Go::Channel {
       return $value;
     }
     else {
-      my $wait = Go::Channel::Wait->new;
+      my $read_wait = Go::Channel::Wait->new;
       
-      $self->{read_waits}->push($wait);
+      $self->{read_waits}->push($read_wait);
       
       my $schedule = $self->{schedule};
       
       while (1) {
         
-        my $write_finish = $wait->{write_finish};
+        my $write_finish = $read_wait->{write_finish};
         
         if ($write_finish) {
-          my $value = $wait->{value};
+          my $value = $read_wait->{value};
           
           return $value;
         }
         
         if ($self->{write_waits}->length) {
-          if ($wait == $self->{read_waits}->get(0)) {
+          if ($read_wait == $self->{read_waits}->get(0)) {
             my $write_wait = (Go::Channel::Wait)$self->{write_waits}->shift;
             
             my $value = $write_wait->{value};
@@ -160,11 +160,11 @@ class Go::Channel {
     my $capacity = $self->{capacity};
     
     if ($length < $capacity) {
-      my $wait = Go::Channel::Wait->new;
+      my $write_wait = Go::Channel::Wait->new;
       
-      $wait->{value} = $value;
+      $write_wait->{value} = $value;
       
-      $self->{write_waits}->push($wait);
+      $self->{write_waits}->push($write_wait);
       
       $self->{length}++;
     }
@@ -185,9 +185,9 @@ class Go::Channel {
         return;
       }
       else {
-        my $wait = Go::Channel::Wait->new;
+        my $write_wait = Go::Channel::Wait->new;
         
-        $wait->{value} = $value;
+        $write_wait->{value} = $value;
         
         my $shcedule = $self->{schedule};
         
@@ -195,13 +195,13 @@ class Go::Channel {
         
         $current_coroutine->{disable} = 1;
         
-        $wait->{coroutine} = $current_coroutine;
+        $write_wait->{coroutine} = $current_coroutine;
         
-        $self->{write_waits}->push($wait);
+        $self->{write_waits}->push($write_wait);
         
         while (1) {
           
-          my $read_finish = $wait->{read_finish};
+          my $read_finish = $write_wait->{read_finish};
           
           if ($read_finish) {
             return;
