@@ -110,6 +110,14 @@ class Go::Channel {
       
       while (1) {
         
+        my $write_finish = $wait->{write_finish};
+        
+        if ($write_finish) {
+          my $value = $wait->{value};
+          
+          return $value;
+        }
+        
         if ($self->{write_waits}->length) {
           if ($wait == $self->{read_waits}->get(0)) {
             my $write_wait = (Go::Channel::Wait)$self->{write_waits}->shift;
@@ -161,29 +169,46 @@ class Go::Channel {
       $self->{length}++;
     }
     else {
-      my $wait = Go::Channel::Wait->new;
-      
-      $wait->{value} = $value;
-      
-      my $shcedule = $self->{schedule};
-      
-      my $current_coroutine = $shcedule->{current_coroutine};
-      
-      $current_coroutine->{disable} = 1;
-      
-      $wait->{coroutine} = $current_coroutine;
-      
-      $self->{write_waits}->push($wait);
-      
-      while (1) {
+      if ($self->{read_waits}->length) {
+        my $read_wait = (Go::Channel::Wait)$self->{read_waits}->shift;
         
-        my $read_finish = $wait->{read_finish};
+        $read_wait->{write_finish} = 1;
         
-        if ($read_finish) {
-          return;
+        my $read_wait_coroutine = $read_wait->{coroutine};
+        
+        if ($read_wait_coroutine) {
+          $read_wait_coroutine->{disable} = 0;
         }
         
-        $shcedule->schedule;
+        $read_wait->{value} = $value;
+        
+        return;
+      }
+      else {
+        my $wait = Go::Channel::Wait->new;
+        
+        $wait->{value} = $value;
+        
+        my $shcedule = $self->{schedule};
+        
+        my $current_coroutine = $shcedule->{current_coroutine};
+        
+        $current_coroutine->{disable} = 1;
+        
+        $wait->{coroutine} = $current_coroutine;
+        
+        $self->{write_waits}->push($wait);
+        
+        while (1) {
+          
+          my $read_finish = $wait->{read_finish};
+          
+          if ($read_finish) {
+            return;
+          }
+          
+          $shcedule->schedule;
+        }
       }
     }
   }

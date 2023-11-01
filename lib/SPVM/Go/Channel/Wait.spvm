@@ -13,6 +13,8 @@ class Go::Channel::Wait {
   
   has read_finish : byte;
   
+  has write_finish : byte;
+  
   # Class Methods
   static method new : Go::Channel::Wait () {
     
