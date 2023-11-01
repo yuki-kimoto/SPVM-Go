@@ -108,6 +108,8 @@ class Go::Channel {
       
       my $current_coroutine = $schedule->{current_coroutine};
       
+      warn;
+      
       $current_coroutine->{disable} = 1;
       
       $read_wait->{coroutine} = $current_coroutine;
@@ -155,6 +157,7 @@ class Go::Channel {
   }
   
   method write : void ($value : object) {
+      warn;
     my $closed = $self->{closed};
     
     if ($closed) {
@@ -166,15 +169,6 @@ class Go::Channel {
     my $capacity = $self->{capacity};
     
     if ($length < $capacity) {
-      my $write_wait = Go::Channel::Wait->new;
-      
-      $write_wait->{value} = $value;
-      
-      $self->{write_waits}->push($write_wait);
-      
-      $self->{length}++;
-    }
-    else {
       if ($self->{read_waits}->length) {
         my $read_wait = (Go::Channel::Wait)$self->{read_waits}->shift;
         
@@ -183,6 +177,35 @@ class Go::Channel {
         my $read_wait_coroutine = $read_wait->{coroutine};
         
         if ($read_wait_coroutine) {
+          $read_wait_coroutine->{disable} = 0;
+        }
+        
+        $read_wait->{value} = $value;
+        
+        return;
+      }
+      else {
+        my $write_wait = Go::Channel::Wait->new;
+        
+        $write_wait->{value} = $value;
+        
+        $self->{write_waits}->push($write_wait);
+        
+        $self->{length}++;
+      }
+    }
+    else {
+      warn;
+      if ($self->{read_waits}->length) {
+        my $read_wait = (Go::Channel::Wait)$self->{read_waits}->shift;
+        
+        $read_wait->{write_finish} = 1;
+        
+        my $read_wait_coroutine = $read_wait->{coroutine};
+        
+        warn;
+        if ($read_wait_coroutine) {
+          warn;
           $read_wait_coroutine->{disable} = 0;
         }
         

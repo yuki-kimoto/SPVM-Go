@@ -59,6 +59,9 @@ class Go::Schedule::Task {
         if ($coroutine->{finished}) {
           $schedule->{current_coroutine} = undef;
         }
+        elsif ($coroutine->{disable}) {
+          $schedule->{coroutines}->push($coroutine);
+        }
         else {
           my $over_deadline = 1;
           
