@@ -104,9 +104,15 @@ class Go::Channel {
     else {
       my $read_wait = Go::Channel::Wait->new;
       
-      $self->{read_waits}->push($read_wait);
-      
       my $schedule = $self->{schedule};
+      
+      my $current_coroutine = $schedule->{current_coroutine};
+      
+      $current_coroutine->{disable} = 1;
+      
+      $read_wait->{coroutine} = $current_coroutine;
+      
+      $self->{read_waits}->push($read_wait);
       
       while (1) {
         
@@ -189,9 +195,9 @@ class Go::Channel {
         
         $write_wait->{value} = $value;
         
-        my $shcedule = $self->{schedule};
+        my $schedule = $self->{schedule};
         
-        my $current_coroutine = $shcedule->{current_coroutine};
+        my $current_coroutine = $schedule->{current_coroutine};
         
         $current_coroutine->{disable} = 1;
         
@@ -207,7 +213,7 @@ class Go::Channel {
             return;
           }
           
-          $shcedule->schedule;
+          $schedule->schedule;
         }
       }
     }
