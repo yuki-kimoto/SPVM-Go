@@ -74,6 +74,15 @@ class Go::Channel {
   # Instance Methods
   method read : object ($ok_ref : int*) {
     
+    my $non_blocking = 0;
+    
+    my $value = $self->read_with_non_blocking($ok_ref, $non_blocking);
+    
+    return $value;
+  }
+  
+  private method read_with_non_blocking : object ($ok_ref : int*, $non_blocking : int) {
+    
     $$ok_ref = 1;
     
     my $closed = $self->{closed};
@@ -147,7 +156,12 @@ class Go::Channel {
           }
         }
         
-        $schedule->schedule;
+        if ($non_blocking) {
+          return undef;
+        }
+        else {
+          $schedule->schedule;
+        }
       }
     }
     
