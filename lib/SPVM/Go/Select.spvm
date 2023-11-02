@@ -7,6 +7,7 @@ class Go::Select {
   use Go::Channel;
   use List;
   use Fn;
+  use Sys;
   
   # Fields
   has read_cases_h : Hash of Go::Channel;
@@ -15,6 +16,8 @@ class Go::Select {
   
   has non_blocking : rw byte;
   
+  has seed : int;
+  
   # Class Methods
   static method new : Go::Select () {
     
@@ -22,8 +25,9 @@ class Go::Select {
     
     $self->{read_cases_h} = Hash->new;
     
-    
     $self->{write_cases_h} = Hash->new;
+    
+    $self->{seed} = Sys->process_id * (int)Sys->time;
     
     return $self;
   }
@@ -121,6 +125,51 @@ class Go::Select {
     
     my $result = Go::Select::Result->new;
     
+    my $read_cases_h = $self->{read_cases_h};
+    
+    my $write_cases_h = $self->{write_cases_h};
+    
+    my $read_cases_length = $read_cases_h->keys_length;
+    
+    my $write_cases_length = $write_cases_h->keys_length;
+    
+    my $cases_list = List->new(new Go::Select::Case[0]);
+    
+    for my $address (@{$read_cases_h->keys}) {
+      my $read_case = $read_cases_h->get($address);
+      
+      $cases_list->push($read_case);
+    }
+    
+    for my $address (@{$write_cases_h->keys}) {
+      my $write_case = $write_cases_h->get($address);
+      
+      $cases_list->push($write_case);
+    }
+    
+    my $cases_length = $cases_list->length;
+    
+    my $cases = $cases_list->to_array;
+    
+    
+    
+    
     return $result;
+  }
+  
+  static method shuffle : void ($array : object[], $seed_ref : int*) {
+    
+    my $array_length = @$array;
+    
+    for (my $i = $array_length - 1; $i > 0; $i--) {
+      
+      my $j = Fn->crand($seed_ref) % ($i + 1);
+      
+      my $temp = $array->[$i];
+      
+      $array->[$i] = $array->[$j];
+      
+      $array->[$j] = $temp;
+    }
   }
 }
