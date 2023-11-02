@@ -151,7 +151,11 @@ class Go::Select {
     
     my $cases = $cases_list->to_array;
     
+    my $seed = $self->{seed};
     
+    &shuffle($cases, \$seed);
+    
+    $self->{seed} = $seed;
     
     
     return $result;
