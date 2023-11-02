@@ -7,6 +7,7 @@ class Go {
   use Go::Channel;
   use Go::Schedule;
   use Callback;
+  use Go::Select;
   
   our $GO : Go;
   

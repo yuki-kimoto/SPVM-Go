@@ -2,5 +2,6 @@
 # MIT License
 
 class Go::Select {
-  
+  use Go::Select::Case;
+  use Go::Select::Result;
 }
