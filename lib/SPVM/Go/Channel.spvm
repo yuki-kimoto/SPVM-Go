@@ -170,13 +170,6 @@ class Go::Channel {
   }
   
   method write : void ($value : object) {
-    
-    my $non_blocking = 0;
-    
-    $self->write_with_non_blocking($value, $non_blocking);
-  }
-  
-  private method write_with_non_blocking : void ($value : object, $non_blocking : int = 0) {
     my $closed = $self->{closed};
     
     if ($closed) {
@@ -252,12 +245,7 @@ class Go::Channel {
             return;
           }
           
-          if ($non_blocking) {
-            return;
-          }
-          else {
-            $schedule->schedule;
-          }
+          $schedule->schedule;
         }
       }
     }
