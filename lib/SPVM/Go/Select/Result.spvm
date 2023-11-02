@@ -2,5 +2,13 @@
 # MIT License
 
 class Go::Select::Result {
+  allow Go::Select;
   
+  use Go::Channel;
+  
+  has ro ok : byte;
+  
+  has ro value : object;
+  
+  has ro channel : Go::Channel;
 }
