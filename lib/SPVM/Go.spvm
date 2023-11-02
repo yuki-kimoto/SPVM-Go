@@ -39,6 +39,15 @@ class Go {
     return $channel;
   }
   
+  static method new_select : Go::Select () {
+    
+    my $schedule = $GO->{schedule};
+    
+    my $select = Go::Select->new($schedule);
+    
+    return $select;
+  }
+  
   static method gosched : int () {
     
     my $schedule = $GO->{schedule};

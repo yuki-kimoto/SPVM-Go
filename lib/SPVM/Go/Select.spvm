@@ -2,6 +2,8 @@
 # MIT License
 
 class Go::Select {
+  allow Go;
+  
   use Go::Select::Case;
   use Go::Select::Result;
   use Go::Channel;
@@ -252,7 +254,7 @@ class Go::Select {
     return $result;
   }
   
-  static method shuffle : void ($array : object[], $seed_ref : int*) {
+  private static method shuffle : void ($array : object[], $seed_ref : int*) {
     
     my $array_length = @$array;
     
