@@ -168,28 +168,64 @@ class Go::Select {
       my $is_write = $case->{is_write};
       
       if ($is_write) {
-        my $value = $case->{value};
         
-        $channel->write_with_non_blocking($value, $non_blocking);
+        my $can_write = 0;
         
-        my $result = Go::Select::Result->new;
+        {
+          my $length = $channel->{length};
+          
+          my $capacity = $channel->{capacity};
+          
+          if ($length < $capacity) {
+            $can_write = 1;
+          }
+          else {
+            if ($channel->{read_waits}->length) {
+              $can_write = 1;
+            }
+          }
+        }
         
-        $result->{ok} = 1;
-        
-        $result->{channel} = $channel;
+        if ($can_write) {
+          my $value = $case->{value};
+          
+          $channel->write($value);
+          
+          my $result = Go::Select::Result->new;
+          
+          $result->{ok} = 1;
+          
+          $result->{channel} = $channel;
+          
+          $found = 1;
+          
+          last;
+        }
       }
       else {
-        my $ok = 0;
+        my $can_read = 0;
         
-        my $value = $channel->read_with_non_blocking(\$ok, $non_blocking);
+        if ($channel->{write_waits}->length) {
+          $can_read = 1;
+        }
         
-        my $result = Go::Select::Result->new;
-        
-        $result->{ok} = (byte)$ok;
-        
-        $result->{channel} = $channel;
-        
-        $result->{value} = $value;
+        if ($can_read) {
+          my $ok = 0;
+          
+          my $value = $channel->read(\$ok);
+          
+          my $result = Go::Select::Result->new;
+          
+          $result->{ok} = (byte)$ok;
+          
+          $result->{channel} = $channel;
+          
+          $result->{value} = $value;
+          
+          $found = 1;
+          
+          last;
+        }
       }
     }
     
