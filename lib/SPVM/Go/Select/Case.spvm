@@ -2,5 +2,13 @@
 # MIT License
 
 class Go::Select::Case {
+  allow Go::Select;
   
+  use Go::Channel;
+  
+  has channel : Go::Channel;
+  
+  has value : object;
+  
+  has is_write : byte;
 }
