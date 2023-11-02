@@ -84,24 +84,6 @@ class Go {
     return $status;
   }
   
-  static method gosched_channel_read : int ($channel : Go::Channel) {
-    
-    my $schedule = $GO->{schedule};
-    
-    my $status = $schedule->schedule_channel_read($channel);
-    
-    return $status;
-  }
-  
-  static method gosched_channel_write : int ($channel : Go::Channel, $value : object) {
-    
-    my $schedule = $GO->{schedule};
-    
-    my $status = $schedule->schedule_channel_write($channel, $value);
-    
-    return $status;
-  }
-  
   method DESTROY : void () {
     
     my $schedule = $self->{schedule};
