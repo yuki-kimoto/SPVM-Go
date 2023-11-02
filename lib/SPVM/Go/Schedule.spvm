@@ -38,7 +38,7 @@ class Go::Schedule {
     return $self;
   }
   
-  method schedule_io_read : int ($fd : int, $timeout : double = 0) {
+  private method schedule_io_read : int ($fd : int, $timeout : double = 0) {
     
     my $is_write = 0;
     
@@ -47,7 +47,7 @@ class Go::Schedule {
     return $status;
   }
   
-  method schedule_io_write : int ($fd : int, $timeout : double = 0) {
+  private method schedule_io_write : int ($fd : int, $timeout : double = 0) {
     
     my $is_write = 1;
     

@@ -4,6 +4,8 @@
 class Go {
   version "0.001";
   
+  allow Sys;
+  
   use Go::Channel;
   use Go::Schedule;
   use Callback;
@@ -66,7 +68,7 @@ class Go {
     return $status;
   }
   
-  static method gosched_io_read : int ($fd : int, $timeout : double = 0) {
+  private static method gosched_io_read : int ($fd : int, $timeout : double = 0) {
     
     my $schedule = $GO->{schedule};
     
@@ -75,7 +77,7 @@ class Go {
     return $status;
   }
   
-  static method gosched_io_write : int ($fd : int, $timeout : double = 0) {
+  private static method gosched_io_write : int ($fd : int, $timeout : double = 0) {
     
     my $schedule = $GO->{schedule};
     
@@ -84,7 +86,7 @@ class Go {
     return $status;
   }
   
-  method DESTROY : void () {
+  private method DESTROY : void () {
     
     my $schedule = $self->{schedule};
     
