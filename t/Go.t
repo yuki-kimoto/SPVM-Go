@@ -15,9 +15,9 @@ use SPVM 'Fn';
 # Start objects count
 my $start_memory_blocks_count = SPVM::api->get_memory_blocks_count();
 
-# ok(SPVM::TestCase::Go->go);
+ok(SPVM::TestCase::Go->go);
 
-# ok(SPVM::TestCase::Go->channel);
+ok(SPVM::TestCase::Go->channel);
 
 ok(SPVM::TestCase::Go->select);
 
