@@ -6,9 +6,17 @@ class Go::Select::Result {
   
   use Go::Channel;
   
+  # Fields
   has ok : ro byte;
   
   has value : ro object;
   
   has channel : ro Go::Channel;
+  
+  private static method new : Go::Select::Result () {
+    
+    my $self = new Go::Select::Result;
+    
+    return $self;
+  }
 }

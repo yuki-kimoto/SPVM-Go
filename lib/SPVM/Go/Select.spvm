@@ -4,4 +4,71 @@
 class Go::Select {
   use Go::Select::Case;
   use Go::Select::Result;
+  use Go::Channel;
+  use List;
+  use Fn;
+  
+  # Fields
+  has read_channels_h : Hash of Go::Channel;
+  
+  has write_channels_h : Hash of Go::Channel;
+  
+  has non_blocking : rw byte;
+  
+  # Class Methods
+  static method new : Go::Select () {
+    
+    my $self = new Go::Select;
+    
+    $self->{read_channels_h} = Hash->new;
+    
+    
+    $self->{write_channels_h} = Hash->new;
+    
+    return $self;
+  }
+  
+  # Instance Methods
+  method add_read : void ($channel : Go::Channel) {
+    
+    my $read_channels_h = $self->{read_channels_h};
+    
+    my $address = Fn->to_address($channel);
+    
+    $read_channels_h->set($address, $channel);
+  }
+  
+  method add_write : void ($channel : Go::Channel) {
+    
+    my $write_channels_h = $self->{write_channels_h};
+    
+    my $address = Fn->to_address($channel);
+    
+    $write_channels_h->set($address, $channel);
+  }
+  
+  method remove_read : void ($channel : Go::Channel) {
+    
+    my $read_channels_h = $self->{read_channels_h};
+    
+    my $address = Fn->to_address($channel);
+    
+    $read_channels_h->delete($address);
+  }
+  
+  method remove_write : void ($channel : Go::Channel) {
+    
+    my $write_channels_h = $self->{write_channels_h};
+    
+    my $address = Fn->to_address($channel);
+    
+    $write_channels_h->delete($address);
+  }
+  
+  method select : Go::Select::Result () {
+    
+    my $result = Go::Select::Result->new;
+    
+    return $result;
+  }
 }

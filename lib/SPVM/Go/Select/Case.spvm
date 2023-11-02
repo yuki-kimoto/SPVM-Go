@@ -11,4 +11,11 @@ class Go::Select::Case {
   has value : object;
   
   has is_write : byte;
+  
+  private static method new : Go::Select::Case () {
+    
+    my $self = new Go::Select::Case;
+    
+    return $self;
+  }
 }
