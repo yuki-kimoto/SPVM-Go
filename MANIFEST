@@ -26,6 +26,12 @@ lib/SPVM/Go/Schedule.pm
 lib/SPVM/Go/Schedule.spvm
 lib/SPVM/Go/Schedule/Task.pm
 lib/SPVM/Go/Schedule/Task.spvm
+lib/SPVM/Go/Select.pm
+lib/SPVM/Go/Select.spvm
+lib/SPVM/Go/Select/Case.pm
+lib/SPVM/Go/Select/Case.spvm
+lib/SPVM/Go/Select/Result.pm
+lib/SPVM/Go/Select/Result.spvm
 lib/SPVM/Go/Sync/WaitGroup.pm
 lib/SPVM/Go/Sync/WaitGroup.spvm
 LICENSE
