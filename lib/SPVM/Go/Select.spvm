@@ -123,8 +123,6 @@ class Go::Select {
   
   method select : Go::Select::Result () {
     
-    my $result = Go::Select::Result->new;
-    
     my $read_cases_h = $self->{read_cases_h};
     
     my $write_cases_h = $self->{write_cases_h};
@@ -149,7 +147,7 @@ class Go::Select {
     
     my $cases_length = $cases_list->length;
     
-    my $cases = $cases_list->to_array;
+    my $cases = (Go::Select::Case[])$cases_list->to_array;
     
     my $seed = $self->{seed};
     
@@ -157,6 +155,43 @@ class Go::Select {
     
     $self->{seed} = $seed;
     
+    my $result = Go::Select::Result->new;
+    
+    my $non_blocking = $self->{non_blocking};
+    
+    my $found = 0;
+    
+    for my $case (@$cases) {
+      
+      my $channel = $case->{channel};
+      
+      my $is_write = $case->{is_write};
+      
+      if ($is_write) {
+        my $value = $case->{value};
+        
+        $channel->write_with_non_blocking($value, $non_blocking);
+        
+        my $result = Go::Select::Result->new;
+        
+        $result->{ok} = 1;
+        
+        $result->{channel} = $channel;
+      }
+      else {
+        my $ok = 0;
+        
+        my $value = $channel->read_with_non_blocking(\$ok, $non_blocking);
+        
+        my $result = Go::Select::Result->new;
+        
+        $result->{ok} = (byte)$ok;
+        
+        $result->{channel} = $channel;
+        
+        $result->{value} = $value;
+      }
+    }
     
     return $result;
   }

@@ -4,6 +4,7 @@
 class Go::Channel {
   allow Go::Schedule;
   allow Go;
+  allow Go::Select;
   
   use Hash;
   use Go::Channel::Wait;
