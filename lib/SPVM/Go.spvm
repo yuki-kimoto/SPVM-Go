@@ -39,14 +39,6 @@ class Go {
     return $channel;
   }
   
-  static method read : object () {
-    
-  }
-  
-  static method write : void ($data : object) {
-    
-  }
-  
   static method gosched : int () {
     
     my $schedule = $GO->{schedule};
