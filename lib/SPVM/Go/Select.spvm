@@ -18,8 +18,10 @@ class Go::Select {
   
   has seed : int;
   
+  has schedule : Go::Schedule;
+  
   # Class Methods
-  static method new : Go::Select () {
+  private static method new : Go::Select ($schedule : Go::Schedule) {
     
     my $self = new Go::Select;
     
@@ -28,6 +30,8 @@ class Go::Select {
     $self->{write_cases_h} = Hash->new;
     
     $self->{seed} = Sys->process_id * (int)Sys->time;
+    
+    $self->{schedule} = $schedule;
     
     return $self;
   }
@@ -155,76 +159,92 @@ class Go::Select {
     
     $self->{seed} = $seed;
     
-    my $result = Go::Select::Result->new;
-    
-    my $non_blocking = $self->{non_blocking};
+    my $result = (Go::Select::Result)undef;
     
     my $found = 0;
     
-    for my $case (@$cases) {
-      
-      my $channel = $case->{channel};
-      
-      my $is_write = $case->{is_write};
-      
-      if ($is_write) {
+    while (1) {
+      for my $case (@$cases) {
         
-        my $can_write = 0;
+        my $channel = $case->{channel};
         
-        {
-          my $length = $channel->{length};
+        my $is_write = $case->{is_write};
+        
+        if ($is_write) {
           
-          my $capacity = $channel->{capacity};
+          my $can_write = 0;
           
-          if ($length < $capacity) {
-            $can_write = 1;
-          }
-          else {
-            if ($channel->{read_waits}->length) {
+          {
+            my $length = $channel->{length};
+            
+            my $capacity = $channel->{capacity};
+            
+            if ($length < $capacity) {
               $can_write = 1;
             }
+            else {
+              if ($channel->{read_waits}->length) {
+                $can_write = 1;
+              }
+            }
+          }
+          
+          if ($can_write) {
+            my $value = $case->{value};
+            
+            $channel->write($value);
+            
+            $result = Go::Select::Result->new;
+            
+            $result->{ok} = 1;
+            
+            $result->{channel} = $channel;
+            
+            $found = 1;
+            
+            last;
           }
         }
-        
-        if ($can_write) {
-          my $value = $case->{value};
+        else {
+          my $can_read = 0;
           
-          $channel->write($value);
+          if ($channel->{write_waits}->length) {
+            $can_read = 1;
+          }
           
-          my $result = Go::Select::Result->new;
-          
-          $result->{ok} = 1;
-          
-          $result->{channel} = $channel;
-          
-          $found = 1;
-          
-          last;
+          if ($can_read) {
+            my $ok = 0;
+            
+            my $value = $channel->read(\$ok);
+            
+            $result = Go::Select::Result->new;
+            
+            $result->{ok} = (byte)$ok;
+            
+            $result->{channel} = $channel;
+            
+            $result->{value} = $value;
+            
+            $found = 1;
+            
+            last;
+          }
         }
       }
+      
+      if ($found) {
+        last;
+      }
       else {
-        my $can_read = 0;
+        my $non_blocking = $self->{non_blocking};
         
-        if ($channel->{write_waits}->length) {
-          $can_read = 1;
-        }
-        
-        if ($can_read) {
-          my $ok = 0;
-          
-          my $value = $channel->read(\$ok);
-          
-          my $result = Go::Select::Result->new;
-          
-          $result->{ok} = (byte)$ok;
-          
-          $result->{channel} = $channel;
-          
-          $result->{value} = $value;
-          
-          $found = 1;
-          
+        if ($non_blocking) {
           last;
+        }
+        else {
+          my $schedule = $self->{schedule};
+          
+          $schedule->schedule;
         }
       }
     }
