@@ -6,9 +6,9 @@ class Go::Select::Result {
   
   use Go::Channel;
   
-  has ro ok : byte;
+  has ok : ro byte;
   
-  has ro value : object;
+  has value : ro object;
   
-  has ro channel : Go::Channel;
+  has channel : ro Go::Channel;
 }
