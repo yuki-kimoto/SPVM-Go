@@ -9,7 +9,7 @@ class Go::Select {
   use Fn;
   
   # Fields
-  has read_channels_h : Hash of Go::Channel;
+  has read_cases_h : Hash of Go::Channel;
   
   has write_channels_h : Hash of Go::Channel;
   
@@ -20,7 +20,7 @@ class Go::Select {
     
     my $self = new Go::Select;
     
-    $self->{read_channels_h} = Hash->new;
+    $self->{read_cases_h} = Hash->new;
     
     
     $self->{write_channels_h} = Hash->new;
@@ -31,29 +31,41 @@ class Go::Select {
   # Instance Methods
   method add_read : void ($channel : Go::Channel) {
     
-    my $read_channels_h = $self->{read_channels_h};
+    my $read_cases_h = $self->{read_cases_h};
+    
+    my $case = Go::Select::Case->new;
+    
+    $case->{channel} = $channel;
     
     my $address = Fn->to_address($channel);
     
-    $read_channels_h->set($address, $channel);
+    $read_cases_h->set($address, $case);
   }
   
-  method add_write : void ($channel : Go::Channel) {
+  method add_write : void ($channel : Go::Channel, $value : object) {
     
     my $write_channels_h = $self->{write_channels_h};
     
+    my $case = Go::Select::Case->new;
+    
+    $case->{channel} = $channel;
+    
+    $case->{value} = $value;
+    
+    $case->{is_write} = 1;
+    
     my $address = Fn->to_address($channel);
     
-    $write_channels_h->set($address, $channel);
+    $write_channels_h->set($address, $case);
   }
   
   method remove_read : void ($channel : Go::Channel) {
     
-    my $read_channels_h = $self->{read_channels_h};
+    my $read_cases_h = $self->{read_cases_h};
     
     my $address = Fn->to_address($channel);
     
-    $read_channels_h->delete($address);
+    $read_cases_h->delete($address);
   }
   
   method remove_write : void ($channel : Go::Channel) {
