@@ -11,7 +11,7 @@ class Go::Select {
   # Fields
   has read_cases_h : Hash of Go::Channel;
   
-  has write_channels_h : Hash of Go::Channel;
+  has write_cases_h : Hash of Go::Channel;
   
   has non_blocking : rw byte;
   
@@ -23,7 +23,7 @@ class Go::Select {
     $self->{read_cases_h} = Hash->new;
     
     
-    $self->{write_channels_h} = Hash->new;
+    $self->{write_cases_h} = Hash->new;
     
     return $self;
   }
@@ -31,20 +31,42 @@ class Go::Select {
   # Instance Methods
   method add_read : void ($channel : Go::Channel) {
     
+    unless ($channel) {
+      die "\$channel must be defined";
+    }
+    
     my $read_cases_h = $self->{read_cases_h};
+    
+    my $address = Fn->to_address($channel);
+    
+    my $exists = $read_cases_h->exists($address);
+    
+    if ($exists) {
+      die "\$channel is already exists";
+    }
     
     my $case = Go::Select::Case->new;
     
     $case->{channel} = $channel;
-    
-    my $address = Fn->to_address($channel);
     
     $read_cases_h->set($address, $case);
   }
   
   method add_write : void ($channel : Go::Channel, $value : object) {
     
-    my $write_channels_h = $self->{write_channels_h};
+    unless ($channel) {
+      die "\$channel must be defined";
+    }
+    
+    my $write_cases_h = $self->{write_cases_h};
+    
+    my $address = Fn->to_address($channel);
+    
+    my $exists = $write_cases_h->exists($address);
+    
+    if ($exists) {
+      die "\$channel is already exists";
+    }
     
     my $case = Go::Select::Case->new;
     
@@ -54,27 +76,45 @@ class Go::Select {
     
     $case->{is_write} = 1;
     
-    my $address = Fn->to_address($channel);
-    
-    $write_channels_h->set($address, $case);
+    $write_cases_h->set($address, $case);
   }
   
   method remove_read : void ($channel : Go::Channel) {
     
+    unless ($channel) {
+      die "\$channel must be defined";
+    }
+    
     my $read_cases_h = $self->{read_cases_h};
     
     my $address = Fn->to_address($channel);
+    
+    my $exists = $read_cases_h->exists($address);
+    
+    unless ($exists) {
+      die "\$channel is not found";
+    }
     
     $read_cases_h->delete($address);
   }
   
   method remove_write : void ($channel : Go::Channel) {
     
-    my $write_channels_h = $self->{write_channels_h};
+    unless ($channel) {
+      die "\$channel must be defined";
+    }
+    
+    my $write_cases_h = $self->{write_cases_h};
     
     my $address = Fn->to_address($channel);
     
-    $write_channels_h->delete($address);
+    my $exists = $write_cases_h->exists($address);
+    
+    unless ($exists) {
+      die "\$channel is not found";
+    }
+    
+    $write_cases_h->delete($address);
   }
   
   method select : Go::Select::Result () {
