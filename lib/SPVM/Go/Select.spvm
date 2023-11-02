@@ -208,6 +208,7 @@ class Go::Select {
           }
         }
         else {
+          
           my $can_read = 0;
           
           if ($channel->{write_waits}->length) {
@@ -268,5 +269,26 @@ class Go::Select {
       
       $array->[$j] = $temp;
     }
+  }
+  
+  method is_empty : int () {
+    
+    my $read_cases_h = $self->{read_cases_h};
+    
+    my $write_cases_h = $self->{write_cases_h};
+    
+    my $read_cases_length = $read_cases_h->keys_length;
+    
+    my $write_cases_length = $write_cases_h->keys_length;
+    
+    my $cases_length = $read_cases_length  + $write_cases_length;
+    
+    my $is_empty = 1;
+    
+    if ($cases_length > 0) {
+      $is_empty = 0;
+    }
+    
+    return $is_empty;
   }
 }

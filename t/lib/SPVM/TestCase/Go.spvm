@@ -4,6 +4,94 @@ class TestCase::Go {
   use Go::Sync::WaitGroup;
   use Point;
   
+  static method select : int () {
+
+=pod
+    
+    Go->go(method : void () {
+      
+      my $ch = Go->make;
+      
+      Go->go([has ch : Go::Channel = $ch] method : void () {
+        
+        my $ch = $self->{ch};
+        
+        $ch->write(1);
+      });
+      
+      my $select = Go->new_select;
+      
+      $select->add_read($ch);
+      
+      my $result = $select->select;
+      
+      my $value = (int)$result->value;
+      
+      my $ok = $result->ok;
+      
+      warn "select 1:$value $ok";
+    });
+
+=cut
+
+    Go->go(method : void () {
+      
+      my $ch0 = Go->make;
+      
+      my $ch1 = Go->make;
+      
+      my $ch2 = Go->make;
+      
+      Go->go([has ch0 : Go::Channel = $ch0, has ch1 : Go::Channel = $ch1, has ch2 : Go::Channel = $ch2] method : void () {
+        
+        my $ch0 = $self->{ch0};
+        
+        $ch0->write(1);
+        
+        my $ch1 = $self->{ch1};
+        
+        $ch1->write(2);
+        
+        my $ch2 = $self->{ch2};
+        
+        $ch2->write(3);
+        
+      });
+      
+      my $select = Go->new_select;
+      
+      $select->add_read($ch2);
+      
+      $select->add_read($ch1);
+      
+      $select->add_read($ch0);
+      
+      while (1) {
+        my $result = $select->select;
+        
+        my $ch = $result->channel;
+        
+        my $value = (int)$result->value;
+        
+        my $ok = $result->ok;
+        
+        if ($ok) {
+          warn "select 2:$value $ok " . Fn->to_address($ch);
+          $select->remove_read($ch);
+        }
+        
+        if ($select->is_empty) {
+          last;
+        }
+      }
+      
+    });
+    
+    Go->gosched;
+    
+    return 1;
+  }
+  
   static method channel : int () {
     
     Go->go(method : void () {
