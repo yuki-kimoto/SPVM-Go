@@ -4,19 +4,17 @@ class TestCase::Go::Coroutine {
   
   static method transfer : int () {
     
-    my $coroutine_start_task_ref = [(Callback)undef];
+    my $coroutines = new Go::Coroutine[2];
     
-    my $coroutines = new Go::Coroutine[10];
-      
-    $coroutine_start_task_ref->[0] = [has coroutines : Go::Coroutine[] = $coroutines, has coroutine_start_task_ref : Callback[] = $coroutine_start_task_ref] method : void () {
+    my $coroutine_return_back = Go::Coroutine->new;
+    
+    my $coroutine0 = Go::Coroutine->new([has coroutines : Go::Coroutine[] = $coroutines] method : void () {
       
       # die "Foo";
       
       my $coroutines = $self->{coroutines};
       
-      my $coroutine1 = (Go::Coroutine)undef;
-      
-      $coroutine1 = Go::Coroutine->new([has coroutines : Go::Coroutine[] = $coroutines] method : void () {
+      my $coroutine1 = Go::Coroutine->new([has coroutines : Go::Coroutine[] = $coroutines] method : void () {
         
         # die "Foo";
         
@@ -43,15 +41,13 @@ class TestCase::Go::Coroutine {
       
       warn("G0-C");
       
-    };
+      Go::Coroutine->transfer($coroutines->[0], $coroutines->[9]);
+    }, $coroutine_return_back);
     
-    my $coroutine_start_task = $coroutine_start_task_ref->[0];
-    my $coroutine_start = Go::Coroutine->new($coroutine_start_task);
-    $coroutines->[0] = $coroutine_start;
-      
-    $coroutine_start_task_ref->[0]->();
+    $coroutines->[0] = $coroutine0;
     
-    $coroutine_start_task_ref->[0] = undef;
+    Go::Coroutine->transfer($coroutine_return_back, $coroutines->[0]);
+    
     $coroutines->[0] = undef;
     $coroutines->[1] = undef;
     
