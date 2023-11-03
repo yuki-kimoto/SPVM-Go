@@ -41,7 +41,6 @@ class TestCase::Go::Coroutine {
       
       warn("G0-C");
       
-      Go::Coroutine->transfer($coroutines->[0], $coroutines->[9]);
     }, $coroutine_return_back);
     
     $coroutines->[0] = $coroutine0;
