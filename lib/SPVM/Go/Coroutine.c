@@ -64,7 +64,6 @@ static void coroutine_handler (void* obj_self) {
   env->free_stack(env, stack);
   
   coro_transfer_fix(coroutine_context, coroutine_context_return_back);
-  assert(0);
   
   return;
 }
@@ -133,6 +132,7 @@ int32_t SPVM__Go__Coroutine__transfer(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   coro_transfer_fix(coroutine_context_from, coroutine_context_to);
   
+  return 0;
 }
 
 int32_t SPVM__Go__Coroutine__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
@@ -157,4 +157,5 @@ int32_t SPVM__Go__Coroutine__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   env->free_memory_block(env, stack, pointer_items);
   
+  return 0;
 }
