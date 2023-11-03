@@ -33,8 +33,8 @@ WriteMakefile(
     resources => {
       repository => {
         type => 'git',
-        url  => '',
-        web  => '',
+        url  => 'https://github.com/yuki-kimoto/SPVM-Go.git',
+        web  => 'https://github.com/yuki-kimoto/SPVM-Go',
       },
     },
     no_index => {
