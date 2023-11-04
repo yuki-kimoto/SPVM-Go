@@ -138,17 +138,14 @@ int32_t SPVM__Go__Coroutine__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
   struct coro_stack* coroutine_stack = pointer_items[1];
   
   if (coroutine_stack) {
-    coro_stack_free(coroutine_stack);
-  }
-  
-  if (coroutine_stack) {
-    coro_stack_free(coroutine_stack);
     coro_destroy(coroutine_context);
+    
+    coro_stack_free(coroutine_stack);
+    
+    env->free_memory_block(env, stack, coroutine_stack);
   }
   
   env->free_memory_block(env, stack, coroutine_context);
-  
-  env->free_memory_block(env, stack, coroutine_stack);
   
   env->free_memory_block(env, stack, pointer_items);
   
