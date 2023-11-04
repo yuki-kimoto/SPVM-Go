@@ -141,13 +141,10 @@ int32_t SPVM__Go__Coroutine__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
     coro_stack_free(coroutine_stack);
   }
   
-#if CORO_FIBER
-  if (coroutine_context->coro) {
+  if (coroutine_stack) {
+    coro_stack_free(coroutine_stack);
     coro_destroy(coroutine_context);
   }
-#else
-  coro_destroy(coroutine_context);
-#endif
   
   env->free_memory_block(env, stack, coroutine_context);
   
