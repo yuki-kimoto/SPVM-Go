@@ -32,8 +32,6 @@ class Go::Coroutine : pointer {
   
   has poll_index : int;
   
-  has stack : Native::Stack;
-  
   has disable : byte;
   
   # Class Methods
@@ -46,8 +44,6 @@ class Go::Coroutine : pointer {
     $self->{return_back} = $return_back;
     
     my $env = Native->get_current_env;
-    
-    $self->{stack} = $env->new_stack;
     
     $self->init_coroutine;
     

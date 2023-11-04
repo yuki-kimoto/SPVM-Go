@@ -86,11 +86,6 @@ int32_t SPVM__Go__Coroutine__init_coroutine(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void** pointer_items = env->new_memory_block(env, stack, sizeof(void*) * 4);
   
-  void* obj_spvm_stack = env->get_field_object_by_name(env, stack, obj_self, "stack", &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) { return error_id; }
-  
-  SPVM_VALUE* spvm_stack = env->get_pointer(env, stack, obj_spvm_stack);
-  
   pointer_items[0] = coroutine_context;
   pointer_items[1] = coroutine_stack;
   pointer_items[2] = env;
