@@ -6,7 +6,40 @@
 #include "spvm_native.h"
 #include "coro.h"
 
+#include <stdlib.h>
+
+
 static const char* FILE_NAME = "Go/Coroutine.c";
+
+void* SPVM_ALLOCATOR_alloc_memory_block_unmanaged1(size_t size) {
+  
+  spvm_warn("SIZE %llu\n", size);
+  
+  if (size < 1) {
+    return NULL;
+  }
+  
+  if ((size_t)size > SIZE_MAX) {
+    return NULL;
+  }
+  
+  void* block = calloc(1, (size_t)size);
+  
+  return block;
+}
+
+void* SPVM_ALLOCATOR_alloc_memory_block_unmanaged2(size_t size) {
+  
+  spvm_warn("SIZE %llu\n", size);
+  
+  if ((size_t)size > SIZE_MAX) {
+    return NULL;
+  }
+  
+  void* block = calloc(1, (size_t)size);
+  
+  return block;
+}
 
 static void coroutine_handler (void* obj_self) {
   
@@ -15,6 +48,46 @@ static void coroutine_handler (void* obj_self) {
   void** pointer_items = (void**)SPVM_NATIVE_GET_POINTER(obj_self);
   
   SPVM_ENV* env = pointer_items[2];
+  
+  for (int32_t i = 0; i < 1000; i++) {
+    spvm_warn("RE LINE %d", __LINE__);
+   
+    void* tmp0 = calloc(sizeof(void*), 1);
+   
+    spvm_warn("RE LINE %d", __LINE__);
+   
+    free(tmp0);
+  }
+  
+  for (int32_t i = 0; i < 1000; i++) {
+    spvm_warn("RE LINE %d", __LINE__);
+   
+    void* tmp0 = calloc(1, sizeof(void*) * 1);
+   
+    spvm_warn("RE LINE %d", __LINE__);
+   
+    free(tmp0);
+  }
+  
+  for (int32_t i = 0; i < 1000; i++) {
+    spvm_warn("RE LINE %d", __LINE__);
+   
+    void* tmp0 = SPVM_ALLOCATOR_alloc_memory_block_unmanaged2(sizeof(void*) * 1);
+    
+    spvm_warn("RE LINE %d", __LINE__);
+    
+    free(tmp0);
+  }
+  
+  for (int32_t i = 0; i < 1000; i++) {
+    spvm_warn("RE LINE %d", __LINE__);
+   
+    void* tmp0 = SPVM_ALLOCATOR_alloc_memory_block_unmanaged1(sizeof(void*) * 1);
+    
+    spvm_warn("RE LINE %d", __LINE__);
+    
+    free(tmp0);
+  }
   
   SPVM_VALUE* stack = env->new_stack(env);
   
