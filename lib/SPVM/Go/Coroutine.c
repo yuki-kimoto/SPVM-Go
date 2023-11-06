@@ -68,7 +68,7 @@ int32_t SPVM__Go__Coroutine__init_coroutine(SPVM_ENV* env, SPVM_VALUE* stack) {
   coro_context* coroutine_context = env->new_memory_block(env, stack, sizeof(coro_context));
   struct coro_stack* coroutine_stack = NULL;
   if (obj_task) {
-    coroutine_stack = env->new_memory_block(env, stack, sizeof(struct coro_stack*));
+    coroutine_stack = env->new_memory_block(env, stack, sizeof(struct coro_stack));
     
     if (!coro_stack_alloc(coroutine_stack, 0)) {
       return env->die(env, stack, "coro_stack_alloc failed.", __func__, FILE_NAME, __LINE__);

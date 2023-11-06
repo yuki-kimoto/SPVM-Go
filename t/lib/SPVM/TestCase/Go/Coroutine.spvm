@@ -19,7 +19,11 @@ class TestCase::Go::Coroutine {
     
     $coroutine = undef;
     
+    warn;
+    
     $coroutine_return_back = undef;
+    
+    warn;
     
     return 1;
   }
