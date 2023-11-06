@@ -16,7 +16,7 @@ static void coroutine_handler (void* obj_self) {
   
   SPVM_ENV* env = pointer_items[2];
   
-  SPVM_VALUE* stack = env->new_stack(env);
+  SPVM_VALUE* stack = pointer_items[3];
   
   void* obj_task = env->get_field_object_by_name(env, stack, obj_self, "task", &error_id, __func__, FILE_NAME, __LINE__);
   assert(error_id == 0);
@@ -51,10 +51,6 @@ static void coroutine_handler (void* obj_self) {
   env->set_field_byte_by_name(env, stack, obj_self, "finished", 1, &error_id, __func__, FILE_NAME, __LINE__);
   assert(error_id == 0);
   
-  env->set_exception(env, stack, NULL);
-  
-  env->free_stack(env, stack);
-  
   coro_transfer(coroutine_context, coroutine_context_return_back);
   
   return;
@@ -86,9 +82,12 @@ int32_t SPVM__Go__Coroutine__init_coroutine(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void** pointer_items = env->new_memory_block(env, stack, sizeof(void*) * 4);
   
+  SPVM_VALUE* coroutine_spvm_stack = env->new_stack(env);
+  
   pointer_items[0] = coroutine_context;
   pointer_items[1] = coroutine_stack;
   pointer_items[2] = env;
+  pointer_items[3] = coroutine_spvm_stack;
   
   env->set_pointer(env, stack, obj_self, pointer_items);
   
@@ -131,6 +130,10 @@ int32_t SPVM__Go__Coroutine__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
   coro_context* coroutine_context = pointer_items[0];
   
   struct coro_stack* coroutine_stack = pointer_items[1];
+  
+  SPVM_VALUE* coroutine_spvm_stack = pointer_items[3];
+  
+  env->free_stack(env, coroutine_spvm_stack);
   
   if (coroutine_stack) {
     coro_destroy(coroutine_context);
