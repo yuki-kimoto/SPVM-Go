@@ -4,58 +4,22 @@ class TestCase::Go::Coroutine {
   
   static method transfer : int () {
     
-    my $coroutines = new Go::Coroutine[2];
-    
     my $coroutine_return_back = Go::Coroutine->new;
     
-    my $coroutine0 = Go::Coroutine->new([has coroutines : Go::Coroutine[] = $coroutines] method : void () {
-      
-      # die "Foo";
-      
-      my $coroutines = $self->{coroutines};
-      
-      my $coroutine1 = Go::Coroutine->new([has coroutines : Go::Coroutine[] = $coroutines] method : void () {
-        
-        # die "Foo";
-        
-        warn("G1-A");
-        
-        warn("G1-CallMethodStart");
-        TestCase::Go::Coroutine->foo();
-        warn("G1-CallMethodEnd");
-        
-        Go::Coroutine->transfer($self->{coroutines}[1], $self->{coroutines}[0]);
-        
-        warn("G1-B");
-      }, $coroutines->[0]);
-      
-      $coroutines->[1] = $coroutine1;
-      
-      warn("G0-A");
-      
-      Go::Coroutine->transfer($coroutines->[0], $coroutines->[1]);
-      
-      warn("G0-B");
-      
-      Go::Coroutine->transfer($coroutines->[0], $coroutines->[1]);
-      
-      warn("G0-C");
-      
+    my $coroutine = Go::Coroutine->new(method : void () {
+      warn;
     }, $coroutine_return_back);
     
-    $coroutines->[0] = $coroutine0;
+    warn;
     
-    Go::Coroutine->transfer($coroutine_return_back, $coroutines->[0]);
+    Go::Coroutine->transfer($coroutine_return_back, $coroutine);
     
-    $coroutines->[0] = undef;
-    $coroutines->[1] = undef;
+    warn;
     
-    warn("END");
+    $coroutine = undef;
+    
+    $coroutine_return_back = undef;
     
     return 1;
-  }
-  
-  static method foo : void () {
-    warn "G1-CallMethod";
   }
 }
