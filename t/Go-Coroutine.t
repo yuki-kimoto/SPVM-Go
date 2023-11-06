@@ -11,6 +11,10 @@ use SPVM 'TestCase::Go::Coroutine';
 # Start objects count
 my $start_memory_blocks_count = SPVM::api->get_memory_blocks_count();
 
+ok(SPVM::TestCase::Go::Coroutine->transfer_minimal);
+
+ok(SPVM::TestCase::Go::Coroutine->transfer_create_many_objects);
+
 ok(SPVM::TestCase::Go::Coroutine->transfer);
 
 # All object is freed
