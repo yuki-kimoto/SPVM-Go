@@ -5,7 +5,7 @@ class Go::Sync::WaitGroup {
   use Go;
   use Sync::Mutex;
   
-  has state : int;
+  has count : int;
   
   has mutex : Sync::Mutex;
   
@@ -24,35 +24,35 @@ class Go::Sync::WaitGroup {
     
     my $mutex = $self->{mutex};
     
-    $mutex->lock;
-    
-    my $state = $self->{state};
-    
-    $state += $delta;
-    
-    $self->{state} = $state;
-    
-    $mutex->unlock;
-    
-    my $state_is_negative = $self->{state} < 0;
-    
-    if ($state_is_negative) {
-      die "The state field must be greater than or equal to 0.";
+    {
+      $mutex->lock;
+      
+      my $count = $self->{count};
+      
+      $count += $delta;
+        
+      my $count_is_negative = $count < 0;
+      
+      if ($count_is_negative) {
+        die "The count field must be greater than or equal to 0.";
+      }
+      
+      $self->{count} = $count;
+      
+      $mutex->unlock;
     }
   }
   
   method done : void () {
-    
     $self->add(-1);
   }
   
   method wait : void () {
+    
     while (1) {
+      my $count = $self->{count};
       
-      my $state = $self->{state};
-      
-      if ($state == 0) {
-        
+      if ($count == 0) {
         return;
       }
       
