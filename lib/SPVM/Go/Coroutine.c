@@ -53,7 +53,7 @@ static void coroutine_handler (void* obj_self) {
   
   coro_transfer(coroutine_context, coroutine_context_return_back);
   
-  return;
+  assert(0);
 }
 
 int32_t SPVM__Go__Coroutine__init_coroutine(SPVM_ENV* env, SPVM_VALUE* stack) {
