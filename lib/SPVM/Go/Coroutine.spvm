@@ -11,10 +11,6 @@ class Go::Coroutine : pointer {
   
   use Sys::Time::Timespec;
   
-  use Native::Stack;
-  
-  use Native;
-  
   use Go::Channel;
   
   # Fields
@@ -42,8 +38,6 @@ class Go::Coroutine : pointer {
     $self->{task} = $task;
     
     $self->{return_back} = $return_back;
-    
-    my $env = Native->get_current_env;
     
     $self->init_coroutine;
     
