@@ -6,12 +6,6 @@
 .github/workflows/windows-latest.yml
 .gitignore
 Changes
-coro-original/coro.c
-coro-original/coro.h
-coro-original/Coro_API.c
-coro-original/Coro_EV.xs
-coro-original/Coro_State.xs
-coro-original/EV.xs
 lib/SPVM/Go.pm
 lib/SPVM/Go.spvm
 lib/SPVM/Go/Channel.pm
