@@ -46,6 +46,8 @@ ok(SPVM::TestCase::Go->channel_unbuffered);
 
 ok(SPVM::TestCase::Go->channel_cap);
 
+ok(SPVM::TestCase::Go->channel_len);
+
 ok(SPVM::TestCase::Go->channel);
 
 ok(SPVM::TestCase::Go->select);

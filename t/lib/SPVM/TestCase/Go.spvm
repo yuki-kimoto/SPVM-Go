@@ -478,6 +478,61 @@ class TestCase::Go {
     return 1;
   }
   
+  static method channel_len : int () {
+    
+    {
+      my $ch = Go->make;
+      
+      unless ($ch->len == 0) {
+        return 0;
+      }
+    }
+    
+    {
+      my $ch = Go->make(0);
+      
+      unless ($ch->len == 0) {
+        return 0;
+      }
+    }
+    
+    {
+      $TestCase::Go::RESULT = IntList->new;
+      
+      Go->go(method : void () {
+        
+        my $ch = Go->make(1);
+        
+        Go->go([has ch : Go::Channel = $ch] method : void () {
+          
+          my $ch = $self->{ch};
+          
+          $ch->write(1);
+          
+          $TestCase::Go::RESULT->push($ch->len);
+        });
+        
+        Go->sleep(0.1);
+        
+        my $ok = 0;
+        
+        $ch->read(\$ok);
+        
+        $TestCase::Go::RESULT->push($ch->len);
+      });
+      
+      Go->gosched;
+      
+      unless (Array->equals_int($TestCase::Go::RESULT->to_array, [1, 0])) {
+        return 0;
+      }
+      
+      $TestCase::Go::RESULT = undef;
+    }
+    
+    return 1;
+  }
+  
   static method channel : int () {
     
     Go->go(method : void () {
