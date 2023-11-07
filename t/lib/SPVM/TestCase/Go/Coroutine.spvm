@@ -5,29 +5,29 @@ class TestCase::Go::Coroutine {
   use IntList;
   use Array;
   
-  our $MINIMAL_RESULT : IntList;
+  our $RESULT : IntList;
   
   static method transfer_minimal : int () {
     
-    $TestCase::Go::Coroutine::MINIMAL_RESULT = IntList->new;
+    $TestCase::Go::Coroutine::RESULT = IntList->new;
     
     my $coroutine_return_back = Go::Coroutine->new;
     
     my $coroutine = Go::Coroutine->new(method : void () {
-      $TestCase::Go::Coroutine::MINIMAL_RESULT->push(2);
+      $TestCase::Go::Coroutine::RESULT->push(2);
     }, $coroutine_return_back);
     
-    $TestCase::Go::Coroutine::MINIMAL_RESULT->push(1);
+    $TestCase::Go::Coroutine::RESULT->push(1);
     
     Go::Coroutine->transfer($coroutine_return_back, $coroutine);
     
-    $TestCase::Go::Coroutine::MINIMAL_RESULT->push(3);
+    $TestCase::Go::Coroutine::RESULT->push(3);
     
-    unless (Array->equals_int($TestCase::Go::Coroutine::MINIMAL_RESULT->to_array, [1, 2, 3])) {
+    unless (Array->equals_int($TestCase::Go::Coroutine::RESULT->to_array, [1, 2, 3])) {
       return 0;
     }
     
-    $TestCase::Go::Coroutine::MINIMAL_RESULT = undef;
+    $TestCase::Go::Coroutine::RESULT = undef;
     
     return 1;
   }
@@ -48,8 +48,6 @@ class TestCase::Go::Coroutine {
     
     return 1;
   }
-  
-  our $RESULT : IntList;
   
   static method transfer : int () {
     
@@ -117,4 +115,5 @@ class TestCase::Go::Coroutine {
   static method foo : void () {
     $TestCase::Go::Coroutine::RESULT->push(5);
   }
+
 }
