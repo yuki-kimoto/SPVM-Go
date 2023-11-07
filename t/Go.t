@@ -17,6 +17,8 @@ my $start_memory_blocks_count = SPVM::api->get_memory_blocks_count();
 
 ok(SPVM::TestCase::Go->go_minimal);
 
+ok(SPVM::TestCase::Go->go_basic);
+
 ok(SPVM::TestCase::Go->go_die);
 
 ok(SPVM::TestCase::Go->go_extra);
