@@ -14,7 +14,77 @@ Go::Select class of L<SPVM> has methods to select a readable/writable channel.
 
 =head1 Usage
 
-  use Go::Select;
+  use Go;
+  
+  Go->go(method : void () {
+    
+    my $ch0 = Go->make;
+    
+    my $ch1 = Go->make;
+    
+    my $ch2 = Go->make;
+    
+    my $ch3 = Go->make;
+    
+    Go->go([has ch0 : Go::Channel = $ch0, has ch1 : Go::Channel = $ch1, has ch2 : Go::Channel = $ch2, has ch3 : Go::Channel = $ch3] method : void () {
+      
+      my $ch0 = $self->{ch0};
+      
+      $ch0->write(1);
+      
+      my $ch1 = $self->{ch1};
+      
+      $ch1->write(2);
+      
+      my $ch2 = $self->{ch2};
+      
+      $ch2->write(3);
+      
+      my $ch3 = $self->{ch3};
+      
+      my $ok = 0;
+      
+      my $value = (int)$ch3->read(\$ok);
+    });
+    
+    my $select = Go->new_select;
+    
+    $select->add_read($ch2);
+    
+    $select->add_read($ch1);
+    
+    $select->add_read($ch0);
+    
+    $select->add_write($ch3 => 4);
+    
+    while (1) {
+      my $result = $select->select;
+      
+      my $ok = $result->ok;
+      
+      if ($ok) {
+        my $ch = $result->channel;
+        
+        my $is_write = $result->is_write;
+        
+        if ($is_write) {
+          $select->remove_write($ch);
+        }
+        else {
+          my $value = (int)$result->value;
+          
+          $select->remove_read($ch);
+        }
+      }
+      
+      if ($select->is_empty) {
+        last;
+      }
+    }
+    
+  });
+  
+  Go->gosched;
 
 =head1 Fields
 

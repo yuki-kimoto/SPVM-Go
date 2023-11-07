@@ -6,11 +6,11 @@ package SPVM::Go::Select::Result;
 
 =head1 Name
 
-SPVM::Go::Select::Result - Short Description
+SPVM::Go::Select::Result - Result of select
 
 =head1 Description
 
-Go::Select::Result class of L<SPVM> has methods for someting.
+Go::Select::Result class of L<SPVM> has methods to manipulate the result of select.
 
 =head1 Usage
 
@@ -18,24 +18,33 @@ Go::Select::Result class of L<SPVM> has methods for someting.
 
 =head1 Fields
 
+=head2 ok
 
+C<has ok : ro byte;>
 
-=head1 Class Methods
+A ok flag got by the L<read|Go::Channel/"read"> method in the L<Go::Channel|SPVM::Go::Channel> class.
 
+If the channel is a write channle, this value is always 1.
 
+=head2 value
 
-=head1 Instance Methods
+C<has value : ro object;>
 
+A return value got by the L<read|Go::Channel/"read"> method in the L<Go::Channel|SPVM::Go::Channel> class.
 
+=head2 channel
 
+C<has channel : ro L<Go::Channel|SPVM::Go::Channel>;>
 
-=head1 Repository
+A channel.
 
+=head2 is_write
 
+C<has is_write : ro byte;>
 
-=head1 Author
+A flag if the channel is a write channel.
 
-Yuki Kimoto C<kimoto.yuki@gmail.com>
+If this flag is 0, the channel is a read channel.
 
 =head1 Copyright & License
 
