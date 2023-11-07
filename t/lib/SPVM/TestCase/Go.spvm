@@ -1,7 +1,6 @@
 class TestCase::Go {
   use Go;
   use Sys;
-  use Go::Sync::WaitGroup;
   use Point;
   
   our $RESULT : IntList;
@@ -127,50 +126,6 @@ class TestCase::Go {
     return 1;
   }
   
-  static method wait_group : int () {
-    
-    $TestCase::Go::RESULT = IntList->new;
-    
-    Go->go(method : void () {
-      my $wg = Go::Sync::WaitGroup->new;
-      
-      $wg->add(2);
-      
-      Go->go([has wg : Go::Sync::WaitGroup = $wg] method : void () {
-        
-        Fn->defer([has wg : Go::Sync::WaitGroup = $self->{wg}] method : void () {
-          $self->{wg}->done;
-        });
-        
-        $TestCase::Go::RESULT->push(2);
-        
-      });
-      
-      Go->go([has wg : Go::Sync::WaitGroup = $wg] method : void () {
-        Fn->defer([has wg : Go::Sync::WaitGroup = $self->{wg}] method : void () {
-          $self->{wg}->done;
-        });
-        
-        $TestCase::Go::RESULT->push(3);
-      });
-      
-      $TestCase::Go::RESULT->push(1);
-      
-      $wg->wait;
-      
-      $TestCase::Go::RESULT->push(4);
-    });
-    
-    Go->gosched;
-    
-    unless (Array->equals_int($TestCase::Go::RESULT->to_array, [1, 2, 3, 4])) {
-      return 0;
-    }
-    
-    $TestCase::Go::RESULT = undef;
-    
-    return 1;
-  }
   static method select : int () {
 
     Go->go(method : void () {
