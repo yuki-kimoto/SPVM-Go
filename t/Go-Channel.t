@@ -19,6 +19,8 @@ ok(SPVM::TestCase::Go::Channel->cap);
 
 ok(SPVM::TestCase::Go::Channel->len);
 
+ok(SPVM::TestCase::Go::Channel->close);
+
 ok(SPVM::TestCase::Go::Channel->basic);
 
 # All object is freed
