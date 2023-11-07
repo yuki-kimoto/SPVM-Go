@@ -6,7 +6,7 @@ class TestCase::Go::Channel {
   
   our $RESULT : IntList;
   
-  static method channel_unbuffered_minimal : int () {
+  static method unbuffered_minimal : int () {
     
     $TestCase::Go::Channel::RESULT = IntList->new;
     
@@ -39,7 +39,7 @@ class TestCase::Go::Channel {
     return 1;
   }
   
-  static method channel_unbuffered : int () {
+  static method unbuffered : int () {
     
     $TestCase::Go::Channel::RESULT = IntList->new;
     
@@ -101,7 +101,7 @@ class TestCase::Go::Channel {
     return 1;
   }
   
-  static method channel_cap : int () {
+  static method cap : int () {
     
     {
       my $ch = Go->make;
@@ -130,7 +130,7 @@ class TestCase::Go::Channel {
     return 1;
   }
   
-  static method channel_len : int () {
+  static method len : int () {
     
     {
       my $ch = Go->make;
@@ -185,7 +185,7 @@ class TestCase::Go::Channel {
     return 1;
   }
   
-  static method channel : int () {
+  static method basic : int () {
     
     Go->go(method : void () {
       
