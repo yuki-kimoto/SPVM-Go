@@ -409,7 +409,7 @@ class TestCase::Go {
     return 1;
   }
   
-  static method go : int () {
+  static method go_extra : int () {
     
     Go->go(method : void () {});
     

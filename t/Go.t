@@ -19,9 +19,9 @@ ok(SPVM::TestCase::Go->go_minimal);
 
 ok(SPVM::TestCase::Go->go_die);
 
-ok(SPVM::TestCase::Go->wait_group);
+ok(SPVM::TestCase::Go->go_extra);
 
-ok(SPVM::TestCase::Go->go);
+ok(SPVM::TestCase::Go->wait_group);
 
 ok(SPVM::TestCase::Go->channel);
 
