@@ -89,6 +89,8 @@ class Go::Channel {
       
       $write_wait->{finish} = 1;
       
+      $write_wait->{ok} = 1;
+      
       my $write_wait_coroutine = $write_wait->{coroutine};
       
       if ($write_wait_coroutine) {
@@ -122,9 +124,7 @@ class Go::Channel {
         if ($finish) {
           my $value = $read_wait->{value};
           
-          if ($self->{closed}) {
-            $$ok_ref = 0;
-          }
+          $$ok_ref = $read_wait->{ok};
           
           return $value;
         }
@@ -136,6 +136,8 @@ class Go::Channel {
             my $value = $write_wait->{value};
             
             $write_wait->{finish} = 1;
+            
+            $write_wait->{ok} = 1;
             
             my $write_wait_coroutine = $write_wait->{coroutine};
             
@@ -176,6 +178,8 @@ class Go::Channel {
         
         $read_wait->{finish} = 1;
         
+        $read_wait->{ok} = 1;
+        
         my $read_wait_coroutine = $read_wait->{coroutine};
         
         if ($read_wait_coroutine) {
@@ -201,6 +205,8 @@ class Go::Channel {
         my $read_wait = (Go::Channel::Wait)$self->{read_waits}->shift;
         
         $read_wait->{finish} = 1;
+        
+        $read_wait->{ok} = 1;
         
         my $read_wait_coroutine = $read_wait->{coroutine};
         
@@ -254,6 +260,8 @@ class Go::Channel {
       my $read_wait = (Go::Channel::Wait)$read_waits->shift;
       
       $read_wait->{finish} = 1;
+      
+      $read_wait->{ok} = 0;
       
       my $read_wait_coroutine = $read_wait->{coroutine};
       
