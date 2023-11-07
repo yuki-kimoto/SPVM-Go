@@ -21,7 +21,7 @@ ok(SPVM::TestCase::Go::Channel->len);
 
 ok(SPVM::TestCase::Go::Channel->close);
 
-ok(SPVM::TestCase::Go::Channel->basic);
+ok(SPVM::TestCase::Go::Channel->extra);
 
 # All object is freed
 my $end_memory_blocks_count = SPVM::api->get_memory_blocks_count();
