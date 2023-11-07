@@ -103,7 +103,6 @@ class Go::Channel {
       return $value;
     }
     else {
-      warn;
       my $read_wait = Go::Channel::Wait->new;
       
       my $schedule = $self->{schedule};
@@ -117,8 +116,6 @@ class Go::Channel {
       $self->{read_waits}->push($read_wait);
       
       while (1) {
-        
-        warn;
         
         my $write_finish = $read_wait->{write_finish};
         
@@ -154,8 +151,6 @@ class Go::Channel {
             return $value;
           }
         }
-        
-        warn;
         
         $schedule->schedule;
       }
