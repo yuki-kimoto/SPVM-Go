@@ -87,7 +87,7 @@ class Go::Channel {
     if ($self->{write_waits}->length) {
       my $write_wait = (Go::Channel::Wait)$self->{write_waits}->shift;
       
-      $write_wait->{read_finish} = 1;
+      $write_wait->{finish} = 1;
       
       my $write_wait_coroutine = $write_wait->{coroutine};
       
@@ -117,9 +117,9 @@ class Go::Channel {
       
       while (1) {
         
-        my $write_finish = $read_wait->{write_finish};
+        my $finish = $read_wait->{finish};
         
-        if ($write_finish) {
+        if ($finish) {
           my $value = $read_wait->{value};
           
           if ($self->{closed}) {
@@ -135,7 +135,7 @@ class Go::Channel {
             
             my $value = $write_wait->{value};
             
-            $write_wait->{read_finish} = 1;
+            $write_wait->{finish} = 1;
             
             my $write_wait_coroutine = $write_wait->{coroutine};
             
@@ -174,7 +174,7 @@ class Go::Channel {
       if ($self->{read_waits}->length) {
         my $read_wait = (Go::Channel::Wait)$self->{read_waits}->shift;
         
-        $read_wait->{write_finish} = 1;
+        $read_wait->{finish} = 1;
         
         my $read_wait_coroutine = $read_wait->{coroutine};
         
@@ -200,7 +200,7 @@ class Go::Channel {
       if ($self->{read_waits}->length) {
         my $read_wait = (Go::Channel::Wait)$self->{read_waits}->shift;
         
-        $read_wait->{write_finish} = 1;
+        $read_wait->{finish} = 1;
         
         my $read_wait_coroutine = $read_wait->{coroutine};
         
@@ -229,9 +229,9 @@ class Go::Channel {
         
         while (1) {
           
-          my $read_finish = $write_wait->{read_finish};
+          my $finish = $write_wait->{finish};
           
-          if ($read_finish) {
+          if ($finish) {
             return;
           }
           
@@ -253,7 +253,7 @@ class Go::Channel {
     while ($read_waits->length > 0) {
       my $read_wait = (Go::Channel::Wait)$read_waits->shift;
       
-      $read_wait->{write_finish} = 1;
+      $read_wait->{finish} = 1;
       
       my $read_wait_coroutine = $read_wait->{coroutine};
       

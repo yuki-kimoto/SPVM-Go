@@ -11,9 +11,7 @@ class Go::Channel::Wait {
   
   has value : object;
   
-  has read_finish : byte;
-  
-  has write_finish : byte;
+  has finish : byte;
   
   has in_buffer : byte;
   
