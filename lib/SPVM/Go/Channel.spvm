@@ -87,16 +87,13 @@ class Go::Channel {
     if ($self->{write_waits}->length) {
       my $write_wait = (Go::Channel::Wait)$self->{write_waits}->shift;
       
-      $write_wait->{finish} = 1;
+      my $ok = 1;
       
-      $write_wait->{ok} = 1;
+      &finish_wait($write_wait, $ok);
       
       my $write_wait_coroutine = $write_wait->{coroutine};
       
-      if ($write_wait_coroutine) {
-        $write_wait_coroutine->{disable} = 0;
-      }
-      else {
+      unless ($write_wait_coroutine) {
         $self->{length}--;
       }
       
