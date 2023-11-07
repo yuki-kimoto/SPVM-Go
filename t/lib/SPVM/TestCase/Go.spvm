@@ -29,6 +29,50 @@ class TestCase::Go {
     return 1;
   }
   
+  static method wait_group : int () {
+    
+    $TestCase::Go::RESULT = IntList->new;
+    
+    Go->go(method : void () {
+      my $wg = Go::Sync::WaitGroup->new;
+      
+      $wg->add(2);
+      
+      Go->go([has wg : Go::Sync::WaitGroup = $wg] method : void () {
+        
+        Fn->defer([has wg : Go::Sync::WaitGroup = $self->{wg}] method : void () {
+          $self->{wg}->done;
+        });
+        
+        $TestCase::Go::RESULT->push(2);
+        
+      });
+      
+      Go->go([has wg : Go::Sync::WaitGroup = $wg] method : void () {
+        Fn->defer([has wg : Go::Sync::WaitGroup = $self->{wg}] method : void () {
+          $self->{wg}->done;
+        });
+        
+        $TestCase::Go::RESULT->push(3);
+      });
+      
+      $TestCase::Go::RESULT->push(1);
+      
+      $wg->wait;
+      
+      $TestCase::Go::RESULT->push(4);
+    });
+    
+    Go->gosched;
+    
+    unless (Array->equals_int($TestCase::Go::RESULT->to_array, [1, 2, 3, 4])) {
+      return 0;
+    }
+    
+    $TestCase::Go::RESULT = undef;
+    
+    return 1;
+  }
   static method select : int () {
 
     Go->go(method : void () {
@@ -396,53 +440,6 @@ class TestCase::Go {
       Go->sleep(0.5);
       
       warn "Sleep 0.5 seconds";
-    });
-    
-    Go->go(method : void () {
-      my $wg = Go::Sync::WaitGroup->new;
-      
-      $wg->add(2);
-      
-      Go->go([has wg : Go::Sync::WaitGroup = $wg] method : void () {
-        
-        Fn->defer([has wg : Go::Sync::WaitGroup = $self->{wg}] method : void () {
-          $self->{wg}->done;
-        });
-        
-        # die "Foo";
-        
-        warn("G0-A");
-        
-        warn("G0-CallMethodStart");
-        TestCase::Go->foo();
-        warn("G0-CallMethodEnd");
-        
-        Go->gosched;
-        
-        warn("G0-B");
-      });
-      
-      Go->go([has wg : Go::Sync::WaitGroup = $wg] method : void () {
-        Fn->defer([has wg : Go::Sync::WaitGroup = $self->{wg}] method : void () {
-          $self->{wg}->done;
-        });
-        
-        # die "Foo";
-        
-        warn("G1-A");
-        
-        warn("G1-CallMethodStart");
-        TestCase::Go->foo();
-        warn("G1-CallMethodEnd");
-        
-        Go->gosched;
-        
-        warn("G1-B");
-      });
-      
-      $wg->wait;
-      
-      warn("Wait");
     });
     
     Go->gosched;
