@@ -413,20 +413,6 @@ class TestCase::Go {
     
     Go->go(method : void () {});
     
-    Go->go(method : void () {
-      die "Exception!.";
-    });
-    
-    Go->go(method : void () {
-      eval {
-        die "Exception!.";
-      }
-    });
-    
-    Go->go(method : void () {
-      TestCase::Go->error();
-    });
-    
     Go->gosched;
     
     Go->go(method : void () {
@@ -444,16 +430,45 @@ class TestCase::Go {
     
     Go->gosched;
     
-    
-    
     return 1;
   }
   
-  static method foo : void () {
+  static method go_die : int () {
     
-    my $foo = Point->new;
+    $TestCase::Go::RESULT = IntList->new;
     
-    warn "G1-CallMethod";
+    Go->go(method : void () {
+      die "Exception!.";
+      
+      $TestCase::Go::RESULT->push(1);
+      
+    });
+    
+    Go->go(method : void () {
+      eval {
+        die "Exception!.";
+      }
+      
+      $TestCase::Go::RESULT->push(2);
+      
+    });
+    
+    Go->go(method : void () {
+      TestCase::Go->error();
+      
+      $TestCase::Go::RESULT->push(3);
+      
+    });
+    
+    Go->gosched;
+    
+    unless (Array->equals_int($TestCase::Go::RESULT->to_array, [2])) {
+      return 0;
+    }
+    
+    $TestCase::Go::RESULT = undef;
+    
+    return 1;
   }
   
   static method error : void () {
