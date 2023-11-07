@@ -133,18 +133,15 @@ class Go::Channel {
           if ($read_wait == $self->{read_waits}->get(0)) {
             my $write_wait = (Go::Channel::Wait)$self->{write_waits}->shift;
             
+            my $ok = 1;
+            
+            &finish_wait($write_wait, $ok);
+            
             my $value = $write_wait->{value};
-            
-            $write_wait->{finish} = 1;
-            
-            $write_wait->{ok} = 1;
             
             my $write_wait_coroutine = $write_wait->{coroutine};
             
-            if ($write_wait_coroutine) {
-              $write_wait_coroutine->{disable} = 0;
-            }
-            else {
+            unless ($write_wait_coroutine) {
               $self->{length}--;
             }
             
