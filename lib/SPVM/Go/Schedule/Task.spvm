@@ -63,7 +63,7 @@ class Go::Schedule::Task {
           $schedule->{coroutines}->push($coroutine);
         }
         else {
-          my $over_deadline = 1;
+          my $over_deadline = 0;
           
           my $deadline_ts = $coroutine->{deadline};
           if ($deadline_ts) {
@@ -76,15 +76,17 @@ class Go::Schedule::Task {
             
             Sys::Time->gettimeofday($now_tv, undef);
             
-            if ($now_sec > $deadline_sec || ($now_sec == $deadline_sec && $deadline_nsec > $deadline_nsec)) {
+            if ($now_sec > $deadline_sec || ($now_sec == $deadline_sec && $now_nsec > $deadline_nsec)) {
               $coroutine->{deadline} = undef;
+              $over_deadline = 1;
             }
             else {
               $schedule->{coroutines}->push($coroutine);
-              $over_deadline = 0;
             }
           }
-          
+          else {
+            $over_deadline = 1;
+          }
           
           my $fd = $coroutine->{fd};
           if ($fd >= 0) {

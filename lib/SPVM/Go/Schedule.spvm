@@ -74,7 +74,7 @@ class Go::Schedule {
         
         my $now_sec = $now_tv->tv_sec;
         
-        my $now_nsec = 1000 * $now_tv->tv_sec;
+        my $now_nsec = 1000 * $now_tv->tv_usec;
         
         my $after_sec = (int)$after;
         

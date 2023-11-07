@@ -445,17 +445,18 @@ class TestCase::Go {
     
     Go->gosched;
     
+    Go->gosched;
+    
+    return 1;
+  }
+  
+  static method sleep : int () {
+    
     Go->go(method : void () {
       
       my $seconds = 1.5;
       
       Go->sleep($seconds);
-      
-      warn "Sleep 1.5 seconds";
-      
-      Go->sleep(0.5);
-      
-      warn "Sleep 0.5 seconds";
     });
     
     Go->gosched;
