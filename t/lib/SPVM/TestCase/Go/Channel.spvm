@@ -101,6 +101,41 @@ class TestCase::Go::Channel {
     return 1;
   }
   
+  static method buffered_minimal : int () {
+    
+    $TestCase::Go::Channel::RESULT = IntList->new;
+    
+    Go->go(method : void () {
+      
+      my $ch = Go->make(1);
+      
+      Go->go([has ch : Go::Channel = $ch] method : void () {
+        
+        my $ch = $self->{ch};
+        
+        my $ok = 0;
+        
+        my $value = (int)$ch->read(\$ok);
+        
+        $TestCase::Go::Channel::RESULT->push($value);
+      });
+      
+      $ch->write(2);
+      
+      $TestCase::Go::Channel::RESULT->push(1);
+    });
+    
+    Go->gosched;
+    
+    unless (Array->equals_int($TestCase::Go::Channel::RESULT->to_array, [1, 2])) {
+      return 0;
+    }
+    
+    $TestCase::Go::Channel::RESULT = undef;
+    
+    return 1;
+  }
+  
   static method cap : int () {
     
     {
@@ -275,26 +310,6 @@ class TestCase::Go::Channel {
   }
   
   static method extra : int () {
-    
-    Go->go(method : void () {
-      
-      my $ch = Go->make(1);
-      
-      Go->go([has ch : Go::Channel = $ch] method : void () {
-        
-        my $ch = $self->{ch};
-        
-        $ch->write(2);
-        
-        warn "Buffer 1";
-      });
-      
-      my $ok = 0;
-      
-      my $value = (int)$ch->read(\$ok);
-      
-      warn "Buffer 1 Channel:$value";
-    });
     
     Go->go(method : void () {
       
