@@ -17,6 +17,8 @@ ok(SPVM::TestCase::Go::Coroutine->transfer_create_many_objects);
 
 ok(SPVM::TestCase::Go::Coroutine->transfer);
 
+ok(SPVM::TestCase::Go::Coroutine->die);
+
 # All object is freed
 my $end_memory_blocks_count = SPVM::api->get_memory_blocks_count();
 is($end_memory_blocks_count, $start_memory_blocks_count);

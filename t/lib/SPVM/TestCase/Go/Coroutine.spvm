@@ -116,4 +116,34 @@ class TestCase::Go::Coroutine {
     $TestCase::Go::Coroutine::RESULT->push(5);
   }
 
+  static method die : int () {
+    
+    $TestCase::Go::Coroutine::RESULT = IntList->new;
+    
+    my $coroutine_return_back = Go::Coroutine->new;
+    
+    my $coroutine = Go::Coroutine->new(method : void () {
+      
+      $TestCase::Go::Coroutine::RESULT->push(2);
+      
+      die "Coroutine Error.";
+      
+      $TestCase::Go::Coroutine::RESULT->push(4);
+    }, $coroutine_return_back);
+    
+    $TestCase::Go::Coroutine::RESULT->push(1);
+    
+    Go::Coroutine->transfer($coroutine_return_back, $coroutine);
+    
+    $TestCase::Go::Coroutine::RESULT->push(3);
+    
+    unless (Array->equals_int($TestCase::Go::Coroutine::RESULT->to_array, [1, 2, 3])) {
+      return 0;
+    }
+    
+    $TestCase::Go::Coroutine::RESULT = undef;
+    
+    return 1;
+  }
+  
 }
