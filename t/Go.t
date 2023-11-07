@@ -40,6 +40,10 @@ ok(SPVM::TestCase::Go->go_extra);
 
 ok(SPVM::TestCase::Go->wait_group);
 
+ok(SPVM::TestCase::Go->channel_unbuffered_minimal);
+
+ok(SPVM::TestCase::Go->channel_unbuffered);
+
 ok(SPVM::TestCase::Go->channel);
 
 ok(SPVM::TestCase::Go->select);

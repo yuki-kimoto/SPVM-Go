@@ -103,6 +103,7 @@ class Go::Channel {
       return $value;
     }
     else {
+      warn;
       my $read_wait = Go::Channel::Wait->new;
       
       my $schedule = $self->{schedule};
@@ -117,10 +118,16 @@ class Go::Channel {
       
       while (1) {
         
+        warn;
+        
         my $write_finish = $read_wait->{write_finish};
         
         if ($write_finish) {
           my $value = $read_wait->{value};
+          
+          if ($self->{closed}) {
+            $$ok_ref = 0;
+          }
           
           return $value;
         }
@@ -147,6 +154,8 @@ class Go::Channel {
             return $value;
           }
         }
+        
+        warn;
         
         $schedule->schedule;
       }
@@ -242,6 +251,20 @@ class Go::Channel {
     
     if ($closed) {
       die "This channel is already closed.";
+    }
+    
+    my $read_waits = $self->{read_waits};
+    
+    while ($read_waits->length > 0) {
+      my $read_wait = (Go::Channel::Wait)$read_waits->shift;
+      
+      $read_wait->{write_finish} = 1;
+      
+      my $read_wait_coroutine = $read_wait->{coroutine};
+      
+      if ($read_wait_coroutine) {
+        $read_wait_coroutine->{disable} = 0;
+      }
     }
     
     $self->{closed} = 1;

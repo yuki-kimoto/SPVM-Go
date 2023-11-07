@@ -50,6 +50,7 @@ class Go::Schedule::Task {
         }
       }
       else {
+      
         my $coroutine = (Go::Coroutine)undef;
         
         if ($schedule->{coroutines}->length > 0) {

@@ -354,7 +354,9 @@ class TestCase::Go {
     return 1;
   }
   
-  static method channel : int () {
+  static method channel_unbuffered_minimal : int () {
+    
+    $TestCase::Go::RESULT = IntList->new;
     
     Go->go(method : void () {
       
@@ -371,8 +373,83 @@ class TestCase::Go {
       
       my $value = (int)$ch->read(\$ok);
       
-      warn "No Buffer Channel:$value";
+      $TestCase::Go::RESULT->push($value);
     });
+    
+    Go->gosched;
+    
+    unless (Array->equals_int($TestCase::Go::RESULT->to_array, [1])) {
+      return 0;
+    }
+    
+    $TestCase::Go::RESULT = undef;
+    
+    return 1;
+  }
+  
+  static method channel_unbuffered : int () {
+    
+    $TestCase::Go::RESULT = IntList->new;
+    
+    Go->go(method : void () {
+      
+      my $ch = Go->make;
+      
+      Go->go([has ch : Go::Channel = $ch] method : void () {
+        
+        my $ch = $self->{ch};
+        
+        $ch->write(1);
+        
+        $ch->write(2);
+        
+        $ch->close;
+      });
+      
+      my $ok = 0;
+      
+      my $value1 = (int)$ch->read(\$ok);
+      
+      $TestCase::Go::RESULT->push($value1);
+      
+      $TestCase::Go::RESULT->push($ok);
+      
+      my $value2 = (int)$ch->read(\$ok);
+      
+      $TestCase::Go::RESULT->push($value2);
+      
+      $TestCase::Go::RESULT->push($ok);
+      my $value3 = $ch->read(\$ok);
+      
+      if ($value3) {
+        $TestCase::Go::RESULT->push(1);
+      }
+      else {
+        $TestCase::Go::RESULT->push(0);
+      }
+      
+      $TestCase::Go::RESULT->push($ok);
+    });
+    
+    Go->gosched;
+    
+    # value, ok
+    my $expected = [
+      1, 1,
+      2, 1,
+      0, 0
+    ];
+    
+    unless (Array->equals_int($TestCase::Go::RESULT->to_array, $expected)) {
+      return 0;
+    }
+    
+    $TestCase::Go::RESULT = undef;
+    
+    return 1;
+  }
+  
+  static method channel : int () {
     
     Go->go(method : void () {
       
