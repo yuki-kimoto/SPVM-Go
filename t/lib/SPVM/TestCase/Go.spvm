@@ -449,6 +449,35 @@ class TestCase::Go {
     return 1;
   }
   
+  static method channel_cap : int () {
+    
+    {
+      my $ch = Go->make;
+      
+      unless ($ch->cap == 0) {
+        return 0;
+      }
+    }
+    
+    {
+      my $ch = Go->make(0);
+      
+      unless ($ch->cap == 0) {
+        return 0;
+      }
+    }
+    
+    {
+      my $ch = Go->make(2);
+      
+      unless ($ch->cap == 2) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
   static method channel : int () {
     
     Go->go(method : void () {
