@@ -35,6 +35,8 @@ ok(SPVM::TestCase::Go->go_extra);
   
   my $proc_time = $end - $start;
   
+  warn("[Test Output]Proc time:$proc_time");
+  
   ok($proc_time > 1.5 && $proc_time < 1.51);
 }
 
