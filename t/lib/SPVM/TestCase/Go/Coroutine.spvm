@@ -2,28 +2,32 @@ class TestCase::Go::Coroutine {
   use Go::Coroutine;
   use Callback;
   use Point;
+  use IntList;
+  use Array;
+  
+  our $MINIMAL_RESULT : IntList;
   
   static method transfer_minimal : int () {
+    
+    $TestCase::Go::Coroutine::MINIMAL_RESULT = IntList->new;
     
     my $coroutine_return_back = Go::Coroutine->new;
     
     my $coroutine = Go::Coroutine->new(method : void () {
-      warn;
+      $TestCase::Go::Coroutine::MINIMAL_RESULT->push(2);
     }, $coroutine_return_back);
     
-    warn;
+    $TestCase::Go::Coroutine::MINIMAL_RESULT->push(1);
     
     Go::Coroutine->transfer($coroutine_return_back, $coroutine);
     
-    warn;
+    $TestCase::Go::Coroutine::MINIMAL_RESULT->push(3);
     
-    $coroutine = undef;
+    unless (Array->equals_int($TestCase::Go::Coroutine::MINIMAL_RESULT->to_array, [1, 2, 3])) {
+      return 0;
+    }
     
-    warn;
-    
-    $coroutine_return_back = undef;
-    
-    warn;
+    $TestCase::Go::Coroutine::MINIMAL_RESULT = undef;
     
     return 1;
   }
@@ -33,24 +37,14 @@ class TestCase::Go::Coroutine {
     my $coroutine_return_back = Go::Coroutine->new;
     
     my $coroutine = Go::Coroutine->new(method : void () {
-      warn;
       
       for (my $i = 0; $i < 100; $i++) {
         my $point = Point->new;
       }
       
-      warn;
     }, $coroutine_return_back);
     
-    warn;
-    
     Go::Coroutine->transfer($coroutine_return_back, $coroutine);
-    
-    warn;
-    
-    $coroutine = undef;
-    
-    $coroutine_return_back = undef;
     
     return 1;
   }
