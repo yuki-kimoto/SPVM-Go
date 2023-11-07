@@ -59,6 +59,74 @@ class TestCase::Go {
     return 1;
   }
   
+  static method go_die : int () {
+    
+    $TestCase::Go::RESULT = IntList->new;
+    
+    Go->go(method : void () {
+      die "Exception!.";
+      
+      $TestCase::Go::RESULT->push(1);
+      
+    });
+    
+    Go->go(method : void () {
+      eval {
+        die "Exception!.";
+      }
+      
+      $TestCase::Go::RESULT->push(2);
+      
+    });
+    
+    Go->go(method : void () {
+      TestCase::Go->error();
+      
+      $TestCase::Go::RESULT->push(3);
+      
+    });
+    
+    Go->gosched;
+    
+    unless (Array->equals_int($TestCase::Go::RESULT->to_array, [2])) {
+      return 0;
+    }
+    
+    $TestCase::Go::RESULT = undef;
+    
+    return 1;
+  }
+  
+  static method error : void () {
+    
+    die "Error Method";
+  }
+  
+  static method go_extra : int () {
+    
+    Go->go(method : void () {});
+    
+    Go->gosched;
+    
+    Go->gosched;
+    
+    return 1;
+  }
+  
+  static method sleep : int () {
+    
+    Go->go(method : void () {
+      
+      my $seconds = 1.5;
+      
+      Go->sleep($seconds);
+    });
+    
+    Go->gosched;
+    
+    return 1;
+  }
+  
   static method wait_group : int () {
     
     $TestCase::Go::RESULT = IntList->new;
@@ -439,71 +507,4 @@ class TestCase::Go {
     return 1;
   }
   
-  static method go_extra : int () {
-    
-    Go->go(method : void () {});
-    
-    Go->gosched;
-    
-    Go->gosched;
-    
-    return 1;
-  }
-  
-  static method sleep : int () {
-    
-    Go->go(method : void () {
-      
-      my $seconds = 1.5;
-      
-      Go->sleep($seconds);
-    });
-    
-    Go->gosched;
-    
-    return 1;
-  }
-  
-  static method go_die : int () {
-    
-    $TestCase::Go::RESULT = IntList->new;
-    
-    Go->go(method : void () {
-      die "Exception!.";
-      
-      $TestCase::Go::RESULT->push(1);
-      
-    });
-    
-    Go->go(method : void () {
-      eval {
-        die "Exception!.";
-      }
-      
-      $TestCase::Go::RESULT->push(2);
-      
-    });
-    
-    Go->go(method : void () {
-      TestCase::Go->error();
-      
-      $TestCase::Go::RESULT->push(3);
-      
-    });
-    
-    Go->gosched;
-    
-    unless (Array->equals_int($TestCase::Go::RESULT->to_array, [2])) {
-      return 0;
-    }
-    
-    $TestCase::Go::RESULT = undef;
-    
-    return 1;
-  }
-  
-  static method error : void () {
-    
-    die "Error Method";
-  }
 }
