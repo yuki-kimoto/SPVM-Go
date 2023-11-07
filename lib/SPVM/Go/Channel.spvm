@@ -241,19 +241,6 @@ class Go::Channel {
     }
   }
   
-  static method finish_wait : void ($wait : Go::Channel::Wait, $ok : int) {
-    
-    $wait->{finish} = 1;
-    
-    $wait->{ok} = (byte)$ok;
-    
-    my $wait_coroutine = $wait->{coroutine};
-    
-    if ($wait_coroutine) {
-      $wait_coroutine->{disable} = 0;
-    }
-  }
-  
   method close : void () {
     my $closed = $self->{closed};
     
@@ -266,15 +253,9 @@ class Go::Channel {
     while ($read_waits->length > 0) {
       my $read_wait = (Go::Channel::Wait)$read_waits->shift;
       
-      $read_wait->{finish} = 1;
+      my $ok = 0;
       
-      $read_wait->{ok} = 0;
-      
-      my $read_wait_coroutine = $read_wait->{coroutine};
-      
-      if ($read_wait_coroutine) {
-        $read_wait_coroutine->{disable} = 0;
-      }
+      &finish_wait($read_wait, $ok);
     }
     
     $self->{closed} = 1;
@@ -286,6 +267,19 @@ class Go::Channel {
   
   method len : int () {
     return $self->{length};
+  }
+  
+  private static method finish_wait : void ($wait : Go::Channel::Wait, $ok : int) {
+    
+    $wait->{finish} = 1;
+    
+    $wait->{ok} = (byte)$ok;
+    
+    my $wait_coroutine = $wait->{coroutine};
+    
+    if ($wait_coroutine) {
+      $wait_coroutine->{disable} = 0;
+    }
   }
   
 }
