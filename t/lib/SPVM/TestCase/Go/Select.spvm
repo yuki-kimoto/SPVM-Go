@@ -1,7 +1,5 @@
 class TestCase::Go::Select {
   use Go;
-  use Sys;
-  use Point;
   use Sort;
   
   our $RESULT : IntList;

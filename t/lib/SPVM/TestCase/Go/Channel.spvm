@@ -1,8 +1,5 @@
 class TestCase::Go::Channel {
   use Go;
-  use Sys;
-  use Go::Sync::WaitGroup;
-  use Point;
   
   our $RESULT : IntList;
   
