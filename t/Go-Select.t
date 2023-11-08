@@ -11,6 +11,8 @@ use SPVM 'TestCase::Go::Select';
 # Start objects count
 my $start_memory_blocks_count = SPVM::api->get_memory_blocks_count();
 
+ok(SPVM::TestCase::Go::Select->minimal);
+
 ok(SPVM::TestCase::Go::Select->select);
 
 # All object is freed

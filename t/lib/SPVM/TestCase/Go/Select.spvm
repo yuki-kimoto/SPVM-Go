@@ -5,8 +5,10 @@ class TestCase::Go::Select {
   
   our $RESULT : IntList;
   
-  static method select : int () {
-
+  static method minimal : int () {
+    
+    $TestCase::Go::Select::RESULT = IntList->new;
+    
     Go->go(method : void () {
       
       my $ch = Go->make;
@@ -28,8 +30,22 @@ class TestCase::Go::Select {
       
       my $ok = $result->ok;
       
-      warn "select 1:$value $ok";
+      $TestCase::Go::Select::RESULT->push($value);
+      
     });
+    
+    Go->gosched;
+    
+    unless (Array->equals_int($TestCase::Go::Select::RESULT->to_array, [1])) {
+      return 0;
+    }
+    
+    $TestCase::Go::Select::RESULT = undef;
+    
+    return 1;
+  }
+  
+  static method select : int () {
     
     Go->go(method : void () {
       
