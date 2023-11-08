@@ -380,13 +380,9 @@ class TestCase::Go::Channel {
         
         my $len3 = $ch->len;
         
-        warn "Buffer 3";
-        
         $ch->write(5);
         
         my $len4 = $ch->len;
-        
-        warn "Write len: $len1 $len2 $len3 $len4";
       });
       
       Go->gosched;
@@ -410,12 +406,6 @@ class TestCase::Go::Channel {
       my $len4 = $ch->len;
       
       my $cap = $ch->cap;
-      
-      warn "Buffer 3 Channel:$value1 $value2 $value3";
-
-      warn "Read len: $len1 $len2 $len3 $len4";
-      
-      warn "cap: $cap";
     });
     
     Go->go(method : void () {
@@ -436,13 +426,9 @@ class TestCase::Go::Channel {
         
         my $len3 = $ch->len;
         
-        warn "Buffer 3";
-        
         $ch->write(5);
         
         my $len4 = $ch->len;
-        
-        warn "Write len: $len1 $len2 $len3 $len4";
       });
       
       my $ok = 0;
@@ -463,11 +449,6 @@ class TestCase::Go::Channel {
       
       my $cap = $ch->cap;
       
-      warn "Buffer 3 Channel:$value1 $value2 $value3";
-
-      warn "Read len: $len1 $len2 $len3 $len4";
-      
-      warn "cap: $cap";
     });
     
     Go->gosched;
