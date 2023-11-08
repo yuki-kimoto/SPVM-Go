@@ -154,6 +154,8 @@ class TestCase::Go::Channel {
         
         $TestCase::Go::Channel::RESULT->push(-2);
         
+        $TestCase::Go::Channel::RESULT->push($ch->len);
+        
         $TestCase::Go::Channel::RESULT->push($value1);
         
         my $value2 = (int)$ch->read(\$ok);
@@ -167,6 +169,8 @@ class TestCase::Go::Channel {
       
       $TestCase::Go::Channel::RESULT->push(-1);
       
+      $TestCase::Go::Channel::RESULT->push($ch->len);
+      
       $ch->write(11);
       
       $TestCase::Go::Channel::RESULT->push(-4);
@@ -174,7 +178,7 @@ class TestCase::Go::Channel {
     
     Go->gosched;
     
-    unless (Array->equals_int($TestCase::Go::Channel::RESULT->to_array, [-1, -2, 10, -3, 11, -4])) {
+    unless (Array->equals_int($TestCase::Go::Channel::RESULT->to_array, [-1, 1, -2, 0, 10, -3, 11, -4])) {
       return 0;
     }
     
