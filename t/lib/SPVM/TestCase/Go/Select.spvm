@@ -2,6 +2,7 @@ class TestCase::Go::Select {
   use Go;
   use Sys;
   use Point;
+  use Sort;
   
   our $RESULT : IntList;
   
@@ -47,6 +48,8 @@ class TestCase::Go::Select {
   
   static method blocking : int () {
     
+    $TestCase::Go::Select::RESULT = IntList->new;
+    
     Go->go(method : void () {
       
       my $ch0 = Go->make;
@@ -61,15 +64,15 @@ class TestCase::Go::Select {
         
         my $ch0 = $self->{ch0};
         
-        $ch0->write(1);
+        $ch0->write(4);
         
         my $ch1 = $self->{ch1};
         
-        $ch1->write(2);
+        $ch1->write(3);
         
         my $ch2 = $self->{ch2};
         
-        $ch2->write(3);
+        $ch2->write(2);
         
         my $ch3 = $self->{ch3};
         
@@ -77,7 +80,8 @@ class TestCase::Go::Select {
         
         my $value = (int)$ch3->read(\$ok);
         
-        warn "$value";
+        $TestCase::Go::Select::RESULT->push($value);
+        
       });
       
       my $select = Go->new_select;
@@ -88,7 +92,7 @@ class TestCase::Go::Select {
       
       $select->add_read($ch0);
       
-      $select->add_write($ch3 => 4);
+      $select->add_write($ch3 => 1);
       
       while (1) {
         my $result = $select->select;
@@ -106,7 +110,7 @@ class TestCase::Go::Select {
           else {
             my $value = (int)$result->value;
             
-            warn "select 2:$value $ok " . Fn->to_address($ch);
+            $TestCase::Go::Select::RESULT->push($value);
             
             $select->remove_read($ch);
           }
@@ -120,6 +124,16 @@ class TestCase::Go::Select {
     });
     
     Go->gosched;
+    
+    my $got = $TestCase::Go::Select::RESULT->to_array;
+    
+    Sort->sort_int_asc($got);
+    
+    unless (Array->equals_int($got, [1, 2, 3, 4])) {
+      return 0;
+    }
+    
+    $TestCase::Go::Select::RESULT = undef;
     
     return 1;
   }
