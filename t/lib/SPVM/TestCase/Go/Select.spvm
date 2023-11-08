@@ -140,6 +140,8 @@ class TestCase::Go::Select {
   
   static method non_blocking : int () {
     
+    $TestCase::Go::Select::RESULT = IntList->new;
+    
     Go->go(method : void () {
       
       my $ch0 = Go->make;
@@ -170,7 +172,8 @@ class TestCase::Go::Select {
         
         my $value = (int)$ch3->read(\$ok);
         
-        warn "$value";
+        $TestCase::Go::Select::RESULT->push($value);
+        
       });
       
       my $select = Go->new_select;
@@ -202,7 +205,7 @@ class TestCase::Go::Select {
             else {
               my $value = (int)$result->value;
               
-              warn "select 2:$value $ok " . Fn->to_address($ch);
+              $TestCase::Go::Select::RESULT->push($value);
               
               $select->remove_read($ch);
             }
@@ -213,14 +216,25 @@ class TestCase::Go::Select {
           }
         }
         else {
-          warn "No read/write";
+          warn "[Test Output]Non-blocking select returns undef";
           Go->gosched;
         }
       }
       
     });
     
+    
     Go->gosched;
+    
+    my $got = $TestCase::Go::Select::RESULT->to_array;
+    
+    Sort->sort_int_asc($got);
+    
+    unless (Array->equals_int($got, [1, 2, 3, 4])) {
+      return 0;
+    }
+    
+    $TestCase::Go::Select::RESULT = undef;
     
     return 1;
   }
