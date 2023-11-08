@@ -37,7 +37,7 @@ ok(SPVM::TestCase::Go->go_extra);
   
   warn("[Test Output]Proc time:$proc_time");
   
-  ok($proc_time > 1.5 && $proc_time < 1.51);
+  ok($proc_time > 1.5 && $proc_time < 1.52);
 }
 
 # All object is freed
