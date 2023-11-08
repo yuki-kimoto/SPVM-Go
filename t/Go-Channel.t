@@ -17,6 +17,8 @@ ok(SPVM::TestCase::Go::Channel->unbuffered);
 
 ok(SPVM::TestCase::Go::Channel->buffered_minimal);
 
+ok(SPVM::TestCase::Go::Channel->buffered);
+
 ok(SPVM::TestCase::Go::Channel->cap);
 
 ok(SPVM::TestCase::Go::Channel->len);
