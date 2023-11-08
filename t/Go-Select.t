@@ -13,7 +13,9 @@ my $start_memory_blocks_count = SPVM::api->get_memory_blocks_count();
 
 ok(SPVM::TestCase::Go::Select->minimal);
 
-ok(SPVM::TestCase::Go::Select->select);
+ok(SPVM::TestCase::Go::Select->blocking);
+
+ok(SPVM::TestCase::Go::Select->non_blocking);
 
 # All object is freed
 my $end_memory_blocks_count = SPVM::api->get_memory_blocks_count();

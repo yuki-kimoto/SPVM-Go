@@ -45,7 +45,7 @@ class TestCase::Go::Select {
     return 1;
   }
   
-  static method select : int () {
+  static method blocking : int () {
     
     Go->go(method : void () {
       
@@ -118,6 +118,13 @@ class TestCase::Go::Select {
       }
       
     });
+    
+    Go->gosched;
+    
+    return 1;
+  }
+  
+  static method non_blocking : int () {
     
     Go->go(method : void () {
       
