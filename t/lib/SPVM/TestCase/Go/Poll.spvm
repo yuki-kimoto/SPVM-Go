@@ -2,6 +2,11 @@ class TestCase::Go::Poll {
   use Go;
   use Sys::Socket;
   use Sys::Socket::Constant as SOCKET;
+  use Sys::OS;
+  use Sys::IO::Constant as IO;
+  use Sys::Ioctl::Constant as IOCTL;
+  use Sys::Socket::Util;
+  use Errno;
   
   our $RESULT : IntList;
   
@@ -38,6 +43,139 @@ class TestCase::Go::Poll {
     return 1;
   }
 
+  static method send_and_recv_non_blocking : int ($port : int) {
+    
+    my $socket_domain = SOCKET->AF_INET;
+    
+    my $socket_type = SOCKET->SOCK_STREAM;
+    
+    my $socket_protocol = 0;
+    
+    my $socket = -1;
+    Sys->socket(\$socket, $socket_domain, $socket_type, $socket_protocol);
+    
+    Fn->defer([$socket : int] method :void () {
+      Sys::Socket->close($socket);
+    });
+    
+    # IPv4 address
+    my $in_addr = Sys::Socket::Util->inet_aton("127.0.0.1");
+    my $sockaddr = Sys::Socket::Util->sockaddr_in($port, $in_addr);
+    
+    # Connect
+    my $status_connect = Sys->connect($socket, $sockaddr);
+    
+    my $blocking = 0;
+    
+    # Enable non-blocking IO
+    if (Sys::OS->is_windows) {
+      my $flags = [(int)!$blocking];
+      Sys->ioctl($socket, IOCTL->FIONBIO, $flags);
+    }
+    else {
+      my $newmode = Sys->fcntl($socket, IO->F_GETFL);
+      
+      if ($blocking == 0) {
+        $newmode &= ~IO->O_NDELAY;
+        $newmode |= IO->O_NONBLOCK;
+      }
+      else {
+        $newmode &= ~(IO->O_NDELAY|IO->O_NONBLOCK);
+      }
+      
+      Sys->fcntl($socket,IO->F_SETFL, $newmode);
+    }
+    
+    {
+      my $send_buffer = "abcd";
+      
+      my $send_length = -1;
+      
+      while (1) {
+        eval { $send_length = Sys->send($socket, $send_buffer, 0); }
+        
+        if ($@) {
+          if (Errno->errno == Errno->EAGAIN) {
+            Go->gosched_io_write($socket, 0);
+          }
+          else {
+            die $@;
+          }
+        }
+      }
+      
+      unless ($send_length == 4) {
+        return 0;
+      }
+    }
+    
+    {
+      my $send_buffer = "ef";
+      
+      my $send_length = -1;
+      
+      while (1) {
+        eval { $send_length = Sys->send($socket, $send_buffer, 0); }
+        
+        if ($@) {
+          if (Errno->errno == Errno->EAGAIN) {
+            Go->gosched_io_write($socket, 0);
+          }
+          else {
+            die $@;
+          }
+        }
+      }
+      
+      unless ($send_length == 2) {
+        return 0;
+      }
+    }
+    
+    my $status_shutdown = Sys::Socket->shutdown($socket, SOCKET->SHUT_WR);
+    
+    unless ($status_shutdown == 0) {
+      return 0;
+    }
+    
+    {
+      my $recv_buffer = (mutable string)new_string_len 3;
+      my $recv_length = Sys->recv($socket, $recv_buffer, length $recv_buffer, 0);
+      
+      unless ($recv_length == 3) {
+        return 0;
+      }
+      
+      unless ($recv_buffer eq "abc") {
+        return 0;
+      }
+    }
+    
+    {
+      my $recv_buffer = (mutable string)new_string_len 3;
+      my $recv_length = Sys::Socket->recv($socket, $recv_buffer, length $recv_buffer, 0);
+      
+      unless ($recv_length == 3) {
+        return 0;
+      }
+      
+      unless ($recv_buffer eq "def") {
+        return 0;
+      }
+    }
+
+    {
+      my $recv_buffer = (mutable string)new_string_len 3;
+      my $recv_length = Sys::Socket->recv($socket, $recv_buffer, length $recv_buffer, 0);
+      
+      unless ($recv_length == 0) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
   static method send_and_recv : int ($port : int) {
     # Socket
     my $socket = Sys::Socket->socket(SOCKET->AF_INET, SOCKET->SOCK_STREAM, 0);
