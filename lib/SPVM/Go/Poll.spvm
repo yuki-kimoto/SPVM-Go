@@ -22,7 +22,7 @@ class Go::Poll {
     return $self;
   }
   
-  method get_ready_coroutines : Go::Coroutine[] () {
+  private method poll : Go::Coroutine[] () {
   
     my $poll_coroutines_h = $self->{coroutines_h};
     

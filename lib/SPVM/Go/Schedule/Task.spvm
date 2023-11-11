@@ -44,7 +44,7 @@ class Go::Schedule::Task {
       }
       
       if ($check_io) {
-        my $ready_coroutines = $poll->get_ready_coroutines;
+        my $ready_coroutines = $poll->poll;
         for my $ready_coroutine (@$ready_coroutines) {
           $schedule->{coroutines}->push($ready_coroutine);
         }

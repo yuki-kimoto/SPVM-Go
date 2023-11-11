@@ -6,36 +6,11 @@ package SPVM::Go::Poll;
 
 =head1 Name
 
-SPVM::Go::Poll - Short Description
+SPVM::Go::Poll - IO Polling
 
 =head1 Description
 
-Go::Poll class of L<SPVM> has methods for someting.
-
-=head1 Usage
-
-  use Go::Poll;
-
-=head1 Fields
-
-
-
-=head1 Class Methods
-
-
-
-=head1 Instance Methods
-
-
-
-
-=head1 Repository
-
-
-
-=head1 Author
-
-Yuki Kimoto C<kimoto.yuki@gmail.com>
+Go::Poll class of L<SPVM> has methods to poll read/write IO.
 
 =head1 Copyright & License
 
