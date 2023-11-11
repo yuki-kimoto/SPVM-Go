@@ -6,12 +6,24 @@ use FindBin;
 use lib "$FindBin::Bin/lib";
 BEGIN { $ENV{SPVM_BUILD_DIR} = "$FindBin::Bin/.spvm_build"; }
 
+use TestUtil::ServerRunner;
+
 use SPVM 'TestCase::Go::Poll';
 
 # Start objects count
 my $start_memory_blocks_count = SPVM::api->get_memory_blocks_count();
 
-ok(SPVM::TestCase::Go::Poll->basic);
+{
+  my $server = TestUtil::ServerRunner->new(
+    code => sub {
+      my ($port) = @_;
+      
+      TestUtil::ServerRunner->run_echo_server($port);
+    },
+  );
+  
+  ok(SPVM::TestCase::Go::Poll->basic($server->port));
+}
 
 # All object is freed
 my $end_memory_blocks_count = SPVM::api->get_memory_blocks_count();
