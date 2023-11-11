@@ -1,0 +1,38 @@
+class TestCase::Go::Poll {
+  use Go;
+  
+  our $RESULT : IntList;
+  
+  static method basic : int () {
+    
+    $TestCase::Go::Poll::RESULT = IntList->new;
+    
+    Go->go(method : void () {
+      
+      my $ch = Go->make;
+      
+      Go->go([has ch : Go::Channel = $ch] method : void () {
+        
+        my $ch = $self->{ch};
+        
+        $ch->write(1);
+      });
+      
+      my $ok = 0;
+      
+      my $value = (int)$ch->read(\$ok);
+      
+      $TestCase::Go::Poll::RESULT->push($value);
+    });
+    
+    Go->gosched;
+    
+    unless (Array->equals_int($TestCase::Go::Poll::RESULT->to_array, [1])) {
+      return 0;
+    }
+    
+    $TestCase::Go::Poll::RESULT = undef;
+    
+    return 1;
+  }
+}
