@@ -140,7 +140,20 @@ class TestCase::Go::Poll {
     
     {
       my $recv_buffer = (mutable string)new_string_len 3;
-      my $recv_length = Sys->recv($socket, $recv_buffer, length $recv_buffer, 0);
+      
+      my $recv_length = -1;
+      while (1) {
+        eval { $recv_length = Sys->recv($socket, $recv_buffer, length $recv_buffer, 0); }
+        
+        if ($@) {
+          if (Errno->errno == Errno->EAGAIN) {
+            Go->gosched_io_read($socket, 0);
+          }
+          else {
+            die $@;
+          }
+        }
+      }
       
       unless ($recv_length == 3) {
         return 0;
@@ -153,7 +166,20 @@ class TestCase::Go::Poll {
     
     {
       my $recv_buffer = (mutable string)new_string_len 3;
-      my $recv_length = Sys::Socket->recv($socket, $recv_buffer, length $recv_buffer, 0);
+      
+      my $recv_length = -1;
+      while (1) {
+        eval { $recv_length = Sys->recv($socket, $recv_buffer, length $recv_buffer, 0); }
+        
+        if ($@) {
+          if (Errno->errno == Errno->EAGAIN) {
+            Go->gosched_io_read($socket, 0);
+          }
+          else {
+            die $@;
+          }
+        }
+      }
       
       unless ($recv_length == 3) {
         return 0;
@@ -166,7 +192,21 @@ class TestCase::Go::Poll {
 
     {
       my $recv_buffer = (mutable string)new_string_len 3;
-      my $recv_length = Sys::Socket->recv($socket, $recv_buffer, length $recv_buffer, 0);
+      
+      my $recv_length = -1;
+      while (1) {
+        eval { $recv_length = Sys->recv($socket, $recv_buffer, length $recv_buffer, 0); }
+        
+        if ($@) {
+          if (Errno->errno == Errno->EAGAIN) {
+            Go->gosched_io_read($socket, 0);
+          }
+          else {
+            die $@;
+          }
+        }
+      }
+      
       
       unless ($recv_length == 0) {
         return 0;
