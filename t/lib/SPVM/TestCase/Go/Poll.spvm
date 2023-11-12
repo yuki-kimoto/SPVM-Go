@@ -7,12 +7,13 @@ class TestCase::Go::Poll {
   use Sys::Ioctl::Constant as IOCTL;
   use Sys::Socket::Util;
   use Errno;
+  use StringList;
   
-  our $RESULT : IntList;
+  our $RESULT : StringList;
   
   static method basic : int ($port : int) {
     
-    $TestCase::Go::Poll::RESULT = IntList->new;
+    $TestCase::Go::Poll::RESULT = StringList->new;
     
     Go->go(method : void () {
       
@@ -34,7 +35,7 @@ class TestCase::Go::Poll {
     
     Go->gosched;
     
-    unless (Array->equals_int($TestCase::Go::Poll::RESULT->to_array, [1])) {
+    unless (Array->equals_string($TestCase::Go::Poll::RESULT->to_array, ["1"])) {
       return 0;
     }
     
@@ -83,6 +84,8 @@ class TestCase::Go::Poll {
   
   static method send_and_recv_non_blocking : int ($port : int) {
     
+    $TestCase::Go::Poll::RESULT = StringList->new;
+    
     my $socket_domain = SOCKET->AF_INET;
     
     my $socket_type = SOCKET->SOCK_STREAM;
@@ -129,9 +132,7 @@ class TestCase::Go::Poll {
       
       my $send_length = &go_send($socket, $send_buffer, 0);
       
-      unless ($send_length == 4) {
-        return 0;
-      }
+      $TestCase::Go::Poll::RESULT->push($send_length);
     }
     
     {
@@ -139,9 +140,7 @@ class TestCase::Go::Poll {
       
       my $send_length = &go_send($socket, $send_buffer, 0);
       
-      unless ($send_length == 2) {
-        return 0;
-      }
+      $TestCase::Go::Poll::RESULT->push($send_length);
     }
     
     my $status_shutdown = Sys::Socket->shutdown($socket, SOCKET->SHUT_WR);
@@ -155,38 +154,33 @@ class TestCase::Go::Poll {
       
       my $recv_length = &go_recv($socket, $recv_buffer, length $recv_buffer, 0);
       
-      unless ($recv_length == 3) {
-        return 0;
-      }
+      $TestCase::Go::Poll::RESULT->push($recv_length);
       
-      unless ($recv_buffer eq "abc") {
-        return 0;
-      }
+      $TestCase::Go::Poll::RESULT->push($recv_buffer);
     }
     
     {
       my $recv_buffer = (mutable string)new_string_len 3;
       
       my $recv_length = &go_recv($socket, $recv_buffer, length $recv_buffer, 0);
+      $TestCase::Go::Poll::RESULT->push($recv_length);
       
-      unless ($recv_length == 3) {
-        return 0;
-      }
-      
-      unless ($recv_buffer eq "def") {
-        return 0;
-      }
+      $TestCase::Go::Poll::RESULT->push($recv_buffer);
+      $TestCase::Go::Poll::RESULT->push($recv_buffer);
     }
-
+    
     {
       my $recv_buffer = (mutable string)new_string_len 3;
       
       my $recv_length = &go_recv($socket, $recv_buffer, length $recv_buffer, 0);
-      
-      unless ($recv_length == 0) {
-        return 0;
-      }
+      $TestCase::Go::Poll::RESULT->push($recv_length);
     }
+    
+    unless (Array->equals_string($TestCase::Go::Poll::RESULT->to_array, ["4", "2", "3", "abc", "3", "def", "0"])) {
+      return 0;
+    }
+    
+    $TestCase::Go::Poll::RESULT = undef;
     
     return 1;
   }
