@@ -12,35 +12,25 @@ class TestCase::Go::Poll {
   our $RESULT : StringList;
   
   static method basic : int ($port : int) {
-    
+
+=pod
+
     $TestCase::Go::Poll::RESULT = StringList->new;
     
-    Go->go(method : void () {
-      
-      my $ch = Go->make;
-      
-      Go->go([has ch : Go::Channel = $ch] method : void () {
-        
-        my $ch = $self->{ch};
-        
-        $ch->write(1);
-      });
-      
-      my $ok = 0;
-      
-      my $value = (int)$ch->read(\$ok);
-      
-      $TestCase::Go::Poll::RESULT->push($value);
+    Go->go([$port : int] method : void () {
+      TestCase::Go::Poll->go_send_and_recv($port);
     });
     
     Go->gosched;
     
-    unless (Array->equals_string($TestCase::Go::Poll::RESULT->to_array, ["1"])) {
+    unless (Array->equals_string($TestCase::Go::Poll::RESULT->to_array, ["4", "2", "3", "abc", "3", "def", "0"])) {
       return 0;
     }
     
     $TestCase::Go::Poll::RESULT = undef;
-    
+
+=cut
+
     return 1;
   }
   
@@ -58,6 +48,9 @@ class TestCase::Go::Poll {
           die $@;
         }
       }
+      else {
+        last;
+      }
     }
     
     return $recv_length;
@@ -67,6 +60,7 @@ class TestCase::Go::Poll {
     
     my $send_length = -1;
     while (1) {
+      
       eval { $send_length = Sys->send($socket, $buf, 0, undef); }
       
       if ($@) {
@@ -77,14 +71,15 @@ class TestCase::Go::Poll {
           die $@;
         }
       }
+      else {
+        last;
+      }
     }
     
     return $send_length;
   }
   
-  static method send_and_recv_non_blocking : int ($port : int) {
-    
-    $TestCase::Go::Poll::RESULT = StringList->new;
+  static method go_send_and_recv : int ($port : int) {
     
     my $socket_domain = SOCKET->AF_INET;
     
@@ -175,13 +170,6 @@ class TestCase::Go::Poll {
       my $recv_length = &go_recv($socket, $recv_buffer, length $recv_buffer, 0);
       $TestCase::Go::Poll::RESULT->push($recv_length);
     }
-    
-    unless (Array->equals_string($TestCase::Go::Poll::RESULT->to_array, ["4", "2", "3", "abc", "3", "def", "0"])) {
-      return 0;
-    }
-    
-    $TestCase::Go::Poll::RESULT = undef;
-    
     return 1;
   }
   

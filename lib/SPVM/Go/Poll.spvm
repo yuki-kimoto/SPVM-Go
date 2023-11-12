@@ -83,7 +83,8 @@ class Go::Poll {
         
         if ($ready) {
           my $ready_coroutine = $poll_coroutines_h->delete($address);
-          $ready_coroutines_list->push($address);
+          
+          $ready_coroutines_list->push($poll_coroutine);
         }
       }
     }

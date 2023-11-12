@@ -26,17 +26,14 @@ class Go::Schedule::Task {
     
     my $loop_count = 0;
     while (1) {
-      
       my $schedule = $self->{schedule};
       
       my $poll = $schedule->{poll};
       
       my $finshed = !$schedule->{coroutines}->length && !$poll->{coroutines_h}->keys_length;
-      
       if ($finshed) {
         last;
       }
-      
       my $check_io = 0;
       
       if ($loop_count % 60 == 0 || !$schedule->{coroutines}->length) {
@@ -44,13 +41,14 @@ class Go::Schedule::Task {
       }
       
       if ($check_io) {
+        
         my $ready_coroutines = $poll->poll;
+        
         for my $ready_coroutine (@$ready_coroutines) {
           $schedule->{coroutines}->push($ready_coroutine);
         }
       }
       else {
-      
         my $coroutine = (Go::Coroutine)undef;
         
         if ($schedule->{coroutines}->length > 0) {
@@ -88,7 +86,6 @@ class Go::Schedule::Task {
           else {
             $over_deadline = 1;
           }
-          
           my $fd = $coroutine->{fd};
           if ($fd >= 0) {
             my $coroutine_address = Fn->to_address($coroutine);
