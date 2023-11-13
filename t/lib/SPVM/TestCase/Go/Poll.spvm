@@ -54,9 +54,6 @@ class TestCase::Go::Poll {
     my $in_addr = Sys::Socket::Util->inet_aton("127.0.0.1");
     my $sockaddr = Sys::Socket::Util->sockaddr_in($port, $in_addr);
     
-    # Connect
-    my $status_connect = Sys->connect($socket, $sockaddr);
-    
     my $blocking = 0;
     
     # Enable non-blocking IO
@@ -77,6 +74,9 @@ class TestCase::Go::Poll {
       
       Sys->fcntl($socket,IO->F_SETFL, $newmode);
     }
+    
+    # Connect
+    my $status_connect = &go_connect($socket, $sockaddr);
     
     {
       my $send_buffer = "abcd";
@@ -124,6 +124,36 @@ class TestCase::Go::Poll {
       $TestCase::Go::Poll::RESULTS->[$id]->push($recv_length);
     }
     return 1;
+  }
+  
+  static method go_connect : int ($socket : int, $addr : Sys::Socket::Sockaddr, $timeout : int = 0) {
+    
+    my $recv_length = -1;
+    while (1) {
+      eval { $recv_length = Sys->connect($socket, $addr); }
+      
+      my $eagain = 0;
+      if (Sys::OS->is_windows) {
+        $eagain = Errno->WSAEWOULDBLOCK;
+      }
+      else {
+        $eagain = Errno->EAGAIN;
+      }
+      
+      if ($@) {
+        if (Sys::Socket->socket_errno == $eagain) {
+          Go->gosched_io_read($socket, $timeout);
+        }
+        else {
+          die $@;
+        }
+      }
+      else {
+        last;
+      }
+    }
+    
+    return $recv_length;
   }
   
   static method go_recv : int ($socket : int, $buf : mutable string, $count : int, $buf_offset : int = 0, $timeout : int = 0) {
