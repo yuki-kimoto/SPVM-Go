@@ -128,9 +128,8 @@ class TestCase::Go::Poll {
       eval { $recv_length = Sys::Socket->recv($socket, $buf, length $buf, 0); }
       
       if ($@) {
+        warn "socket_errno:" . Sys::Socket->socket_errno . ",errno:" . Errno->errno . ",EAGAIN:" . Errno->EAGAIN . ",EWOULDBLOCK:" . Errno->EWOULDBLOCK;
         if (Errno->errno == Errno->EAGAIN) {
-          warn "errno:" . Errno->errno . ",EAGAIN:" . Errno->EAGAIN . ",EWOULDBLOCK:" . Errno->EWOULDBLOCK;
-          
           Go->gosched_io_read($socket, $timeout);
         }
         else {
@@ -153,8 +152,8 @@ class TestCase::Go::Poll {
       eval { $send_length = Sys->send($socket, $buf, 0, undef); }
       
       if ($@) {
-        warn "errno:" . Errno->errno . ",EAGAIN:" . Errno->EAGAIN . ",EWOULDBLOCK:" . Errno->EWOULDBLOCK;
-        if (Errno->errno == Errno->EAGAIN) {
+        warn "socket_errno:" . Sys::Socket->socket_errno . ",errno:" . Errno->errno . ",EAGAIN:" . Errno->EAGAIN . ",EWOULDBLOCK:" . Errno->EWOULDBLOCK;
+        if (Sys::Socket->socket_errno == Errno->EAGAIN) {
           
           Go->gosched_io_write($socket, $timeout);
         }
