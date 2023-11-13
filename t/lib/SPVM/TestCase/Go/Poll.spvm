@@ -11,26 +11,31 @@ class TestCase::Go::Poll {
   
   our $RESULT : StringList;
   
+  our $RESULTS : StringList[];
+  
   static method basic : int ($port : int) {
     
-    $TestCase::Go::Poll::RESULT = StringList->new;
+    $TestCase::Go::Poll::RESULTS = new StringList[2];
+    
+    $TestCase::Go::Poll::RESULTS->[0] = StringList->new;
     
     Go->go([$port : int] method : void () {
-      TestCase::Go::Poll->go_send_and_recv($port);
+      my $id = 0;
+      TestCase::Go::Poll->go_send_and_recv($port, $id);
     });
     
     Go->gosched;
     
-    unless (Array->equals_string($TestCase::Go::Poll::RESULT->to_array, ["4", "2", "0", "3", "abc", "3", "def", "0"])) {
+    unless (Array->equals_string($TestCase::Go::Poll::RESULTS->[0]->to_array, ["4", "2", "0", "3", "abc", "3", "def", "0"])) {
       return 0;
     }
     
-    $TestCase::Go::Poll::RESULT = undef;
+    $TestCase::Go::Poll::RESULTS = undef;
     
     return 1;
   }
   
-  static method go_send_and_recv : int ($port : int) {
+  static method go_send_and_recv : int ($port : int, $id : int) {
     
     my $socket_domain = SOCKET->AF_INET;
     
@@ -78,7 +83,7 @@ class TestCase::Go::Poll {
       
       my $send_length = &go_send($socket, $send_buffer, 0);
       
-      $TestCase::Go::Poll::RESULT->push($send_length);
+      $TestCase::Go::Poll::RESULTS->[$id]->push($send_length);
     }
     
     {
@@ -86,37 +91,37 @@ class TestCase::Go::Poll {
       
       my $send_length = &go_send($socket, $send_buffer, 0);
       
-      $TestCase::Go::Poll::RESULT->push($send_length);
+      $TestCase::Go::Poll::RESULTS->[$id]->push($send_length);
     }
     
     my $status_shutdown = Sys::Socket->shutdown($socket, SOCKET->SHUT_WR);
     
-    $TestCase::Go::Poll::RESULT->push($status_shutdown);
+    $TestCase::Go::Poll::RESULTS->[$id]->push($status_shutdown);
     
     {
       my $recv_buffer = (mutable string)new_string_len 3;
       
       my $recv_length = &go_recv($socket, $recv_buffer, length $recv_buffer, 0);
       
-      $TestCase::Go::Poll::RESULT->push($recv_length);
+      $TestCase::Go::Poll::RESULTS->[$id]->push($recv_length);
       
-      $TestCase::Go::Poll::RESULT->push($recv_buffer);
+      $TestCase::Go::Poll::RESULTS->[$id]->push($recv_buffer);
     }
     
     {
       my $recv_buffer = (mutable string)new_string_len 3;
       
       my $recv_length = &go_recv($socket, $recv_buffer, length $recv_buffer, 0);
-      $TestCase::Go::Poll::RESULT->push($recv_length);
+      $TestCase::Go::Poll::RESULTS->[$id]->push($recv_length);
       
-      $TestCase::Go::Poll::RESULT->push($recv_buffer);
+      $TestCase::Go::Poll::RESULTS->[$id]->push($recv_buffer);
     }
     
     {
       my $recv_buffer = (mutable string)new_string_len 3;
       
       my $recv_length = &go_recv($socket, $recv_buffer, length $recv_buffer, 0);
-      $TestCase::Go::Poll::RESULT->push($recv_length);
+      $TestCase::Go::Poll::RESULTS->[$id]->push($recv_length);
     }
     return 1;
   }
