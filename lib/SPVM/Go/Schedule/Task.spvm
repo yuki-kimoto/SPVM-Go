@@ -92,6 +92,7 @@ class Go::Schedule::Task {
             $coroutine->{disable} = 1;
             my $coroutine_address = Fn->to_address($coroutine);
             $schedule->{poll}->{coroutines_h}->set($coroutine_address, $coroutine);
+            $coroutines->push($coroutine);
           }
           else {
             if ($over_deadline) {

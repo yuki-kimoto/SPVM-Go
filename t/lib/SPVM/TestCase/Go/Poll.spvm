@@ -13,8 +13,6 @@ class TestCase::Go::Poll {
   
   static method basic : int ($port : int) {
 
-=pod
-
     $TestCase::Go::Poll::RESULT = StringList->new;
     
     Go->go([$port : int] method : void () {
@@ -23,15 +21,11 @@ class TestCase::Go::Poll {
     
     Go->gosched;
     
-    warn dump $TestCase::Go::Poll::RESULT->to_array;
-    
     unless (Array->equals_string($TestCase::Go::Poll::RESULT->to_array, ["4", "2", "0", "3", "abc", "3", "def", "0"])) {
       return 0;
     }
     
     $TestCase::Go::Poll::RESULT = undef;
-
-=cut
 
     return 1;
   }
@@ -102,12 +96,8 @@ class TestCase::Go::Poll {
     {
       my $recv_buffer = (mutable string)new_string_len 3;
       
-    warn;
-    
       my $recv_length = &go_recv($socket, $recv_buffer, length $recv_buffer, 0);
       
-    warn;
-    
       $TestCase::Go::Poll::RESULT->push($recv_length);
       
       $TestCase::Go::Poll::RESULT->push($recv_buffer);
@@ -162,7 +152,6 @@ class TestCase::Go::Poll {
       
       if ($@) {
         if (Errno->errno == Errno->EAGAIN) {
-          warn;
           Go->gosched_io_write($socket, $timeout);
         }
         else {
