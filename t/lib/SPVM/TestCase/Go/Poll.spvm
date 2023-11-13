@@ -35,6 +35,39 @@ class TestCase::Go::Poll {
     return 1;
   }
   
+  static method parallel : int ($port : int) {
+    
+    $TestCase::Go::Poll::RESULTS = new StringList[2];
+    
+    $TestCase::Go::Poll::RESULTS->[0] = StringList->new;
+    
+    $TestCase::Go::Poll::RESULTS->[1] = StringList->new;
+    
+    Go->go([$port : int] method : void () {
+      my $id = 0;
+      TestCase::Go::Poll->go_send_and_recv($port, $id);
+    });
+    
+    Go->go([$port : int] method : void () {
+      my $id = 1;
+      TestCase::Go::Poll->go_send_and_recv($port, $id);
+    });
+    
+    Go->gosched;
+    
+    unless (Array->equals_string($TestCase::Go::Poll::RESULTS->[0]->to_array, ["4", "2", "0", "3", "abc", "3", "def", "0"])) {
+      return 0;
+    }
+    
+    unless (Array->equals_string($TestCase::Go::Poll::RESULTS->[1]->to_array, ["4", "2", "0", "3", "abc", "3", "def", "0"])) {
+      return 0;
+    }
+    
+    $TestCase::Go::Poll::RESULTS = undef;
+    
+    return 1;
+  }
+  
   static method go_send_and_recv : int ($port : int, $id : int) {
     
     my $socket_domain = SOCKET->AF_INET;
