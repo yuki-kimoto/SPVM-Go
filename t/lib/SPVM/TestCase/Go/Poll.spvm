@@ -127,9 +127,17 @@ class TestCase::Go::Poll {
     while (1) {
       eval { $recv_length = Sys::Socket->recv($socket, $buf, length $buf, 0); }
       
+      my $eagain = 0;
+      if (Sys::OS->is_windows) {
+        $eagain = Errno->WSAEWOULDBLOCK;
+      }
+      else {
+        $eagain = Errno->EAGAIN;
+      }
+      
       if ($@) {
         warn "socket_errno:" . Sys::Socket->socket_errno . ",errno:" . Errno->errno . ",EAGAIN:" . Errno->EAGAIN . ",EWOULDBLOCK:" . Errno->EWOULDBLOCK;
-        if (Errno->errno == Errno->EAGAIN) {
+        if (Sys::Socket->socket_errno == $eagain) {
           Go->gosched_io_read($socket, $timeout);
         }
         else {
@@ -152,8 +160,16 @@ class TestCase::Go::Poll {
       eval { $send_length = Sys->send($socket, $buf, 0, undef); }
       
       if ($@) {
+        my $eagain = 0;
+        if (Sys::OS->is_windows) {
+          $eagain = Errno->WSAEWOULDBLOCK;
+        }
+        else {
+          $eagain = Errno->EAGAIN;
+        }
+        
         warn "socket_errno:" . Sys::Socket->socket_errno . ",errno:" . Errno->errno . ",EAGAIN:" . Errno->EAGAIN . ",EWOULDBLOCK:" . Errno->EWOULDBLOCK;
-        if (Sys::Socket->socket_errno == Errno->EAGAIN) {
+        if (Sys::Socket->socket_errno == $eagain) {
           
           Go->gosched_io_write($socket, $timeout);
         }
