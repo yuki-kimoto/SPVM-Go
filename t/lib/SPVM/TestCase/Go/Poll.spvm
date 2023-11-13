@@ -136,7 +136,6 @@ class TestCase::Go::Poll {
       }
       
       if ($@) {
-        warn "socket_errno:" . Sys::Socket->socket_errno . ",errno:" . Errno->errno . ",EAGAIN:" . Errno->EAGAIN . ",EWOULDBLOCK:" . Errno->EWOULDBLOCK;
         if (Sys::Socket->socket_errno == $eagain) {
           Go->gosched_io_read($socket, $timeout);
         }
@@ -168,7 +167,6 @@ class TestCase::Go::Poll {
           $eagain = Errno->EAGAIN;
         }
         
-        warn "socket_errno:" . Sys::Socket->socket_errno . ",errno:" . Errno->errno . ",EAGAIN:" . Errno->EAGAIN . ",EWOULDBLOCK:" . Errno->EWOULDBLOCK;
         if (Sys::Socket->socket_errno == $eagain) {
           
           Go->gosched_io_write($socket, $timeout);
