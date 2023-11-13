@@ -190,6 +190,8 @@ class TestCase::Go::Poll {
       eval { $recv_length = Sys->connect($socket, $addr); }
       
       if ($@) {
+        warn Sys::Socket->socket_errno;
+        
         if (Sys::Socket->socket_errno == &EAGAIN || Sys::Socket->socket_errno == &EALREADY) {
           Go->gosched_io_read($socket, $timeout);
         }
@@ -198,6 +200,7 @@ class TestCase::Go::Poll {
         }
       }
       else {
+        warn;
         last;
       }
     }

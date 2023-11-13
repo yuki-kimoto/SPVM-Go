@@ -25,8 +25,6 @@ my $start_memory_blocks_count = SPVM::api->get_memory_blocks_count();
   ok(SPVM::TestCase::Go::Poll->basic($server->port));
 }
 
-=pod
-
 {
   my $server = TestUtil::ServerRunner->new(
     code => sub {
@@ -38,8 +36,6 @@ my $start_memory_blocks_count = SPVM::api->get_memory_blocks_count();
   
   ok(SPVM::TestCase::Go::Poll->parallel($server->port));
 }
-
-=cut
 
 # All object is freed
 my $end_memory_blocks_count = SPVM::api->get_memory_blocks_count();
