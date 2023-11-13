@@ -171,6 +171,18 @@ class TestCase::Go::Poll {
     return $eagain;
   }
   
+  static method EALREADY : int () {
+    my $eagain = 0;
+    if (Sys::OS->is_windows) {
+      $eagain = Errno->WSAEALREADY;
+    }
+    else {
+      $eagain = Errno->EALREADY;
+    }
+    
+    return $eagain;
+  }
+  
   static method go_connect : int ($socket : int, $addr : Sys::Socket::Sockaddr, $timeout : int = 0) {
     
     my $recv_length = -1;
@@ -178,7 +190,7 @@ class TestCase::Go::Poll {
       eval { $recv_length = Sys->connect($socket, $addr); }
       
       if ($@) {
-        if (Sys::Socket->socket_errno == &EAGAIN) {
+        if (Sys::Socket->socket_errno == &EAGAIN || Sys::Socket->socket_errno == &EALREADY) {
           Go->gosched_io_read($socket, $timeout);
         }
         else {
