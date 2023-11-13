@@ -24,27 +24,24 @@ class Go::Schedule::Task {
     
     my $now_tv = Sys::Time::Timeval->new;
     
+    my $schedule = $self->{schedule};
+    
+    my $poll = $schedule->{poll};
+    
     my $loop_count = 0;
     while (1) {
-      my $schedule = $self->{schedule};
       
-      my $poll = $schedule->{poll};
+      my $coroutines = $schedule->{coroutines};
       
-      my $finshed = !$schedule->{coroutines}->length && !$poll->{coroutines_h}->keys_length;
-      if ($finshed) {
+      if ($coroutines->length == 0) {
         last;
       }
-      my $check_io = 0;
       
-      if ($loop_count % 60 == 0 || !$schedule->{coroutines}->length) {
-        $check_io = 1;
-      }
+      my $check_io = $loop_count % 60 == 0;
       
       if ($check_io) {
         
         my $ready_coroutines = $poll->poll;
-        
-        warn @$ready_coroutines;
         
         for my $ready_coroutine (@$ready_coroutines) {
           $ready_coroutine->{disable} = 0;
@@ -54,15 +51,15 @@ class Go::Schedule::Task {
       else {
         my $coroutine = (Go::Coroutine)undef;
         
-        if ($schedule->{coroutines}->length > 0) {
-          $coroutine = (Go::Coroutine)$schedule->{coroutines}->shift;
+        if ($coroutines->length > 0) {
+          $coroutine = (Go::Coroutine)$coroutines->shift;
         }
         
         if ($coroutine->{finished}) {
           $schedule->{current_coroutine} = undef;
         }
         elsif ($coroutine->{disable}) {
-          $schedule->{coroutines}->push($coroutine);
+          $coroutines->push($coroutine);
         }
         else {
           my $over_deadline = 0;
@@ -83,7 +80,7 @@ class Go::Schedule::Task {
               $over_deadline = 1;
             }
             else {
-              $schedule->{coroutines}->push($coroutine);
+              $coroutines->push($coroutine);
             }
           }
           else {
@@ -92,7 +89,6 @@ class Go::Schedule::Task {
           
           my $fd = $coroutine->{fd};
           if ($fd >= 0) {
-            warn;
             $coroutine->{disable} = 1;
             my $coroutine_address = Fn->to_address($coroutine);
             $schedule->{poll}->{coroutines_h}->set($coroutine_address, $coroutine);
@@ -102,7 +98,7 @@ class Go::Schedule::Task {
               
               my $schedule_task_coroutine = $schedule->{schedule_task_coroutine};
               
-              $schedule->{coroutines}->push($coroutine);
+              $coroutines->push($coroutine);
               
               $coroutine->{return_back} = $schedule_task_coroutine;
               

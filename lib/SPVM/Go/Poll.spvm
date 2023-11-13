@@ -27,8 +27,6 @@ class Go::Poll {
     
     my $poll_coroutines_length = $poll_coroutines_h->keys_length;
     
-    warn $poll_coroutines_length;
-  
     my $ready_coroutines_list = List->new(new Go::Coroutine[0]);
     
     if ($poll_coroutines_length > 0) {
@@ -84,11 +82,6 @@ class Go::Poll {
         
         if ($ready) {
           my $ready_coroutine = $poll_coroutines_h->delete($address);
-          
-          warn $address;
-          
-          warn $poll_coroutines_h->keys_length;
-          
           $ready_coroutines_list->push($poll_coroutine);
         }
       }
