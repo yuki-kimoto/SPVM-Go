@@ -12,7 +12,7 @@ class TestCase::Go::Poll {
   our $RESULT : StringList;
   
   static method basic : int ($port : int) {
-
+    
     $TestCase::Go::Poll::RESULT = StringList->new;
     
     Go->go([$port : int] method : void () {
@@ -26,7 +26,7 @@ class TestCase::Go::Poll {
     }
     
     $TestCase::Go::Poll::RESULT = undef;
-
+    
     return 1;
   }
   
@@ -128,7 +128,7 @@ class TestCase::Go::Poll {
       eval { $recv_length = Sys::Socket->recv($socket, $buf, length $buf, 0); }
       
       if ($@) {
-        if (Errno->errno == Errno->EAGAIN) {
+        if (Errno->errno == Errno->EAGAIN || Errno->errno == Errno->EWOULDBLOCK) {
           Go->gosched_io_read($socket, $timeout);
         }
         else {
@@ -151,7 +151,7 @@ class TestCase::Go::Poll {
       eval { $send_length = Sys->send($socket, $buf, 0, undef); }
       
       if ($@) {
-        if (Errno->errno == Errno->EAGAIN) {
+        if (Errno->errno == Errno->EAGAIN || Errno->errno == Errno->EWOULDBLOCK) {
           Go->gosched_io_write($socket, $timeout);
         }
         else {
