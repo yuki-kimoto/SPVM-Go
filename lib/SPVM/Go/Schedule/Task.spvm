@@ -67,13 +67,13 @@ class Go::Schedule::Task {
           my $deadline_ts = $coroutine->{deadline};
           if ($deadline_ts) {
             
+            Sys::Time->gettimeofday($now_tv, undef);
+            
             my $now_sec = $now_tv->tv_sec;
             my $now_nsec = 1000 * $now_tv->tv_usec;
             
             my $deadline_sec = $deadline_ts->tv_sec;
             my $deadline_nsec = $deadline_ts->tv_nsec;
-            
-            Sys::Time->gettimeofday($now_tv, undef);
             
             if ($now_sec > $deadline_sec || ($now_sec == $deadline_sec && $now_nsec > $deadline_nsec)) {
               $coroutine->{deadline} = undef;
