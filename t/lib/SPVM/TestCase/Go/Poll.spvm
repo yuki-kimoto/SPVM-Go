@@ -65,6 +65,7 @@ class TestCase::Go::Poll {
       
       if ($@) {
         if (Errno->errno == Errno->EAGAIN) {
+          warn;
           Go->gosched_io_write($socket, $timeout);
         }
         else {

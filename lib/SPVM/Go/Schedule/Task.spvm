@@ -44,8 +44,11 @@ class Go::Schedule::Task {
         
         my $ready_coroutines = $poll->poll;
         
+        warn @$ready_coroutines;
+        
         for my $ready_coroutine (@$ready_coroutines) {
-          $schedule->{coroutines}->push($ready_coroutine);
+          $ready_coroutine->{disable} = 0;
+          $ready_coroutine->{fd} = -1;
         }
       }
       else {
@@ -86,8 +89,11 @@ class Go::Schedule::Task {
           else {
             $over_deadline = 1;
           }
+          
           my $fd = $coroutine->{fd};
           if ($fd >= 0) {
+            warn;
+            $coroutine->{disable} = 1;
             my $coroutine_address = Fn->to_address($coroutine);
             $schedule->{poll}->{coroutines_h}->set($coroutine_address, $coroutine);
           }
