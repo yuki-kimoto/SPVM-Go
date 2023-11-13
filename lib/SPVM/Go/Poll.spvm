@@ -45,6 +45,8 @@ class Go::Poll {
         
         my $is_write = $poll_coroutine->{is_write};
         
+        warn $is_write;
+        
         if ($is_write) {
           $poll_fd_array->set_events($poll_index, POLL->POLLOUT);
         }
@@ -65,19 +67,26 @@ class Go::Poll {
         my $poll_index = $poll_coroutine->{poll_index};
         
         my $revent = $poll_fd_array->revents($poll_index);
+        
+        warn $poll_index;
+        
+        warn dump [$revent, POLL->POLLIN, POLL->POLLOUT, POLL->POLLPRI, POLL->POLLNVAL, POLL->POLLHUP, POLL->POLLERR];
+        
         my $ready = 0;
-        if ($revent & (POLL->POLLPRI | POLL->POLLNVAL | POLL->POLLHUP | POLL->POLLERR)) {
-          $ready = 1;
-        }
-        elsif ($revent & POLL->POLLIN) {
+        if ($revent & POLL->POLLIN) {
           unless ($poll_coroutine->{is_write}) {
+            warn;
             $ready = 1;
           }
         }
         elsif ($revent & POLL->POLLOUT) {
           if ($poll_coroutine->{is_write}) {
+            warn;
             $ready = 1;
           }
+        }
+        elsif ($revent & (POLL->POLLPRI | POLL->POLLNVAL | POLL->POLLHUP | POLL->POLLERR)) {
+          $ready = 1;
         }
         
         if ($ready) {
