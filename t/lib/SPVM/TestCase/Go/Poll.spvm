@@ -160,27 +160,39 @@ class TestCase::Go::Poll {
   }
   
   static method EAGAIN : int () {
-    my $eagain = 0;
+    my $EAGAIN = 0;
     if (Sys::OS->is_windows) {
-      $eagain = Errno->WSAEWOULDBLOCK;
+      $EAGAIN = Errno->WSAEWOULDBLOCK;
     }
     else {
-      $eagain = Errno->EAGAIN;
+      $EAGAIN = Errno->EAGAIN;
     }
     
-    return $eagain;
+    return $EAGAIN;
   }
   
   static method EALREADY : int () {
-    my $eagain = 0;
+    my $EALREADY = 0;
     if (Sys::OS->is_windows) {
-      $eagain = Errno->WSAEALREADY;
+      $EALREADY = Errno->WSAEALREADY;
     }
     else {
-      $eagain = Errno->EALREADY;
+      $EALREADY = Errno->EALREADY;
     }
     
-    return $eagain;
+    return $EALREADY;
+  }
+  
+  static method EINPROGRESS : int () {
+    my $EINPROGRESS = 0;
+    if (Sys::OS->is_windows) {
+      $EINPROGRESS = Errno->EINPROGRESS;
+    }
+    else {
+      $EINPROGRESS = Errno->EINPROGRESS;
+    }
+    
+    return $EINPROGRESS;
   }
   
   static method go_connect : int ($socket : int, $addr : Sys::Socket::Sockaddr, $timeout : int = 0) {
@@ -190,7 +202,7 @@ class TestCase::Go::Poll {
       eval { $recv_length = Sys->connect($socket, $addr); }
       
       if ($@) {
-        if (Sys::Socket->socket_errno == &EAGAIN || Sys::Socket->socket_errno == &EALREADY) {
+        if (Sys::Socket->socket_errno == &EINPROGRESS || Sys::Socket->socket_errno == &EALREADY) {
           Go->gosched_io_write($socket, $timeout);
         }
         else {
@@ -198,6 +210,18 @@ class TestCase::Go::Poll {
         }
       }
       else {
+        while (1) {
+          my $connected = (Sys::Socket::Sockaddr)undef;
+          
+          eval { $connected = Sys->getpeername($socket); };
+          
+          if ($connected) {
+            last;
+          }
+          else {
+            Go->gosched;
+          }
+        }
         last;
       }
     }
