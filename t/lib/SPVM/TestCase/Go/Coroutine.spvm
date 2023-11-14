@@ -9,25 +9,25 @@ class TestCase::Go::Coroutine {
   
   static method transfer_minimal : int () {
     
-    $TestCase::Go::Coroutine::RESULT = IntList->new;
+    $RESULT = IntList->new;
     
     my $coroutine_return_back = Go::Coroutine->new;
     
     my $coroutine = Go::Coroutine->new(method : void () {
-      $TestCase::Go::Coroutine::RESULT->push(2);
+      $RESULT->push(2);
     }, $coroutine_return_back);
     
-    $TestCase::Go::Coroutine::RESULT->push(1);
+    $RESULT->push(1);
     
     Go::Coroutine->transfer($coroutine_return_back, $coroutine);
     
-    $TestCase::Go::Coroutine::RESULT->push(3);
+    $RESULT->push(3);
     
-    unless (Array->equals_int($TestCase::Go::Coroutine::RESULT->to_array, [1, 2, 3])) {
+    unless (Array->equals_int($RESULT->to_array, [1, 2, 3])) {
       return 0;
     }
     
-    $TestCase::Go::Coroutine::RESULT = undef;
+    $RESULT = undef;
     
     return 1;
   }
@@ -51,7 +51,7 @@ class TestCase::Go::Coroutine {
   
   static method transfer : int () {
     
-    $TestCase::Go::Coroutine::RESULT = IntList->new;
+    $RESULT = IntList->new;
     
     my $coroutines = new Go::Coroutine[2];
     
@@ -59,51 +59,51 @@ class TestCase::Go::Coroutine {
     
     my $coroutine0 = Go::Coroutine->new([has coroutines : Go::Coroutine[] = $coroutines] method : void () {
       
-      $TestCase::Go::Coroutine::RESULT->push(2);
+      $RESULT->push(2);
       
       my $coroutines = $self->{coroutines};
       
       my $coroutine1 = Go::Coroutine->new([has coroutines : Go::Coroutine[] = $coroutines] method : void () {
         
-        $TestCase::Go::Coroutine::RESULT->push(4);
+        $RESULT->push(4);
         
-        TestCase::Go::Coroutine->foo();
+        &foo;
         
-        $TestCase::Go::Coroutine::RESULT->push(6);
+        $RESULT->push(6);
         
         Go::Coroutine->transfer($self->{coroutines}[1], $self->{coroutines}[0]);
         
-        $TestCase::Go::Coroutine::RESULT->push(8);
+        $RESULT->push(8);
         
       }, $coroutines->[0]);
       
       $coroutines->[1] = $coroutine1;
       
-      $TestCase::Go::Coroutine::RESULT->push(3);
+      $RESULT->push(3);
       
       Go::Coroutine->transfer($coroutines->[0], $coroutines->[1]);
       
-      $TestCase::Go::Coroutine::RESULT->push(7);
+      $RESULT->push(7);
       
       Go::Coroutine->transfer($coroutines->[0], $coroutines->[1]);
       
-      $TestCase::Go::Coroutine::RESULT->push(9);
+      $RESULT->push(9);
       
     }, $coroutine_return_back);
     
     $coroutines->[0] = $coroutine0;
     
-    $TestCase::Go::Coroutine::RESULT->push(1);
+    $RESULT->push(1);
     
     Go::Coroutine->transfer($coroutine_return_back, $coroutines->[0]);
     
-    $TestCase::Go::Coroutine::RESULT->push(10);
+    $RESULT->push(10);
     
-    unless (Array->equals_int($TestCase::Go::Coroutine::RESULT->to_array, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10])) {
+    unless (Array->equals_int($RESULT->to_array, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10])) {
       return 0;
     }
     
-    $TestCase::Go::Coroutine::RESULT = undef;
+    $RESULT = undef;
     
     $coroutines->[0] = undef;
     
@@ -113,35 +113,35 @@ class TestCase::Go::Coroutine {
   }
   
   static method foo : void () {
-    $TestCase::Go::Coroutine::RESULT->push(5);
+    $RESULT->push(5);
   }
 
   static method die : int () {
     
-    $TestCase::Go::Coroutine::RESULT = IntList->new;
+    $RESULT = IntList->new;
     
     my $coroutine_return_back = Go::Coroutine->new;
     
     my $coroutine = Go::Coroutine->new(method : void () {
       
-      $TestCase::Go::Coroutine::RESULT->push(2);
+      $RESULT->push(2);
       
       die "Coroutine Error.";
       
-      $TestCase::Go::Coroutine::RESULT->push(4);
+      $RESULT->push(4);
     }, $coroutine_return_back);
     
-    $TestCase::Go::Coroutine::RESULT->push(1);
+    $RESULT->push(1);
     
     Go::Coroutine->transfer($coroutine_return_back, $coroutine);
     
-    $TestCase::Go::Coroutine::RESULT->push(3);
+    $RESULT->push(3);
     
-    unless (Array->equals_int($TestCase::Go::Coroutine::RESULT->to_array, [1, 2, 3])) {
+    unless (Array->equals_int($RESULT->to_array, [1, 2, 3])) {
       return 0;
     }
     
-    $TestCase::Go::Coroutine::RESULT = undef;
+    $RESULT = undef;
     
     return 1;
   }

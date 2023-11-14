@@ -6,7 +6,7 @@ class TestCase::Go::Select {
   
   static method minimal : int () {
     
-    $TestCase::Go::Select::RESULT = IntList->new;
+    $RESULT = IntList->new;
     
     Go->go(method : void () {
       
@@ -29,24 +29,24 @@ class TestCase::Go::Select {
       
       my $ok = $result->ok;
       
-      $TestCase::Go::Select::RESULT->push($value);
+      $RESULT->push($value);
       
     });
     
     Go->gosched;
     
-    unless (Array->equals_int($TestCase::Go::Select::RESULT->to_array, [1])) {
+    unless (Array->equals_int($RESULT->to_array, [1])) {
       return 0;
     }
     
-    $TestCase::Go::Select::RESULT = undef;
+    $RESULT = undef;
     
     return 1;
   }
   
   static method blocking : int () {
     
-    $TestCase::Go::Select::RESULT = IntList->new;
+    $RESULT = IntList->new;
     
     Go->go(method : void () {
       
@@ -78,7 +78,7 @@ class TestCase::Go::Select {
         
         my $value = (int)$ch3->read(\$ok);
         
-        $TestCase::Go::Select::RESULT->push($value);
+        $RESULT->push($value);
         
       });
       
@@ -108,7 +108,7 @@ class TestCase::Go::Select {
           else {
             my $value = (int)$result->value;
             
-            $TestCase::Go::Select::RESULT->push($value);
+            $RESULT->push($value);
             
             $select->remove_read($ch);
           }
@@ -123,7 +123,7 @@ class TestCase::Go::Select {
     
     Go->gosched;
     
-    my $got = $TestCase::Go::Select::RESULT->to_array;
+    my $got = $RESULT->to_array;
     
     Sort->sort_int_asc($got);
     
@@ -131,14 +131,14 @@ class TestCase::Go::Select {
       return 0;
     }
     
-    $TestCase::Go::Select::RESULT = undef;
+    $RESULT = undef;
     
     return 1;
   }
   
   static method non_blocking : int () {
     
-    $TestCase::Go::Select::RESULT = IntList->new;
+    $RESULT = IntList->new;
     
     Go->go(method : void () {
       
@@ -170,7 +170,7 @@ class TestCase::Go::Select {
         
         my $value = (int)$ch3->read(\$ok);
         
-        $TestCase::Go::Select::RESULT->push($value);
+        $RESULT->push($value);
         
       });
       
@@ -203,7 +203,7 @@ class TestCase::Go::Select {
             else {
               my $value = (int)$result->value;
               
-              $TestCase::Go::Select::RESULT->push($value);
+              $RESULT->push($value);
               
               $select->remove_read($ch);
             }
@@ -224,7 +224,7 @@ class TestCase::Go::Select {
     
     Go->gosched;
     
-    my $got = $TestCase::Go::Select::RESULT->to_array;
+    my $got = $RESULT->to_array;
     
     Sort->sort_int_asc($got);
     
@@ -232,7 +232,7 @@ class TestCase::Go::Select {
       return 0;
     }
     
-    $TestCase::Go::Select::RESULT = undef;
+    $RESULT = undef;
     
     return 1;
   }

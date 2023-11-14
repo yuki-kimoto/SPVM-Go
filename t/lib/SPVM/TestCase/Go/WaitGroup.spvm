@@ -6,7 +6,7 @@ class TestCase::Go::WaitGroup {
   
   static method basic : int () {
     
-    $TestCase::Go::WaitGroup::RESULT = IntList->new;
+    $RESULT = IntList->new;
     
     Go->go(method : void () {
       my $wg = Go::Sync::WaitGroup->new;
@@ -19,7 +19,7 @@ class TestCase::Go::WaitGroup {
           $self->{wg}->done;
         });
         
-        $TestCase::Go::WaitGroup::RESULT->push(2);
+        $RESULT->push(2);
         
       });
       
@@ -28,23 +28,23 @@ class TestCase::Go::WaitGroup {
           $self->{wg}->done;
         });
         
-        $TestCase::Go::WaitGroup::RESULT->push(3);
+        $RESULT->push(3);
       });
       
-      $TestCase::Go::WaitGroup::RESULT->push(1);
+      $RESULT->push(1);
       
       $wg->wait;
       
-      $TestCase::Go::WaitGroup::RESULT->push(4);
+      $RESULT->push(4);
     });
     
     Go->gosched;
     
-    unless (Array->equals_int($TestCase::Go::WaitGroup::RESULT->to_array, [1, 2, 3, 4])) {
+    unless (Array->equals_int($RESULT->to_array, [1, 2, 3, 4])) {
       return 0;
     }
     
-    $TestCase::Go::WaitGroup::RESULT = undef;
+    $RESULT = undef;
     
     return 1;
   }

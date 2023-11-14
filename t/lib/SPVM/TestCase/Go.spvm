@@ -7,65 +7,65 @@ class TestCase::Go {
   
   static method go_minimal : int () {
     
-    $TestCase::Go::RESULT = IntList->new;
+    $RESULT = IntList->new;
     
     Go->go(method : void () {
-      $TestCase::Go::RESULT->push(2);
+      $RESULT->push(2);
     });
     
-    $TestCase::Go::RESULT->push(1);
+    $RESULT->push(1);
     
     Go->gosched;
     
-    $TestCase::Go::RESULT->push(3);
+    $RESULT->push(3);
     
-    unless (Array->equals_int($TestCase::Go::RESULT->to_array, [1, 2, 3])) {
+    unless (Array->equals_int($RESULT->to_array, [1, 2, 3])) {
       return 0;
     }
     
-    $TestCase::Go::RESULT = undef;
+    $RESULT = undef;
     
     return 1;
   }
   
   static method go_basic : int () {
     
-    $TestCase::Go::RESULT = IntList->new;
+    $RESULT = IntList->new;
     
     Go->go(method : void () {
       
-      $TestCase::Go::RESULT->push(2);
+      $RESULT->push(2);
       
       Go->go(method : void () {
-        $TestCase::Go::RESULT->push(4);
+        $RESULT->push(4);
       });
       
-      $TestCase::Go::RESULT->push(3);
+      $RESULT->push(3);
     });
     
-    $TestCase::Go::RESULT->push(1);
+    $RESULT->push(1);
     
     Go->gosched;
     
-    $TestCase::Go::RESULT->push(5);
+    $RESULT->push(5);
     
-    unless (Array->equals_int($TestCase::Go::RESULT->to_array, [1, 2, 3, 4, 5])) {
+    unless (Array->equals_int($RESULT->to_array, [1, 2, 3, 4, 5])) {
       return 0;
     }
     
-    $TestCase::Go::RESULT = undef;
+    $RESULT = undef;
     
     return 1;
   }
   
   static method go_die : int () {
     
-    $TestCase::Go::RESULT = IntList->new;
+    $RESULT = IntList->new;
     
     Go->go(method : void () {
       die "Exception!.";
       
-      $TestCase::Go::RESULT->push(1);
+      $RESULT->push(1);
       
     });
     
@@ -74,24 +74,24 @@ class TestCase::Go {
         die "Exception!.";
       }
       
-      $TestCase::Go::RESULT->push(2);
+      $RESULT->push(2);
       
     });
     
     Go->go(method : void () {
-      TestCase::Go->error();
+      &error();
       
-      $TestCase::Go::RESULT->push(3);
+      $RESULT->push(3);
       
     });
     
     Go->gosched;
     
-    unless (Array->equals_int($TestCase::Go::RESULT->to_array, [2])) {
+    unless (Array->equals_int($RESULT->to_array, [2])) {
       return 0;
     }
     
-    $TestCase::Go::RESULT = undef;
+    $RESULT = undef;
     
     return 1;
   }

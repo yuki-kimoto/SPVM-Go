@@ -5,7 +5,7 @@ class TestCase::Go::Channel {
   
   static method unbuffered_minimal : int () {
     
-    $TestCase::Go::Channel::RESULT = IntList->new;
+    $RESULT = IntList->new;
     
     Go->go(method : void () {
       
@@ -22,23 +22,23 @@ class TestCase::Go::Channel {
       
       my $value = (int)$ch->read(\$ok);
       
-      $TestCase::Go::Channel::RESULT->push($value);
+      $RESULT->push($value);
     });
     
     Go->gosched;
     
-    unless (Array->equals_int($TestCase::Go::Channel::RESULT->to_array, [1])) {
+    unless (Array->equals_int($RESULT->to_array, [1])) {
       return 0;
     }
     
-    $TestCase::Go::Channel::RESULT = undef;
+    $RESULT = undef;
     
     return 1;
   }
   
   static method unbuffered : int () {
     
-    $TestCase::Go::Channel::RESULT = IntList->new;
+    $RESULT = IntList->new;
     
     Go->go(method : void () {
       
@@ -59,25 +59,25 @@ class TestCase::Go::Channel {
       
       my $value1 = (int)$ch->read(\$ok);
       
-      $TestCase::Go::Channel::RESULT->push($value1);
+      $RESULT->push($value1);
       
-      $TestCase::Go::Channel::RESULT->push($ok);
+      $RESULT->push($ok);
       
       my $value2 = (int)$ch->read(\$ok);
       
-      $TestCase::Go::Channel::RESULT->push($value2);
+      $RESULT->push($value2);
       
-      $TestCase::Go::Channel::RESULT->push($ok);
+      $RESULT->push($ok);
       my $value3 = $ch->read(\$ok);
       
       if ($value3) {
-        $TestCase::Go::Channel::RESULT->push(1);
+        $RESULT->push(1);
       }
       else {
-        $TestCase::Go::Channel::RESULT->push(0);
+        $RESULT->push(0);
       }
       
-      $TestCase::Go::Channel::RESULT->push($ok);
+      $RESULT->push($ok);
     });
     
     Go->gosched;
@@ -89,18 +89,18 @@ class TestCase::Go::Channel {
       0, 0
     ];
     
-    unless (Array->equals_int($TestCase::Go::Channel::RESULT->to_array, $expected)) {
+    unless (Array->equals_int($RESULT->to_array, $expected)) {
       return 0;
     }
     
-    $TestCase::Go::Channel::RESULT = undef;
+    $RESULT = undef;
     
     return 1;
   }
   
   static method buffered_minimal : int () {
     
-    $TestCase::Go::Channel::RESULT = IntList->new;
+    $RESULT = IntList->new;
     
     Go->go(method : void () {
       
@@ -114,28 +114,28 @@ class TestCase::Go::Channel {
         
         my $value = (int)$ch->read(\$ok);
         
-        $TestCase::Go::Channel::RESULT->push($value);
+        $RESULT->push($value);
       });
       
       $ch->write(2);
       
-      $TestCase::Go::Channel::RESULT->push(1);
+      $RESULT->push(1);
     });
     
     Go->gosched;
     
-    unless (Array->equals_int($TestCase::Go::Channel::RESULT->to_array, [1, 2])) {
+    unless (Array->equals_int($RESULT->to_array, [1, 2])) {
       return 0;
     }
     
-    $TestCase::Go::Channel::RESULT = undef;
+    $RESULT = undef;
     
     return 1;
   }
   
   static method buffered : int () {
     
-    $TestCase::Go::Channel::RESULT = IntList->new;
+    $RESULT = IntList->new;
     
     Go->go(method : void () {
       
@@ -149,37 +149,37 @@ class TestCase::Go::Channel {
         
         my $value1 = (int)$ch->read(\$ok);
         
-        $TestCase::Go::Channel::RESULT->push(-2);
+        $RESULT->push(-2);
         
-        $TestCase::Go::Channel::RESULT->push($ch->len);
+        $RESULT->push($ch->len);
         
-        $TestCase::Go::Channel::RESULT->push($value1);
+        $RESULT->push($value1);
         
         my $value2 = (int)$ch->read(\$ok);
         
-        $TestCase::Go::Channel::RESULT->push(-3);
+        $RESULT->push(-3);
         
-        $TestCase::Go::Channel::RESULT->push($value2);
+        $RESULT->push($value2);
       });
       
       $ch->write(10);
       
-      $TestCase::Go::Channel::RESULT->push(-1);
+      $RESULT->push(-1);
       
-      $TestCase::Go::Channel::RESULT->push($ch->len);
+      $RESULT->push($ch->len);
       
       $ch->write(11);
       
-      $TestCase::Go::Channel::RESULT->push(-4);
+      $RESULT->push(-4);
     });
     
     Go->gosched;
     
-    unless (Array->equals_int($TestCase::Go::Channel::RESULT->to_array, [-1, 1, -2, 0, 10, -3, 11, -4])) {
+    unless (Array->equals_int($RESULT->to_array, [-1, 1, -2, 0, 10, -3, 11, -4])) {
       return 0;
     }
     
-    $TestCase::Go::Channel::RESULT = undef;
+    $RESULT = undef;
     
     return 1;
   }
@@ -232,7 +232,7 @@ class TestCase::Go::Channel {
     }
     
     {
-      $TestCase::Go::Channel::RESULT = IntList->new;
+      $RESULT = IntList->new;
       
       Go->go(method : void () {
         
@@ -244,7 +244,7 @@ class TestCase::Go::Channel {
           
           $ch->write(1);
           
-          $TestCase::Go::Channel::RESULT->push($ch->len);
+          $RESULT->push($ch->len);
         });
         
         Go->sleep(0.1);
@@ -253,16 +253,16 @@ class TestCase::Go::Channel {
         
         $ch->read(\$ok);
         
-        $TestCase::Go::Channel::RESULT->push($ch->len);
+        $RESULT->push($ch->len);
       });
       
       Go->gosched;
       
-      unless (Array->equals_int($TestCase::Go::Channel::RESULT->to_array, [1, 0])) {
+      unless (Array->equals_int($RESULT->to_array, [1, 0])) {
         return 0;
       }
       
-      $TestCase::Go::Channel::RESULT = undef;
+      $RESULT = undef;
     }
     
     return 1;
@@ -296,7 +296,7 @@ class TestCase::Go::Channel {
     }
     
     {
-      $TestCase::Go::Channel::RESULT = IntList->new;
+      $RESULT = IntList->new;
       
       Go->go(method : void () {
         
@@ -317,25 +317,25 @@ class TestCase::Go::Channel {
         
         my $value1 = (int)$ch->read(\$ok);
         
-        $TestCase::Go::Channel::RESULT->push($value1);
+        $RESULT->push($value1);
         
-        $TestCase::Go::Channel::RESULT->push($ok);
+        $RESULT->push($ok);
         
         my $value2 = (int)$ch->read(\$ok);
         
-        $TestCase::Go::Channel::RESULT->push($value2);
+        $RESULT->push($value2);
         
-        $TestCase::Go::Channel::RESULT->push($ok);
+        $RESULT->push($ok);
         my $value3 = $ch->read(\$ok);
         
         if ($value3) {
-          $TestCase::Go::Channel::RESULT->push(1);
+          $RESULT->push(1);
         }
         else {
-          $TestCase::Go::Channel::RESULT->push(0);
+          $RESULT->push(0);
         }
         
-        $TestCase::Go::Channel::RESULT->push($ok);
+        $RESULT->push($ok);
       });
       
       Go->gosched;
@@ -347,11 +347,11 @@ class TestCase::Go::Channel {
         0, 0
       ];
       
-      unless (Array->equals_int($TestCase::Go::Channel::RESULT->to_array, $expected)) {
+      unless (Array->equals_int($RESULT->to_array, $expected)) {
         return 0;
       }
       
-      $TestCase::Go::Channel::RESULT = undef;
+      $RESULT = undef;
     }
     
     return 1;
