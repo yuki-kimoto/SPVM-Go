@@ -56,7 +56,7 @@ class Go::Schedule {
     return $status;
   }
   
-  private method schedule : int ($after : double = 0, $channel : Go::Channel = undef, $fd : int = -1, $is_write : int = 0, $value : object = undef) {
+  private method schedule : int ($after : double = 0, $channel : Go::Channel = undef, $fd : int = -1, $is_write : int = 0) {
     
     my $status = 0;
     
