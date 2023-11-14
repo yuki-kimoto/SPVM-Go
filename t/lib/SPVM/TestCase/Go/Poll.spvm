@@ -210,19 +210,6 @@ class TestCase::Go::Poll {
         }
       }
       else {
-        # TODO: This is ideally not needed, but Mac needs this logic.
-        while (1) {
-          my $connected = (Sys::Socket::Sockaddr)undef;
-          
-          eval { $connected = Sys->getpeername($socket); };
-          
-          if ($connected) {
-            last;
-          }
-          else {
-            Go->gosched;
-          }
-        }
         last;
       }
     }
