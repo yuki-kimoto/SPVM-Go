@@ -76,6 +76,10 @@ class Go::Schedule {
         
         my $now_nsec = 1000 * $now_tv->tv_usec;
         
+        unless ($after <= Fn->INT_MAX) {
+          die "\$after must be less than or equal to Fn->INT_MAX.";
+        }
+        
         my $after_sec = (int)$after;
         
         my $after_nsec = (int)(($after - $after_sec) * 1_000_000_000);
