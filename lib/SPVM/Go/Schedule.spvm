@@ -66,8 +66,15 @@ class Go::Schedule {
       
       my $schedule_task_coroutine = $self->{schedule_task_coroutine};
       
-      if ($after > 0) {
-        
+      unless ($after >= 0) {
+        die "\$after must be greater than or equal to 0.";
+      }
+      
+      unless ($after <= Fn->INT_MAX) {
+        die "\$after must be less than or equal to Fn->INT_MAX.";
+      }
+      
+      {
         my $now_tv = Sys::Time::Timeval->new;
         
         Sys::Time->gettimeofday($now_tv, undef);
@@ -75,10 +82,6 @@ class Go::Schedule {
         my $now_sec = $now_tv->tv_sec;
         
         my $now_nsec = 1000 * $now_tv->tv_usec;
-        
-        unless ($after <= Fn->INT_MAX) {
-          die "\$after must be less than or equal to Fn->INT_MAX.";
-        }
         
         my $after_sec = (int)$after;
         
