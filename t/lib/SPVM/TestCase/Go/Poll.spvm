@@ -8,6 +8,7 @@ class TestCase::Go::Poll {
   use Sys::Socket::Util;
   use Errno;
   use StringList;
+  use Sys::Socket::Errno;
   
   our $RESULT : StringList;
   
@@ -159,42 +160,6 @@ class TestCase::Go::Poll {
     return 1;
   }
   
-  static method EAGAIN : int () {
-    my $EAGAIN = 0;
-    if (Sys::OS->is_windows) {
-      $EAGAIN = Errno->WSAEWOULDBLOCK;
-    }
-    else {
-      $EAGAIN = Errno->EAGAIN;
-    }
-    
-    return $EAGAIN;
-  }
-  
-  static method EALREADY : int () {
-    my $EALREADY = 0;
-    if (Sys::OS->is_windows) {
-      $EALREADY = Errno->WSAEALREADY;
-    }
-    else {
-      $EALREADY = Errno->EALREADY;
-    }
-    
-    return $EALREADY;
-  }
-  
-  static method EINPROGRESS : int () {
-    my $EINPROGRESS = 0;
-    if (Sys::OS->is_windows) {
-      $EINPROGRESS = Errno->EINPROGRESS;
-    }
-    else {
-      $EINPROGRESS = Errno->EINPROGRESS;
-    }
-    
-    return $EINPROGRESS;
-  }
-  
   static method go_connect : int ($socket : int, $addr : Sys::Socket::Sockaddr, $timeout : int = 0) {
     
     my $recv_length = -1;
@@ -202,7 +167,7 @@ class TestCase::Go::Poll {
       eval { $recv_length = Sys->connect($socket, $addr); }
       
       if ($@) {
-        if (Sys::Socket->socket_errno == &EINPROGRESS || Sys::Socket->socket_errno == &EALREADY) {
+        if (Sys::Socket->socket_errno == Sys::Socket::Errno->EINPROGRESS || Sys::Socket->socket_errno == Sys::Socket::Errno->EALREADY) {
           Go->gosched_io_write($socket, $timeout);
         }
         else {
@@ -224,7 +189,7 @@ class TestCase::Go::Poll {
       eval { $recv_length = Sys->recv($socket, $buf, length $buf, 0); }
       
       if ($@) {
-        if (Sys::Socket->socket_errno == &EAGAIN) {
+        if (Sys::Socket->socket_errno == Sys::Socket::Errno->EWOULDBLOCK) {
           Go->gosched_io_read($socket, $timeout);
         }
         else {
@@ -247,7 +212,7 @@ class TestCase::Go::Poll {
       eval { $send_length = Sys->send($socket, $buf, 0, undef); }
       
       if ($@) {
-        if (Sys::Socket->socket_errno == &EAGAIN) {
+        if (Sys::Socket->socket_errno == Sys::Socket::Errno->EWOULDBLOCK) {
           
           Go->gosched_io_write($socket, $timeout);
         }
