@@ -162,24 +162,25 @@ class TestCase::Go::Poll {
   
   static method go_connect : int ($socket : int, $addr : Sys::Socket::Sockaddr, $timeout : int = 0) {
     
-    my $recv_length = -1;
-    while (1) {
-      eval { $recv_length = Sys->connect($socket, $addr); }
+    my $status = -1;
+    eval { $status = Sys->connect($socket, $addr); }
+    
+    if ($@) {
+      my $again = 
+        Sys::Socket->socket_errno == Sys::Socket::Errno->EWOULDBLOCK
+        || Sys::Socket->socket_errno == Sys::Socket::Errno->EINPROGRESS
+        || Sys::Socket->socket_errno == Sys::Socket::Errno->EALREADY
+      ;
       
-      if ($@) {
-        if (Sys::Socket->socket_errno == Sys::Socket::Errno->EINPROGRESS || Sys::Socket->socket_errno == Sys::Socket::Errno->EALREADY) {
-          Go->gosched_io_write($socket, $timeout);
-        }
-        else {
-          die $@;
-        }
+      if ($again) {
+        Go->gosched_io_write($socket, $timeout);
       }
       else {
-        last;
+        die $@;
       }
     }
     
-    return $recv_length;
+    return $status;
   }
   
   static method go_recv : int ($socket : int, $buf : mutable string, $count : int, $buf_offset : int = 0, $timeout : int = 0) {
