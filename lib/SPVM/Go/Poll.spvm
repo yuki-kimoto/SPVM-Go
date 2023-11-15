@@ -22,7 +22,7 @@ class Go::Poll {
     return $self;
   }
   
-  private method poll : Go::Coroutine[] () {
+  private method check : void () {
     my $poll_coroutines_h = $self->{coroutines_h};
     
     my $poll_coroutines_length = $poll_coroutines_h->keys_length;
@@ -79,7 +79,9 @@ class Go::Poll {
         }
         
         if ($ready) {
-          my $ready_coroutine = $poll_coroutines_h->delete($address);
+          my $ready_coroutine = (Go::Coroutine)$poll_coroutines_h->delete($address);
+          $ready_coroutine->{disable} = 0;
+          $ready_coroutine->{fd} = -1;
           $ready_coroutines_list->push($poll_coroutine);
         }
         else {
@@ -90,17 +92,13 @@ class Go::Poll {
             
             if ($is_over_deadline) {
               $poll_coroutine->{deadline_io_timeout} = undef;
+              $poll_coroutine->{disable} = 0;
               $poll_coroutine->{fd} = -1;
               $poll_coroutine->{io_timeout_occurred} = 1;
-              $ready_coroutines_list->push($poll_coroutine);
             }
           }
         }
       }
     }
-    
-    my $ready_coroutines = (Go::Coroutine[])$ready_coroutines_list->to_array;
-    
-    return $ready_coroutines;
   }
 }
