@@ -2,6 +2,7 @@ class TestCase::Go::WaitGroup {
   use Go;
   use Go::Sync::WaitGroup;
   use Thread;
+  use Sys;
   
   our $RESULT : IntList;
   
@@ -63,6 +64,8 @@ class TestCase::Go::WaitGroup {
         Fn->defer([$wg : Go::Sync::WaitGroup] method : void () {
           $wg->done;
         });
+        
+        Sys->sleep(1);
         
         $results->[0] = 1;
       });
