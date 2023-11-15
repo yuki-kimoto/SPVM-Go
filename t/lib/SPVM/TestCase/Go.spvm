@@ -2,6 +2,7 @@ class TestCase::Go {
   use Go;
   use Sys;
   use Point;
+  use Thread;
   
   our $RESULT : IntList;
   
@@ -122,6 +123,25 @@ class TestCase::Go {
     });
     
     Go->gosched;
+    
+    return 1;
+  }
+  
+  static method thread_exception : int () {
+    
+    my $error_ref = [(string)undef];
+    
+    my $thread = Thread->new([$error_ref : string[]] method : void () {
+      eval { Go->gosched; }
+      
+      $error_ref->[0] = $@;
+    });
+    
+    $thread->join;
+    
+    unless (Fn->contains($error_ref->[0], "The schedule method in the Go::Schedule class must be called from the main thread.")) {
+      return 0;
+    }
     
     return 1;
   }
