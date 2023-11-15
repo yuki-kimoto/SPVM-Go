@@ -231,7 +231,6 @@ class TestCase::Go::Poll {
       my $again = 
         Sys::Socket->socket_errno == Sys::Socket::Errno->EWOULDBLOCK
         || Sys::Socket->socket_errno == Sys::Socket::Errno->EINPROGRESS
-        || Sys::Socket->socket_errno == Sys::Socket::Errno->EALREADY
       ;
       
       if ($again) {
