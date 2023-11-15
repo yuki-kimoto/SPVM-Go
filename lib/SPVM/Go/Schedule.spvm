@@ -170,7 +170,7 @@ class Go::Schedule {
           }
           
           $current_coroutine->{deadline_base_io_timeout} = &create_deadline_base;
-          $current_coroutine->{io_timeout} = $timeout;
+          $current_coroutine->{io_timeout_ref} = $timeout_ref;
         }
       }
       else {
