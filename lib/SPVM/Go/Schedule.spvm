@@ -127,16 +127,8 @@ class Go::Schedule {
       
       my $schedule_task_coroutine = $self->{schedule_task_coroutine};
       
-      unless ($after >= 0) {
-        die "\$after must be greater than or equal to 0.";
-      }
-      
       unless ($after <= Fn->INT_MAX) {
         die "\$after must be less than or equal to Fn->INT_MAX.";
-      }
-      
-      unless ($timeout >= 0) {
-        die "\$timeout must be greater than or equal to 0.";
       }
       
       unless ($timeout <= Fn->INT_MAX) {
