@@ -143,6 +143,33 @@ class Go::Schedule {
     return $is_over_deadline;
   }
   
+  private static method is_over_deadline_v2 : int ($deadline_base : Sys::Time::Timespec, $after : double) {
+    
+    unless ($deadline_base) {
+      die "\$deadline_base must be defined.";
+    }
+    
+    my $deadline = Go::Schedule->create_deadline_v2($deadline_base, $after);
+    
+    my $now_tv = Sys::Time::Timeval->new;
+    
+    my $is_over_deadline = 0;
+    
+    Sys::Time->gettimeofday($now_tv, undef);
+    
+    my $now_sec = $now_tv->tv_sec;
+    my $now_nsec = 1000 * $now_tv->tv_usec;
+    
+    my $deadline_sec = $deadline->tv_sec;
+    my $deadline_nsec = $deadline->tv_nsec;
+    
+    if ($now_sec > $deadline_sec || ($now_sec == $deadline_sec && $now_nsec > $deadline_nsec)) {
+      $is_over_deadline = 1;
+    }
+    
+    return $is_over_deadline;
+  }
+  
   # Instance Methods
   private method schedule_io_read : int ($fd : int, , $timeout_ref : double[] = undef) {
     
