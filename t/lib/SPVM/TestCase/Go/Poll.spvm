@@ -235,7 +235,8 @@ class TestCase::Go::Poll {
       ;
       
       if ($again) {
-        my $status = Go->gosched_io_write($socket, $timeout);
+        my $timeout_ref = [$timeout];
+        my $status = Go->gosched_io_write($socket, $timeout_ref);
         unless ($status == 0) {
           $status = -1;
         }
@@ -256,7 +257,8 @@ class TestCase::Go::Poll {
       
       if ($@) {
         if (Sys::Socket->socket_errno == Sys::Socket::Errno->EWOULDBLOCK || Sys::Socket->socket_errno == Errno->EINTR) {
-          my $status = Go->gosched_io_read($socket, $timeout);
+          my $timeout_ref = [$timeout];
+          my $status = Go->gosched_io_read($socket, $timeout_ref);
           unless ($status == 0) {
             $recv_length = -1;
             last;
@@ -283,7 +285,8 @@ class TestCase::Go::Poll {
       
       if ($@) {
         if (Sys::Socket->socket_errno == Sys::Socket::Errno->EWOULDBLOCK || Sys::Socket->socket_errno == Errno->EINTR) {
-          my $status = Go->gosched_io_write($socket, $timeout);
+          my $timeout_ref = [$timeout];
+          my $status = Go->gosched_io_write($socket, $timeout_ref);
           unless ($status == 0) {
             $send_length = -1;
             last;

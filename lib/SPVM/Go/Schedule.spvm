@@ -144,29 +144,29 @@ class Go::Schedule {
   }
   
   # Instance Methods
-  private method schedule_io_read : int ($fd : int, $timeout : double = 0) {
+  private method schedule_io_read : int ($fd : int, , $timeout_ref : double[] = undef) {
     
     my $after = 0;
     
     my $is_write = 0;
     
-    my $status = $self->schedule($after, $fd, $is_write, $timeout);
+    my $status = $self->schedule($after, $fd, $is_write, $timeout_ref);
     
     return $status;
   }
   
-  private method schedule_io_write : int ($fd : int, $timeout : double = 0) {
+  private method schedule_io_write : int ($fd : int, , $timeout_ref : double[] = undef) {
     
     my $after = 0;
     
     my $is_write = 1;
     
-    my $status = $self->schedule($after, $fd, $is_write, $timeout);
+    my $status = $self->schedule($after, $fd, $is_write, $timeout_ref);
     
     return $status;
   }
   
-  private method schedule : int ($after : double = 0, $fd : int = -1, $is_write : int = 0, $timeout : double = 0) {
+  private method schedule : int ($after : double = 0, $fd : int = -1, $is_write : int = 0, $timeout_ref : double[] = undef) {
     
     my $status = 0;
     
@@ -180,26 +180,37 @@ class Go::Schedule {
         die "\$after must be less than or equal to Fn->INT_MAX.";
       }
       
-      unless ($timeout <= Fn->INT_MAX) {
-        die "\$timeout must be less than or equal to Fn->INT_MAX.";
+      if ($fd >= 0 && $after > 0) {
+        die "The arguments must not both \$fd is greater than or equal to 0 and \$after is greater than 0.";
       }
       
-      if ($after > 0 && $timeout > 0) {
-        die "Both \$after and $timeout cannot be greater than 0.";
+      # IO
+      if ($fd >= 0) {
+        $current_coroutine->{fd} = $fd;
+        
+        $current_coroutine->{is_write} = (byte)$is_write;
+        
+        # IO timeout
+        if ($timeout_ref) {
+          my $timeout = $timeout_ref->[0];
+          
+          unless ($timeout <= Fn->INT_MAX) {
+            die "\$timeout must be less than or equal to Fn->INT_MAX.";
+          }
+          
+          $current_coroutine->{deadline_base_io_timeout} = &create_deadline_base;
+          $current_coroutine->{io_timeout} = $timeout;
+        }
       }
-      
-      if ($after > 0) {
-        $current_coroutine->{deadline_base_timer} = &create_deadline_base;
-        $current_coroutine->{after} = $after;
+      else {
+        $current_coroutine->{fd} = -1;
+        
+        # Timer
+        if ($after > 0) {
+          $current_coroutine->{deadline_base_timer} = &create_deadline_base;
+          $current_coroutine->{after} = $after;
+        }
       }
-      elsif ($timeout > 0) {
-        $current_coroutine->{deadline_base_io_timeout} = &create_deadline_base;
-        $current_coroutine->{io_timeout} = $timeout;
-      }
-      
-      $current_coroutine->{fd} = $fd;
-      
-      $current_coroutine->{is_write} = (byte)$is_write;
       
       Go::Coroutine->transfer($current_coroutine, $schedule_task_coroutine);
       
