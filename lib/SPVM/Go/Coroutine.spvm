@@ -22,6 +22,8 @@ class Go::Coroutine : pointer {
   
   has deadline_timer : Sys::Time::Timespec;
   
+  has deadline_io_timeout : Sys::Time::Timespec;
+  
   has fd : int;
   
   has is_write : byte;
