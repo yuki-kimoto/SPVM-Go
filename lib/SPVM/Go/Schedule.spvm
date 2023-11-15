@@ -59,13 +59,38 @@ class Go::Schedule {
       $deadline_nsec -= 1_000_000_000;
     }
     
-    my $deadline_ts = Sys::Time::Timespec->new;
+    my $deadline = Sys::Time::Timespec->new;
     
-    $deadline_ts->set_tv_sec($deadline_sec);
+    $deadline->set_tv_sec($deadline_sec);
     
-    $deadline_ts->set_tv_nsec($deadline_nsec);
+    $deadline->set_tv_nsec($deadline_nsec);
     
-    return $deadline_ts;
+    return $deadline;
+  }
+  
+  private static method is_over_deadline : int ($deadline : Sys::Time::Timespec) {
+    
+    unless ($deadline) {
+      die "\$deadline must be defined.";
+    }
+    
+    my $now_tv = Sys::Time::Timeval->new;
+    
+    my $is_over_deadline = 0;
+    
+    Sys::Time->gettimeofday($now_tv, undef);
+    
+    my $now_sec = $now_tv->tv_sec;
+    my $now_nsec = 1000 * $now_tv->tv_usec;
+    
+    my $deadline_sec = $deadline->tv_sec;
+    my $deadline_nsec = $deadline->tv_nsec;
+    
+    if ($now_sec > $deadline_sec || ($now_sec == $deadline_sec && $now_nsec > $deadline_nsec)) {
+      $is_over_deadline = 1;
+    }
+    
+    return $is_over_deadline;
   }
   
   # Instance Methods
