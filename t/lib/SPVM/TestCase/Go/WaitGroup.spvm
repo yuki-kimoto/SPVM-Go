@@ -52,6 +52,36 @@ class TestCase::Go::WaitGroup {
   
   static method thread_safe : int () {
     
+    my $results = new int[2];
+    
+    Go->go([$results : int[]] method : void () {
+      my $wg = Go::Sync::WaitGroup->new;
+      
+      $wg->add(2);
+      
+      my $thread0 = Thread->new([$wg : Go::Sync::WaitGroup, $results : int[]] method : void () {
+        Fn->defer([$wg : Go::Sync::WaitGroup] method : void () {
+          $wg->done;
+        });
+        
+        $results->[0] = 1;
+      });
+      
+      my $thread1 = Thread->new([$wg : Go::Sync::WaitGroup, $results : int[]] method : void () {
+        Fn->defer([$wg : Go::Sync::WaitGroup] method : void () {
+          $wg->done;
+        });
+        
+        $results->[1] = 2;
+      });
+      
+      $wg->wait;
+      
+      $thread0->join;
+      $thread1->join;
+      
+    });
+    
     Go->go(method : void () {
       my $wg = Go::Sync::WaitGroup->new;
       
@@ -106,6 +136,10 @@ class TestCase::Go::WaitGroup {
     });
     
     Go->gosched;
+    
+    unless (Array->equals_int($results, [1, 2])) {
+      return 0;
+    }
     
     return 1;
   }
