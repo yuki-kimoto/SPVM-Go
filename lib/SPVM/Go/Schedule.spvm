@@ -124,6 +124,9 @@ class Go::Schedule {
       if ($after > 0) {
         $current_coroutine->{deadline_timer} = &create_deadline($after);
       }
+      elsif ($timeout > 0) {
+        $current_coroutine->{deadline_io_timeout} = &create_deadline($timeout);
+      }
       
       $current_coroutine->{fd} = $fd;
       
