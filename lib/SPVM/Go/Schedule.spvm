@@ -124,31 +124,25 @@ class Go::Schedule {
   }
   
   # Instance Methods
-  private method schedule_io_read : int ($fd : int, , $timeout_ref : double[] = undef) {
+  private method schedule_io_read : void ($fd : int, , $timeout_ref : double[] = undef) {
     
     my $after = 0;
     
     my $is_write = 0;
     
-    my $status = $self->schedule($after, $fd, $is_write, $timeout_ref);
-    
-    return $status;
+    $self->schedule($after, $fd, $is_write, $timeout_ref);
   }
   
-  private method schedule_io_write : int ($fd : int, , $timeout_ref : double[] = undef) {
+  private method schedule_io_write : void ($fd : int, , $timeout_ref : double[] = undef) {
     
     my $after = 0;
     
     my $is_write = 1;
     
-    my $status = $self->schedule($after, $fd, $is_write, $timeout_ref);
-    
-    return $status;
+    $self->schedule($after, $fd, $is_write, $timeout_ref);
   }
   
   private method schedule : int ($after : double = 0, $fd : int = -1, $is_write : int = 0, $timeout_ref : double[] = undef) {
-    
-    my $status = 0;
     
     my $current_coroutine = $self->{current_coroutine};
     
@@ -224,8 +218,6 @@ class Go::Schedule {
       
       $schedule_task_coroutine->{task} = undef;
     }
-    
-    return $status;
   }
   
   private method add_task : void ($task : Callback) {

@@ -48,40 +48,32 @@ class Go {
     return $select;
   }
   
-  static method gosched : int () {
+  static method gosched : void () {
     
     my $schedule = $GO->{schedule};
     
-    my $status = $schedule->schedule;
-    
-    return $status;
+    $schedule->schedule;
   }
   
-  static method sleep : int ($seconds : double = 0) {
+  static method sleep : void ($seconds : double = 0) {
     
     my $schedule = $GO->{schedule};
     
-    my $status = $schedule->schedule($seconds);
-    
-    return $status;
+    $schedule->schedule($seconds);
   }
   
-  static method gosched_io_read : int ($fd : int, $timeout_ref : double[] = undef) {
+  static method gosched_io_read : void ($fd : int, $timeout_ref : double[] = undef) {
     
     my $schedule = $GO->{schedule};
     
-    my $status = $schedule->schedule_io_read($fd, $timeout_ref);
-    
-    return $status;
+    $schedule->schedule_io_read($fd, $timeout_ref);
   }
   
-  static method gosched_io_write : int ($fd : int, $timeout_ref : double[] = undef) {
+  static method gosched_io_write : void ($fd : int, $timeout_ref : double[] = undef) {
     
     my $schedule = $GO->{schedule};
     
-    my $status = $schedule->schedule_io_write($fd, $timeout_ref);
-    
-    return $status;
+    $schedule->schedule_io_write($fd, $timeout_ref);
   }
   
   private method DESTROY : void () {

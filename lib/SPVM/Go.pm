@@ -58,7 +58,7 @@ Creats a new L<Go::Select|SPVM::Go::Select> object.
 
 =head2 gosched
 
-C<static method gosched : int ();>
+C<static method gosched : void ();>
 
 Suspends the current goroutine.
 
@@ -66,23 +66,27 @@ The control is transferred to the scheduler.
 
 =head2 gosched_io_read
 
-C<static method gosched_io_read : int ($fd : int, $timeout : double = 0);>
+C<static method gosched_io_read : void ($fd : int, $timeout_ref : double[] = undef);>
 
-Suspends the current goroutine for IO reading given the file descriptor $fd and the timeout $timeout.
+Suspends the current goroutine for IO reading given the file descriptor $fd and the value of the timeout reference $timeout_ref.
 
 The control is transferred to the scheduler.
+
+The value of $timeout_ref is updated by the rest timeout. If it is less than 0, timeout has occured.
 
 =head2 gosched_io_write
 
-C<static method gosched_io_write : int ($fd : int, $timeout : double = 0);>
+C<static method gosched_io_write : void ($fd : int, $timeout_ref : double[] = undef);>
 
-Suspends the current goroutine for IO writing given the file descriptor $fd and the timeout $timeout.
+Suspends the current goroutine for IO writing given the file descriptor $fd and the value of the timeout reference $timeout_ref.
 
 The control is transferred to the scheduler.
 
+The value of $timeout_ref is updated by the rest timeout. If it is less than 0, timeout has occured.
+
 =head2 sleep
 
-C<static method sleep : int ($seconds : double = 0);>
+C<static method sleep : void ($seconds : double = 0);>
 
 Sleeps the seconds $seconds.
 
