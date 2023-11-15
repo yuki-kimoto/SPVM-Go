@@ -23,6 +23,7 @@ class Go::Schedule {
   
   has poll : Go::Poll;
   
+  # Class Methods
   private static method new : Go::Schedule () {
     
     my $self = new Go::Schedule;
@@ -36,6 +37,38 @@ class Go::Schedule {
     return $self;
   }
   
+  private static method create_deadline : Sys::Time::Timespec ($after : double) {
+    my $now_tv = Sys::Time::Timeval->new;
+    
+    Sys::Time->gettimeofday($now_tv, undef);
+    
+    my $now_sec = $now_tv->tv_sec;
+    
+    my $now_nsec = 1000 * $now_tv->tv_usec;
+    
+    my $after_sec = (int)$after;
+    
+    my $after_nsec = (int)(($after - $after_sec) * 1_000_000_000);
+    
+    my $deadline_sec = $now_sec + $after_sec;
+    
+    my $deadline_nsec = $now_nsec + $after_nsec;
+    
+    if ($deadline_nsec >= 1_000_000_000) {
+      $deadline_sec += 1;
+      $deadline_nsec -= 1_000_000_000;
+    }
+    
+    my $deadline_ts = Sys::Time::Timespec->new;
+    
+    $deadline_ts->set_tv_sec($deadline_sec);
+    
+    $deadline_ts->set_tv_nsec($deadline_nsec);
+    
+    return $deadline_ts;
+  }
+  
+  # Instance Methods
   private method schedule_io_read : int ($fd : int, $timeout : double = 0) {
     
     my $after = 0;
@@ -89,34 +122,7 @@ class Go::Schedule {
       }
       
       if ($after > 0) {
-        my $now_tv = Sys::Time::Timeval->new;
-        
-        Sys::Time->gettimeofday($now_tv, undef);
-        
-        my $now_sec = $now_tv->tv_sec;
-        
-        my $now_nsec = 1000 * $now_tv->tv_usec;
-        
-        my $after_sec = (int)$after;
-        
-        my $after_nsec = (int)(($after - $after_sec) * 1_000_000_000);
-        
-        my $deadline_timer_sec = $now_sec + $after_sec;
-        
-        my $deadline_timer_nsec = $now_nsec + $after_nsec;
-        
-        if ($deadline_timer_nsec >= 1_000_000_000) {
-          $deadline_timer_sec += 1;
-          $deadline_timer_nsec -= 1_000_000_000;
-        }
-        
-        my $deadline_timer_ts = Sys::Time::Timespec->new;
-        
-        $deadline_timer_ts->set_tv_sec($deadline_timer_sec);
-        
-        $deadline_timer_ts->set_tv_nsec($deadline_timer_nsec);
-        
-        $current_coroutine->{deadline_timer} = $deadline_timer_ts;
+        $current_coroutine->{deadline_timer} = &create_deadline($after);
       }
       
       $current_coroutine->{fd} = $fd;
