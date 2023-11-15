@@ -64,6 +64,22 @@ Suspends the current goroutine.
 
 The control is transferred to the scheduler.
 
+=head2 gosched_io_read
+
+C<static method gosched_io_read : int ($fd : int, $timeout : double = 0);>
+
+Suspends the current goroutine for IO reading given the file descriptor $fd and the timeout $timeout.
+
+The control is transferred to the scheduler.
+
+=head2 gosched_io_write
+
+C<static method gosched_io_write : int ($fd : int, $timeout : double = 0);>
+
+Suspends the current goroutine for IO writing given the file descriptor $fd and the timeout $timeout.
+
+The control is transferred to the scheduler.
+
 =head2 sleep
 
 C<static method sleep : int ($seconds : double = 0);>
