@@ -6,6 +6,7 @@ class Go::Schedule {
   allow Go::Schedule::Task;
   allow Go::Channel;
   allow Go::Select;
+  allow Go::Poll;
   
   use Go::Coroutine;
   use List;

@@ -82,6 +82,20 @@ class Go::Poll {
           my $ready_coroutine = $poll_coroutines_h->delete($address);
           $ready_coroutines_list->push($poll_coroutine);
         }
+        else {
+          my $deadline_io_timeout = $poll_coroutine->{deadline_io_timeout};
+          
+          if ($deadline_io_timeout) {
+            my $is_over_deadline = Go::Schedule->is_over_deadline($deadline_io_timeout);
+            
+            if ($is_over_deadline) {
+              $poll_coroutine->{deadline_io_timeout} = undef;
+              $poll_coroutine->{fd} = -1;
+              $poll_coroutine->{io_timeout_occurred} = 1;
+              $ready_coroutines_list->push($poll_coroutine);
+            }
+          }
+        }
       }
     }
     
