@@ -93,13 +93,9 @@ class TestCase::Go::Poll {
     
     Go->gosched;
     
-    warn dump $RESULTS->[0]->to_array;
-    
     unless (Array->equals_string($RESULTS->[0]->to_array, ["4", "2", "0", "3", "abc", "3", "def", "0"])) {
       return 0;
     }
-    
-    warn dump $RESULTS->[1]->to_array;
     
     unless (Array->equals_string($RESULTS->[2]->to_array, ["1"])) {
       return 0;

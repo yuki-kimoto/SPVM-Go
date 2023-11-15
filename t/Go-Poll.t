@@ -39,8 +39,6 @@ my $start_memory_blocks_count = SPVM::api->get_memory_blocks_count();
   ok(SPVM::TestCase::Go::Poll->parallel($server->port));
 }
 
-=cut
-
 {
   my $server = TestUtil::ServerRunner->new(
     code => sub {
