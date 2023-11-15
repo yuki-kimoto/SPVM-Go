@@ -22,8 +22,6 @@ class Go::Coroutine : pointer {
   
   has deadline_base_timer : Sys::Time::Timespec;
   
-  has deadline_timer : Sys::Time::Timespec;
-  
   has after : double;
   
   has deadline_base_io_timeout : Sys::Time::Timespec;

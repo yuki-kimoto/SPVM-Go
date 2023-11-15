@@ -65,7 +65,6 @@ class Go::Schedule::Task {
             $is_over_deadline = Go::Schedule->is_over_deadline($deadline_timer);
             
             if ($is_over_deadline) {
-              $coroutine->{deadline_timer} = undef;
               $coroutine->{deadline_base_timer} = undef;
             }
             else {

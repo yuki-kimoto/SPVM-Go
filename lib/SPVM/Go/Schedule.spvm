@@ -191,8 +191,6 @@ class Go::Schedule {
       if ($after > 0) {
         $current_coroutine->{deadline_base_timer} = &create_deadline_base;
         $current_coroutine->{after} = $after;
-        
-        $current_coroutine->{deadline_timer} = &create_deadline_v2($current_coroutine->{deadline_base_timer}, $after);
       }
       elsif ($timeout > 0) {
         $current_coroutine->{deadline_base_io_timeout} = &create_deadline_base;
