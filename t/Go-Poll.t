@@ -13,8 +13,6 @@ use SPVM 'TestCase::Go::Poll';
 # Start objects count
 my $start_memory_blocks_count = SPVM::api->get_memory_blocks_count();
 
-=pod
-
 {
   my $server = TestUtil::ServerRunner->new(
     code => sub {
