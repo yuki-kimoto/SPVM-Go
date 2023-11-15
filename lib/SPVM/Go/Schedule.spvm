@@ -38,38 +38,25 @@ class Go::Schedule {
     return $self;
   }
   
-  private static method create_deadline : Sys::Time::Timespec ($after : double) {
+  private static method create_deadline_base : Sys::Time::Timespec () {
     my $now_tv = Sys::Time::Timeval->new;
     
     Sys::Time->gettimeofday($now_tv, undef);
     
-    my $now_sec = $now_tv->tv_sec;
+    my $deadline_base_sec = $now_tv->tv_sec;
     
-    my $now_nsec = 1000 * $now_tv->tv_usec;
+    my $deadline_base_nsec = 1000 * $now_tv->tv_usec;
     
-    my $after_sec = (int)$after;
+    my $deadline_base = Sys::Time::Timespec->new;
     
-    my $after_nsec = (int)(($after - $after_sec) * 1_000_000_000);
+    $deadline_base->set_tv_sec($deadline_base_sec);
     
-    my $deadline_sec = $now_sec + $after_sec;
+    $deadline_base->set_tv_nsec($deadline_base_nsec);
     
-    my $deadline_nsec = $now_nsec + $after_nsec;
-    
-    if ($deadline_nsec >= 1_000_000_000) {
-      $deadline_sec += 1;
-      $deadline_nsec -= 1_000_000_000;
-    }
-    
-    my $deadline = Sys::Time::Timespec->new;
-    
-    $deadline->set_tv_sec($deadline_sec);
-    
-    $deadline->set_tv_nsec($deadline_nsec);
-    
-    return $deadline;
+    return $deadline_base;
   }
   
-  private static method create_deadline_v2 : Sys::Time::Timespec ($deadline_base : Sys::Time::Timespec, $after : double) {
+  private static method create_deadline : Sys::Time::Timespec ($deadline_base : Sys::Time::Timespec, $after : double) {
     my $now_tv = Sys::Time::Timeval->new;
     
     Sys::Time->gettimeofday($now_tv, undef);
@@ -100,56 +87,13 @@ class Go::Schedule {
     return $deadline;
   }
   
-  private static method create_deadline_base : Sys::Time::Timespec () {
-    my $now_tv = Sys::Time::Timeval->new;
-    
-    Sys::Time->gettimeofday($now_tv, undef);
-    
-    my $deadline_base_sec = $now_tv->tv_sec;
-    
-    my $deadline_base_nsec = 1000 * $now_tv->tv_usec;
-    
-    my $deadline_base = Sys::Time::Timespec->new;
-    
-    $deadline_base->set_tv_sec($deadline_base_sec);
-    
-    $deadline_base->set_tv_nsec($deadline_base_nsec);
-    
-    return $deadline_base;
-  }
-  
-  private static method is_over_deadline : int ($deadline : Sys::Time::Timespec) {
-    
-    unless ($deadline) {
-      die "\$deadline must be defined.";
-    }
-    
-    my $now_tv = Sys::Time::Timeval->new;
-    
-    my $is_over_deadline = 0;
-    
-    Sys::Time->gettimeofday($now_tv, undef);
-    
-    my $now_sec = $now_tv->tv_sec;
-    my $now_nsec = 1000 * $now_tv->tv_usec;
-    
-    my $deadline_sec = $deadline->tv_sec;
-    my $deadline_nsec = $deadline->tv_nsec;
-    
-    if ($now_sec > $deadline_sec || ($now_sec == $deadline_sec && $now_nsec > $deadline_nsec)) {
-      $is_over_deadline = 1;
-    }
-    
-    return $is_over_deadline;
-  }
-  
-  private static method is_over_deadline_v2 : int ($deadline_base : Sys::Time::Timespec, $after : double) {
+  private static method is_over_deadline : int ($deadline_base : Sys::Time::Timespec, $after : double) {
     
     unless ($deadline_base) {
       die "\$deadline_base must be defined.";
     }
     
-    my $deadline = Go::Schedule->create_deadline_v2($deadline_base, $after);
+    my $deadline = Go::Schedule->create_deadline($deadline_base, $after);
     
     my $now_tv = Sys::Time::Timeval->new;
     
