@@ -15,6 +15,8 @@ class Go::Schedule {
   use Sys::Time::Timeval;
   use Sys::Time::Timespec;
   use Go::Poll;
+  use Thread::ID;
+  use Thread::ThisThread;
   
   has coroutines : List of Go::Coroutine;
   
@@ -23,6 +25,8 @@ class Go::Schedule {
   has schedule_task_coroutine : Go::Coroutine;
   
   has poll : Go::Poll;
+  
+  has thread_id : Thread::ID;
   
   # Class Methods
   private static method new : Go::Schedule () {
@@ -34,6 +38,8 @@ class Go::Schedule {
     $self->{coroutines} = $coroutines;
     
     $self->{poll} = Go::Poll->new;
+    
+    $self->{thread_id} = Thread::ThisThread->get_id;
     
     return $self;
   }
