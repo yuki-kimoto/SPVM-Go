@@ -150,6 +150,12 @@ class Go::Schedule {
   
   private method schedule : int ($after : double = 0, $fd : int = -1, $is_write : int = 0, $timeout_ref : double[] = undef) {
     
+    my $called_from_main_thread = Thread::ID->eq(Thread::ThisThread->get_id, $self->{thread_id});
+    
+    unless ($called_from_main_thread) {
+      die "The schedule method in the Go::Schedule class must be called from the main thread.";
+    }
+    
     my $current_coroutine = $self->{current_coroutine};
     
     if ($current_coroutine) {

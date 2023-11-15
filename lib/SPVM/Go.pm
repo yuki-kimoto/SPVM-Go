@@ -64,6 +64,10 @@ Suspends the current goroutine.
 
 The control is transferred to the scheduler.
 
+Exceptions:
+
+This method must be called from the main thread. Otherwise an exception is thrown.
+
 =head2 gosched_io_read
 
 C<static method gosched_io_read : void ($fd : int, $timeout_ref : double[] = undef);>
@@ -73,6 +77,10 @@ Suspends the current goroutine for IO reading given the file descriptor $fd and 
 The control is transferred to the scheduler.
 
 The value of $timeout_ref is updated by the rest timeout. If it is less than 0, timeout has occured.
+
+Exceptions:
+
+This method must be called from the main thread. Otherwise an exception is thrown.
 
 =head2 gosched_io_write
 
@@ -84,11 +92,19 @@ The control is transferred to the scheduler.
 
 The value of $timeout_ref is updated by the rest timeout. If it is less than 0, timeout has occured.
 
+Exceptions:
+
+This method must be called from the main thread. Otherwise an exception is thrown.
+
 =head2 sleep
 
 C<static method sleep : void ($seconds : double = 0);>
 
 Sleeps the seconds $seconds.
+
+Exceptions:
+
+This method must be called from the main thread. Otherwise an exception is thrown.
 
 =head1 Repository
 
