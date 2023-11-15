@@ -76,7 +76,19 @@ class Go::Schedule {
         die "\$after must be less than or equal to Fn->INT_MAX.";
       }
       
-      {
+      unless ($timeout >= 0) {
+        die "\$timeout must be greater than or equal to 0.";
+      }
+      
+      unless ($timeout <= Fn->INT_MAX) {
+        die "\$timeout must be less than or equal to Fn->INT_MAX.";
+      }
+      
+      if ($after > 0 && $timeout > 0) {
+        die "Both \$after and $timeout cannot be greater than 0.";
+      }
+      
+      if ($after > 0) {
         my $now_tv = Sys::Time::Timeval->new;
         
         Sys::Time->gettimeofday($now_tv, undef);
