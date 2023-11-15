@@ -38,23 +38,27 @@ class Go::Schedule {
   
   private method schedule_io_read : int ($fd : int, $timeout : double = 0) {
     
+    my $after = 0;
+    
     my $is_write = 0;
     
-    my $status = $self->schedule($timeout, $fd, $is_write);
+    my $status = $self->schedule($after, $fd, $is_write, $timeout);
     
     return $status;
   }
   
   private method schedule_io_write : int ($fd : int, $timeout : double = 0) {
     
+    my $after = 0;
+    
     my $is_write = 1;
     
-    my $status = $self->schedule($timeout, $fd, $is_write);
+    my $status = $self->schedule($after, $fd, $is_write, $timeout);
     
     return $status;
   }
   
-  private method schedule : int ($after : double = 0, $fd : int = -1, $is_write : int = 0) {
+  private method schedule : int ($after : double = 0, $fd : int = -1, $is_write : int = 0, $timeout : double = 0) {
     
     my $status = 0;
     
