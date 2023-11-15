@@ -1,3 +1,6 @@
+0.003 2023-11-15
+  [Requirement Changes]
+    * Require SPVM::Thread 0.001.
 0.002 2023-11-14
   [Requirement Changes]
     * Require SPVM 0.989061.
