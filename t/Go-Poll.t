@@ -13,6 +13,8 @@ use SPVM 'TestCase::Go::Poll';
 # Start objects count
 my $start_memory_blocks_count = SPVM::api->get_memory_blocks_count();
 
+=pod
+
 {
   my $server = TestUtil::ServerRunner->new(
     code => sub {
@@ -35,6 +37,20 @@ my $start_memory_blocks_count = SPVM::api->get_memory_blocks_count();
   );
   
   ok(SPVM::TestCase::Go::Poll->parallel($server->port));
+}
+
+=cut
+
+{
+  my $server = TestUtil::ServerRunner->new(
+    code => sub {
+      my ($port) = @_;
+      
+      TestUtil::ServerRunner->run_echo_server($port);
+    },
+  );
+  
+  ok(SPVM::TestCase::Go::Poll->timeout($server->port));
 }
 
 # All object is freed

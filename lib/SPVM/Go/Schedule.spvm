@@ -103,6 +103,8 @@ class Go::Schedule {
     
     my $status = $self->schedule($after, $fd, $is_write, $timeout);
     
+    warn $status;
+    
     return $status;
   }
   
@@ -113,6 +115,8 @@ class Go::Schedule {
     my $is_write = 1;
     
     my $status = $self->schedule($after, $fd, $is_write, $timeout);
+    
+    warn $status;
     
     return $status;
   }
@@ -161,6 +165,7 @@ class Go::Schedule {
       Go::Coroutine->transfer($current_coroutine, $schedule_task_coroutine);
       
       if ($current_coroutine->{io_timeout_occurred}) {
+        warn;
         $current_coroutine->{io_timeout_occurred} = 0;
         $status = 1;
       }

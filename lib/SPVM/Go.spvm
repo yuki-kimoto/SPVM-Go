@@ -72,6 +72,8 @@ class Go {
     
     my $status = $schedule->schedule_io_read($fd, $timeout);
     
+    warn $status;
+    
     return $status;
   }
   
@@ -80,6 +82,8 @@ class Go {
     my $schedule = $GO->{schedule};
     
     my $status = $schedule->schedule_io_write($fd, $timeout);
+    
+    warn $status;
     
     return $status;
   }

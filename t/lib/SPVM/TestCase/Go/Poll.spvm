@@ -69,7 +69,54 @@ class TestCase::Go::Poll {
     return 1;
   }
   
-  static method go_send_and_recv : int ($port : int, $id : int) {
+  static method timeout : int ($port : int) {
+    
+    $RESULTS = new StringList[3];
+    
+    $RESULTS->[0] = StringList->new;
+    
+    $RESULTS->[1] = StringList->new;
+    
+    $RESULTS->[2] = StringList->new;
+    
+    Go->go([$port : int] method : void () {
+      my $id = 0;
+      &go_send_and_recv($port, $id, 2, 0);
+    });
+    
+    Go->go([$port : int] method : void () {
+      my $id = 1;
+      my $status = &go_send_and_recv($port, $id, 0, 1);
+      
+      $RESULTS->[2]->push($status);
+    });
+    
+    Go->gosched;
+    
+    warn dump $RESULTS->[0]->to_array;
+    
+    unless (Array->equals_string($RESULTS->[0]->to_array, ["4", "2", "0", "3", "abc", "3", "def", "0"])) {
+      return 0;
+    }
+    
+    warn dump $RESULTS->[1]->to_array;
+    
+    unless (Array->equals_string($RESULTS->[2]->to_array, ["1"])) {
+      return 0;
+    }
+    
+    unless (Array->equals_string($RESULTS->[1]->to_array, ["4", "2", "0"])) {
+      return 0;
+    }
+    
+    $RESULTS = undef;
+    
+    return 1;
+  }
+  
+  static method go_send_and_recv : int ($port : int, $id : int, $sleep_after_connect : double = 0, $timeout : double = 0) {
+    
+    my $status = 0;
     
     my $socket_domain = SOCKET->AF_INET;
     
@@ -112,6 +159,10 @@ class TestCase::Go::Poll {
     # Connect
     my $status_connect = &go_connect($socket, $sockaddr);
     
+    if ($sleep_after_connect > 0) {
+      Go->sleep($sleep_after_connect);
+    }
+    
     {
       my $send_buffer = "abcd";
       
@@ -135,7 +186,11 @@ class TestCase::Go::Poll {
     {
       my $recv_buffer = (mutable string)new_string_len 3;
       
-      my $recv_length = &go_recv($socket, $recv_buffer, length $recv_buffer, 0);
+      my $recv_length = &go_recv($socket, $recv_buffer, length $recv_buffer, 0, $timeout);
+      
+      if ($recv_length < 0) {
+        return 1;
+      }
       
       $RESULTS->[$id]->push($recv_length);
       
@@ -145,7 +200,12 @@ class TestCase::Go::Poll {
     {
       my $recv_buffer = (mutable string)new_string_len 3;
       
-      my $recv_length = &go_recv($socket, $recv_buffer, length $recv_buffer, 0);
+      my $recv_length = &go_recv($socket, $recv_buffer, length $recv_buffer, 0, $timeout);
+      
+      if ($recv_length < 0) {
+        return 1;
+      }
+      
       $RESULTS->[$id]->push($recv_length);
       
       $RESULTS->[$id]->push($recv_buffer);
@@ -154,13 +214,19 @@ class TestCase::Go::Poll {
     {
       my $recv_buffer = (mutable string)new_string_len 3;
       
-      my $recv_length = &go_recv($socket, $recv_buffer, length $recv_buffer, 0);
+      my $recv_length = &go_recv($socket, $recv_buffer, length $recv_buffer, 0, $timeout);
+      
+      if ($recv_length < 0) {
+        return 1;
+      }
+      
       $RESULTS->[$id]->push($recv_length);
     }
-    return 1;
+    
+    return $status;
   }
   
-  static method go_connect : int ($socket : int, $addr : Sys::Socket::Sockaddr, $timeout : int = 0) {
+  static method go_connect : int ($socket : int, $addr : Sys::Socket::Sockaddr, $timeout : double = 0) {
     
     my $status = -1;
     eval { $status = Sys->connect($socket, $addr); }
@@ -173,7 +239,10 @@ class TestCase::Go::Poll {
       ;
       
       if ($again) {
-        Go->gosched_io_write($socket, $timeout);
+        my $status = Go->gosched_io_write($socket, $timeout);
+        unless ($status == 0) {
+          $status = -1;
+        }
       }
       else {
         die $@;
@@ -183,7 +252,7 @@ class TestCase::Go::Poll {
     return $status;
   }
   
-  static method go_recv : int ($socket : int, $buf : mutable string, $count : int, $buf_offset : int = 0, $timeout : int = 0) {
+  static method go_recv : int ($socket : int, $buf : mutable string, $count : int, $buf_offset : int = 0, $timeout : double = 0) {
     
     my $recv_length = -1;
     while (1) {
@@ -191,7 +260,11 @@ class TestCase::Go::Poll {
       
       if ($@) {
         if (Sys::Socket->socket_errno == Sys::Socket::Errno->EWOULDBLOCK) {
-          Go->gosched_io_read($socket, $timeout);
+          my $status = Go->gosched_io_read($socket, $timeout);
+          unless ($status == 0) {
+            $recv_length = -1;
+            last;
+          }
         }
         else {
           die $@;
@@ -205,7 +278,7 @@ class TestCase::Go::Poll {
     return $recv_length;
   }
   
-  static method go_send : int ($socket : int, $buf : string, $flags : int, $addr : Sys::Socket::Sockaddr = undef, $timeout : int = 0) {
+  static method go_send : int ($socket : int, $buf : string, $flags : int, $addr : Sys::Socket::Sockaddr = undef, $timeout : double = 0) {
     
     my $send_length = -1;
     while (1) {
@@ -214,8 +287,11 @@ class TestCase::Go::Poll {
       
       if ($@) {
         if (Sys::Socket->socket_errno == Sys::Socket::Errno->EWOULDBLOCK) {
-          
-          Go->gosched_io_write($socket, $timeout);
+          my $status = Go->gosched_io_write($socket, $timeout);
+          unless ($status == 0) {
+            $send_length = -1;
+            last;
+          }
         }
         else {
           die $@;
