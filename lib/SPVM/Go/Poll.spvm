@@ -27,8 +27,6 @@ class Go::Poll {
     
     my $poll_coroutines_length = $poll_coroutines_h->keys_length;
     
-    my $ready_coroutines_list = List->new(new Go::Coroutine[0]);
-    
     if ($poll_coroutines_length > 0) {
       my $poll_fd_array = Sys::Poll::PollfdArray->new($poll_coroutines_length);
       
@@ -82,7 +80,6 @@ class Go::Poll {
           my $ready_coroutine = (Go::Coroutine)$poll_coroutines_h->delete($address);
           $ready_coroutine->{disable} = 0;
           $ready_coroutine->{fd} = -1;
-          $ready_coroutines_list->push($poll_coroutine);
         }
         else {
           my $deadline_io_timeout = $poll_coroutine->{deadline_io_timeout};
