@@ -231,6 +231,7 @@ class TestCase::Go::Poll {
       my $again = 
         Sys::Socket->socket_errno == Sys::Socket::Errno->EWOULDBLOCK
         || Sys::Socket->socket_errno == Sys::Socket::Errno->EINPROGRESS
+        || Sys::Socket->socket_errno == Errno->EINTR
       ;
       
       if ($again) {
@@ -254,7 +255,7 @@ class TestCase::Go::Poll {
       eval { $recv_length = Sys->recv($socket, $buf, length $buf, 0); }
       
       if ($@) {
-        if (Sys::Socket->socket_errno == Sys::Socket::Errno->EWOULDBLOCK) {
+        if (Sys::Socket->socket_errno == Sys::Socket::Errno->EWOULDBLOCK || Sys::Socket->socket_errno == Errno->EINTR) {
           my $status = Go->gosched_io_read($socket, $timeout);
           unless ($status == 0) {
             $recv_length = -1;
@@ -281,7 +282,7 @@ class TestCase::Go::Poll {
       eval { $send_length = Sys->send($socket, $buf, 0, undef); }
       
       if ($@) {
-        if (Sys::Socket->socket_errno == Sys::Socket::Errno->EWOULDBLOCK) {
+        if (Sys::Socket->socket_errno == Sys::Socket::Errno->EWOULDBLOCK || Sys::Socket->socket_errno == Errno->EINTR) {
           my $status = Go->gosched_io_write($socket, $timeout);
           unless ($status == 0) {
             $send_length = -1;
