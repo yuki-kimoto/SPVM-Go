@@ -62,29 +62,29 @@ class Go::Schedule::Task {
           $coroutines->push($coroutine);
         }
         else {
-          my $over_deadline = 0;
+          my $over_deadline_timer = 0;
           
-          my $deadline_ts = $coroutine->{deadline};
-          if ($deadline_ts) {
+          my $deadline_timer_ts = $coroutine->{deadline_timer};
+          if ($deadline_timer_ts) {
             
             Sys::Time->gettimeofday($now_tv, undef);
             
             my $now_sec = $now_tv->tv_sec;
             my $now_nsec = 1000 * $now_tv->tv_usec;
             
-            my $deadline_sec = $deadline_ts->tv_sec;
-            my $deadline_nsec = $deadline_ts->tv_nsec;
+            my $deadline_timer_sec = $deadline_timer_ts->tv_sec;
+            my $deadline_timer_nsec = $deadline_timer_ts->tv_nsec;
             
-            if ($now_sec > $deadline_sec || ($now_sec == $deadline_sec && $now_nsec > $deadline_nsec)) {
-              $coroutine->{deadline} = undef;
-              $over_deadline = 1;
+            if ($now_sec > $deadline_timer_sec || ($now_sec == $deadline_timer_sec && $now_nsec > $deadline_timer_nsec)) {
+              $coroutine->{deadline_timer} = undef;
+              $over_deadline_timer = 1;
             }
             else {
               $coroutines->push($coroutine);
             }
           }
           else {
-            $over_deadline = 1;
+            $over_deadline_timer = 1;
           }
           
           my $fd = $coroutine->{fd};
@@ -95,7 +95,7 @@ class Go::Schedule::Task {
             $coroutines->push($coroutine);
           }
           else {
-            if ($over_deadline) {
+            if ($over_deadline_timer) {
               
               my $schedule_task_coroutine = $schedule->{schedule_task_coroutine};
               

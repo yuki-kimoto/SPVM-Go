@@ -89,22 +89,22 @@ class Go::Schedule {
         
         my $after_nsec = (int)(($after - $after_sec) * 1_000_000_000);
         
-        my $deadline_sec = $now_sec + $after_sec;
+        my $deadline_timer_sec = $now_sec + $after_sec;
         
-        my $deadline_nsec = $now_nsec + $after_nsec;
+        my $deadline_timer_nsec = $now_nsec + $after_nsec;
         
-        if ($deadline_nsec >= 1_000_000_000) {
-          $deadline_sec += 1;
-          $deadline_nsec -= 1_000_000_000;
+        if ($deadline_timer_nsec >= 1_000_000_000) {
+          $deadline_timer_sec += 1;
+          $deadline_timer_nsec -= 1_000_000_000;
         }
         
-        my $deadline_ts = Sys::Time::Timespec->new;
+        my $deadline_timer_ts = Sys::Time::Timespec->new;
         
-        $deadline_ts->set_tv_sec($deadline_sec);
+        $deadline_timer_ts->set_tv_sec($deadline_timer_sec);
         
-        $deadline_ts->set_tv_nsec($deadline_nsec);
+        $deadline_timer_ts->set_tv_nsec($deadline_timer_nsec);
         
-        $current_coroutine->{deadline} = $deadline_ts;
+        $current_coroutine->{deadline_timer} = $deadline_timer_ts;
       }
       
       $current_coroutine->{fd} = $fd;

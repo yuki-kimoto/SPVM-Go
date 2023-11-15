@@ -20,7 +20,7 @@ class Go::Coroutine : pointer {
   
   has finished : byte;
   
-  has deadline : Sys::Time::Timespec;
+  has deadline_timer : Sys::Time::Timespec;
   
   has fd : int;
   
