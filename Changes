@@ -1,10 +1,10 @@
-0.004 2023-11-15
-  [Incompatible Changes]
-    Go->goshced, Go->gosched_io_write, Go->gosched_io_read, Go->sleep methods must be called from the main thread. Otherwise an exception is thrown.
-
 0.003 2023-11-15
   [Requirement Changes]
     * Require SPVM::Thread 0.001.
+  [Incompatible Changes]
+    * Go->goshced, Go->gosched_io_write, Go->gosched_io_read, Go->sleep methods must be called from the main thread. Otherwise an exception is thrown.
+  [Test Improvement]
+    * Add thread-safe tests of Go::WaitGroup.
 0.002 2023-11-14
   [Requirement Changes]
     * Require SPVM 0.989061.
