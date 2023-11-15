@@ -28,8 +28,6 @@ class Go::Coroutine : pointer {
   
   has io_timeout_ref : double[];
   
-  has io_timeout_occurred : byte;
-  
   has fd : int;
   
   has is_write : byte;

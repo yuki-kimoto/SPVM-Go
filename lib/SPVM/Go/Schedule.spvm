@@ -194,10 +194,6 @@ class Go::Schedule {
       
       Go::Coroutine->transfer($current_coroutine, $schedule_task_coroutine);
       
-      if ($current_coroutine->{io_timeout_occurred}) {
-        $current_coroutine->{io_timeout_occurred} = 0;
-        $status = 1;
-      }
     }
     else {
       if ($after > 0) {
