@@ -89,6 +89,8 @@ class Go::Poll {
             
             my $io_timeout = $io_timeout_ref->[0];
             
+            Go::Schedule->update_io_timeout($deadline_base_io_timeout, $io_timeout_ref);
+            
             my $is_over_deadline = Go::Schedule->is_over_deadline($deadline_base_io_timeout, $io_timeout);
             
             if ($is_over_deadline) {
