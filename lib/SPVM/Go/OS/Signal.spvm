@@ -1,0 +1,15 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
+class Go::OS::Signal {
+  use Go::Channel;
+  use Sys::Signal;
+  
+  static method ignore : void ($signal : int) {
+    Sys::Signal->signal($signal, signal->SIG_IGN);
+  }
+  
+  static method func notify($channle : Go::Channel, $signal : int) {
+    
+  }
+}
