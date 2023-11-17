@@ -76,7 +76,7 @@ Suspends the current goroutine for IO reading given the file descriptor $fd and 
 
 The control is transferred to the scheduler.
 
-The value of $timeout_ref is updated by the rest timeout. If it is less than 0, timeout has occured.
+The value of $timeout_ref is updated to a negative value if timeout occured.
 
 Exceptions:
 
@@ -90,7 +90,7 @@ Suspends the current goroutine for IO writing given the file descriptor $fd and 
 
 The control is transferred to the scheduler.
 
-The value of $timeout_ref is updated by the rest timeout. If it is less than 0, timeout has occured.
+The value of $timeout_ref is updated to a negative value if timeout occured.
 
 Exceptions:
 
