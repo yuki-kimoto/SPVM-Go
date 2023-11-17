@@ -8,6 +8,8 @@ class Go::OS::Signal {
   use Sys::IO::Constant as IO;
   use Sys;
   use Errno;
+  use Thread;
+  use Go::Sync::WaitGroup;
   
   INIT {
     my $fds = [-1, -1];
@@ -41,19 +43,45 @@ class Go::OS::Signal {
     
     Go->go([$channel : Go::Channel] method : void () {
       my $buffer = (mutable string)new_string_len 4;
-      while (1) {
-        eval { Sys::IO->read($READ_FD, $buffer, 4); }
+      
+      my $use_thread = 0;
+      if (Sys::OS->is_windows) {
+        $use_thread = 1;
+      }
+      
+      if ($use_thread) {
         
-        if ($@) {
-          if (Errno->errno == Errno->EWOULDBLOCK || Errno->errno == Errno->EINTR) {
-            Go->gosched_io_read($READ_FD);
+        my $wg = Go::Sync::WaitGroup->new;
+        
+        $wg->add(1);
+        
+        my $thread = Thread->new([$wg : Go::Sync::WaitGroup, $buffer : mutable string] method : void () {
+          Fn->defer([$wg : Go::Sync::WaitGroup] method : void () {
+            $wg->done;
+          });
+          
+          Sys::IO->read($READ_FD, $buffer, 4);
+        });
+        
+        $wg->wait;
+        
+        $thread->join;
+      }
+      else {
+        while (1) {
+          eval { Sys::IO->read($READ_FD, $buffer, 4); }
+          
+          if ($@) {
+            if (Errno->errno == Errno->EWOULDBLOCK || Errno->errno == Errno->EINTR) {
+              Go->gosched_io_read($READ_FD);
+            }
+            else {
+              die $@;
+            }
           }
           else {
-            die $@;
+            last;
           }
-        }
-        else {
-          last;
         }
       }
       

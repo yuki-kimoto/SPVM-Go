@@ -8,8 +8,6 @@ BEGIN { $ENV{SPVM_BUILD_DIR} = "$FindBin::Bin/.spvm_build"; }
 
 use SPVM 'TestCase::Go::OS::Signal';
 
-plan skip_all => 'Skip tests of Go::OS::Signal on Windows' if $^O eq 'MSWin32';
-
 # Start objects count
 my $start_memory_blocks_count = SPVM::api->get_memory_blocks_count();
 
