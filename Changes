@@ -1,6 +1,8 @@
 0.004 2023-11-17
   [Requirement Changes]
     * Require SPVM::Sys 0.500.
+  [New Featrues]
+    * Add a Go::OS::Signal class.
 0.003 2023-11-15
   [Requirement Changes]
     * Require SPVM::Thread 0.001.
