@@ -55,5 +55,6 @@ t/lib/SPVM/TestCase/Go/Coroutine.spvm
 t/lib/SPVM/TestCase/Go/OS/Signal.spvm
 t/lib/SPVM/TestCase/Go/Poll.spvm
 t/lib/SPVM/TestCase/Go/Select.spvm
+t/lib/SPVM/TestCase/Go/Sync/WaitGroup.spvm
 t/lib/SPVM/TestCase/Go/WaitGroup.spvm
 t/lib/TestUtil/ServerRunner.pm

@@ -1,4 +1,4 @@
-class TestCase::Go::WaitGroup {
+class TestCase::Go::Sync::WaitGroup {
   use Go;
   use Go::Sync::WaitGroup;
   use Thread;
