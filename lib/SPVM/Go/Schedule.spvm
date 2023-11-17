@@ -120,15 +120,6 @@ class Go::Schedule {
     return $is_over_deadline;
   }
   
-  private static method update_io_timeout : void ($deadline_base : Sys::Time::Timespec, $timeout_ref : double[]) {
-    
-    my $deadline_now = Go::Schedule->create_deadline_base;
-    
-    my $interval = ($deadline_now->tv_sec - $deadline_base->tv_sec) + (($deadline_now->tv_nsec - $deadline_base->tv_nsec) / 1_000_000_000);
-    
-    $timeout_ref->[0] -= $interval;
-  }
-  
   # Instance Methods
   private method schedule_io_read : void ($fd : int, , $timeout_ref : double[] = undef) {
     

@@ -3,8 +3,6 @@
     * Require SPVM::Sys 0.500.
   [New Featrues]
     * Add a Go::OS::Signal class.
-  [Fix Bugs]
-    * Fixed the bug that timeout is not updated in the IO ready case.
 0.003 2023-11-15
   [Requirement Changes]
     * Require SPVM::Thread 0.001.
