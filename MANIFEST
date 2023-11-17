@@ -20,6 +20,8 @@ lib/SPVM/Go/Coroutine.native/src/.gitkeep
 lib/SPVM/Go/Coroutine.native/src/coro.c
 lib/SPVM/Go/Coroutine.pm
 lib/SPVM/Go/Coroutine.spvm
+lib/SPVM/Go/OS/Signal.pm
+lib/SPVM/Go/OS/Signal.spvm
 lib/SPVM/Go/Poll.pm
 lib/SPVM/Go/Poll.spvm
 lib/SPVM/Go/Schedule.pm
@@ -41,13 +43,16 @@ MANIFEST.SKIP
 README.md
 t/Go-Channel.t
 t/Go-Coroutine.t
+t/Go-OS-Signal.t
 t/Go-Poll.t
 t/Go-Select.t
+t/Go-Sync-WaitGroup.t
 t/Go-WaitGroup.t
 t/Go.t
 t/lib/SPVM/TestCase/Go.spvm
 t/lib/SPVM/TestCase/Go/Channel.spvm
 t/lib/SPVM/TestCase/Go/Coroutine.spvm
+t/lib/SPVM/TestCase/Go/OS/Signal.spvm
 t/lib/SPVM/TestCase/Go/Poll.spvm
 t/lib/SPVM/TestCase/Go/Select.spvm
 t/lib/SPVM/TestCase/Go/WaitGroup.spvm

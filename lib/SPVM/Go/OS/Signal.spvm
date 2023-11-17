@@ -4,15 +4,57 @@
 class Go::OS::Signal {
   use Go::Channel;
   use Sys::Signal;
+  use Sys::IO::Constant as IO;
+  use Sys;
+  use Errno;
   
   static method ignore : void ($signal : int) {
-    Sys::Signal->signal($signal, signal->SIG_IGN);
+    Sys::Signal->signal($signal, Sys::Signal->SIG_IGN);
   }
   
-  static method func notify($channle : Go::Channel, $signal : int) {
+  static method notify : void ($channel : Go::Channel, $signal : int) {
     
+    unless ($channel) {
+      die "\$channel must be defined.";
+    }
     
+    my $fds = [-1, -1];
     
+    Sys->pipe($fds);
+    
+    my $read_fd = $fds->[0];
+    my $write_fd = $fds->[1];
+    
+    Sys->fcntl($read_fd, IO->F_SETFL, IO->O_NONBLOCK);
+    
+    Sys::Signal->signal_io($signal, $write_fd);
+    
+    Go->go([$channel : Go::Channel, $read_fd : int] method : void () {
+      my $buffer = (mutable string)new_string_len 4;
+      while (1) {
+        eval { Sys::IO->read($read_fd, $buffer, 4); }
+        
+        if ($@) {
+          if (Errno->errno == Errno->EWOULDBLOCK || Errno->errno == Errno->EINTR) {
+            Go->gosched_io_read($read_fd);
+          }
+          else {
+            die $@;
+          }
+        }
+        else {
+          last;
+        }
+      }
+      
+      my $numbers = new int [1];
+      
+      Fn->memcpy($numbers, 0, $buffer, 0, 4);
+      
+      my $got_signal = $numbers->[0];
+      
+      $channel->write($got_signal);
+    });
     
   }
 }
