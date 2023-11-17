@@ -34,7 +34,7 @@ class TestCase::Go::OS::Signal {
     return 1;
   }
   
-  static method multi : int () {
+  static method multi_channles : int () {
     
     $RESULT = IntList->new;
     
@@ -74,21 +74,21 @@ class TestCase::Go::OS::Signal {
     return 1;
   }
   
-  static method multi2 : int () {
+  static method multi_signals : int () {
     
     $RESULT = IntList->new;
     
     Go->go(method : void () {
     
-      my $ch0 = Go->make(1);
+      my $ch0 = Go->make(2);
       
-      my $ch1 = Go->make(1);
+      Go::OS::Signal->notify($ch0, SIGNAL->SIGINT);
       
       Go::OS::Signal->notify($ch0, SIGNAL->SIGTERM);
       
       Sys->kill(SIGNAL->SIGTERM, Sys->process_id);
       
-      Sys->kill(SIGNAL->SIGTERM, Sys->process_id);
+      Sys->kill(SIGNAL->SIGINT, Sys->process_id);
       
       my $ok = 0;
       
@@ -96,56 +96,14 @@ class TestCase::Go::OS::Signal {
       
       $RESULT->push($signal0);
       
-      Go::OS::Signal->notify($ch1, SIGNAL->SIGTERM);
-      
-      my $signal1 = $ch1->read(\$ok);
+      my $signal1 = $ch0->read(\$ok);
       
       $RESULT->push($signal1);
     });
     
     Go->gosched;
     
-    unless (Array->equals_int($RESULT->to_array, [SIGNAL->SIGTERM, SIGNAL->SIGTERM])) {
-      return 0;
-    }
-    
-    $RESULT = undef;
-    
-    return 1;
-  }
-  
-  static method multi3 : int () {
-    
-    $RESULT = IntList->new;
-    
-    Go->go(method : void () {
-    
-      my $ch0 = Go->make(1);
-      
-      my $ch1 = Go->make(1);
-      
-      Sys->kill(SIGNAL->SIGTERM, Sys->process_id);
-      
-      Sys->kill(SIGNAL->SIGTERM, Sys->process_id);
-      
-      Go::OS::Signal->notify($ch0, SIGNAL->SIGTERM);
-      
-      my $ok = 0;
-      
-      my $signal0 = $ch0->read(\$ok);
-      
-      $RESULT->push($signal0);
-      
-      Go::OS::Signal->notify($ch1, SIGNAL->SIGTERM);
-      
-      my $signal1 = $ch1->read(\$ok);
-      
-      $RESULT->push($signal1);
-    });
-    
-    Go->gosched;
-    
-    unless (Array->equals_int($RESULT->to_array, [SIGNAL->SIGTERM, SIGNAL->SIGTERM])) {
+    unless (Array->equals_int($RESULT->to_array, [SIGNAL->SIGTERM, SIGNAL->SIGINT])) {
       return 0;
     }
     

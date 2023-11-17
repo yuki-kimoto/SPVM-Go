@@ -13,9 +13,9 @@ my $start_memory_blocks_count = SPVM::api->get_memory_blocks_count();
 
 ok(SPVM::TestCase::Go::OS::Signal->minimal);
 
-ok(SPVM::TestCase::Go::OS::Signal->multi);
+ok(SPVM::TestCase::Go::OS::Signal->multi_channles);
 
-ok(SPVM::TestCase::Go::OS::Signal->multi3);
+ok(SPVM::TestCase::Go::OS::Signal->multi_signals);
 
 # All object is freed
 my $end_memory_blocks_count = SPVM::api->get_memory_blocks_count();
