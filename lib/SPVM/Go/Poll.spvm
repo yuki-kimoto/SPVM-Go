@@ -64,40 +64,36 @@ class Go::Poll {
         
         my $revent = $poll_fd_array->revents($poll_index);
         
-        my $ready = 0;
+        my $io_ready = 0;
         if ($poll_coroutine->{is_write}) {
           if ($revent & POLL->POLLOUT) {
-            $ready = 1;
+            $io_ready = 1;
           }
         }
         else {
           if ($revent & POLL->POLLIN) {
-            $ready = 1;
+            $io_ready = 1;
           }
         }
         
-        if ($ready) {
+        my $deadline_base_io_timeout = $poll_coroutine->{deadline_base_io_timeout};
+        
+        my $io_timeout_ref = $poll_coroutine->{io_timeout_ref};
+        
+        if ($deadline_base_io_timeout) {
+          
+          my $io_timeout = $io_timeout_ref->[0];
+          
+          Go::Schedule->update_io_timeout($deadline_base_io_timeout, $io_timeout_ref);
+        }
+        
+        my $io_timeout_occured = $deadline_base_io_timeout && $io_timeout_ref->[0] < 0;
+        
+        if ($io_ready || $io_timeout_occured) {
           my $ready_coroutine = (Go::Coroutine)$poll_coroutines_h->delete($address);
           $ready_coroutine->{disable} = 0;
           $ready_coroutine->{fd} = -1;
-        }
-        else {
-          my $deadline_base_io_timeout = $poll_coroutine->{deadline_base_io_timeout};
-          
-          if ($deadline_base_io_timeout) {
-            my $io_timeout_ref = $poll_coroutine->{io_timeout_ref};
-            
-            my $io_timeout = $io_timeout_ref->[0];
-            
-            Go::Schedule->update_io_timeout($deadline_base_io_timeout, $io_timeout_ref);
-            
-            if ($io_timeout_ref->[0] < 0) {
-              $poll_coroutines_h->delete($address);
-              $poll_coroutine->{deadline_base_io_timeout} = undef;
-              $poll_coroutine->{disable} = 0;
-              $poll_coroutine->{fd} = -1;
-            }
-          }
+          $ready_coroutine->{deadline_base_io_timeout} = undef;
         }
       }
     }
