@@ -2,6 +2,7 @@ class TestCase::Go::OS::Signal {
   use Go;
   use Go::OS::Signal;
   use Sys::Signal::Constant as SIGNAL;
+  use Sys::Signal;
   
   our $RESULT : IntList;
   
@@ -15,7 +16,7 @@ class TestCase::Go::OS::Signal {
       
       Go::OS::Signal->notify($ch, SIGNAL->SIGTERM);
       
-      Sys->kill(SIGNAL->SIGTERM, Sys->process_id);
+      Sys::Signal->raise(SIGNAL->SIGTERM);
       
       my $ok = 0;
       my $signal = $ch->read(\$ok);
@@ -44,7 +45,7 @@ class TestCase::Go::OS::Signal {
       
       Go::OS::Signal->notify($ch0, SIGNAL->SIGTERM);
       
-      Sys->kill(SIGNAL->SIGTERM, Sys->process_id);
+      Sys::Signal->raise(SIGNAL->SIGTERM);
       
       my $ok = 0;
       
@@ -56,7 +57,7 @@ class TestCase::Go::OS::Signal {
       
       Go::OS::Signal->notify($ch1, SIGNAL->SIGTERM);
       
-      Sys->kill(SIGNAL->SIGTERM, Sys->process_id);
+      Sys::Signal->raise(SIGNAL->SIGTERM);
       
       my $signal1 = $ch1->read(\$ok);
       
@@ -86,7 +87,7 @@ class TestCase::Go::OS::Signal {
       
       Go::OS::Signal->notify($ch0, SIGNAL->SIGTERM);
       
-      Sys->kill(SIGNAL->SIGTERM, Sys->process_id);
+      Sys::Signal->raise(SIGNAL->SIGTERM);
       
       Sys->kill(SIGNAL->SIGINT, Sys->process_id);
       
