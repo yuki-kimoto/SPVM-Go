@@ -15,14 +15,17 @@ class Go::OS::Signal {
     Sys->pipe($fds);
     
     $READ_FD = $fds->[0];
-    $WRITE_FD = $fds->[1];
     
-    Sys->fcntl($READ_FD, IO->F_SETFL, IO->O_NONBLOCK);
+    my $write_fd = $fds->[1];
+    
+    unless (Sys::OS->is_windows) {
+      Sys->fcntl($READ_FD, IO->F_SETFL, IO->O_NONBLOCK);
+    }
+    
+    Sys::Signal->SET_SIG_GO_WRITE_FD($write_fd);
   }
   
   our $READ_FD : int;
-  
-  our $WRITE_FD : int;
   
   static method ignore : void ($signal : int) {
     Sys::Signal->signal($signal, Sys::Signal->SIG_IGN);
@@ -34,7 +37,7 @@ class Go::OS::Signal {
       die "\$channel must be defined.";
     }
     
-    Sys::Signal->signal_io($signal, $WRITE_FD);
+    Sys::Signal->signal_go($signal);
     
     Go->go([$channel : Go::Channel] method : void () {
       my $buffer = (mutable string)new_string_len 4;
