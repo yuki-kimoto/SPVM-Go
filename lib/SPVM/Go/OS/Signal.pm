@@ -6,36 +6,44 @@ package SPVM::Go::OS::Signal;
 
 =head1 Name
 
-SPVM::Go::OS::Signal - Short Description
+SPVM::Go::OS::Signal - Signal Manipulation
 
 =head1 Description
 
-The Go::OS::Signal class of L<SPVM> has methods to do someting.
+The Go::OS::Signal class of L<SPVM> has methods to manipulate signals.
 
 =head1 Usage
 
   use Go::OS::Signal;
-
-=head1 Fields
-
-
+  use Sys::Signal::Constant as SIGNAL;
+  use Sys;
+  
+  my $ch = Go->make(1);
+  
+  Go::OS::Signal->notify($ch, SIGNAL->SIGTERM);
+  
+  Sys->kill(SIGNAL->SIGTERM, Sys->process_id);
+  
+  my $ok = 0;
+  my $signal = $ch->read(\$ok);
 
 =head1 Class Methods
 
+=head2 
 
+C<static method ignore : void ($signal : int);>
 
-=head1 Instance Methods
+Ignores the signal $signal.
 
+See L<Sys::Signal::Constant|SPVM::Sys::Signal::Constant> about the values of signals.
 
+=head2 notify
 
+C<static method notify : void ($channel : L<Go::Channel|SPVM::Go::Channel>, $signal : int);>
 
-=head1 Repository
+Creates a goroutine to read the sent signal and write it to the $channel.
 
-
-
-=head1 Author
-
-Yuki Kimoto C<kimoto.yuki@gmail.com>
+See L<Sys::Signal::Constant|SPVM::Sys::Signal::Constant> about the values of signals.
 
 =head1 Copyright & License
 
