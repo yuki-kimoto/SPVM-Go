@@ -17,8 +17,12 @@ class TestCase::Go::OS::Signal {
       
       Sys->kill(SIGNAL->SIGTERM, Sys->process_id);
       
+      warn;
+      
       my $ok = 0;
       my $signal = $ch->read(\$ok);
+      
+      warn;
       
       $RESULT->push($signal);
     });
@@ -26,6 +30,46 @@ class TestCase::Go::OS::Signal {
     Go->gosched;
     
     unless (Array->equals_int($RESULT->to_array, [SIGNAL->SIGTERM])) {
+      return 0;
+    }
+    
+    $RESULT = undef;
+    
+    return 1;
+  }
+  
+  static method basic : int () {
+    
+    $RESULT = IntList->new;
+    
+    Go->go(method : void () {
+    
+      my $ch0 = Go->make(1);
+      
+      Go::OS::Signal->notify($ch0, SIGNAL->SIGTERM);
+      
+      Sys->kill(SIGNAL->SIGTERM, Sys->process_id);
+      
+      my $ok = 0;
+      
+      my $signal0 = $ch0->read(\$ok);
+      
+      $RESULT->push($signal0);
+      
+      my $ch1 = Go->make(1);
+      
+      Go::OS::Signal->notify($ch1, SIGNAL->SIGTERM);
+      
+      Sys->kill(SIGNAL->SIGTERM, Sys->process_id);
+      
+      my $signal1 = $ch1->read(\$ok);
+      
+      $RESULT->push($signal1);
+    });
+    
+    Go->gosched;
+    
+    unless (Array->equals_int($RESULT->to_array, [SIGNAL->SIGTERM, SIGNAL->SIGTERM])) {
       return 0;
     }
     

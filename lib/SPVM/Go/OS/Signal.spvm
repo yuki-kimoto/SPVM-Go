@@ -2,11 +2,27 @@
 # MIT License
 
 class Go::OS::Signal {
+  use Go;
   use Go::Channel;
   use Sys::Signal;
   use Sys::IO::Constant as IO;
   use Sys;
   use Errno;
+  
+  INIT {
+    my $fds = [-1, -1];
+    
+    Sys->pipe($fds);
+    
+    $READ_FD = $fds->[0];
+    $WRITE_FD = $fds->[1];
+    
+    Sys->fcntl($READ_FD, IO->F_SETFL, IO->O_NONBLOCK);
+  }
+  
+  our $READ_FD : int;
+  
+  our $WRITE_FD : int;
   
   static method ignore : void ($signal : int) {
     Sys::Signal->signal($signal, Sys::Signal->SIG_IGN);
@@ -18,25 +34,16 @@ class Go::OS::Signal {
       die "\$channel must be defined.";
     }
     
-    my $fds = [-1, -1];
+    Sys::Signal->signal_io($signal, $WRITE_FD);
     
-    Sys->pipe($fds);
-    
-    my $read_fd = $fds->[0];
-    my $write_fd = $fds->[1];
-    
-    Sys->fcntl($read_fd, IO->F_SETFL, IO->O_NONBLOCK);
-    
-    Sys::Signal->signal_io($signal, $write_fd);
-    
-    Go->go([$channel : Go::Channel, $read_fd : int] method : void () {
+    Go->go([$channel : Go::Channel] method : void () {
       my $buffer = (mutable string)new_string_len 4;
       while (1) {
-        eval { Sys::IO->read($read_fd, $buffer, 4); }
+        eval { Sys::IO->read($READ_FD, $buffer, 4); }
         
         if ($@) {
           if (Errno->errno == Errno->EWOULDBLOCK || Errno->errno == Errno->EINTR) {
-            Go->gosched_io_read($read_fd);
+            Go->gosched_io_read($READ_FD);
           }
           else {
             die $@;
@@ -55,6 +62,5 @@ class Go::OS::Signal {
       
       $channel->write($got_signal);
     });
-    
   }
 }
