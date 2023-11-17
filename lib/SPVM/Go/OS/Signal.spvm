@@ -11,5 +11,8 @@ class Go::OS::Signal {
   
   static method func notify($channle : Go::Channel, $signal : int) {
     
+    
+    
+    
   }
 }
