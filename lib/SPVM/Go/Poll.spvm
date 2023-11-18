@@ -81,11 +81,11 @@ class Go::Poll {
           my $deadline_base_io_timeout = $poll_coroutine->{deadline_base_io_timeout};
           
           if ($deadline_base_io_timeout) {
-            my $io_timeout_ref = $poll_coroutine->{io_timeout_ref};
+            my $io_timeout = $poll_coroutine->{io_timeout};
             
-            &update_io_timeout($deadline_base_io_timeout, $io_timeout_ref);
+            my $io_timeout_occur = &check_io_timeout($deadline_base_io_timeout, $io_timeout);
             
-            $io_timeout_occured = $io_timeout_ref->[0] < 0;
+            $poll_coroutine->{io_timeout_occur} = (byte)$io_timeout_occur;
           }
         }
         
@@ -99,13 +99,15 @@ class Go::Poll {
     }
   }
   
-  private static method update_io_timeout : void ($deadline_base : Sys::Time::Timespec, $timeout_ref : double[]) {
+  private static method check_io_timeout : int ($deadline_base : Sys::Time::Timespec, $timeout : double) {
     
     my $deadline_now = Go::Schedule->create_deadline_base;
     
     my $interval = ($deadline_now->tv_sec - $deadline_base->tv_sec) + (($deadline_now->tv_nsec - $deadline_base->tv_nsec) / 1_000_000_000);
     
-    $timeout_ref->[0] -= $interval;
+    my $timeout_occur = $timeout - $interval < 0;
+    
+    return $timeout_occur;
   }
   
 }

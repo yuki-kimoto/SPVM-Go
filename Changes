@@ -1,3 +1,18 @@
+0.005 2023-11-18
+  [New Features]
+    * Add the Go::Error::IOTimeout class.
+  [Incompatible Changes]
+    * If IO timeout occurs, an exception is thrown set eval_error_id to the basic type ID of the Go::Error::IOTimeout.
+    * Changes the definitions of the following methods in the Go class.
+    
+    [Before]
+    static method gosched_io_read : void ($fd : int, $timeout_ref : double[] = undef);
+    static method gosched_io_write : void ($fd : int, $timeout_ref : double[] = undef);
+    
+    [After]
+    static method gosched_io_read : void ($fd : int, $timeout : double = 0);
+    static method gosched_io_write : void ($fd : int, $timeout : double = 0);
+    
 0.004 2023-11-17
   [Requirement Changes]
     * Require SPVM::Sys 0.500.

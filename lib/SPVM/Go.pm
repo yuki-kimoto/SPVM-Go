@@ -70,39 +70,39 @@ This method must be called from the main thread. Otherwise an exception is throw
 
 =head2 gosched_io_read
 
-C<static method gosched_io_read : void ($fd : int, $timeout_ref : double[] = undef);>
+C<static method gosched_io_read : void ($fd : int, $timeout : double = 0);>
 
-Suspends the current goroutine for IO reading given the file descriptor $fd and the value of the timeout reference $timeout_ref.
+Suspends the current goroutine for IO reading given the file descriptor $fd and the value of the timeout $timeout.
 
 The control is transferred to the scheduler.
-
-The value of $timeout_ref is updated to a negative value if timeout occured.
 
 Exceptions:
 
 This method must be called from the main thread. Otherwise an exception is thrown.
 
-The value of $timeout_ref must be greater than 0. Otherwise an exception is thrown.
+$timeout must be greater than 0. Otherwise an exception is thrown.
 
-The value of $timeout_ref must be less than or equal to Fn->INT_MAX. Otherwise an exception is thrown.
+$timeout must be less than or equal to Fn->INT_MAX. Otherwise an exception is thrown.
+
+If IO timeout occurs, an exception is thrown set C<eval_error_id> to the basic type ID of the L<Go::Error::IOTimeout|SPVM::Go::Error::IOTimeout> class.
 
 =head2 gosched_io_write
 
-C<static method gosched_io_write : void ($fd : int, $timeout_ref : double[] = undef);>
+C<static method gosched_io_write : void ($fd : int, $timeout : double = 0);>
 
-Suspends the current goroutine for IO writing given the file descriptor $fd and the value of the timeout reference $timeout_ref.
+Suspends the current goroutine for IO writing given the file descriptor $fd and the timeout $timeout.
 
 The control is transferred to the scheduler.
-
-The value of $timeout_ref is updated to a negative value if timeout occured.
 
 Exceptions:
 
 This method must be called from the main thread. Otherwise an exception is thrown.
 
-The value of $timeout_ref must be greater than 0. Otherwise an exception is thrown.
+$timeout must be greater than 0. Otherwise an exception is thrown.
 
-The value of $timeout_ref must be less than or equal to Fn->INT_MAX. Otherwise an exception is thrown.
+$timeout must be less than or equal to Fn->INT_MAX. Otherwise an exception is thrown.
+
+If IO timeout occurs, an exception is thrown set C<eval_error_id> to the basic type ID of the L<Go::Error::IOTimeout|SPVM::Go::Error::IOTimeout> class.
 
 =head2 sleep
 

@@ -17,6 +17,8 @@ class Go::Schedule {
   use Go::Poll;
   use Thread::ID;
   use Thread::ThisThread;
+  use Go::Error::IOTimeout;
+  use Error::System;
   
   has coroutines : List of Go::Coroutine;
   
@@ -121,25 +123,25 @@ class Go::Schedule {
   }
   
   # Instance Methods
-  private method schedule_io_read : void ($fd : int, , $timeout_ref : double[] = undef) {
+  private method schedule_io_read : void ($fd : int, , $timeout : double = 0) {
     
     my $after = 0;
     
     my $is_write = 0;
     
-    $self->schedule($after, $fd, $is_write, $timeout_ref);
+    $self->schedule($after, $fd, $is_write, $timeout);
   }
   
-  private method schedule_io_write : void ($fd : int, , $timeout_ref : double[] = undef) {
+  private method schedule_io_write : void ($fd : int, , $timeout : double = 0) {
     
     my $after = 0;
     
     my $is_write = 1;
     
-    $self->schedule($after, $fd, $is_write, $timeout_ref);
+    $self->schedule($after, $fd, $is_write, $timeout);
   }
   
-  private method schedule : int ($after : double = 0, $fd : int = -1, $is_write : int = 0, $timeout_ref : double[] = undef) {
+  private method schedule : int ($after : double = 0, $fd : int = -1, $is_write : int = 0, $timeout : double = 0) {
     
     my $called_from_main_thread = Thread::ID->eq(Thread::ThisThread->get_id, $self->{thread_id});
     
@@ -167,20 +169,19 @@ class Go::Schedule {
         
         $current_coroutine->{is_write} = (byte)$is_write;
         
+        unless ($timeout >= 0) {
+          die "\$timeout must be greater than 0.";
+        }
+          
+        unless ($timeout <= Fn->INT_MAX) {
+          die "\$timeout must be less than or equal to Fn->INT_MAX.";
+        }
+        
         # IO timeout
-        if ($timeout_ref) {
-          my $timeout = $timeout_ref->[0];
-          
-          unless ($timeout > 0) {
-            die "\$timeout must be greater than 0.";
-          }
-          
-          unless ($timeout <= Fn->INT_MAX) {
-            die "\$timeout must be less than or equal to Fn->INT_MAX.";
-          }
+        if ($timeout > 0) {
           
           $current_coroutine->{deadline_base_io_timeout} = &create_deadline_base;
-          $current_coroutine->{io_timeout_ref} = $timeout_ref;
+          $current_coroutine->{io_timeout} = $timeout;
         }
       }
       else {
@@ -195,6 +196,10 @@ class Go::Schedule {
       
       Go::Coroutine->transfer($current_coroutine, $schedule_task_coroutine);
       
+      if ($current_coroutine->{io_timeout_occur}) {
+        $current_coroutine->{io_timeout_occur} = 0;
+        die Go::Error::IOTimeout "IO timeout occur";
+      }
     }
     else {
       if ($after > 0) {
