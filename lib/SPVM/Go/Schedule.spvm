@@ -170,7 +170,7 @@ class Go::Schedule {
         $current_coroutine->{is_write} = (byte)$is_write;
         
         unless ($timeout >= 0) {
-          die "\$timeout must be greater than 0.";
+          die "\$timeout must be greater than or equal to 0.";
         }
           
         unless ($timeout <= Fn->INT_MAX) {
