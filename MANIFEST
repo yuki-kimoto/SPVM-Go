@@ -47,7 +47,6 @@ t/Go-OS-Signal.t
 t/Go-Poll.t
 t/Go-Select.t
 t/Go-Sync-WaitGroup.t
-t/Go-WaitGroup.t
 t/Go.t
 t/lib/SPVM/TestCase/Go.spvm
 t/lib/SPVM/TestCase/Go/Channel.spvm
@@ -56,5 +55,4 @@ t/lib/SPVM/TestCase/Go/OS/Signal.spvm
 t/lib/SPVM/TestCase/Go/Poll.spvm
 t/lib/SPVM/TestCase/Go/Select.spvm
 t/lib/SPVM/TestCase/Go/Sync/WaitGroup.spvm
-t/lib/SPVM/TestCase/Go/WaitGroup.spvm
 t/lib/TestUtil/ServerRunner.pm
