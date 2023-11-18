@@ -82,6 +82,10 @@ Exceptions:
 
 This method must be called from the main thread. Otherwise an exception is thrown.
 
+The value of $timeout_ref must be greater than 0. Otherwise an exception is thrown.
+
+The value of $timeout_ref must be less than or equal to Fn->INT_MAX. Otherwise an exception is thrown.
+
 =head2 gosched_io_write
 
 C<static method gosched_io_write : void ($fd : int, $timeout_ref : double[] = undef);>
@@ -96,6 +100,10 @@ Exceptions:
 
 This method must be called from the main thread. Otherwise an exception is thrown.
 
+The value of $timeout_ref must be greater than 0. Otherwise an exception is thrown.
+
+The value of $timeout_ref must be less than or equal to Fn->INT_MAX. Otherwise an exception is thrown.
+
 =head2 sleep
 
 C<static method sleep : void ($seconds : double = 0);>
@@ -105,6 +113,8 @@ Sleeps the seconds $seconds.
 Exceptions:
 
 This method must be called from the main thread. Otherwise an exception is thrown.
+
+$seconds must be less than or equal to Fn->INT_MAX. Otherwise an exception is thrown.
 
 =head1 Repository
 

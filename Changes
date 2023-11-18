@@ -3,6 +3,8 @@
     * Require SPVM::Sys 0.500.
   [New Featrues]
     * Add a Go::OS::Signal class.
+  [Incompatible Changes]
+    * The value of $timeout_ref must be greater than 0. Otherwise an exception is thrown.
 0.003 2023-11-15
   [Requirement Changes]
     * Require SPVM::Thread 0.001.

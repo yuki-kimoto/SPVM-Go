@@ -171,6 +171,10 @@ class Go::Schedule {
         if ($timeout_ref) {
           my $timeout = $timeout_ref->[0];
           
+          unless ($timeout > 0) {
+            die "\$timeout must be greater than 0.";
+          }
+          
           unless ($timeout <= Fn->INT_MAX) {
             die "\$timeout must be less than or equal to Fn->INT_MAX.";
           }
