@@ -39,7 +39,7 @@ class Go::OS::Signal {
       die "\$channel must be defined.";
     }
     
-    Sys::Signal->signal_go($signal);
+    Sys::Signal->signal($signal, Sys::Signal->SIG_GO);
     
     Go->go([$channel : Go::Channel] method : void () {
       my $buffer = (mutable string)new_string_len 4;
