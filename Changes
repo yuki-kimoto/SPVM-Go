@@ -1,7 +1,8 @@
-0.006 2023-11-26
+0.005001 2023-11-26
   [Test Fix]
     * Catch up with the latest Sys class.
-    
+  [Internal Changes]
+    * Do not use the signal_go class in the Sys::Signal class.
 0.005 2023-11-18
   [New Features]
     * Add the Go::Error::IOTimeout class.
