@@ -1,3 +1,7 @@
+0.006 2023-11-26
+  [Test Fix]
+    * Catch up with the latest Sys class.
+    
 0.005 2023-11-18
   [New Features]
     * Add the Go::Error::IOTimeout class.

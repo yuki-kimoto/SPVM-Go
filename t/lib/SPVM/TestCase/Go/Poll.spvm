@@ -166,7 +166,7 @@ class TestCase::Go::Poll {
     }
     
     # Connect
-    my $status_connect = &go_connect($socket, $sockaddr);
+    &go_connect($socket, $sockaddr);
     
     if ($sleep_after_connect > 0) {
       Go->sleep($sleep_after_connect);
@@ -235,10 +235,9 @@ class TestCase::Go::Poll {
     return $status;
   }
   
-  static method go_connect : int ($socket : int, $addr : Sys::Socket::Sockaddr, $timeout : double = 0) {
+  static method go_connect : void ($socket : int, $addr : Sys::Socket::Sockaddr, $timeout : double = 0) {
     
-    my $status = -1;
-    eval { $status = Sys->connect($socket, $addr); }
+    eval { Sys->connect($socket, $addr); }
     
     if ($@) {
       my $again = 
@@ -254,8 +253,6 @@ class TestCase::Go::Poll {
         die $@;
       }
     }
-    
-    return $status;
   }
   
   static method go_recv : int ($socket : int, $buf : mutable string, $count : int, $buf_offset : int = 0, $timeout : double = 0) {
