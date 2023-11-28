@@ -56,15 +56,6 @@ class Go::Schedule {
     return $now_ts;
   }
   
-  private static method create_deadline : Sys::Time::Timespec ($deadline_base : Sys::Time::Timespec, $after : double) {
-    
-    my $after_ts = Time::HiRes::Util->float_seconds_to_timespec($after);
-    
-    my $deadline = &add_timespec($deadline_base, $after_ts);
-    
-    return $deadline;
-  }
-  
   private static method add_timespec : Sys::Time::Timespec ($ts : Sys::Time::Timespec, $after_ts : Sys::Time::Timespec) {
     
     my $ts_sec = $ts->tv_sec;
@@ -95,7 +86,9 @@ class Go::Schedule {
       die "\$deadline_base must be defined.";
     }
     
-    my $deadline = Go::Schedule->create_deadline($deadline_base, $after);
+    my $after_ts = Time::HiRes::Util->float_seconds_to_timespec($after);
+    
+    my $deadline = &add_timespec($deadline_base, $after_ts);
     
     my $now_tv = Sys::Time::Timeval->new;
     
