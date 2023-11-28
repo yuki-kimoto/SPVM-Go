@@ -62,13 +62,11 @@ class Go::Schedule {
     
     my $now_nsec = $deadline_base->tv_nsec;
     
-    my $after_sec = (int)$after;
+    my $after_ts = Time::HiRes::Util->float_seconds_to_timespec($after);
     
-    my $after_nsec = (int)(($after - $after_sec) * 1_000_000_000);
+    my $deadline_sec = $now_sec + $after_ts->tv_sec;
     
-    my $deadline_sec = $now_sec + $after_sec;
-    
-    my $deadline_nsec = $now_nsec + $after_nsec;
+    my $deadline_nsec = $now_nsec + $after_ts->tv_nsec;
     
     if ($deadline_nsec >= 1_000_000_000) {
       $deadline_sec += 1;
