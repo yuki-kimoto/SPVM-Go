@@ -58,26 +58,9 @@ class Go::Schedule {
   
   private static method create_deadline : Sys::Time::Timespec ($deadline_base : Sys::Time::Timespec, $after : double) {
     
-    my $now_sec = $deadline_base->tv_sec;
-    
-    my $now_nsec = $deadline_base->tv_nsec;
-    
     my $after_ts = Time::HiRes::Util->float_seconds_to_timespec($after);
     
-    my $deadline_sec = $now_sec + $after_ts->tv_sec;
-    
-    my $deadline_nsec = $now_nsec + $after_ts->tv_nsec;
-    
-    if ($deadline_nsec >= 1_000_000_000) {
-      $deadline_sec += 1;
-      $deadline_nsec -= 1_000_000_000;
-    }
-    
-    my $deadline = Sys::Time::Timespec->new;
-    
-    $deadline->set_tv_sec($deadline_sec);
-    
-    $deadline->set_tv_nsec($deadline_nsec);
+    my $deadline = &add_timespec($deadline_base, $after_ts);
     
     return $deadline;
   }
