@@ -57,9 +57,6 @@ class Go::Schedule {
   }
   
   private static method create_deadline : Sys::Time::Timespec ($deadline_base : Sys::Time::Timespec, $after : double) {
-    my $now_tv = Sys::Time::Timeval->new;
-    
-    Sys::Time->gettimeofday($now_tv, undef);
     
     my $now_sec = $deadline_base->tv_sec;
     
