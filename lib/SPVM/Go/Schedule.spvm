@@ -50,7 +50,16 @@ class Go::Schedule {
   private static method clock_gettime : Sys::Time::Timespec () {
     my $now_ts = Sys::Time::Timespec->new;
     
-    Sys::Time->clock_gettime(TIME->CLOCK_REALTIME, $now_ts);
+    eval { Sys::Time->clock_gettime(TIME->CLOCK_MONOTONIC, $now_ts); }
+    
+    if ($@) {
+      if (eval_error_id is_error Error::NotSupported) {
+        Sys::Time->clock_gettime(TIME->CLOCK_REALTIME, $now_ts);
+      }
+      else {
+        die eval_error_id, $@;
+      }
+    }
     
     return $now_ts;
   }
