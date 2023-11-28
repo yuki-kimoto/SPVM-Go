@@ -19,6 +19,8 @@ class Go::Schedule {
   use Thread::ThisThread;
   use Go::Error::IOTimeout;
   use Error::System;
+  use Time::HiRes;
+  use Sys::Time::Constant as TIME;
   
   has coroutines : List of Go::Coroutine;
   
@@ -47,21 +49,11 @@ class Go::Schedule {
   }
   
   private static method clock_gettime : Sys::Time::Timespec () {
-    my $now_tv = Sys::Time::Timeval->new;
+    my $now_ts = Sys::Time::Timespec->new;
     
-    Sys::Time->gettimeofday($now_tv, undef);
+    Sys::Time->clock_gettime(TIME->CLOCK_REALTIME, $now_ts);
     
-    my $deadline_base_sec = $now_tv->tv_sec;
-    
-    my $deadline_base_nsec = 1000 * $now_tv->tv_usec;
-    
-    my $deadline_base = Sys::Time::Timespec->new;
-    
-    $deadline_base->set_tv_sec($deadline_base_sec);
-    
-    $deadline_base->set_tv_nsec($deadline_base_nsec);
-    
-    return $deadline_base;
+    return $now_ts;
   }
   
   private static method create_deadline : Sys::Time::Timespec ($deadline_base : Sys::Time::Timespec, $after : double) {
