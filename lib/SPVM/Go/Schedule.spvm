@@ -82,6 +82,30 @@ class Go::Schedule {
     return $deadline;
   }
   
+  private static method add_timespec : Sys::Time::Timespec ($ts : Sys::Time::Timespec, $after_ts : Sys::Time::Timespec) {
+    
+    my $ts_sec = $ts->tv_sec;
+    
+    my $ts_nsec = $ts->tv_nsec;
+    
+    my $result_sec = $ts_sec + $after_ts->tv_sec;
+    
+    my $result_nsec = $ts_nsec + $after_ts->tv_nsec;
+    
+    if ($result_nsec >= 1_000_000_000) {
+      $result_sec += 1;
+      $result_nsec -= 1_000_000_000;
+    }
+    
+    my $result = Sys::Time::Timespec->new;
+    
+    $result->set_tv_sec($result_sec);
+    
+    $result->set_tv_nsec($result_nsec);
+    
+    return $result;
+  }
+  
   private static method is_over_deadline : int ($deadline_base : Sys::Time::Timespec, $after : double) {
     
     unless ($deadline_base) {
