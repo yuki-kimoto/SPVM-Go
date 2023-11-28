@@ -90,14 +90,12 @@ class Go::Schedule {
     
     my $deadline = &add_timespec($deadline_base, $after_ts);
     
-    my $now_tv = Sys::Time::Timeval->new;
+    my $now_ts = &clock_gettime;
     
     my $is_over_deadline = 0;
     
-    Sys::Time->gettimeofday($now_tv, undef);
-    
-    my $now_sec = $now_tv->tv_sec;
-    my $now_nsec = 1000 * $now_tv->tv_usec;
+    my $now_sec = $now_ts->tv_sec;
+    my $now_nsec = $now_ts->tv_nsec;
     
     my $deadline_sec = $deadline->tv_sec;
     my $deadline_nsec = $deadline->tv_nsec;
