@@ -12,7 +12,6 @@ class Go::Schedule {
   use List;
   use Go::Schedule::Task;
   use Sys::Time;
-  use Sys::Time::Timeval;
   use Sys::Time::Timespec;
   use Go::Poll;
   use Thread::ID;
