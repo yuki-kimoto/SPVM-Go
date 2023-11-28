@@ -10,6 +10,7 @@ class Go::Poll {
   use Sys::Poll::PollfdArray;
   use Sys::Poll::Constant as POLL;
   use Sys::Poll;
+  use Time::HiRes::Util;
   
   has coroutines_h : Hash of Go::Coroutine;
   
@@ -103,7 +104,7 @@ class Go::Poll {
     
     my $deadline_now = Go::Schedule->create_deadline_base;
     
-    my $interval = ($deadline_now->tv_sec - $deadline_base->tv_sec) + (($deadline_now->tv_nsec - $deadline_base->tv_nsec) / 1_000_000_000);
+    my $interval = Time::HiRes::Util->timespec_interval($deadline_base, $deadline_now);
     
     my $timeout_occur = $timeout - $interval < 0;
     
