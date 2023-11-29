@@ -116,6 +116,22 @@ This method must be called from the main thread. Otherwise an exception is throw
 
 $seconds must be less than or equal to Fn->INT_MAX. Otherwise an exception is thrown.
 
+=head1 Modules
+
+=over 2
+
+=item * L<Go::Channel|SPVM::Go::Channel>
+
+=item * L<Go::Select|SPVM::Go::Select>
+
+=item * L<Go::Select::Result|SPVM::Go::Select::Result>
+
+=item * L<Go::Sync::WaitGroup|SPVM::Go::Sync::WaitGroup>
+
+=item * L<Go::OS::Signal|SPVM::Go::OS::Signal>
+
+=back
+
 =head1 Repository
 
 L<SPVM::Go - Github|https://github.com/yuki-kimoto/SPVM-Go>
