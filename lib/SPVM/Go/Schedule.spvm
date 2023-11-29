@@ -53,7 +53,7 @@ class Go::Schedule {
     eval { Sys::Time->clock_gettime(TIME->CLOCK_MONOTONIC, $now_ts); }
     
     if ($@) {
-      if (eval_error_id is_error Error::NotSupported) {
+      if (eval_error_id is_error Error::System) {
         Sys::Time->clock_gettime(TIME->CLOCK_REALTIME, $now_ts);
       }
       else {
