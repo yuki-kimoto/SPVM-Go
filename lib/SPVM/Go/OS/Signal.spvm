@@ -14,7 +14,7 @@ class Go::OS::Signal {
   INIT {
     my $fds = [-1, -1];
     
-    Sys->pipe($fds);
+    &pipe($fds);
     
     $READ_FD = $fds->[0];
     
@@ -93,5 +93,22 @@ class Go::OS::Signal {
       
       $channel->write($got_signal);
     });
+  }
+  
+  use Sys::Process;
+  use Sys::IO;
+  use Sys;
+  private static method pipe : void ($pipe_fds : int[]) {
+    
+    if (Sys::OS->is_windows) {
+      Sys::Process->_pipe($pipe_fds, 0, IO->O_BINARY);
+    }
+    else {
+      Sys::Process->pipe($pipe_fds);
+      
+      Sys->fcntl($pipe_fds->[0], IO->F_SETFD, IO->FD_CLOEXEC);
+      
+      Sys->fcntl($pipe_fds->[1], IO->F_SETFD, IO->FD_CLOEXEC);
+    }
   }
 }
