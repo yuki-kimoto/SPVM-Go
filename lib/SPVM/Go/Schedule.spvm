@@ -19,6 +19,7 @@ class Go::Schedule {
   use Go::Error::IOTimeout;
   use Error::System;
   use Time::HiRes;
+  use Sys::Time::Util;
   use Sys::Time::Constant as TIME;
   
   has coroutines : List of Go::Coroutine;
@@ -94,7 +95,7 @@ class Go::Schedule {
       die "\$deadline_base must be defined.";
     }
     
-    my $after_ts = Time::HiRes::Util->float_seconds_to_timespec($after);
+    my $after_ts = Sys::Time::Util->float_seconds_to_timespec($after);
     
     my $deadline = &add_timespec($deadline_base, $after_ts);
     
