@@ -1,3 +1,7 @@
+0.007 2023-11-30
+  [Requrement Changes]
+    * Require SPVM::Time::HiRes 0.004.
+    * Require SPVM::Sys 0.504.
 0.006 2023-11-29
   [Requrement Changes]
     * Require SPVM 0.989063.
