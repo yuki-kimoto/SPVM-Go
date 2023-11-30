@@ -49,13 +49,13 @@ class Go::Schedule {
   }
   
   private static method clock_gettime : Sys::Time::Timespec () {
-    my $now_ts = Sys::Time::Timespec->new;
+    my $now_ts = (Sys::Time::Timespec)undef;
     
-    eval { Sys::Time->clock_gettime(TIME->CLOCK_MONOTONIC, $now_ts); }
+    eval { $now_ts = Time::HiRes->clock_gettime_timespec(TIME->CLOCK_MONOTONIC); }
     
     if ($@) {
       if (eval_error_id is_error Error::System) {
-        Sys::Time->clock_gettime(TIME->CLOCK_REALTIME, $now_ts);
+        $now_ts = Time::HiRes->clock_gettime_timespec(TIME->CLOCK_REALTIME);
       }
       else {
         die eval_error_id, $@;
