@@ -10,7 +10,7 @@ SPVM::Go - Goroutines of The Go Programming Language
 
 =head1 Description
 
-The Go class of L<SPVM> has methods to create goroutines and manipulate channels.
+The Go class in L<SPVM> has methods to create goroutines and manipulate channels.
 
 Goroutines and channels are features of the Go programming language.
 
