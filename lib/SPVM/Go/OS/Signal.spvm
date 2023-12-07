@@ -12,13 +12,12 @@ class Go::OS::Signal {
   use Go::Sync::WaitGroup;
   
   INIT {
-    my $fds = [-1, -1];
+    my $read_fd = -1;
+    my $write_fd = -1;
     
-    &pipe($fds);
+    Sys->pipe(\$read_fd, \$write_fd);
     
-    $READ_FD = $fds->[0];
-    
-    my $write_fd = $fds->[1];
+    $READ_FD = $read_fd;
     
     unless (Sys::OS->is_windows) {
       Sys->fcntl($READ_FD, IO->F_SETFL, IO->O_NONBLOCK);
@@ -98,17 +97,4 @@ class Go::OS::Signal {
   use Sys::Process;
   use Sys::IO;
   use Sys;
-  private static method pipe : void ($pipe_fds : int[]) {
-    
-    if (Sys::OS->is_windows) {
-      Sys::Process->_pipe($pipe_fds, 0, IO->O_BINARY);
-    }
-    else {
-      Sys::Process->pipe($pipe_fds);
-      
-      Sys->fcntl($pipe_fds->[0], IO->F_SETFD, IO->FD_CLOEXEC);
-      
-      Sys->fcntl($pipe_fds->[1], IO->F_SETFD, IO->FD_CLOEXEC);
-    }
-  }
 }
