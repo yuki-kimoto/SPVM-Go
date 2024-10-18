@@ -6,6 +6,9 @@
   
     * Improve an exception message in Go::Channel#read method.
     * Improve an exception message in Go::Channel#write method.
+  [New Features]
+    * Add Go#ENV_DEBUG method.
+    * Add SPVM_GO_DEBUG environment variable.
     
 0.007003 2024-06-10
   [Requrement Changes]
