@@ -107,6 +107,10 @@ class Go::Poll {
     
     my $timeout_occur = $timeout - $interval < 0;
     
+    if (Go->ENV_DEBUG) {
+      Fn->say_stderr(Fn->sprintf("[Go Debug]Check IO timeout(Timeout:%f, ElapsedTime:%f, TimeoutOccur:%d).", [(object)$timeout, $interval, $timeout_occur]));
+    }
+    
     return $timeout_occur;
   }
   

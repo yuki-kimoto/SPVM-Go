@@ -79,7 +79,7 @@ class Go::Schedule::Task {
               $coroutines->push($coroutines->shift);
               
               if (Go->ENV_DEBUG) {
-                Fn->say_stderr(Fn->sprintf("[Go Debug]Rotate timer goroutine (Callback:%p, QueueNum:%d.)", [(object)$coroutine->{task}, $coroutines->length]));
+                Fn->say_stderr(Fn->sprintf("[Go Debug]Rotate timer goroutine (Callback:%p, QueueNum:%d)", [(object)$coroutine->{task}, $coroutines->length]));
               }
             }
           }
