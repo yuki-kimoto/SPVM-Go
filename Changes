@@ -1,6 +1,11 @@
 0.008 2024-10-18
   [Document Improvemetn]
     * Add docs for Go::Error::IOTimeout.
+  
+  [Exception Improvement]
+  
+    * Improve an exception message in Go::Channel#read method.
+    * Improve an exception message in Go::Channel#write method.
     
 0.007003 2024-06-10
   [Requrement Changes]
