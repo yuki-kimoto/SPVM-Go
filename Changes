@@ -9,6 +9,9 @@
   [New Features]
     * Add Go#ENV_DEBUG method.
     * Add SPVM_GO_DEBUG environment variable.
+  
+  [Bug Fix]
+    * Fix a bug that poll IO timeout logic was wrong.
     
 0.007003 2024-06-10
   [Requrement Changes]
