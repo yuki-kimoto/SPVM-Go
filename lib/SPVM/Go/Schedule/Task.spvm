@@ -43,14 +43,12 @@ class Go::Schedule::Task {
         my $coroutine = (Go::Coroutine)undef;
         
         if ($coroutines->length > 0) {
-          $coroutine = (Go::Coroutine)$coroutines->shift;
-          
-          if (Go->ENV_DEBUG) {
-            Fn->say_stderr(Fn->sprintf("[Go Debug]Unshift a goroutine with the callback %p.", [(object)$coroutine->{task}]));
-          }
+          $coroutine = (Go::Coroutine)$coroutines->get(0);
         }
         
         if ($coroutine->{finished}) {
+          $coroutines->shift;
+          
           $schedule->{current_coroutine} = undef;
           
           if (Go->ENV_DEBUG) {
@@ -58,10 +56,10 @@ class Go::Schedule::Task {
           }
         }
         elsif ($coroutine->{disable}) {
-          $coroutines->push($coroutine);
+          $coroutines->push($coroutines->shift);
           
           if (Go->ENV_DEBUG) {
-            Fn->say_stderr(Fn->sprintf("[Go Debug]Push a disabled goroutine with the callback %p.", [(object)$coroutine->{task}]));
+            Fn->say_stderr(Fn->sprintf("[Go Debug]Rotate a IO goroutine with the callback %p.", [(object)$coroutine->{task}]));
           }
         }
         else {
@@ -78,10 +76,10 @@ class Go::Schedule::Task {
               $coroutine->{deadline_base_timer} = undef;
             }
             else {
-              $coroutines->push($coroutine);
+              $coroutines->push($coroutines->shift);
               
               if (Go->ENV_DEBUG) {
-                Fn->say_stderr(Fn->sprintf("[Go Debug]Push a non over deadline goroutine with the callback %p.", [(object)$coroutine->{task}]));
+                Fn->say_stderr(Fn->sprintf("[Go Debug]Rotate a timer goroutine with the callback %p.", [(object)$coroutine->{task}]));
               }
             }
           }
@@ -94,10 +92,10 @@ class Go::Schedule::Task {
             $coroutine->{disable} = 1;
             my $coroutine_address = Fn->to_address($coroutine);
             $schedule->{poll}->{coroutines_h}->set($coroutine_address, $coroutine);
-            $coroutines->push($coroutine);
+            $coroutines->push($coroutines->shift);
             
             if (Go->ENV_DEBUG) {
-              Fn->say_stderr(Fn->sprintf("[Go Debug]Push a IO wait goroutine with the callback %p.", [(object)$coroutine->{task}]));
+              Fn->say_stderr(Fn->sprintf("[Go Debug]Rotate a IO goroutine first time with the callback %p.", [(object)$coroutine->{task}]));
             }
           }
           else {
@@ -105,11 +103,7 @@ class Go::Schedule::Task {
               
               my $schedule_task_coroutine = $schedule->{schedule_task_coroutine};
               
-              $coroutines->push($coroutine);
-              
-              if (Go->ENV_DEBUG) {
-                Fn->say_stderr(Fn->sprintf("[Go Debug]Push a non IO wait goroutine with the callback %p.", [(object)$coroutine->{task}]));
-              }
+              $coroutines->push($coroutines->shift);
               
               $coroutine->{return_back} = $schedule_task_coroutine;
               
