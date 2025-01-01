@@ -1,3 +1,7 @@
+0.008001 2025-01-02
+  [Bug Fix]
+    * Fix a potential bug that the argument width on a method call is wrong.
+    
 0.008 2024-10-18
   [Document Improvemetn]
     * Add docs for Go::Error::IOTimeout.
