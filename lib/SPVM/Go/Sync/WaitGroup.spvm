@@ -2,6 +2,7 @@
 # MIT License
 
 class Go::Sync::WaitGroup {
+  version_from Go;
   use Go;
   use Sync::Mutex;
   

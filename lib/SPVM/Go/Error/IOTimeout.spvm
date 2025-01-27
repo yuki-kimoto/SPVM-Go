@@ -2,5 +2,5 @@
 # MIT License
 
 class Go::Error::IOTimeout extends Error {
-  
+  version_from Go;
 }

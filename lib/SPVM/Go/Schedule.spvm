@@ -2,6 +2,7 @@
 # MIT License
 
 class Go::Schedule {
+  version_from Go;
   allow Go;
   allow Go::Schedule::Task;
   allow Go::Channel;

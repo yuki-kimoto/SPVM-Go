@@ -2,6 +2,7 @@
 # MIT License
 
 class Go::Select::Result {
+  version_from Go;
   allow Go::Select;
   
   use Go::Channel;

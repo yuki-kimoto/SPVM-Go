@@ -281,8 +281,6 @@ class TestCase::Go::Channel {
         return 0;
       }
       
-      $@ = undef;
-      
       my $ok = 0;
       my $value = $ch->read(\$ok);
       

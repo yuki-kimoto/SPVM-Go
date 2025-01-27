@@ -2,6 +2,8 @@
 # MIT License
 
 class Go::Channel::Wait {
+  version_from Go;
+  
   allow Go::Schedule;
   allow Go::Channel;
   

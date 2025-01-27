@@ -6,6 +6,7 @@ use FindBin;
 use lib "$FindBin::Bin/lib";
 BEGIN { $ENV{SPVM_BUILD_DIR} = "$FindBin::Bin/.spvm_build"; }
 
+use SPVM 'Fn';
 use SPVM 'TestCase::Go';
 
 use SPVM 'Go';
@@ -14,8 +15,9 @@ use SPVM 'Fn';
 
 use Time::HiRes;
 
-# Start objects count
-my $start_memory_blocks_count = SPVM::api->get_memory_blocks_count();
+my $api = SPVM::api();
+
+my $start_memory_blocks_count = $api->get_memory_blocks_count;
 
 ok(SPVM::TestCase::Go->go_minimal);
 
@@ -42,14 +44,15 @@ ok(SPVM::TestCase::Go->go_extra);
 
 ok(SPVM::TestCase::Go->thread_exception);
 
-# All object is freed
-my $end_memory_blocks_count = SPVM::api->get_memory_blocks_count();
-is($end_memory_blocks_count, $start_memory_blocks_count);
-
 # Version
 {
   my $version_string = SPVM::Fn->get_version_string("Go");
   is($SPVM::Go::VERSION, $version_string);
 }
+
+SPVM::Fn->destroy_runtime_permanent_vars;
+
+my $end_memory_blocks_count = $api->get_memory_blocks_count;
+is($end_memory_blocks_count, $start_memory_blocks_count);
 
 done_testing;

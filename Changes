@@ -1,3 +1,10 @@
+0.009 2025-01-27
+  [Requirement Changes]
+    * Require SPVM 0.990042.
+    * Require SPVM::Regex 0.246.
+  [Test Improvement]
+    * Call Fn#destroy_runtime_permanent_vars method in the end of tests.
+    
 0.008001 2025-01-02
   [Bug Fix]
     * Fix a potential bug that the argument width on a method call is wrong.
