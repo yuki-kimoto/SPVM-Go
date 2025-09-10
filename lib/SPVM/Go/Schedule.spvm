@@ -22,6 +22,7 @@ class Go::Schedule {
   use Time::HiRes;
   use Sys::Time::Util;
   use Sys::Time::Constant as TIME;
+  use Format;
   
   has coroutines : List of Go::Coroutine;
   
@@ -210,7 +211,7 @@ class Go::Schedule {
     $self->{coroutines}->push($coroutine);
     
     if (Go->ENV_DEBUG) {
-      Fn->say_stderr(Fn->sprintf("[Go Debug]Push new goroutine with the callback %p.", [(object)$task]));
+      Fn->say_stderr(Format->sprintf("[Go Debug]Push new goroutine with the callback %p.", [(object)$task]));
     }
     
   }

@@ -10,6 +10,7 @@ class Go::Schedule::Task {
   use Sys::Poll::PollfdArray;
   use Sys::Poll::Constant as POLL;
   use Sys::Poll;
+  use Format;
   
   has schedule : Go::Schedule;
   
@@ -53,14 +54,14 @@ class Go::Schedule::Task {
           $schedule->{current_coroutine} = undef;
           
           if (Go->ENV_DEBUG) {
-            Fn->say_stderr(Fn->sprintf("[Go Debug]End goroutine (Callback:%p, QueueNum:%d.)", [(object)$coroutine->{task}, $coroutines->length]));
+            Fn->say_stderr(Format->sprintf("[Go Debug]End goroutine (Callback:%p, QueueNum:%d.)", [(object)$coroutine->{task}, $coroutines->length]));
           }
         }
         elsif ($coroutine->{disable}) {
           $coroutines->push($coroutines->shift);
           
           if (Go->ENV_DEBUG) {
-            Fn->say_stderr(Fn->sprintf("[Go Debug]Rotate IO goroutine (Callback:%p, QueueNum:%d.)", [(object)$coroutine->{task}, $coroutines->length]));
+            Fn->say_stderr(Format->sprintf("[Go Debug]Rotate IO goroutine (Callback:%p, QueueNum:%d.)", [(object)$coroutine->{task}, $coroutines->length]));
           }
         }
         else {
@@ -80,7 +81,7 @@ class Go::Schedule::Task {
               $coroutines->push($coroutines->shift);
               
               if (Go->ENV_DEBUG) {
-                Fn->say_stderr(Fn->sprintf("[Go Debug]Rotate timer goroutine (Callback:%p, QueueNum:%d)", [(object)$coroutine->{task}, $coroutines->length]));
+                Fn->say_stderr(Format->sprintf("[Go Debug]Rotate timer goroutine (Callback:%p, QueueNum:%d)", [(object)$coroutine->{task}, $coroutines->length]));
               }
             }
           }
@@ -96,7 +97,7 @@ class Go::Schedule::Task {
             $coroutines->push($coroutines->shift);
             
             if (Go->ENV_DEBUG) {
-              Fn->say_stderr(Fn->sprintf("[Go Debug]Rotate IO goroutine first time (Callback:%p, QueueNum:%d.)", [(object)$coroutine->{task}, $coroutines->length]));
+              Fn->say_stderr(Format->sprintf("[Go Debug]Rotate IO goroutine first time (Callback:%p, QueueNum:%d.)", [(object)$coroutine->{task}, $coroutines->length]));
             }
           }
           else {
@@ -113,7 +114,7 @@ class Go::Schedule::Task {
               Go::Coroutine->transfer($schedule_task_coroutine, $coroutine);
               
               if (Go->ENV_DEBUG) {
-                Fn->say_stderr(Fn->sprintf("[Go Debug]Start or resume goroutine (Callback:%p, QueueNum:%d.)", [(object)$coroutine->{task}, $coroutines->length]));
+                Fn->say_stderr(Format->sprintf("[Go Debug]Start or resume goroutine (Callback:%p, QueueNum:%d.)", [(object)$coroutine->{task}, $coroutines->length]));
               }
             }
           }
