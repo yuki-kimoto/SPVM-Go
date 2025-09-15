@@ -1,3 +1,7 @@
+0.011 2025-09-15
+  [Internal Changes]
+    * Fix generics bugs.
+    
 0.010 2025-09-10
   [Internal Changes]
     * Use Format->sprintf instead of Fn->sprintf.

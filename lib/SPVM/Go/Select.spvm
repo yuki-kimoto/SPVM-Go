@@ -13,9 +13,9 @@ class Go::Select {
   use Sys;
   
   # Fields
-  has read_cases_h : Hash of Go::Channel;
+  has read_cases_h : Hash of Go::Select::Case;
   
-  has write_cases_h : Hash of Go::Channel;
+  has write_cases_h : Hash of Go::Select::Case;
   
   has non_blocking : rw byte;
   
