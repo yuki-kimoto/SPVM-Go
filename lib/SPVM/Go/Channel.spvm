@@ -33,14 +33,14 @@ class Go::Channel {
     
     my $self = new Go::Channel;
     
-    my $capacity = $options_h->delete_or_default_int("capacity", 0);
+    my $capacity = $options_h->get_or_default("capacity", 0)->(int);
     $self->{capacity} = $capacity;
     
     unless ($capacity >= 0) {
       die "The \"capacity\" option must be greater than or equal to 0.";
     }
     
-    my $schedule = (Go::Schedule)$options_h->delete_or_default("schedule", undef);
+    my $schedule = (Go::Schedule)$options_h->get_or_default("schedule", undef);
     $self->{schedule} = $schedule;
     
     unless ($schedule) {
