@@ -9,6 +9,7 @@ class Go::Select {
   use Go::Select::Result;
   use Go::Channel;
   use List;
+  use QList;
   use Fn;
   use Sys;
   
@@ -138,7 +139,7 @@ class Go::Select {
     
     my $write_cases_length = $write_cases_h->keys_length;
     
-    my $cases_list = List->new(new Go::Select::Case[0]);
+    my $cases_list = QList->new(new Go::Select::Case[0]);
     
     for my $address (@{$read_cases_h->keys}) {
       my $read_case = $read_cases_h->get($address);

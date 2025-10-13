@@ -10,6 +10,7 @@ class Go::Channel {
   use Hash;
   use Go::Channel::Wait;
   use Fn;
+  use QList;
   
   # Fields
   has capacity : int;
@@ -47,9 +48,9 @@ class Go::Channel {
       die "The \"schedule\" option must be defined.";
     }
     
-    $self->{read_waits} = List->new(new Go::Channel::Wait[0]);
+    $self->{read_waits} = QList->new(new Go::Channel::Wait[0]);
     
-    $self->{write_waits} = List->new(new Go::Channel::Wait[0]);
+    $self->{write_waits} = QList->new(new Go::Channel::Wait[0]);
     
     return $self;
   }

@@ -11,6 +11,7 @@ class Go::Schedule {
   
   use Go::Coroutine;
   use List;
+  use QList;
   use Go::Schedule::Task;
   use Sys::Time;
   use Sys::Time::Timespec;
@@ -39,7 +40,7 @@ class Go::Schedule {
     
     my $self = new Go::Schedule;
     
-    my $coroutines = List->new(new Go::Coroutine[0]);;
+    my $coroutines = QList->new(new Go::Coroutine[0]);;
     
     $self->{coroutines} = $coroutines;
     
