@@ -218,6 +218,9 @@ class Go::Select {
           if ($channel->{write_waits}->length) {
             $can_read = 1;
           }
+          elsif ($channel->{closed}) {
+            $can_read = 1;
+          }
           
           if ($can_read) {
             my $ok = 0;

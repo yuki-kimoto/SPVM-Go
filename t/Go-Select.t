@@ -19,6 +19,8 @@ ok(SPVM::TestCase::Go::Select->blocking);
 
 ok(SPVM::TestCase::Go::Select->non_blocking);
 
+ok(SPVM::TestCase::Go::Select->select_closed_channel);
+
 SPVM::Fn->destroy_runtime_permanent_vars;
 
 my $end_memory_blocks_count = $api->get_memory_blocks_count;

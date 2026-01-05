@@ -1,3 +1,7 @@
+0.014 2025-01-13-05
+  [Bug Fix]
+    * Fix a bug that Go::Select#select blocks when the channel is closed.
+    
 0.013 2025-10-13
   [Changes]
     * Use QList instead of List internally.
