@@ -478,4 +478,23 @@ class TestCase::Go::Channel {
     return 1;
   }
   
+  static method issues8 : int () {
+    
+    Go->go(method : void () {
+      my $ch = Go->make;
+      
+      Go->go([$ch : Go::Channel] method : void () {
+        $ch->write(1);
+      });
+      
+      Go->gosched;
+      
+      my $read_ok = 0;
+      $ch->read(\$read_ok);
+    });
+    
+    Go->gosched;
+    
+    return 1;
+  }
 }

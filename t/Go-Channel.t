@@ -31,6 +31,8 @@ ok(SPVM::TestCase::Go::Channel->extra);
 
 ok(SPVM::TestCase::Go::Channel->exception);
 
+ok(SPVM::TestCase::Go::Channel->issues8);
+
 SPVM::Fn->destroy_runtime_permanent_vars;
 
 my $end_memory_blocks_count = $api->get_memory_blocks_count;
