@@ -33,7 +33,7 @@ The Go::Channel class in L<SPVM> has methods to manipulate channels.
 
 =head2 read
 
-C<method read : object ($ok_ref : int*);>
+C<method read : object ($ok_ref : int* = undef);>
 
 Reads a value from the channel. If the value is red from a closed channl, undef is returned.
 

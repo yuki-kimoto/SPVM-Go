@@ -56,14 +56,18 @@ class Go::Channel {
   }
   
   # Instance Methods
-  method read : object ($ok_ref : int*) {
+  method read : object ($ok_ref : int* = undef) {
     
-    $$ok_ref = 1;
+    if ($ok_ref) {
+      $$ok_ref = 1;
+    }
     
     my $closed = $self->{closed};
     
     if ($closed && $self->{write_waits}->length == 0) {
-      $$ok_ref = 0;
+      if ($ok_ref) {
+        $$ok_ref = 0;
+      }
       return undef;
     }
     
@@ -108,7 +112,9 @@ class Go::Channel {
         if ($finish) {
           my $value = $read_wait->{value};
           
-          $$ok_ref = $read_wait->{ok};
+          if ($ok_ref) {
+            $$ok_ref = $read_wait->{ok};
+          }
           
           return $value;
         }

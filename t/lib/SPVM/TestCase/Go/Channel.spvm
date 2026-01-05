@@ -18,9 +18,7 @@ class TestCase::Go::Channel {
         $ch->write(1);
       });
       
-      my $ok = 0;
-      
-      my $value = (int)$ch->read(\$ok);
+      my $value = (int)$ch->read;
       
       $RESULT->push($value);
     });
