@@ -67,14 +67,19 @@ class Go::Poll {
         my $revent = $poll_fd_array->revents($poll_index);
         
         my $io_ready = 0;
-        if ($poll_coroutine->{is_write}) {
-          if ($revent & POLL->POLLOUT) {
-            $io_ready = 1;
-          }
+        if ($revent & (POLL->POLLHUP | POLL->POLLNVAL | POLL->POLLERR)) {
+          $io_ready = 1;
         }
         else {
-          if ($revent & POLL->POLLIN) {
-            $io_ready = 1;
+          if ($poll_coroutine->{is_write}) {
+            if ($revent & POLL->POLLOUT) {
+              $io_ready = 1;
+            }
+          }
+          else {
+            if ($revent & POLL->POLLIN) {
+              $io_ready = 1;
+            }
           }
         }
         

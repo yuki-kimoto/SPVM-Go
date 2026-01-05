@@ -1,6 +1,7 @@
 0.014 2025-01-13-05
   [Bug Fix]
     * Fix a bug that Go::Select#select blocks when the channel is closed.
+    * Fix a bug that POLL->POLLHUP, POLL->POLLNVAL, POLL->POLLERR is not treated.
     
 0.013 2025-10-13
   [Changes]
