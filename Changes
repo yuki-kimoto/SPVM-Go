@@ -1,4 +1,4 @@
-0.014 2025-01-13-05
+0.014 2026-01-05
   [Changes]
     * Channel#read $ok_ref argument becomes optional. 
   [Bug Fix]
