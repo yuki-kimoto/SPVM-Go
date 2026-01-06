@@ -97,8 +97,4 @@ class Go::OS::Signal {
       $select->select;
     });
   }
-  
-  use Sys::Process;
-  use Sys::IO;
-  use Sys;
 }
