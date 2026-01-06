@@ -129,7 +129,7 @@ class TestCase::Go::OS::Signal {
       
       my $process_id = Sys->process_id;
       Sys->kill(SIGNAL->SIGTERM, $process_id);
-      Sys->kill(SIGNAL->SIGTERM, $process_id);
+      Sys->kill(SIGNAL->SIGINT, $process_id);
       
       my $ok = 0;
       my $signal = $ch->read(\$ok);
