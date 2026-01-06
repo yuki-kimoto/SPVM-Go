@@ -1,3 +1,6 @@
+0.015 2026-01-06
+  [Bug Fix]
+    * Fix a bug that Go::OS::Signal#notify blocks duplicated signals.
 0.014 2026-01-05
   [Changes]
     * Channel#read $ok_ref argument becomes optional. 

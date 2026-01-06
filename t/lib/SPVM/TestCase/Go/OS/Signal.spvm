@@ -116,4 +116,36 @@ class TestCase::Go::OS::Signal {
     
     return 1;
   }
+  
+  static method duplicated_signals : int () {
+    
+    $RESULT = IntList->new;
+    
+    Go->go(method : void () {
+    
+      my $ch = Go->make(1);
+      
+      Go::OS::Signal->notify($ch, SIGNAL->SIGTERM);
+      
+      my $process_id = Sys->process_id;
+      Sys->kill(SIGNAL->SIGTERM, $process_id);
+      Sys->kill(SIGNAL->SIGTERM, $process_id);
+      
+      my $ok = 0;
+      my $signal = $ch->read(\$ok);
+      
+      $RESULT->push($signal);
+    });
+    
+    Go->gosched;
+    
+    unless (Array->equals_int($RESULT->to_array, [SIGNAL->SIGTERM])) {
+      return 0;
+    }
+    
+    $RESULT = undef;
+    
+    return 1;
+  }
+  
 }
