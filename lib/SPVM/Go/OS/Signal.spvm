@@ -11,6 +11,7 @@ class Go::OS::Signal {
   use Errno;
   use Thread;
   use Go::Sync::WaitGroup;
+  use Hash;
   
   INIT {
     my $read_fd = -1;
@@ -27,9 +28,15 @@ class Go::OS::Signal {
     Sys::Signal->SET_SIG_GO_WRITE_FD($write_fd);
   }
   
+  # Class Variables
   our $READ_FD : int;
   
+  our $SIGNALS_H : cache Hash of Int;
+  
   static method ignore : void ($signal : int) {
+    
+    $SIGNALS_H->delete("$signal");
+    
     Sys::Signal->signal($signal, Sys::Signal->SIG_IGN);
   }
   
@@ -38,6 +45,10 @@ class Go::OS::Signal {
     unless ($channel) {
       die "\$channel must be defined.";
     }
+    
+    $SIGNALS_H //= Hash->new;
+    
+    $SIGNALS_H->{"$signal"} = $signal;
     
     Sys::Signal->signal($signal, Sys::Signal->SIG_GO);
     
