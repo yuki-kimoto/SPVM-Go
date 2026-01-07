@@ -102,10 +102,12 @@ class Go::OS::Signal {
       
       my $got_signal = $numbers->[0];
       
-      my $select = Go->new_select;
-      $select->set_non_blocking(1);
-      $select->add_write($channel, $got_signal);
-      $select->select;
+      if ($SIGNALS_H->{"$got_signal"}) {
+        my $select = Go->new_select;
+        $select->set_non_blocking(1);
+        $select->add_write($channel, $got_signal);
+        $select->select;
+      }
     });
   }
 }
