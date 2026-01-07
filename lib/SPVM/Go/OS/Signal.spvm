@@ -18,13 +18,13 @@ class Go::OS::Signal {
   
   our $WRITE_FD : int;
   
-  our $SIGNALS_H : cache Hash of Go::Channel[];
+  our $NOTIFIED_SIGNALS_H : cache Hash of Go::Channel[];
   
   our $SIGNAL_HANDLER_RUNNING : byte;
   
   static method ignore : void ($signal : int) {
     
-    $SIGNALS_H->delete("$signal");
+    $NOTIFIED_SIGNALS_H->delete("$signal");
   }
   
   static method notify : void ($channel : Go::Channel, $signal : int) {
@@ -33,11 +33,11 @@ class Go::OS::Signal {
       die "\$channel must be defined.";
     }
     
-    $SIGNALS_H //= Hash->new;
+    $NOTIFIED_SIGNALS_H //= Hash->new;
     
-    $SIGNALS_H->{"$signal"} //= new Go::Channel[0];
+    $NOTIFIED_SIGNALS_H->{"$signal"} //= new Go::Channel[0];
     
-    List->new_ref($SIGNALS_H->{"$signal"})->push($channel);
+    List->new_ref($NOTIFIED_SIGNALS_H->{"$signal"})->push($channel);
     
     Sys::Signal->signal($signal, Sys::Signal->SIG_GO);
     
@@ -61,7 +61,7 @@ class Go::OS::Signal {
       
       my $got_signal = $numbers->[0];
       
-      if (my $channels = $SIGNALS_H->{"$got_signal"}) {
+      if (my $channels = $NOTIFIED_SIGNALS_H->{"$got_signal"}) {
         for my $channel (@$channels) {
           my $select = Go->new_select;
           $select->set_non_blocking(1);
@@ -74,7 +74,7 @@ class Go::OS::Signal {
   
   static method stop : void ($channel : Go::Channel, $signal : int) {
     
-    my $channels = $SIGNALS_H->{"$signal"} // new Go::Channel[0];
+    my $channels = $NOTIFIED_SIGNALS_H->{"$signal"} // new Go::Channel[0];
     my $new_channels = (List of Go::Channel)List->new(new Go::Channel[0]);
     for my $_ (@$channels) {
       unless ($_ == $channel) {
@@ -82,7 +82,7 @@ class Go::OS::Signal {
       }
     }
     
-    $SIGNALS_H->{"$signal"} = $new_channels->to_array;
+    $NOTIFIED_SIGNALS_H->{"$signal"} = $new_channels->to_array;
   }
   
   static method start_handler : void () {
