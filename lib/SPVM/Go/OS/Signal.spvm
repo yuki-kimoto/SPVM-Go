@@ -16,7 +16,7 @@ class Go::OS::Signal {
   # Class Variables
   our $READ_FD : int;
   
-  our $SIGNALS_H : cache Hash of Int;
+  our $SIGNALS_H : cache Hash of Go::Channel[];
   
   our $SIGNAL_HANDLER_RUNNING : byte;
   
@@ -35,7 +35,9 @@ class Go::OS::Signal {
     
     $SIGNALS_H //= Hash->new;
     
-    $SIGNALS_H->{"$signal"} = $signal;
+    $SIGNALS_H->{"$signal"} //= new Go::Channel[0];
+    
+    List->new_ref($SIGNALS_H->{"$signal"})->push($channel);
     
     unless (&is_handler_running) {
       &start_handler;
@@ -43,7 +45,7 @@ class Go::OS::Signal {
     
     Sys::Signal->signal($signal, Sys::Signal->SIG_GO);
     
-    Go->go([$channel : Go::Channel] method : void () {
+    Go->go(method : void () {
       my $buffer = (mutable string)new_string_len 4;
       
       my $use_thread = 0;
@@ -93,11 +95,13 @@ class Go::OS::Signal {
       
       my $got_signal = $numbers->[0];
       
-      if ($SIGNALS_H->{"$got_signal"}) {
-        my $select = Go->new_select;
-        $select->set_non_blocking(1);
-        $select->add_write($channel, $got_signal);
-        $select->select;
+      if (my $channels = $SIGNALS_H->{"$got_signal"}) {
+        for my $channel (@$channels) {
+          my $select = Go->new_select;
+          $select->set_non_blocking(1);
+          $select->add_write($channel, $got_signal);
+          $select->select;
+        }
       }
     });
   }
