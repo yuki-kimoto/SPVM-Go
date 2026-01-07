@@ -70,6 +70,10 @@ class Go::OS::Signal {
     
     Go->go(method : void () {
       
+      unless ($SIGNAL_READ_FD > -1) {
+        return;
+      }
+      
       my $buffer = (mutable string)new_string_len 4;
       
       my $thread = Thread->new([$buffer : mutable string] method : void () {
@@ -157,6 +161,8 @@ class Go::OS::Signal {
     
     my $signal_read_fd = $SIGNAL_READ_FD;
     $SIGNAL_READ_FD = -1;
+    
+    Sys::Signal->SET_SIG_GO_WRITE_FD(-1);
     
     Sys::IO->close($signal_write_fd);
     
