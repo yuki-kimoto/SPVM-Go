@@ -39,7 +39,11 @@ class Go::OS::Signal {
     
     Sys::Signal->signal($signal, Sys::Signal->SIG_GO);
     
+    $MUTEX->lock;
+    
     $NOTIFIED_SIGNALS_H->{"$signal"} = new Go::Channel[0];
+    
+    $MUTEX->unlock;
   }
   
   static method notify : void ($channel : Go::Channel, $signal : int) {
@@ -50,11 +54,15 @@ class Go::OS::Signal {
       die "\$channel must be defined.";
     }
     
+    $MUTEX->lock;
+    
     $NOTIFIED_SIGNALS_H //= Hash->new;
     
     $NOTIFIED_SIGNALS_H->{"$signal"} //= new Go::Channel[0];
     
     List->new_ref($NOTIFIED_SIGNALS_H->{"$signal"})->push($channel);
+    
+    $MUTEX->unlock;
     
     unless (&is_handler_running) {
       &start_handler;
@@ -76,6 +84,8 @@ class Go::OS::Signal {
       
       my $got_signal = $numbers->[0];
       
+      $MUTEX->lock;
+      
       if (my $channels = $NOTIFIED_SIGNALS_H->{"$got_signal"}) {
         for my $channel (@$channels) {
           my $select = Go->new_select;
@@ -84,12 +94,16 @@ class Go::OS::Signal {
           $select->select;
         }
       }
+      
+      $MUTEX->unlock;
     });
   }
   
   static method stop : void ($channel : Go::Channel, $signal : int) {
     
     Sys::Signal->signal($signal, Sys::Signal->SIG_GO);
+    
+    $MUTEX->lock;
     
     my $channels = $NOTIFIED_SIGNALS_H->{"$signal"} // new Go::Channel[0];
     my $new_channels = (List of Go::Channel)List->new(new Go::Channel[0]);
@@ -100,6 +114,8 @@ class Go::OS::Signal {
     }
     
     $NOTIFIED_SIGNALS_H->{"$signal"} = $new_channels->to_array;
+    
+    $MUTEX->unlock;
   }
   
   static method start_handler : void () {
@@ -126,11 +142,15 @@ class Go::OS::Signal {
       die "Go::OS::Signal handler is already stopped.";
     }
     
+    $MUTEX->lock;
+    
     for my $signal (@{$NOTIFIED_SIGNALS_H->keys}) {
       Sys::Signal->signal((int)$signal, Sys::Signal->SIG_DFL);
     }
     
     $NOTIFIED_SIGNALS_H = undef;
+    
+    $MUTEX->unlock;
     
     Sys::IO->close($SIGNAL_WRITE_FD);
     $SIGNAL_WRITE_FD = -1;
