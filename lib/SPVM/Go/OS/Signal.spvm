@@ -16,6 +16,8 @@ class Go::OS::Signal {
   # Class Variables
   our $READ_FD : int;
   
+  our $WRITE_FD : int;
+  
   our $SIGNALS_H : cache Hash of Go::Channel[];
   
   our $SIGNAL_HANDLER_RUNNING : byte;
@@ -99,6 +101,8 @@ class Go::OS::Signal {
     Sys->pipe(\$read_fd, \$write_fd);
     
     $READ_FD = $read_fd;
+    
+    $WRITE_FD = $write_fd;
     
     unless (Sys::OS->is_windows) {
       Sys->fcntl($READ_FD, IO->F_SETFL, IO->O_NONBLOCK);
