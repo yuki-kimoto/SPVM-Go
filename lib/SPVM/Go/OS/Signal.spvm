@@ -12,6 +12,7 @@ class Go::OS::Signal {
   use Thread;
   use Go::Sync::WaitGroup;
   use Hash;
+  use Sys::Signal::Handler;
   
   # Class Variables
   our $SIGNAL_READ_FD : int;
@@ -22,11 +23,9 @@ class Go::OS::Signal {
   
   our $SIGNAL_HANDLER_RUNNING : byte;
   
-  our $ORIGINAL_SIGNAL_HANDLERS_H : cache Hash of Int;
-  
   static method ignore : void ($signal : int) {
     
-    $NOTIFIED_SIGNALS_H->delete("$signal");
+    $NOTIFIED_SIGNALS_H->{"$signal"} = new Go::Channel[0];
   }
   
   static method notify : void ($channel : Go::Channel, $signal : int) {
@@ -41,8 +40,6 @@ class Go::OS::Signal {
     
     unless ($NOTIFIED_SIGNALS_H->{"$signal"}) {
       $NOTIFIED_SIGNALS_H->{"$signal"} = new Go::Channel[0];
-      $ORIGINAL_SIGNAL_HANDLERS_H //= Hash->new;
-      $ORIGINAL_SIGNAL_HANDLERS_H->{"$signal"} = $original_signal_hander;
     }
     
     List->new_ref($NOTIFIED_SIGNALS_H->{"$signal"})->push($channel);
@@ -116,6 +113,18 @@ class Go::OS::Signal {
     unless ($SIGNAL_HANDLER_RUNNING) {
       die "Go::OS::Signal handler is already stopped.";
     }
+    
+    for my $signal (@{$NOTIFIED_SIGNALS_H->keys}) {
+      Sys::Signal->signal((int)$signal, Sys::Signal->SIG_DFL);
+    }
+    
+    $NOTIFIED_SIGNALS_H = undef;
+    
+    Sys::IO->close($SIGNAL_WRITE_FD);
+    $SIGNAL_WRITE_FD = -1;
+    
+    Sys::IO->close($SIGNAL_READ_FD);
+    $SIGNAL_READ_FD = -1;
     
     $SIGNAL_HANDLER_RUNNING = 0;
   }
