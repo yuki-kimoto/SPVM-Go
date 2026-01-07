@@ -27,6 +27,8 @@ class Go::OS::Signal {
   
   our $NOTIFIED_SIGNALS_H : cache Hash of Go::Channel[];
   
+  our $SIGNAL_HANDLER_TRHEAD : Thread;
+  
   static method ignore : void ($signal : int) {
     
     Sys::Signal->signal($signal, Sys::Signal->SIG_GO);
