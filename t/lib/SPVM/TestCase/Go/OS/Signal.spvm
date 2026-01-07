@@ -11,7 +11,7 @@ class TestCase::Go::OS::Signal {
     $RESULT = IntList->new;
     
     Go->go(method : void () {
-    
+      
       my $ch = Go->make(1);
       
       Go::OS::Signal->notify($ch, SIGNAL->SIGTERM);
@@ -25,7 +25,15 @@ class TestCase::Go::OS::Signal {
       $RESULT->push($signal);
     });
     
+    unless (Go::OS::Signal->is_handler_running) {
+      Go::OS::Signal->start_handler;
+    }
+    
     Go->gosched;
+    
+    if (Go::OS::Signal->is_handler_running) {
+      Go::OS::Signal->stop_handler;
+    }
     
     unless (Array->equals_int($RESULT->to_array, [SIGNAL->SIGTERM])) {
       return 0;
@@ -66,7 +74,15 @@ class TestCase::Go::OS::Signal {
       $RESULT->push($signal1);
     });
     
+    unless (Go::OS::Signal->is_handler_running) {
+      Go::OS::Signal->start_handler;
+    }
+    
     Go->gosched;
+    
+    if (Go::OS::Signal->is_handler_running) {
+      Go::OS::Signal->stop_handler;
+    }
     
     unless (Array->equals_int($RESULT->to_array, [SIGNAL->SIGTERM, SIGNAL->SIGTERM])) {
       return 0;
@@ -106,7 +122,15 @@ class TestCase::Go::OS::Signal {
       $RESULT->push($signal1);
     });
     
+    unless (Go::OS::Signal->is_handler_running) {
+      Go::OS::Signal->start_handler;
+    }
+    
     Go->gosched;
+    
+    if (Go::OS::Signal->is_handler_running) {
+      Go::OS::Signal->stop_handler;
+    }
     
     unless (Array->equals_int($RESULT->to_array, [SIGNAL->SIGTERM, SIGNAL->SIGINT])) {
       return 0;
@@ -137,7 +161,15 @@ class TestCase::Go::OS::Signal {
       $RESULT->push($signal);
     });
     
+    unless (Go::OS::Signal->is_handler_running) {
+      Go::OS::Signal->start_handler;
+    }
+    
     Go->gosched;
+    
+    if (Go::OS::Signal->is_handler_running) {
+      Go::OS::Signal->stop_handler;
+    }
     
     unless (Array->equals_int($RESULT->to_array, [SIGNAL->SIGTERM])) {
       return 0;

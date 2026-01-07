@@ -3,6 +3,10 @@
     * Throw an exception if a second main goroutine exist.
   [Changes]
     * Throw an exception when leak goroutines exist.
+  [Bug Fix]
+    * Fix a bug that Go::OS::Signal#notify catches a signal only once.
+  [Internal Changes]
+    * Go::OS::Signal is implemented using Thread instead of goroutine.
     
 0.015 2026-01-06
   [Bug Fix]

@@ -14,6 +14,7 @@ class Go::OS::Signal {
   use Hash;
   use Sys::Signal::Handler;
   use Sync::Mutex;
+  use Sys::Process;
   
   # Class Variables
   our $SIGNAL_READ_FD : int;
@@ -28,7 +29,7 @@ class Go::OS::Signal {
   
   our $NOTIFIED_SIGNALS_H : cache Hash of Go::Channel[];
   
-  our $SIGNAL_HANDLER_TRHEAD : Thread;
+  our $SIGNAL_HANDLER_TRHEAD : cache Thread;
   
   our $MUTEX : Sync::Mutex;
   INIT {
@@ -63,44 +64,6 @@ class Go::OS::Signal {
     List->new_ref($NOTIFIED_SIGNALS_H->{"$signal"})->push($channel);
     
     $MUTEX->unlock;
-    
-    unless (&is_handler_running) {
-      &start_handler;
-    }
-    
-    Go->go(method : void () {
-      
-      unless ($SIGNAL_READ_FD > -1) {
-        return;
-      }
-      
-      my $buffer = (mutable string)new_string_len 4;
-      
-      my $thread = Thread->new([$buffer : mutable string] method : void () {
-        Sys::IO->read($SIGNAL_READ_FD, $buffer, 4);
-      });
-      
-      $thread->join;
-      
-      my $numbers = new int [1];
-      
-      Fn->memcpy($numbers, 0, $buffer, 0, 4);
-      
-      my $got_signal = $numbers->[0];
-      
-      $MUTEX->lock;
-      
-      if (my $channels = $NOTIFIED_SIGNALS_H->{"$got_signal"}) {
-        for my $channel (@$channels) {
-          my $select = Go->new_select;
-          $select->set_non_blocking(1);
-          $select->add_write($channel, $got_signal);
-          $select->select;
-        }
-      }
-      
-      $MUTEX->unlock;
-    });
   }
   
   static method stop : void ($channel : Go::Channel, $signal : int) {
@@ -138,6 +101,46 @@ class Go::OS::Signal {
     $SIGNAL_WRITE_FD = $signal_write_fd;
     
     Sys::Signal->SET_SIG_GO_WRITE_FD($signal_write_fd);
+    
+    $SIGNAL_HANDLER_TRHEAD = Thread->new(method : void () {
+      
+      while (1) {
+        unless ($SIGNAL_READ_FD > -1) {
+          return;
+        }
+        
+        my $buffer = (mutable string)new_string_len 4;
+        
+        eval { Sys::IO->read($SIGNAL_READ_FD, $buffer, 4); }
+        
+        if ($@) {
+          return;
+        }
+        
+        my $numbers = new int [1];
+        
+        Fn->memcpy($numbers, 0, $buffer, 0, 4);
+        
+        my $got_signal = $numbers->[0];
+        
+        $MUTEX->lock;
+        
+        if (my $channels = $NOTIFIED_SIGNALS_H->{"$got_signal"}) {
+          for my $channel (@$channels) {
+            my $select = Go->new_select;
+            $select->set_non_blocking(1);
+            $select->add_write($channel, $got_signal);
+            $select->select;
+          }
+        }
+        
+        $MUTEX->unlock;
+        
+        Sys::Process->usleep(10_000); # 10ms
+      }
+      
+    });
+    
   }
   
   static method stop_handler : void () {
@@ -167,6 +170,10 @@ class Go::OS::Signal {
     Sys::IO->close($signal_write_fd);
     
     Sys::IO->close($signal_read_fd);
+    
+    $SIGNAL_HANDLER_TRHEAD->join;
+    
+    $SIGNAL_HANDLER_TRHEAD = undef;
   }
   
   static method is_handler_running : int () {
