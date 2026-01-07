@@ -29,22 +29,22 @@ class Go::OS::Signal {
   
   static method ignore : void ($signal : int) {
     
+    Sys::Signal->signal($signal, Sys::Signal->SIG_GO);
+    
     $NOTIFIED_SIGNALS_H->{"$signal"} = new Go::Channel[0];
   }
   
   static method notify : void ($channel : Go::Channel, $signal : int) {
     
+    Sys::Signal->signal($signal, Sys::Signal->SIG_GO);
+    
     unless ($channel) {
       die "\$channel must be defined.";
     }
     
-    my $original_signal_hander = Sys::Signal->signal($signal, Sys::Signal->SIG_GO);
-    
     $NOTIFIED_SIGNALS_H //= Hash->new;
     
-    unless ($NOTIFIED_SIGNALS_H->{"$signal"}) {
-      $NOTIFIED_SIGNALS_H->{"$signal"} = new Go::Channel[0];
-    }
+    $NOTIFIED_SIGNALS_H->{"$signal"} //= new Go::Channel[0];
     
     List->new_ref($NOTIFIED_SIGNALS_H->{"$signal"})->push($channel);
     
@@ -80,6 +80,8 @@ class Go::OS::Signal {
   }
   
   static method stop : void ($channel : Go::Channel, $signal : int) {
+    
+    Sys::Signal->signal($signal, Sys::Signal->SIG_GO);
     
     my $channels = $NOTIFIED_SIGNALS_H->{"$signal"} // new Go::Channel[0];
     my $new_channels = (List of Go::Channel)List->new(new Go::Channel[0]);
