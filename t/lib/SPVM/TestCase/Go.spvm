@@ -64,26 +64,28 @@ class TestCase::Go {
     $RESULT = IntList->new;
     
     Go->go(method : void () {
-      die "Exception!.";
-      
-      $RESULT->push(1);
-      
-    });
-    
-    Go->go(method : void () {
-      eval {
+      Go->go(method : void () {
         die "Exception!.";
-      }
+        
+        $RESULT->push(1);
+        
+      });
       
-      $RESULT->push(2);
+      Go->go(method : void () {
+        eval {
+          die "Exception!.";
+        }
+        
+        $RESULT->push(2);
+        
+      });
       
-    });
-    
-    Go->go(method : void () {
-      &error();
-      
-      $RESULT->push(3);
-      
+      Go->go(method : void () {
+        &error();
+        
+        $RESULT->push(3);
+        
+      });
     });
     
     Go->gosched;
@@ -154,9 +156,11 @@ class TestCase::Go {
     Go->go(method : void () {
     });
     
-    Go->gosched;
+    eval { Go->gosched; }
     
-    warn;
+    unless ($@) {
+      return 0;
+    }
     
     return 1;
   }

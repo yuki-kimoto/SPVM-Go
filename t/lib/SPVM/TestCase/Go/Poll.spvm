@@ -45,13 +45,15 @@ class TestCase::Go::Poll {
     $RESULTS->[1] = StringList->new;
     
     Go->go([$port : int] method : void () {
-      my $id = 0;
-      &go_send_and_recv($port, $id);
-    });
-    
-    Go->go([$port : int] method : void () {
-      my $id = 1;
-      &go_send_and_recv($port, $id);
+      Go->go([$port : int] method : void () {
+        my $id = 0;
+        &go_send_and_recv($port, $id);
+      });
+      
+      Go->go([$port : int] method : void () {
+        my $id = 1;
+        &go_send_and_recv($port, $id);
+      });
     });
     
     Go->gosched;
@@ -80,28 +82,30 @@ class TestCase::Go::Poll {
     $RESULTS->[2] = StringList->new;
     
     Go->go([$port : int] method : void () {
-      my $id = 0;
-      &go_send_and_recv($port, $id, 2);
-    });
-    
-    Go->go([$port : int] method : void () {
-      my $id = 1;
-      my $timeout = 1.0;
+      Go->go([$port : int] method : void () {
+        my $id = 0;
+        &go_send_and_recv($port, $id, 2);
+      });
       
-      eval { &go_send_and_recv($port, $id, 0, $timeout); }
-      
-      my $timeout_ok = 0;
-      
-      if ($@) {
-        if (eval_error_id is_error Go::Error::IOTimeout) {
-          $timeout_ok = 1;
+      Go->go([$port : int] method : void () {
+        my $id = 1;
+        my $timeout = 1.0;
+        
+        eval { &go_send_and_recv($port, $id, 0, $timeout); }
+        
+        my $timeout_ok = 0;
+        
+        if ($@) {
+          if (eval_error_id is_error Go::Error::IOTimeout) {
+            $timeout_ok = 1;
+          }
+          else {
+            die $@;
+          }
         }
-        else {
-          die $@;
-        }
-      }
-      
-      $RESULTS->[2]->push($timeout_ok);
+        
+        $RESULTS->[2]->push($timeout_ok);
+      });
     });
     
     Go->gosched;

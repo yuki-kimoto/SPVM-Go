@@ -356,92 +356,94 @@ class TestCase::Go::Channel {
   static method extra : int () {
     
     Go->go(method : void () {
-      
-      my $ch = Go->make(2);
-      
-      Go->go([has ch : Go::Channel = $ch] method : void () {
+      Go->go(method : void () {
         
-        my $ch = $self->{ch};
+        my $ch = Go->make(2);
         
-        my $len1 = $ch->len;
+        Go->go([has ch : Go::Channel = $ch] method : void () {
+          
+          my $ch = $self->{ch};
+          
+          my $len1 = $ch->len;
+          
+          $ch->write(3);
+          
+          my $len2 = $ch->len;
+          
+          $ch->write(4);
+          
+          my $len3 = $ch->len;
+          
+          $ch->write(5);
+          
+          my $len4 = $ch->len;
+        });
         
-        $ch->write(3);
+        Go->gosched;
         
-        my $len2 = $ch->len;
+        Go->sleep(0.1);
         
-        $ch->write(4);
-        
-        my $len3 = $ch->len;
-        
-        $ch->write(5);
-        
-        my $len4 = $ch->len;
-      });
-      
-      Go->gosched;
-      
-      Go->sleep(0.1);
-      
-      my $ok = 0;
-      
-      my $len1 = $ch->len;
-      
-      my $value1 = (int)$ch->read(\$ok);
-      
-      my $len2 = $ch->len;
-      
-      my $value2 = (int)$ch->read(\$ok);
-      
-      my $len3 = $ch->len;
-      
-      my $value3 = (int)$ch->read(\$ok);
-      
-      my $len4 = $ch->len;
-      
-      my $cap = $ch->cap;
-    });
-    
-    Go->go(method : void () {
-      
-      my $ch = Go->make(2);
-      
-      Go->go([has ch : Go::Channel = $ch] method : void () {
-        
-        my $ch = $self->{ch};
+        my $ok = 0;
         
         my $len1 = $ch->len;
         
-        $ch->write(3);
+        my $value1 = (int)$ch->read(\$ok);
         
         my $len2 = $ch->len;
         
-        $ch->write(4);
+        my $value2 = (int)$ch->read(\$ok);
         
         my $len3 = $ch->len;
         
-        $ch->write(5);
+        my $value3 = (int)$ch->read(\$ok);
         
         my $len4 = $ch->len;
+        
+        my $cap = $ch->cap;
       });
       
-      my $ok = 0;
-      
-      my $len1 = $ch->len;
-      
-      my $value1 = (int)$ch->read(\$ok);
-      
-      my $len2 = $ch->len;
-      
-      my $value2 = (int)$ch->read(\$ok);
-      
-      my $len3 = $ch->len;
-      
-      my $value3 = (int)$ch->read(\$ok);
-      
-      my $len4 = $ch->len;
-      
-      my $cap = $ch->cap;
-      
+      Go->go(method : void () {
+        
+        my $ch = Go->make(2);
+        
+        Go->go([has ch : Go::Channel = $ch] method : void () {
+          
+          my $ch = $self->{ch};
+          
+          my $len1 = $ch->len;
+          
+          $ch->write(3);
+          
+          my $len2 = $ch->len;
+          
+          $ch->write(4);
+          
+          my $len3 = $ch->len;
+          
+          $ch->write(5);
+          
+          my $len4 = $ch->len;
+        });
+        
+        my $ok = 0;
+        
+        my $len1 = $ch->len;
+        
+        my $value1 = (int)$ch->read(\$ok);
+        
+        my $len2 = $ch->len;
+        
+        my $value2 = (int)$ch->read(\$ok);
+        
+        my $len3 = $ch->len;
+        
+        my $value3 = (int)$ch->read(\$ok);
+        
+        my $len4 = $ch->len;
+        
+        my $cap = $ch->cap;
+        
+      });
     });
     
     Go->gosched;
