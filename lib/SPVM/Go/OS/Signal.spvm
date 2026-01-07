@@ -14,9 +14,9 @@ class Go::OS::Signal {
   use Hash;
   
   # Class Variables
-  our $READ_FD : int;
+  our $SIGNAL_READ_FD : int;
   
-  our $WRITE_FD : int;
+  our $SIGNAL_WRITE_FD : int;
   
   our $NOTIFIED_SIGNALS_H : cache Hash of Go::Channel[];
   
@@ -50,7 +50,7 @@ class Go::OS::Signal {
       my $buffer = (mutable string)new_string_len 4;
       
       my $thread = Thread->new([$buffer : mutable string] method : void () {
-        Sys::IO->read($READ_FD, $buffer, 4);
+        Sys::IO->read($SIGNAL_READ_FD, $buffer, 4);
       });
       
       $thread->join;
@@ -93,16 +93,16 @@ class Go::OS::Signal {
     
     $SIGNAL_HANDLER_RUNNING = 1;
     
-    my $read_fd = -1;
-    my $write_fd = -1;
+    my $signal_read_fd = -1;
+    my $signal_write_fd = -1;
     
-    Sys->pipe(\$read_fd, \$write_fd);
+    Sys->pipe(\$signal_read_fd, \$signal_write_fd);
     
-    $READ_FD = $read_fd;
+    $SIGNAL_READ_FD = $signal_read_fd;
     
-    $WRITE_FD = $write_fd;
+    $SIGNAL_WRITE_FD = $signal_write_fd;
     
-    Sys::Signal->SET_SIG_GO_WRITE_FD($write_fd);
+    Sys::Signal->SET_SIG_GO_WRITE_FD($signal_write_fd);
   }
   
   static method stop_handler : void () {
