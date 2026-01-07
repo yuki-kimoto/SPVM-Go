@@ -22,6 +22,8 @@ class Go::OS::Signal {
   
   our $SIGNAL_HANDLER_RUNNING : byte;
   
+  our $ORIGINAL_SIGNAL_HANDLERS_H : cache Hash of Int;
+  
   static method ignore : void ($signal : int) {
     
     $NOTIFIED_SIGNALS_H->delete("$signal");
@@ -33,13 +35,17 @@ class Go::OS::Signal {
       die "\$channel must be defined.";
     }
     
+    my $original_signal_hander = Sys::Signal->signal($signal, Sys::Signal->SIG_GO);
+    
     $NOTIFIED_SIGNALS_H //= Hash->new;
     
-    $NOTIFIED_SIGNALS_H->{"$signal"} //= new Go::Channel[0];
+    unless ($NOTIFIED_SIGNALS_H->{"$signal"}) {
+      $NOTIFIED_SIGNALS_H->{"$signal"} = new Go::Channel[0];
+      $ORIGINAL_SIGNAL_HANDLERS_H //= Hash->new;
+      $ORIGINAL_SIGNAL_HANDLERS_H->{"$signal"} = $original_signal_hander;
+    }
     
     List->new_ref($NOTIFIED_SIGNALS_H->{"$signal"})->push($channel);
-    
-    Sys::Signal->signal($signal, Sys::Signal->SIG_GO);
     
     unless (&is_handler_running) {
       &start_handler;
