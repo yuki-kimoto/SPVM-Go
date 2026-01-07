@@ -3,6 +3,9 @@
 
 class Go::OS::Signal {
   version_from Go;
+  
+  allow Go::Schedule;
+  
   use Go;
   use Go::Channel;
   use Sys::Signal;
@@ -57,8 +60,6 @@ class Go::OS::Signal {
     
     $MUTEX->lock;
     
-    $NOTIFIED_SIGNALS_H //= Hash->new;
-    
     $NOTIFIED_SIGNALS_H->{"$signal"} //= new Go::Channel[0];
     
     List->new_ref($NOTIFIED_SIGNALS_H->{"$signal"})->push($channel);
@@ -85,9 +86,9 @@ class Go::OS::Signal {
     $MUTEX->unlock;
   }
   
-  static method start_handler : void () {
+  private static method start_handler : void () {
     
-    if (&is_handler_running) {
+    if (&_is_handler_running) {
       die "Go::OS::Signal handler is already running.";
     }
     
@@ -101,6 +102,12 @@ class Go::OS::Signal {
     $SIGNAL_WRITE_FD = $signal_write_fd;
     
     Sys::Signal->SET_SIG_GO_WRITE_FD($signal_write_fd);
+    
+    $MUTEX->lock;
+    
+    $NOTIFIED_SIGNALS_H = Hash->new;
+    
+    $MUTEX->unlock;
     
     $SIGNAL_HANDLER_TRHEAD = Thread->new(method : void () {
       
@@ -125,7 +132,7 @@ class Go::OS::Signal {
         
         $MUTEX->lock;
         
-        if (my $channels = $NOTIFIED_SIGNALS_H->{"$got_signal"}) {
+        if ($NOTIFIED_SIGNALS_H && (my $channels = $NOTIFIED_SIGNALS_H->{"$got_signal"})) {
           for my $channel (@$channels) {
             my $select = Go->new_select;
             $select->set_non_blocking(1);
@@ -143,18 +150,19 @@ class Go::OS::Signal {
     
   }
   
-  static method stop_handler : void () {
+  static method _stop_handler : void () {
     
-    unless (&is_handler_running) {
+    unless (&_is_handler_running) {
       die "Go::OS::Signal handler is already stopped.";
     }
     
     $MUTEX->lock;
     
-    for my $signal (@{$NOTIFIED_SIGNALS_H->keys}) {
-      Sys::Signal->signal((int)$signal, Sys::Signal->SIG_DFL);
+    if ($NOTIFIED_SIGNALS_H) {
+      for my $signal (@{$NOTIFIED_SIGNALS_H->keys}) {
+        Sys::Signal->signal((int)$signal, Sys::Signal->SIG_DFL);
+      }
     }
-    
     $NOTIFIED_SIGNALS_H = undef;
     
     $MUTEX->unlock;
@@ -176,7 +184,7 @@ class Go::OS::Signal {
     $SIGNAL_HANDLER_TRHEAD = undef;
   }
   
-  static method is_handler_running : int () {
+  static method _is_handler_running : int () {
     
     return $SIGNAL_READ_FD > -1;
   }
