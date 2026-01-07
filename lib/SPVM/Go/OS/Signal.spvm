@@ -39,11 +39,11 @@ class Go::OS::Signal {
     
     List->new_ref($SIGNALS_H->{"$signal"})->push($channel);
     
+    Sys::Signal->signal($signal, Sys::Signal->SIG_GO);
+    
     unless (&is_handler_running) {
       &start_handler;
     }
-    
-    Sys::Signal->signal($signal, Sys::Signal->SIG_GO);
     
     Go->go(method : void () {
       my $buffer = (mutable string)new_string_len 4;
@@ -108,7 +108,15 @@ class Go::OS::Signal {
   
   static method stop : void ($channel : Go::Channel, $signal : int) {
     
-    die "TODO";
+    my $channels = $SIGNALS_H->{"$signal"} // new Go::Channel[0];
+    my $new_channels = (List of Go::Channel)List->new(new Go::Channel[0]);
+    for my $_ (@$channels) {
+      unless ($_ == $channel) {
+        $new_channels->push($_);
+      }
+    }
+    
+    $SIGNALS_H->{"$signal"} = $new_channels->to_array;
   }
   
   static method start_handler : void () {
