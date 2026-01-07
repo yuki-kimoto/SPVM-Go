@@ -13,6 +13,7 @@ class Go::OS::Signal {
   use Go::Sync::WaitGroup;
   use Hash;
   use Sys::Signal::Handler;
+  use Sync::Mutex;
   
   # Class Variables
   our $SIGNAL_READ_FD : int;
@@ -28,6 +29,11 @@ class Go::OS::Signal {
   our $NOTIFIED_SIGNALS_H : cache Hash of Go::Channel[];
   
   our $SIGNAL_HANDLER_TRHEAD : Thread;
+  
+  our $MUTEX : Sync::Mutex;
+  INIT {
+    $MUTEX = Sync::Mutex->new;
+  }
   
   static method ignore : void ($signal : int) {
     
