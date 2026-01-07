@@ -102,10 +102,6 @@ class Go::OS::Signal {
     
     $WRITE_FD = $write_fd;
     
-    unless (Sys::OS->is_windows) {
-      Sys->fcntl($READ_FD, IO->F_SETFL, IO->O_NONBLOCK);
-    }
-    
     Sys::Signal->SET_SIG_GO_WRITE_FD($write_fd);
   }
   
