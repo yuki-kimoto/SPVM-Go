@@ -152,11 +152,15 @@ class Go::OS::Signal {
     
     $MUTEX->unlock;
     
-    Sys::IO->close($SIGNAL_WRITE_FD);
+    my $signal_write_fd = $SIGNAL_WRITE_FD;
     $SIGNAL_WRITE_FD = -1;
     
-    Sys::IO->close($SIGNAL_READ_FD);
+    my $signal_read_fd = $SIGNAL_READ_FD;
     $SIGNAL_READ_FD = -1;
+    
+    Sys::IO->close($signal_write_fd);
+    
+    Sys::IO->close($signal_read_fd);
   }
   
   static method is_handler_running : int () {
