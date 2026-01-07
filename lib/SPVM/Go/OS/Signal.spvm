@@ -16,12 +16,16 @@ class Go::OS::Signal {
   
   # Class Variables
   our $SIGNAL_READ_FD : int;
+  INIT {
+    $SIGNAL_READ_FD = -1;
+  }
   
   our $SIGNAL_WRITE_FD : int;
+  INIT {
+    $SIGNAL_WRITE_FD = -1;
+  }
   
   our $NOTIFIED_SIGNALS_H : cache Hash of Go::Channel[];
-  
-  our $SIGNAL_HANDLER_RUNNING : byte;
   
   static method ignore : void ($signal : int) {
     
@@ -90,11 +94,9 @@ class Go::OS::Signal {
   
   static method start_handler : void () {
     
-    if ($SIGNAL_HANDLER_RUNNING) {
+    if (&is_handler_running) {
       die "Go::OS::Signal handler is already running.";
     }
-    
-    $SIGNAL_HANDLER_RUNNING = 1;
     
     my $signal_read_fd = -1;
     my $signal_write_fd = -1;
@@ -110,7 +112,7 @@ class Go::OS::Signal {
   
   static method stop_handler : void () {
     
-    unless ($SIGNAL_HANDLER_RUNNING) {
+    unless (&is_handler_running) {
       die "Go::OS::Signal handler is already stopped.";
     }
     
@@ -125,13 +127,11 @@ class Go::OS::Signal {
     
     Sys::IO->close($SIGNAL_READ_FD);
     $SIGNAL_READ_FD = -1;
-    
-    $SIGNAL_HANDLER_RUNNING = 0;
   }
   
   static method is_handler_running : int () {
     
-    return $SIGNAL_HANDLER_RUNNING;
+    return $SIGNAL_READ_FD > -1;
   }
   
 }
