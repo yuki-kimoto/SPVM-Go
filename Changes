@@ -1,4 +1,8 @@
 0.015 2026-01-06
+  [Changes]
+    * Throw an exception when leak goroutines exist.
+    
+0.015 2026-01-06
   [Bug Fix]
     * Fix a bug that Go::OS::Signal#notify blocks duplicated signals.
 0.014 2026-01-05

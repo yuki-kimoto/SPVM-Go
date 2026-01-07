@@ -145,4 +145,20 @@ class TestCase::Go {
     
     return 1;
   }
+  
+  static method goroutine_leak : int () {
+    
+    Go->go(method : void () {
+    });
+    
+    Go->go(method : void () {
+    });
+    
+    Go->gosched;
+    
+    warn;
+    
+    return 1;
+  }
+  
 }

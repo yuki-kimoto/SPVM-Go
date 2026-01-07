@@ -40,7 +40,7 @@ class Go::Schedule {
     
     my $self = new Go::Schedule;
     
-    my $coroutines = QList->new(new Go::Coroutine[0]);;
+    my $coroutines = QList->new(new Go::Coroutine[0]);
     
     $self->{coroutines} = $coroutines;
     
@@ -202,6 +202,15 @@ class Go::Schedule {
       $schedule_task = undef;
       
       $schedule_task_coroutine->{task} = undef;
+      
+      my $coroutines = $self->{coroutines};
+      
+      if (@$coroutines) {
+        my $coroutines_length = @$coroutines;
+        $self->{coroutines} = QList->new(new Go::Coroutine[0]);
+        die "Goroutine leak:The main goroutine ends with $coroutines_length active goroutines";
+      }
+      
     }
   }
   
