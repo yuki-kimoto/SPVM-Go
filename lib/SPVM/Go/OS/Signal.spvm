@@ -13,21 +13,6 @@ class Go::OS::Signal {
   use Go::Sync::WaitGroup;
   use Hash;
   
-  INIT {
-    my $read_fd = -1;
-    my $write_fd = -1;
-    
-    Sys->pipe(\$read_fd, \$write_fd);
-    
-    $READ_FD = $read_fd;
-    
-    unless (Sys::OS->is_windows) {
-      Sys->fcntl($READ_FD, IO->F_SETFL, IO->O_NONBLOCK);
-    }
-    
-    Sys::Signal->SET_SIG_GO_WRITE_FD($write_fd);
-  }
-  
   # Class Variables
   our $READ_FD : int;
   
@@ -129,6 +114,19 @@ class Go::OS::Signal {
     }
     
     $SIGNAL_HANDLER_RUNNING = 1;
+    
+    my $read_fd = -1;
+    my $write_fd = -1;
+    
+    Sys->pipe(\$read_fd, \$write_fd);
+    
+    $READ_FD = $read_fd;
+    
+    unless (Sys::OS->is_windows) {
+      Sys->fcntl($READ_FD, IO->F_SETFL, IO->O_NONBLOCK);
+    }
+    
+    Sys::Signal->SET_SIG_GO_WRITE_FD($write_fd);
   }
   
   static method stop_handler : void () {
