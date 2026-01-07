@@ -117,6 +117,11 @@ class Go::OS::Signal {
     });
   }
   
+  static method stop : void ($channel : Go::Channel, $signal : int) {
+    
+    die "TODO";
+  }
+  
   static method start_handler : void () {
     
     if ($SIGNAL_HANDLER_RUNNING) {
