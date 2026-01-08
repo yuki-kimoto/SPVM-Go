@@ -151,6 +151,7 @@ class TestCase::Go::OS::Signal {
       my $ch = Go->make(1);
       
       Go::OS::Signal->notify($ch, SIGNAL->SIGTERM);
+      Go::OS::Signal->notify($ch, SIGNAL->SIGINT);
       
       my $process_id = Sys->process_id;
       Sys->kill(SIGNAL->SIGTERM, $process_id);

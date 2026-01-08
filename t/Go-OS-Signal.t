@@ -19,8 +19,7 @@ ok(SPVM::TestCase::Go::OS::Signal->multi_channles);
 
 ok(SPVM::TestCase::Go::OS::Signal->multi_signals);
 
-# TODO
-# ok(SPVM::TestCase::Go::OS::Signal->duplicated_signals);
+ok(SPVM::TestCase::Go::OS::Signal->duplicated_signals);
 
 SPVM::Fn->destroy_runtime_permanent_vars;
 
