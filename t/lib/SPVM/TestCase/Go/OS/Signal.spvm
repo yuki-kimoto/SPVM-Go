@@ -10,12 +10,12 @@ class TestCase::Go::OS::Signal {
     
     $RESULT = IntList->new;
     
-    Go::OS::Signal->start_handler;
+    Go::OS::Signal->start_signal_handler;
     
     Go->go(method : void () {
       
       Fn->defer(method : void () {
-        Go::OS::Signal->stop_handler;
+        Go::OS::Signal->stop_signal_handler;
       });
       
       my $ch = Go->make(1);
@@ -47,12 +47,12 @@ class TestCase::Go::OS::Signal {
     
     $RESULT = IntList->new;
     
-    Go::OS::Signal->start_handler;
+    Go::OS::Signal->start_signal_handler;
     
     Go->go(method : void () {
       
       Fn->defer(method : void () {
-        Go::OS::Signal->stop_handler;
+        Go::OS::Signal->stop_signal_handler;
       });
       
       my $ch0 = Go->make(1);
@@ -94,12 +94,12 @@ class TestCase::Go::OS::Signal {
     
     $RESULT = IntList->new;
     
-    Go::OS::Signal->start_handler;
+    Go::OS::Signal->start_signal_handler;
     
     Go->go(method : void () {
       
       Fn->defer(method : void () {
-        Go::OS::Signal->stop_handler;
+        Go::OS::Signal->stop_signal_handler;
       });
       
       my $ch0 = Go->make(2);
@@ -140,12 +140,12 @@ class TestCase::Go::OS::Signal {
     
     $RESULT = IntList->new;
     
-    Go::OS::Signal->start_handler;
+    Go::OS::Signal->start_signal_handler;
     
     Go->go(method : void () {
       
       Fn->defer(method : void () {
-        Go::OS::Signal->stop_handler;
+        Go::OS::Signal->stop_signal_handler;
       });
       
       my $ch = Go->make(1);

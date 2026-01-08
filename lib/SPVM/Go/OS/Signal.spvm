@@ -69,9 +69,9 @@ class Go::OS::Signal {
     $NOTIFIED_SIGNALS_H->{"$signal"} = $new_channels->to_array;
   }
   
-  static method start_handler : void () {
+  static method start_signal_handler : void () {
     
-    if (&is_handler_running) {
+    if (&is_signal_handler_running) {
       die "Go::OS::Signal handler is already running.";
     }
     
@@ -147,9 +147,9 @@ class Go::OS::Signal {
     
   }
   
-  static method stop_handler : void () {
+  static method stop_signal_handler : void () {
     
-    unless (&is_handler_running) {
+    unless (&is_signal_handler_running) {
       die "Go::OS::Signal handler is already stopped.";
     }
     
@@ -177,7 +177,7 @@ class Go::OS::Signal {
     $SIGNAL_HANDLER_WG = undef;
   }
   
-  static method is_handler_running : int () {
+  static method is_signal_handler_running : int () {
     
     return $SIGNAL_READ_FD > -1;
   }
