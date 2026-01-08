@@ -1,9 +1,10 @@
 0.015 2026-01-08
   [Bug Fix]
     * Fix a bug that Go::OS::Signal#notify catches a signal only once.
-  [Internal Changes]
-    * Go::OS::Signal is implemented using Thread instead of goroutine.
-    
+  [New Features with Incompatible Changes]
+    * Add Go::OS::Signal#start_signal_handler method.
+    * Add Go::OS::Signal#stop_signal_handler method.
+    * These methods must be called to manipulate signals.
 0.015 2026-01-06
   [Bug Fix]
     * Fix a bug that Go::OS::Signal#notify blocks duplicated signals.
