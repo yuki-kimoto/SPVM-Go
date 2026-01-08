@@ -72,7 +72,7 @@ class Go::OS::Signal {
   static method start_signal_handler : void () {
     
     if (&is_signal_handler_running) {
-      die "Go::OS::Signal handler is already running.";
+      return;
     }
     
     my $signal_read_fd = -1;
@@ -150,7 +150,7 @@ class Go::OS::Signal {
   static method stop_signal_handler : void () {
     
     unless (&is_signal_handler_running) {
-      die "Go::OS::Signal handler is already stopped.";
+      return;
     }
     
     if ($NOTIFIED_SIGNALS_H) {
