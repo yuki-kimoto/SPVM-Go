@@ -24,7 +24,6 @@ class Go::Schedule {
   use Sys::Time::Util;
   use Sys::Time::Constant as TIME;
   use Format;
-  use Go::OS::Signal;
   
   has coroutines : List of Go::Coroutine;
   
@@ -176,14 +175,6 @@ class Go::Schedule {
       }
     }
     else {
-      Fn->defer(method : void () {
-        if (Go::OS::Signal->_is_handler_running) {
-          Go::OS::Signal->_stop_handler;
-        }
-      });
-      
-      Go::OS::Signal->start_handler;
-      
       if (@{$self->{coroutines}} > 1) {
         $self->{coroutines} = QList->new(new Go::Coroutine[0]);
         die "You must start only one main goroutine.";

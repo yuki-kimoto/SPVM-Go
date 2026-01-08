@@ -25,7 +25,7 @@ class TestCase::Go::OS::Signal {
       $RESULT->push($signal);
     });
     
-    Go->gosched;
+    Go->gosched_with_signal_handler;
     
     unless (Array->equals_int($RESULT->to_array, [SIGNAL->SIGTERM])) {
       return 0;
@@ -66,7 +66,7 @@ class TestCase::Go::OS::Signal {
       $RESULT->push($signal1);
     });
     
-    Go->gosched;
+    Go->gosched_with_signal_handler;
     
     unless (Array->equals_int($RESULT->to_array, [SIGNAL->SIGTERM, SIGNAL->SIGTERM])) {
       return 0;
@@ -106,7 +106,7 @@ class TestCase::Go::OS::Signal {
       $RESULT->push($signal1);
     });
     
-    Go->gosched;
+    Go->gosched_with_signal_handler;
     
     unless (Array->equals_int($RESULT->to_array, [SIGNAL->SIGTERM, SIGNAL->SIGINT])) {
       return 0;
@@ -137,7 +137,7 @@ class TestCase::Go::OS::Signal {
       $RESULT->push($signal);
     });
     
-    Go->gosched;
+    Go->gosched_with_signal_handler;
     
     unless (Array->equals_int($RESULT->to_array, [SIGNAL->SIGTERM])) {
       return 0;

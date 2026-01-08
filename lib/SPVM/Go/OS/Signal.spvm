@@ -86,9 +86,9 @@ class Go::OS::Signal {
     $MUTEX->unlock;
   }
   
-  private static method start_handler : void () {
+  static method start_handler : void () {
     
-    if (&_is_handler_running) {
+    if (&is_handler_running) {
       die "Go::OS::Signal handler is already running.";
     }
     
@@ -150,9 +150,9 @@ class Go::OS::Signal {
     
   }
   
-  static method _stop_handler : void () {
+  static method stop_handler : void () {
     
-    unless (&_is_handler_running) {
+    unless (&is_handler_running) {
       die "Go::OS::Signal handler is already stopped.";
     }
     
@@ -184,7 +184,7 @@ class Go::OS::Signal {
     $SIGNAL_HANDLER_TRHEAD = undef;
   }
   
-  static method _is_handler_running : int () {
+  static method is_handler_running : int () {
     
     return $SIGNAL_READ_FD > -1;
   }

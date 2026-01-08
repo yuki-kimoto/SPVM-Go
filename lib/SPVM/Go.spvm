@@ -8,6 +8,7 @@ class Go {
   use Go::Schedule;
   use Callback;
   use Go::Select;
+  use Go::OS::Signal;
   
   our $GO : Go;
   
@@ -49,6 +50,23 @@ class Go {
   }
   
   static method gosched : void () {
+    
+    my $schedule = $GO->{schedule};
+    
+    $schedule->schedule;
+  }
+  
+  static method gosched_with_signal_handler : void () {
+    
+    Fn->defer(method : void () {
+      if (Go::OS::Signal->is_handler_running) {
+        Go::OS::Signal->stop_handler;
+      }
+    });
+    
+    unless (Go::OS::Signal->is_handler_running) {
+      Go::OS::Signal->start_handler;
+    }
     
     my $schedule = $GO->{schedule};
     
