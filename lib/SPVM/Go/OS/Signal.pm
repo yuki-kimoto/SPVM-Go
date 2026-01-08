@@ -10,7 +10,7 @@ SPVM::Go::OS::Signal - Signal Manipulation
 
 =head1 Description
 
-The Go::OS::Signal class in L<SPVM> has methods to manipulate signals.
+Go::OS::Signal class in L<SPVM> provides a way to handle OS signals using channels.
 
 =head1 Usage
 
@@ -18,18 +18,29 @@ The Go::OS::Signal class in L<SPVM> has methods to manipulate signals.
   use Sys::Signal::Constant as SIGNAL;
   use Sys;
   
-  my $ch = Go->make(1);
+  Go::OS::Signal->start_signal_handler;
   
-  Go::OS::Signal->notify($ch, SIGNAL->SIGTERM);
+  Go->go(method : void () {
+    
+    Fn->defer(method : void () {
+      Go::OS::Signal->stop_signal_handler;
+    });
+    
+    my $ch = Go->make(1);
+    
+    Go::OS::Signal->notify($ch, SIGNAL->SIGTERM);
+    
+    Sys->kill(SIGNAL->SIGTERM, Sys->process_id);
+    
+    my $signal = $ch->read;
+    
+  });
   
-  Sys->kill(SIGNAL->SIGTERM, Sys->process_id);
-  
-  my $ok = 0;
-  my $signal = $ch->read(\$ok);
+  Go->gosched;
 
 =head1 Class Methods
 
-=head2 
+=head2 ignore
 
 C<static method ignore : void ($signal : int);>
 
@@ -44,6 +55,41 @@ C<static method notify : void ($channel : L<Go::Channel|SPVM::Go::Channel>, $sig
 Creates a goroutine to read the sent signal and write it to the $channel.
 
 See L<Sys::Signal::Constant|SPVM::Sys::Signal::Constant> about the values of signals.
+
+=head2 stop
+
+C<static method stop : void ($channel : L<Go::Channel|SPVM::Go::Channel>, $signal : int);>
+
+Stops the signal handling for the signal $signal and the channel $channel.
+
+See Sys::Signal::Constant about the values of signals.
+
+=head2 start_signal_handler
+
+C<static method start_signal_handler : void ();>
+
+Starts signal handling.
+
+This method should be called before the first goroutine execution and L</"stop_signal_handler"> method should be called at the beggining of the first goroutine execution using C<defer>.
+
+  Go::OS::Signal->start_signal_handler;
+  
+  Go->go(method : void () {
+    
+    Fn->defer(method : void () {
+      Go::OS::Signal->stop_signal_handler;
+    });
+    
+    # Do something
+  });
+  
+  Go->gosched;
+
+=head2 stop_signal_handler
+
+C<static method stop_signal_handler : void ();>
+
+Stops signal handling. See L</"start_signal_handler"> method about the usage.
 
 =head1 Copyright & License
 
