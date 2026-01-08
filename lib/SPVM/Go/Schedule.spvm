@@ -175,11 +175,6 @@ class Go::Schedule {
       }
     }
     else {
-      if (@{$self->{coroutines}} > 1) {
-        $self->{coroutines} = QList->new(new Go::Coroutine[0]);
-        die "You must start only one main goroutine.";
-      }
-      
       if ($after > 0) {
         die "\$after(or \$timeout) must be given in a goroutine.";
       }

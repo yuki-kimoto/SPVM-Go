@@ -44,7 +44,7 @@ ok(SPVM::TestCase::Go->go_extra);
 
 ok(SPVM::TestCase::Go->thread_exception);
 
-ok(SPVM::TestCase::Go->goroutine_leak);
+ok(SPVM::TestCase::Go->multi_top_goroutines);
 
 # Version
 {

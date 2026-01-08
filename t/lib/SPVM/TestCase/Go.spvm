@@ -148,7 +148,7 @@ class TestCase::Go {
     return 1;
   }
   
-  static method goroutine_leak : int () {
+  static method multi_top_goroutines : int () {
     
     Go->go(method : void () {
     });
@@ -156,11 +156,7 @@ class TestCase::Go {
     Go->go(method : void () {
     });
     
-    eval { Go->gosched; }
-    
-    unless ($@) {
-      return 0;
-    }
+    Go->gosched;
     
     return 1;
   }
