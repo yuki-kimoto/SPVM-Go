@@ -32,22 +32,13 @@ class Go::OS::Signal {
   
   our $NOTIFIED_SIGNALS_H : cache Hash of Go::Channel[];
   
-  our $SIGNAL_HANDLER_TRHEAD : cache Thread;
-  
-  our $MUTEX : Sync::Mutex;
-  INIT {
-    $MUTEX = Sync::Mutex->new;
-  }
+  our $SIGNAL_HANDLER_WG : cache Go::Sync::WaitGroup;
   
   static method ignore : void ($signal : int) {
     
     Sys::Signal->signal($signal, Sys::Signal->SIG_GO);
     
-    $MUTEX->lock;
-    
     $NOTIFIED_SIGNALS_H->{"$signal"} = new Go::Channel[0];
-    
-    $MUTEX->unlock;
   }
   
   static method notify : void ($channel : Go::Channel, $signal : int) {
@@ -58,20 +49,14 @@ class Go::OS::Signal {
       die "\$channel must be defined.";
     }
     
-    $MUTEX->lock;
-    
     $NOTIFIED_SIGNALS_H->{"$signal"} //= new Go::Channel[0];
     
     List->new_ref($NOTIFIED_SIGNALS_H->{"$signal"})->push($channel);
-    
-    $MUTEX->unlock;
   }
   
   static method stop : void ($channel : Go::Channel, $signal : int) {
     
     Sys::Signal->signal($signal, Sys::Signal->SIG_GO);
-    
-    $MUTEX->lock;
     
     my $channels = $NOTIFIED_SIGNALS_H->{"$signal"} // new Go::Channel[0];
     my $new_channels = (List of Go::Channel)List->new(new Go::Channel[0]);
@@ -82,8 +67,6 @@ class Go::OS::Signal {
     }
     
     $NOTIFIED_SIGNALS_H->{"$signal"} = $new_channels->to_array;
-    
-    $MUTEX->unlock;
   }
   
   static method start_handler : void () {
@@ -103,13 +86,16 @@ class Go::OS::Signal {
     
     Sys::Signal->SET_SIG_GO_WRITE_FD($signal_write_fd);
     
-    $MUTEX->lock;
-    
     $NOTIFIED_SIGNALS_H = Hash->new;
     
-    $MUTEX->unlock;
+    $SIGNAL_HANDLER_WG = Go::Sync::WaitGroup->new;
+    $SIGNAL_HANDLER_WG->add(1);
     
-    $SIGNAL_HANDLER_TRHEAD = Thread->new(method : void () {
+    Go->go(method : void () {
+      
+      Fn->defer(method : void () {
+        $SIGNAL_HANDLER_WG->done;
+      });
       
       while (1) {
         unless ($SIGNAL_READ_FD > -1) {
@@ -118,10 +104,25 @@ class Go::OS::Signal {
         
         my $buffer = (mutable string)new_string_len 4;
         
-        eval { Sys::IO->read($SIGNAL_READ_FD, $buffer, 4); }
+        my $read_error_ref = [0];
         
-        if ($@) {
-          return;
+        my $thred_wg = Go::Sync::WaitGroup->new;
+        $thred_wg->add(1);
+        my $thread = Thread->new([$thred_wg : Go::Sync::WaitGroup, $buffer : mutable string, $read_error_ref : int[]] method : void () {
+          Fn->defer([$thred_wg : Go::Sync::WaitGroup] method : void () {
+            $thred_wg->done;
+          });
+          
+          eval { Sys::IO->read($SIGNAL_READ_FD, $buffer, 4); }
+          if ($@) {
+            $read_error_ref->[0] = 1;
+          }
+        });
+        $thred_wg->wait;
+        $thread->join;
+        
+        if ($read_error_ref->[0]) {
+          next;
         }
         
         my $numbers = new int [1];
@@ -129,8 +130,6 @@ class Go::OS::Signal {
         Fn->memcpy($numbers, 0, $buffer, 0, 4);
         
         my $got_signal = $numbers->[0];
-        
-        $MUTEX->lock;
         
         if ($NOTIFIED_SIGNALS_H && (my $channels = $NOTIFIED_SIGNALS_H->{"$got_signal"})) {
           for my $channel (@$channels) {
@@ -141,9 +140,7 @@ class Go::OS::Signal {
           }
         }
         
-        $MUTEX->unlock;
-        
-        Sys::Process->usleep(10_000); # 10ms
+        Go->sleep(0.01);
       }
       
     });
@@ -156,16 +153,12 @@ class Go::OS::Signal {
       die "Go::OS::Signal handler is already stopped.";
     }
     
-    $MUTEX->lock;
-    
     if ($NOTIFIED_SIGNALS_H) {
       for my $signal (@{$NOTIFIED_SIGNALS_H->keys}) {
         Sys::Signal->signal((int)$signal, Sys::Signal->SIG_DFL);
       }
     }
     $NOTIFIED_SIGNALS_H = undef;
-    
-    $MUTEX->unlock;
     
     my $signal_write_fd = $SIGNAL_WRITE_FD;
     $SIGNAL_WRITE_FD = -1;
@@ -179,9 +172,9 @@ class Go::OS::Signal {
     
     Sys::IO->close($signal_read_fd);
     
-    $SIGNAL_HANDLER_TRHEAD->join;
+    $SIGNAL_HANDLER_WG->wait;
     
-    $SIGNAL_HANDLER_TRHEAD = undef;
+    $SIGNAL_HANDLER_WG = undef;
   }
   
   static method is_handler_running : int () {

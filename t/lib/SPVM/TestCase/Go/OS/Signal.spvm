@@ -10,7 +10,13 @@ class TestCase::Go::OS::Signal {
     
     $RESULT = IntList->new;
     
+    Go::OS::Signal->start_handler;
+    
     Go->go(method : void () {
+      
+      Fn->defer(method : void () {
+        Go::OS::Signal->stop_handler;
+      });
       
       my $ch = Go->make(1);
       
@@ -20,12 +26,13 @@ class TestCase::Go::OS::Signal {
       Sys->kill(SIGNAL->SIGTERM, $process_id);
       
       my $ok = 0;
+      
       my $signal = $ch->read(\$ok);
       
       $RESULT->push($signal);
     });
     
-    Go->gosched_with_signal_handler;
+    Go->gosched;
     
     unless (Array->equals_int($RESULT->to_array, [SIGNAL->SIGTERM])) {
       return 0;
@@ -40,8 +47,14 @@ class TestCase::Go::OS::Signal {
     
     $RESULT = IntList->new;
     
-    Go->go(method : void () {
+    Go::OS::Signal->start_handler;
     
+    Go->go(method : void () {
+      
+      Fn->defer(method : void () {
+        Go::OS::Signal->stop_handler;
+      });
+      
       my $ch0 = Go->make(1);
       
       Go::OS::Signal->notify($ch0, SIGNAL->SIGTERM);
@@ -66,7 +79,7 @@ class TestCase::Go::OS::Signal {
       $RESULT->push($signal1);
     });
     
-    Go->gosched_with_signal_handler;
+    Go->gosched;
     
     unless (Array->equals_int($RESULT->to_array, [SIGNAL->SIGTERM, SIGNAL->SIGTERM])) {
       return 0;
@@ -81,8 +94,14 @@ class TestCase::Go::OS::Signal {
     
     $RESULT = IntList->new;
     
-    Go->go(method : void () {
+    Go::OS::Signal->start_handler;
     
+    Go->go(method : void () {
+      
+      Fn->defer(method : void () {
+        Go::OS::Signal->stop_handler;
+      });
+      
       my $ch0 = Go->make(2);
       
       Go::OS::Signal->notify($ch0, SIGNAL->SIGINT);
@@ -106,7 +125,7 @@ class TestCase::Go::OS::Signal {
       $RESULT->push($signal1);
     });
     
-    Go->gosched_with_signal_handler;
+    Go->gosched;
     
     unless (Array->equals_int($RESULT->to_array, [SIGNAL->SIGTERM, SIGNAL->SIGINT])) {
       return 0;
@@ -121,8 +140,14 @@ class TestCase::Go::OS::Signal {
     
     $RESULT = IntList->new;
     
-    Go->go(method : void () {
+    Go::OS::Signal->start_handler;
     
+    Go->go(method : void () {
+      
+      Fn->defer(method : void () {
+        Go::OS::Signal->stop_handler;
+      });
+      
       my $ch = Go->make(1);
       
       Go::OS::Signal->notify($ch, SIGNAL->SIGTERM);
@@ -137,7 +162,7 @@ class TestCase::Go::OS::Signal {
       $RESULT->push($signal);
     });
     
-    Go->gosched_with_signal_handler;
+    Go->gosched;
     
     unless (Array->equals_int($RESULT->to_array, [SIGNAL->SIGTERM])) {
       return 0;
