@@ -174,4 +174,44 @@ class TestCase::Go::OS::Signal {
     return 1;
   }
   
+  static method stop : int () {
+    
+    $RESULT = IntList->new;
+    
+    Go::OS::Signal->start_signal_handler;
+    
+    Go->go(method : void () {
+      
+      Fn->defer(method : void () {
+        Go::OS::Signal->stop_signal_handler;
+      });
+      
+      my $ch = Go->make(1);
+      
+      Go::OS::Signal->notify($ch, SIGNAL->SIGTERM);
+      Go::OS::Signal->notify($ch, SIGNAL->SIGINT);
+      Go::OS::Signal->stop($ch, SIGNAL->SIGTERM);
+      
+      my $process_id = Sys->process_id;
+      Sys->kill(SIGNAL->SIGTERM, $process_id);
+      Sys->kill(SIGNAL->SIGINT, $process_id);
+      
+      my $ok = 0;
+      
+      my $signal = $ch->read(\$ok);
+      
+      $RESULT->push($signal);
+    });
+    
+    Go->gosched;
+    
+    unless (Array->equals_int($RESULT->to_array, [SIGNAL->SIGINT])) {
+      return 0;
+    }
+    
+    $RESULT = undef;
+    
+    return 1;
+  }
+  
 }

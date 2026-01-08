@@ -21,6 +21,8 @@ ok(SPVM::TestCase::Go::OS::Signal->multi_signals);
 
 ok(SPVM::TestCase::Go::OS::Signal->duplicated_signals);
 
+ok(SPVM::TestCase::Go::OS::Signal->stop);
+
 SPVM::Fn->destroy_runtime_permanent_vars;
 
 my $end_memory_blocks_count = $api->get_memory_blocks_count;
