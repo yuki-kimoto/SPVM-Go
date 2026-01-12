@@ -7,24 +7,49 @@ class Go::Context {
   use Go::Channel;
   use Go::Deadline;
   
+  # Enumerations
+  enum {
+    ERR_NONE = 0,
+    ERR_CANCELED = 1,
+    ERR_DEADLINE_EXCEEDED = 2,
+  }
+  
+  # Fields
   has deadline : ro Go::Deadline;
   
   has done : ro Go::Channel;
   
+  has err : ro int;
+  
+  has values_h : Hash;
+  
+  # Class Methods
+  static method canceled : int () {
+    return &ERR_CANCELED;
+  }
+  
+  static method deadline_exceeded : int () {
+    return &ERR_DEADLINE_EXCEEDED;
+  }
+  
   # Instance Methods
-  method err : string () { die "Not implemented."; }
+  protected method : void () {
+    
+    $self->{values_h} = Hash->new;
+    
+  }
   
-  method value : object ($key : string) { die "Not implemented."; }
+  method value : object ($key : object) {
+    
+    unless ($key) {
+      die "The key \$key must be defined";
+    }
+    
+    my $address = Fn->to_address($key);
+    
+    my $value = $self->{values_h}->{$address};
+    
+    return $value;
+  }
   
 }
-
-=pod
-
-type Context interface {
-    Deadline() (deadline time.Time, ok bool)
-    Done() <-chan struct{}
-    Err() error
-    Value(key interface{}) interface{}
-}
-
-=cut
