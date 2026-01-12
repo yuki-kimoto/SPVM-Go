@@ -7,12 +7,8 @@ class Go::Context {
   use Go::Channel;
   use Go::Deadline;
   
-  # Enumerations
-  enum {
-    ERR_NONE = 0,
-    ERR_CANCELED = 1,
-    ERR_DEADLINE_EXCEEDED = 2,
-  }
+  use Go::Context::Error::Canceled;
+  use Go::Context::Error::DeadlineExceeded;
   
   # Fields
   has deadline : ro Go::Deadline;
@@ -24,14 +20,6 @@ class Go::Context {
   has values_h : Hash;
   
   # Class Methods
-  static method canceled : int () {
-    return &ERR_CANCELED;
-  }
-  
-  static method deadline_exceeded : int () {
-    return &ERR_DEADLINE_EXCEEDED;
-  }
-  
   static method background : Go::Context () {
     
     my $self = new Go::Context;
