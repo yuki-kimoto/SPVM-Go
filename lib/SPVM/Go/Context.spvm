@@ -4,8 +4,10 @@
 class Go::Context {
   version_from Go;
   
+  use Go::Channel;
+  
   # Instance Methods
-  method done : int () { die "Not implemented."; }
+  method done : Go::Channel () { die "Not implemented."; }
   
   method err : string () { die "Not implemented."; }
   
@@ -14,3 +16,14 @@ class Go::Context {
   method value : object ($key : string) { die "Not implemented."; }
   
 }
+
+=pod
+
+type Context interface {
+    Deadline() (deadline time.Time, ok bool)
+    Done() <-chan struct{}
+    Err() error
+    Value(key interface{}) interface{}
+}
+
+=cut
