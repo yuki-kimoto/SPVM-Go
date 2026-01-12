@@ -32,8 +32,17 @@ class Go::Context {
     return &ERR_DEADLINE_EXCEEDED;
   }
   
+  static method background : Go::Context () {
+    
+    my $self = new Go::Context;
+    
+    $self->init;
+    
+    return $self;
+  }
+  
   # Instance Methods
-  protected method : void () {
+  protected method init : void () {
     
     $self->{values_h} = Hash->new;
     
