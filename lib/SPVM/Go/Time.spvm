@@ -69,6 +69,11 @@ class Go::Time {
     return $clone;
   }
   
+  method add_sec : Go::Time ($seconds : double) {
+    
+    return $self->add(Sys::Time::Util->float_seconds_to_nanoseconds($seconds));
+  }
+  
   method clone : Go::Time () {
     
     my $clone = new Go::Time;
