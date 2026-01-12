@@ -1,0 +1,9 @@
+class TestCase::Go::Context {
+  use Go::Context;
+  
+  static method basic : int () {
+    
+    return 1;
+  }
+}
+

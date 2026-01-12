@@ -1,0 +1,14 @@
+# Copyright (c) 2026 Yuki Kimoto
+# MIT License
+
+class Go::Deadline {
+  version_from Go;
+  
+  use Sys::Time::Timespec;
+  
+  # Fields
+  has real_timespec : Sys::Time::Timespec;
+  
+  has mono_timespec : Sys::Time::Timespec;
+  
+}

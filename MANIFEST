@@ -20,6 +20,8 @@ lib/SPVM/Go/Coroutine.native/src/.gitkeep
 lib/SPVM/Go/Coroutine.native/src/coro.c
 lib/SPVM/Go/Coroutine.pm
 lib/SPVM/Go/Coroutine.spvm
+lib/SPVM/Go/Deadline.pm
+lib/SPVM/Go/Deadline.spvm
 lib/SPVM/Go/Error/IOTimeout.pm
 lib/SPVM/Go/Error/IOTimeout.spvm
 lib/SPVM/Go/OS/Signal.pm
@@ -44,6 +46,7 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 README.md
 t/Go-Channel.t
+t/Go-Context.t
 t/Go-Coroutine.t
 t/Go-OS-Signal.t
 t/Go-Poll.t
@@ -52,6 +55,7 @@ t/Go-Sync-WaitGroup.t
 t/Go.t
 t/lib/SPVM/TestCase/Go.spvm
 t/lib/SPVM/TestCase/Go/Channel.spvm
+t/lib/SPVM/TestCase/Go/Context.spvm
 t/lib/SPVM/TestCase/Go/Coroutine.spvm
 t/lib/SPVM/TestCase/Go/OS/Signal.spvm
 t/lib/SPVM/TestCase/Go/Poll.spvm
