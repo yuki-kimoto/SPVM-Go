@@ -3,4 +3,14 @@
 
 class Go::Context {
   version_from Go;
+  
+  # Instance Methods
+  method done : int () { die "Not implemented."; }
+  
+  method err : string () { die "Not implemented."; }
+  
+  method deadline : long () { die "Not implemented."; }
+  
+  method value : object ($key : string) { die "Not implemented."; }
+  
 }
