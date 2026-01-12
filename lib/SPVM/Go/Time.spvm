@@ -1,7 +1,7 @@
 # Copyright (c) 2026 Yuki Kimoto
 # MIT License
 
-class Go::Deadline {
+class Go::Time {
   version_from Go;
   
   use Sys::Time::Timespec;

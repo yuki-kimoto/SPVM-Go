@@ -5,14 +5,14 @@ class Go::Context {
   version_from Go;
   
   use Go::Channel;
-  use Go::Deadline;
+  use Go::Time;
   use Go::Context::Derived;
   
   use Go::Context::Error::Canceled;
   use Go::Context::Error::DeadlineExceeded;
   
   # Fields
-  has deadline : ro Go::Deadline;
+  has deadline : ro Go::Time;
   
   has done : ro Go::Channel;
   
@@ -30,6 +30,36 @@ class Go::Context {
     $self->init;
     
     return $self;
+  }
+  
+  static method with_cancel : Go::Context::Derived ($ctx : Go::Context) {
+    
+    my $new_ctx = new Go::Context;
+    
+    $new_ctx->init;
+    
+    my $derived = my $_ = new Go::Context::Derived;
+    $_->{ctx} = $new_ctx;
+    $_->{cancel} = method : void () {
+      
+    };
+    
+    return $derived;
+  }
+  
+  static method with_deadline : Go::Context::Derived ($ctx : Go::Context) {
+    
+    my $new_ctx = new Go::Context;
+    
+    $new_ctx->init;
+    
+    my $derived = my $_ = new Go::Context::Derived;
+    $_->{ctx} = $new_ctx;
+    $_->{cancel} = method : void () {
+      
+    };
+    
+    return $derived;
   }
   
   # Instance Methods

@@ -4,6 +4,8 @@
 class Go::Context::Derived {
   version_from Go;
   
+  allow Go::Context;
+  
   use Go::Context;
   use Go::Context::CancelCallback;
   

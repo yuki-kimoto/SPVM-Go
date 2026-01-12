@@ -1,4 +1,4 @@
-package SPVM::Go::Deadline;
+package SPVM::Go::Time;
 
 
 
@@ -8,15 +8,15 @@ package SPVM::Go::Deadline;
 
 =head1 Name
 
-SPVM::Go::Deadline - Short Description
+SPVM::Go::Time - Short Description
 
 =head1 Description
 
-Go::Deadline class in L<SPVM> has methods to do someting.
+Go::Time class in L<SPVM> has methods to do someting.
 
 =head1 Usage
 
-  use Go::Deadline;
+  use Go::Time;
 
 =head1 Details
 
