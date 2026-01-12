@@ -1,0 +1,12 @@
+# Copyright (c) 2026 Yuki Kimoto
+# MIT License
+
+class Go::Context::Writable extends Go::Context {
+  version_from Go;
+  
+  # Fields
+  has err : virtual wo int;
+  
+  
+  
+}

@@ -1,0 +1,6 @@
+# Copyright (c) 2026 Yuki Kimoto
+# MIT License
+
+class Go::Context::Value extends Go::Context::Writable {
+  version_from Go;
+}
