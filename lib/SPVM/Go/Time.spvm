@@ -74,6 +74,41 @@ class Go::Time {
     return $self->add(Sys::Time::Util->float_seconds_to_nanoseconds($seconds));
   }
   
+  method after : int ($go_time : Go::Time) {
+    
+    unless ($go_time) {
+      die "The time \$go_time must be defined.";
+    }
+    
+    my $tv_interval = &_tv_interval($self, $go_time);
+    
+    return $tv_interval > 0;
+  }
+  
+  method before : int ($go_time : Go::Time) {
+    
+    unless ($go_time) {
+      die "The time \$go_time must be defined.";
+    }
+    
+    my $tv_interval = &_tv_interval($self, $go_time);
+    
+    return $tv_interval < 0;
+  }
+  
+  private static method _tv_interval : double ($go_time1 : Go::Time, $go_time2 : Go::Time) {
+    
+    my $tv_interval = 0.0;
+    if ($go_time1->{mono_timespec} && $go_time2->{mono_timespec}) {
+      $tv_interval = Sys::Time::Util->timespec_interval($go_time1->{mono_timespec}, $go_time2->{mono_timespec});
+    }
+    else {
+      $tv_interval = Sys::Time::Util->timespec_interval($go_time1->{real_timespec}, $go_time2->{real_timespec});
+    }
+    
+    return $tv_interval;
+  }
+  
   method clone : Go::Time () {
     
     my $clone = new Go::Time;
