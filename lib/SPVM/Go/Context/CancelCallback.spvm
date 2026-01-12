@@ -1,0 +1,8 @@
+# Copyright (c) 2026 Yuki Kimoto
+# MIT License
+
+class Go::Context::CancelCallback : interface_t {
+  version_from Go;
+  
+  required method : void ($err : int = 0);
+}

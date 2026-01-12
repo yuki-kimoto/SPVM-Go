@@ -12,6 +12,10 @@ lib/SPVM/Go/Channel/Wait.pm
 lib/SPVM/Go/Channel/Wait.spvm
 lib/SPVM/Go/Context.pm
 lib/SPVM/Go/Context.spvm
+lib/SPVM/Go/Context/CancelCallback.pm
+lib/SPVM/Go/Context/CancelCallback.spvm
+lib/SPVM/Go/Context/Derived.pm
+lib/SPVM/Go/Context/Derived.spvm
 lib/SPVM/Go/Context/Error/Canceled.pm
 lib/SPVM/Go/Context/Error/Canceled.spvm
 lib/SPVM/Go/Context/Error/DeadlineExceeded.pm

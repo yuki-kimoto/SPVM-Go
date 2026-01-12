@@ -1,0 +1,15 @@
+# Copyright (c) 2026 Yuki Kimoto
+# MIT License
+
+class Go::Context::Derived {
+  version_from Go;
+  
+  use Go::Context;
+  use Go::Context::CancelCallback;
+  
+  # Fields
+  has ctx : Go::Context;
+  
+  has cancel : Go::Context::CancelCallback;
+  
+}

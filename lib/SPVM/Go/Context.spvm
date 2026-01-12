@@ -6,6 +6,7 @@ class Go::Context {
   
   use Go::Channel;
   use Go::Deadline;
+  use Go::Context::Derived;
   
   use Go::Context::Error::Canceled;
   use Go::Context::Error::DeadlineExceeded;
