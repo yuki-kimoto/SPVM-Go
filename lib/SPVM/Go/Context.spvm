@@ -9,9 +9,9 @@ class Go::Context {
   
   has deadline : ro Go::Deadline;
   
-  # Instance Methods
-  method done : Go::Channel () { die "Not implemented."; }
+  has done : ro Go::Channel;
   
+  # Instance Methods
   method err : string () { die "Not implemented."; }
   
   method value : object ($key : string) { die "Not implemented."; }
