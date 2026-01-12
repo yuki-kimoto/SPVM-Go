@@ -20,6 +20,8 @@ class Go::Context {
   
   has values_h : Hash;
   
+  has children : Go::Context[];
+  
   # Class Methods
   static method background : Go::Context () {
     
