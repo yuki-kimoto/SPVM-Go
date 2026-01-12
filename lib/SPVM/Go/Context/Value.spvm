@@ -1,6 +1,25 @@
 # Copyright (c) 2026 Yuki Kimoto
 # MIT License
 
-class Go::Context::Value extends Go::Context::Writable {
+class Go::Context::Value extends Go::Context {
   version_from Go;
+  
+  has deadline : virtual ro Go::Time
+    get {
+      return $self->{parent}->deadline;
+    }
+  ;
+  
+  has done : virtual ro Go::Channel
+    get {
+      return $self->{parent}->done;
+    }
+  ;
+  
+  has err : virtual ro int
+    get {
+      return $self->{parent}->err;
+    }
+  ;
+  
 }

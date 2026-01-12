@@ -22,6 +22,8 @@ class Go::Context {
   
   has children : Go::Context[];
   
+  has parent : Go::Context;
+  
   # Class Methods
   static method background : Go::Context () {
     
