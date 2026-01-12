@@ -27,6 +27,20 @@ class Go::Time {
   
   static method HOUR        : long () { return 3_600_000_000_000L; }
   
+  static method unix : Go::Time ($sec : long, $nsec : long = 0) {
+    
+    my $self = new Go::Time;
+    
+    my $real_timespec = Sys::Time::Timespec->new;
+    
+    $real_timespec->set_tv_sec($sec);
+    $real_timespec->set_tv_nsec($nsec);
+    
+    $self->{real_timespec} = $real_timespec;
+    
+    return $self;
+  }
+  
   # Instance Methods
   method add : Go::Time ($nanoseconds : long) {
     
@@ -34,9 +48,11 @@ class Go::Time {
     
     my $nanoseconds_to_timespec = Sys::Time::Util->nanoseconds_to_timespec($nanoseconds);
     
-    $clone->{real_timespec} = Sys::Time::Util->add_timespec($clone->{real_timespec}, $nanoseconds_to_timespec);
+    $clone->{real_timespec} = Sys::Time::Util->add_timespec($self->{real_timespec}, $nanoseconds_to_timespec);
     
-    $clone->{mono_timespec} = Sys::Time::Util->add_timespec($clone->{mono_timespec}, $nanoseconds_to_timespec);
+    if ($self->{mono_timespec}) {
+      $clone->{mono_timespec} = Sys::Time::Util->add_timespec($self->{mono_timespec}, $nanoseconds_to_timespec);
+    }
     
     return $clone;
   }
@@ -47,7 +63,9 @@ class Go::Time {
     
     $clone->{real_timespec} = &_timespec_clone($self->{real_timespec});
     
-    $clone->{mono_timespec} = &_timespec_clone($self->{mono_timespec});
+    if ($self->{mono_timespec}) {
+      $clone->{mono_timespec} = &_timespec_clone($self->{mono_timespec});
+    }
     
     return $clone;
   }
