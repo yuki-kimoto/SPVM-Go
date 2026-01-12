@@ -5,6 +5,7 @@ class Go::Time {
   version_from Go;
   
   use Sys::Time::Timespec;
+  use Sys::Time::Constant as TIME;
   
   # Interfaces
   interface Cloneable;
@@ -37,6 +38,17 @@ class Go::Time {
     $real_timespec->set_tv_nsec($nsec);
     
     $self->{real_timespec} = $real_timespec;
+    
+    return $self;
+  }
+  
+  static method now : Go::Time () {
+    
+    my $self = new Go::Time;
+    
+    $self->{real_timespec} = Time::HiRes->clock_gettime_timespec(TIME->CLOCK_REALTIME);;
+    
+    $self->{mono_timespec} = Time::HiRes->clock_gettime_timespec(TIME->CLOCK_MONOTONIC);;
     
     return $self;
   }
