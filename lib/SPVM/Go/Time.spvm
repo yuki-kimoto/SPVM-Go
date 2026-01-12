@@ -11,4 +11,16 @@ class Go::Time {
   
   has mono_timespec : Sys::Time::Timespec;
   
+  # Class Methods
+  static method NANOSECOND  : long () { return 1L; }
+  
+  static method MICROSECOND : long () { return 1_000L; }
+  
+  static method MILLISECOND : long () { return 1_000_000L; }
+  
+  static method SECOND      : long () { return 1_000_000_000L; }
+  
+  static method MINUTE      : long () { return 60_000_000_000L; }
+  
+  static method HOUR        : long () { return 3_600_000_000_000L; }
 }
