@@ -4,6 +4,9 @@
 class Go::Context::Value extends Go::Context {
   version_from Go;
   
+  use List;
+  
+  # Fields
   has deadline : virtual ro Go::Time
     get {
       return $self->{parent}->deadline;
@@ -22,6 +25,22 @@ class Go::Context::Value extends Go::Context {
     }
   ;
   
+  # Class Methods
+  static method new_with_value : Go::Context::Value ($ctx : Go::Context) {
+    
+    unless ($ctx) {
+      die "Go::Context \$ctx must be defined.";
+    }
+    
+    $self->SUPER::init;
+    
+    my $self = new Go::Context::Value;
+    $self->{parent} = $ctx;
+    List->new_ref($ctx->{children})->push($ctx);
+    weaken $self->{parent};
+  }
+  
+  # Instance Methods
   method value : object ($key : object) {
     
     unless ($key) {

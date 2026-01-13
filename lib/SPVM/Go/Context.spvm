@@ -69,6 +69,7 @@ class Go::Context {
   # Instance Methods
   protected method init : void () {
     
+    $self->{children} = new Go::Context[0];
   }
   
   method value : object ($key : object) {
