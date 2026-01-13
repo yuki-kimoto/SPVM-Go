@@ -7,6 +7,7 @@ class Go::Context::Writable extends Go::Context {
   use Go::Context;
   use Go::Context::Derived;
   use Go::Duration_1l;
+  use Go::Context::Error::Canceled;
   
   # Fields
   has err : virtual wo int;
@@ -44,8 +45,28 @@ class Go::Context::Writable extends Go::Context {
     
     $self->{done} = Go->make;
     
-    my $cancel = method : void () {
-      die "TODO";
+    my $err = basic_type_id Go::Context::Error::Canceled;
+    
+    my $cancel = [$err : int, $cause : string, $ctx : Go::Context] method : void () {
+      
+      my $children = (List of Go::Context)List->new_ref($ctx->{children});
+      
+      while (my $child = $children->shift) {
+        
+        if ($child isa Go::Context::Writable) {
+          my $child = (Go::Context::Writable)$child;
+          if ($child->done) {
+            $child->done->close;
+            $child->set_err($err);
+            $child->set_cause($cause);
+          }
+        }
+        
+        unweaken $child->{parent};
+        
+        $children->push_($child->{children});
+      }
+      
     };
     
     my $derived = my $_ = Go::Context::Derived->new;

@@ -25,6 +25,12 @@ class Go::Context::Value extends Go::Context {
     }
   ;
   
+  has cause : virtual ro string
+    get {
+      return $self->{parent}->cause;
+    }
+  ;
+  
   # Class Methods
   static method new_with_value : Go::Context::Value ($ctx : Go::Context, $key : object, $value : object) {
     
