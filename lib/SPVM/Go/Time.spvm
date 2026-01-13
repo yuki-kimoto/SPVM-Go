@@ -12,11 +12,11 @@ class Go::Time {
   interface Cloneable;
   
   # Fields
-  has real_sec : long;
+  has sec : long;
   
-  has real_nsec : long;
+  has nsec : long;
   
-  has has_monotonic_time : ro byte;
+  has has_monotonic_time : byte;
   
   has mono_duration_nsec : long;
   
@@ -33,14 +33,21 @@ class Go::Time {
   
   static method HOUR        : long () { return 3_600_000_000_000L; }
   
-  static method unix : Go::Time ($sec : long, $nsec : long = 0) {
+  static method new_from_unix : Go::Time ($sec : long = 0, $nsec : long = 0) {
     
     my $self = new Go::Time;
     
-    my $real_timespec = Sys::Time::Timespec->new;
+    my $extra_sec = $nsec / 1_000_000_000;
+    my $rem_nsec  = $nsec % 1_000_000_000;
     
-    $real_timespec->set_tv_sec($sec);
-    $real_timespec->set_tv_nsec($nsec);
+    if ($rem_nsec < 0) {
+      $extra_sec -= 1;
+      $rem_nsec += 1_000_000_000;
+    }
+    
+    $self->{sec} = $sec + $extra_sec;
+    
+    $self->{nsec} = $rem_nsec;
     
     return $self;
   }
@@ -51,8 +58,8 @@ class Go::Time {
     
     my $real_timespec = Time::HiRes->clock_gettime_timespec(TIME->CLOCK_REALTIME);
     
-    $self->{real_sec} = $real_timespec->tv_sec;
-    $self->{real_nsec} = $real_timespec->tv_nsec;
+    $self->{sec} = $real_timespec->tv_sec;
+    $self->{nsec} = $real_timespec->tv_nsec;
     
     my $mono_timespec = Time::HiRes->clock_gettime_timespec(TIME->CLOCK_MONOTONIC);
     
@@ -64,6 +71,14 @@ class Go::Time {
   }
   
   # Instance Methods
+  method unix : long () {
+    return $self->{sec};
+  }
+  
+  method nanosecond : long () {
+    return $self->{nsec};
+  }
+  
   method add : Go::Time ($duration : Go::Duration_1l) {
     
     my $clone = $self->clone;
@@ -71,8 +86,8 @@ class Go::Time {
     my $timespec = Sys::Time::Util->nanoseconds_to_timespec($duration->{nsec});
     
     my $real_timespec = Sys::Time::Util->add_timespec($self->real_timespec, $timespec);
-    $clone->{real_sec} = $real_timespec->tv_sec;
-    $clone->{real_nsec} = $real_timespec->tv_nsec;
+    $clone->{sec} = $real_timespec->tv_sec;
+    $clone->{nsec} = $real_timespec->tv_nsec;
     
     if ($self->{has_monotonic_time}) {
       $clone->{mono_duration_nsec} += $duration->{nsec};
@@ -112,6 +127,15 @@ class Go::Time {
     return $tv_interval < 0;
   }
   
+  method clone : Go::Time () {
+    
+    my $clone = new Go::Time;
+    
+    copy_fields $clone, $self, Go::Time;
+    
+    return $clone;
+  }
+  
   private static method _tv_interval : double ($go_time1 : Go::Time, $go_time2 : Go::Time) {
     
     my $tv_interval = 0.0;
@@ -123,15 +147,6 @@ class Go::Time {
     }
     
     return $tv_interval;
-  }
-  
-  method clone : Go::Time () {
-    
-    my $clone = new Go::Time;
-    
-    copy_fields $clone, $self, Go::Time;
-    
-    return $clone;
   }
   
   private static method _timespec_clone : Sys::Time::Timespec ($timespec : Sys::Time::Timespec) {
@@ -149,8 +164,8 @@ class Go::Time {
     
     my $ts = Sys::Time::Timespec->new;
     
-    $ts->set_tv_sec($self->{real_sec});
-    $ts->set_tv_nsec($self->{real_nsec});
+    $ts->set_tv_sec($self->{sec});
+    $ts->set_tv_nsec($self->{nsec});
     
     return $ts;
   }
