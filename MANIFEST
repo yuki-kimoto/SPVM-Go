@@ -32,6 +32,8 @@ lib/SPVM/Go/Coroutine.native/src/.gitkeep
 lib/SPVM/Go/Coroutine.native/src/coro.c
 lib/SPVM/Go/Coroutine.pm
 lib/SPVM/Go/Coroutine.spvm
+lib/SPVM/Go/Duration_1l.pm
+lib/SPVM/Go/Duration_1l.spvm
 lib/SPVM/Go/Error/IOTimeout.pm
 lib/SPVM/Go/Error/IOTimeout.spvm
 lib/SPVM/Go/OS/Signal.pm

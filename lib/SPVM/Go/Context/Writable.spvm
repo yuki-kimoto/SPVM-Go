@@ -4,6 +4,8 @@
 class Go::Context::Writable extends Go::Context {
   version_from Go;
   
+  use Go::Duration_1l;
+  
   # Fields
   has err : virtual wo int;
   
