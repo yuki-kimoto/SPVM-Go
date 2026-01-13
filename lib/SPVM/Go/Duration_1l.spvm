@@ -1,9 +1,40 @@
 # Copyright (c) 2026 Yuki Kimoto
 # MIT License
 
-class Go::Duration_1l {
+class Go::Duration_1l : mulnum_t {
   version_from Go;
   
+  use Sys::Time::Timespec;
+  use Sys::Time::Util;
+  
+  # Fields
   has nsec : long;
+  
+  # Class Method
+  static method new : Go::Duration_1l ($nsec : long = 0) {
+    
+    my $duration : Go::Duration_1l;
+    $duration->{nsec} = $nsec;
+    
+    return $duration;
+  }
+  
+  static method to_timespec : Sys::Time::Timespec ($duration : Go::Duration_1l) {
+    
+    my $ts = Sys::Time::Util->nanoseconds_to_timespec($duration->{nsec});
+    
+    return $ts;
+  }
+  
+  static method new_from_sec : Go::Duration_1l ($seconds : double) {
+    
+    my $ts = Sys::Time::Util->float_seconds_to_timespec($seconds);
+    
+    my $nsec = Sys::Time::Util->timespec_to_nanoseconds($ts);
+    
+    my $duration = Go::Duration_1l->new($nsec);
+    
+    return $duration;
+  }
   
 }
