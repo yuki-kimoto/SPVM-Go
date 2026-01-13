@@ -10,6 +10,7 @@ class Go::Context {
   use Go::Context::Error::Canceled;
   use Go::Context::Error::DeadlineExceeded;
   use Fn;
+  use Go::Context::Value;
   
   # Fields
   has deadline : ro Go::Time;
@@ -64,6 +65,11 @@ class Go::Context {
     };
     
     return $derived;
+  }
+  
+  static method with_value : Go::Context ($ctx : Go::Context, $key : object, $value : object) {
+    
+    return Go::Context::Value->new_with_value($ctx, $key, $value);
   }
   
   # Instance Methods
