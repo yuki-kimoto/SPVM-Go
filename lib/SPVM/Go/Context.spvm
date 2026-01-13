@@ -7,9 +7,9 @@ class Go::Context {
   use Go::Channel;
   use Go::Time;
   use Go::Context::Derived;
-  
   use Go::Context::Error::Canceled;
   use Go::Context::Error::DeadlineExceeded;
+  use Fn;
   
   # Fields
   has deadline : ro Go::Time;
@@ -18,11 +18,13 @@ class Go::Context {
   
   has err : ro int;
   
-  has values_h : Hash;
+  has key : object;
   
-  has children : Go::Context[];
+  has value : object;
   
   has parent : Go::Context;
+  
+  has children : Go::Context[];
   
   # Class Methods
   static method background : Go::Context () {
@@ -67,8 +69,6 @@ class Go::Context {
   # Instance Methods
   protected method init : void () {
     
-    $self->{values_h} = Hash->new;
-    
   }
   
   method value : object ($key : object) {
@@ -77,9 +77,10 @@ class Go::Context {
       die "The key \$key must be defined";
     }
     
-    my $address = Fn->to_address($key);
-    
-    my $value = $self->{values_h}->{$address};
+    my $value = (object)undef;
+    if ($self->{key} && Fn->to_address($key) eq Fn->to_address($self->{key})) {
+      $value = $self->{value};
+    }
     
     return $value;
   }
