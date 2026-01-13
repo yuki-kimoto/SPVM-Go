@@ -11,6 +11,7 @@ class Go::Context {
   use Go::Context::Error::DeadlineExceeded;
   use Fn;
   use Go::Context::Value;
+  use Go::Context::Writable;
   
   # Fields
   has deadline : ro Go::Time;
@@ -30,11 +31,7 @@ class Go::Context {
   # Class Methods
   static method background : Go::Context () {
     
-    my $self = new Go::Context;
-    
-    $self->init;
-    
-    return $self;
+    return Go::Context::Writable->new_with_background;
   }
   
   static method with_cancel : Go::Context::Derived ($ctx : Go::Context) {

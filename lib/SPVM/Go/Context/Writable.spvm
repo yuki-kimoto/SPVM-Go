@@ -7,6 +7,14 @@ class Go::Context::Writable extends Go::Context {
   # Fields
   has err : virtual wo int;
   
-  
+  # Class Methods
+  static method new_with_background : Go::Context::Writable () {
+    
+    my $self = new Go::Context::Writable;
+    
+    $self->SUPER::init;
+    
+    return $self;
+  }
   
 }
