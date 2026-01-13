@@ -19,22 +19,40 @@ class Go::Duration_1l : mulnum_t {
     return $duration;
   }
   
-  static method to_timespec : Sys::Time::Timespec ($duration : Go::Duration_1l) {
+  static method new_from_timespec : Go::Duration_1l ($timespec : Sys::Time::Timespec) {
     
-    my $ts = Sys::Time::Util->nanoseconds_to_timespec($duration->{nsec});
+    my $duration_nsec = Sys::Time::Util->timespec_to_nanoseconds($timespec);
     
-    return $ts;
+    my $duration = Go::Duration_1l->new($duration_nsec);
+    
+    return $duration;
   }
   
   static method new_from_sec : Go::Duration_1l ($seconds : double) {
     
-    my $ts = Sys::Time::Util->float_seconds_to_timespec($seconds);
+    my $timespec = Sys::Time::Util->float_seconds_to_timespec($seconds);
     
-    my $nsec = Sys::Time::Util->timespec_to_nanoseconds($ts);
+    my $duration_nsec = Sys::Time::Util->timespec_to_nanoseconds($timespec);
     
-    my $duration = Go::Duration_1l->new($nsec);
+    my $duration = Go::Duration_1l->new($duration_nsec);
     
     return $duration;
+  }
+  
+  static method to_timespec : Sys::Time::Timespec ($duration : Go::Duration_1l) {
+    
+    my $timespec = Sys::Time::Util->nanoseconds_to_timespec($duration->{nsec});
+    
+    return $timespec;
+  }
+  
+  static method to_sec : double ($duration : Go::Duration_1l) {
+    
+    my $timespec = Sys::Time::Util->nanoseconds_to_timespec($duration->{nsec});
+    
+    my $seconds = Sys::Time::Util->timespec_to_float_seconds($timespec);
+    
+    return $seconds;
   }
   
 }
