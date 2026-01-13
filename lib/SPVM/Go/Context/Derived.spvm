@@ -10,8 +10,16 @@ class Go::Context::Derived {
   use Go::Context::CancelCallback;
   
   # Fields
-  has ctx : Go::Context;
+  has ctx : rw Go::Context;
   
-  has cancel : Go::Context::CancelCallback;
+  has cancel : rw Go::Context::CancelCallback;
+  
+  # Class Methods
+  static method new : Go::Context::Derived () {
+    
+    my $self = new Go::Context::Derived;
+    
+    return $self;
+  }
   
 }

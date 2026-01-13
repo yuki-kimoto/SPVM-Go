@@ -7,6 +7,8 @@ class Go::Context::Writable extends Go::Context {
   # Fields
   has err : virtual wo int;
   
+  has cause : virtual wo string;
+  
   # Class Methods
   static method new_with_background : Go::Context::Writable () {
     
@@ -15,6 +17,45 @@ class Go::Context::Writable extends Go::Context {
     $self->SUPER::init;
     
     return $self;
+  }
+  
+  static method new_with_cancel : Go::Context::Derived ($ctx : Go::Context) {
+    
+    return &new_with_cancel_cause($ctx, undef);
+  }
+  
+  static method new_with_cancel_cause : Go::Context::Derived ($ctx : Go::Context, $cause : string) {
+    
+    unless ($ctx) {
+      die "Go::Context \$ctx must be defined.";
+    }
+    
+    my $self = new Go::Context::Writable;
+    
+    $self->SUPER::init;
+    
+    $self->{parent} = $ctx;
+    List->new_ref($ctx->{children})->push($ctx);
+    weaken $self->{parent};
+    
+    $self->{done} = Go->make;
+    
+    my $cancel = method : void () {
+      
+    };
+    
+    my $derived = my $_ = Go::Context::Derived->new;
+    $_->set_ctx($self);
+    $_->set_cancel($cancel);
+    
+    return $derived;
+  }
+  
+  static method new_with_deadline : Go::Context::Derived ($ctx : Go::Context, $deadline : Go::Time) {
+    
+    &new_with_cancel($ctx);
+    
+    die "TODO";
   }
   
 }

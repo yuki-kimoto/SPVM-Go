@@ -20,6 +20,8 @@ class Go::Context {
   
   has err : ro int;
   
+  has cause : ro string;
+  
   has key : object;
   
   has value : object;
@@ -36,32 +38,12 @@ class Go::Context {
   
   static method with_cancel : Go::Context::Derived ($ctx : Go::Context) {
     
-    my $new_ctx = new Go::Context;
-    
-    $new_ctx->init;
-    
-    my $derived = my $_ = new Go::Context::Derived;
-    $_->{ctx} = $new_ctx;
-    $_->{cancel} = method : void () {
-      
-    };
-    
-    return $derived;
+    return Go::Context::Writable->new_with_cancel($ctx);
   }
   
-  static method with_deadline : Go::Context::Derived ($ctx : Go::Context) {
+  static method with_deadline : Go::Context::Derived ($ctx : Go::Context, $deadline : Go::Time) {
     
-    my $new_ctx = new Go::Context;
-    
-    $new_ctx->init;
-    
-    my $derived = my $_ = new Go::Context::Derived;
-    $_->{ctx} = $new_ctx;
-    $_->{cancel} = method : void () {
-      
-    };
-    
-    return $derived;
+    return Go::Context::Writable->new_with_deadline($ctx, $deadline);
   }
   
   static method with_value : Go::Context ($ctx : Go::Context, $key : object, $value : object) {
