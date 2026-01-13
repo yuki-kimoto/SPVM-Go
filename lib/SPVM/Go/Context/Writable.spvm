@@ -4,6 +4,8 @@
 class Go::Context::Writable extends Go::Context {
   version_from Go;
   
+  use Go::Context;
+  use Go::Context::Derived;
   use Go::Duration_1l;
   
   # Fields
@@ -43,7 +45,7 @@ class Go::Context::Writable extends Go::Context {
     $self->{done} = Go->make;
     
     my $cancel = method : void () {
-      
+      die "TODO";
     };
     
     my $derived = my $_ = Go::Context::Derived->new;
@@ -55,9 +57,27 @@ class Go::Context::Writable extends Go::Context {
   
   static method new_with_deadline : Go::Context::Derived ($ctx : Go::Context, $deadline : Go::Time) {
     
-    &new_with_cancel($ctx);
+    my $derived = &new_with_cancel($ctx);
     
     die "TODO";
+    
+    return $derived;
+  }
+  
+  static method new_with_timeout : Go::Context::Derived ($ctx : Go::Context, $timeout : Go::Duration_1l) {
+    
+    my $derived = &new_with_deadline($ctx, Go::Time->now->add($timeout));
+    
+    die "TODO";
+    
+    return $derived;
+  }
+  
+  static method new_with_timeout_sec : Go::Context::Derived ($ctx : Go::Context, $timeout_sec : double) {
+    
+    my $timeout = Go::Duration_1l->new_from_sec($timeout_sec);
+    
+    return &new_with_timeout($ctx, $timeout);
   }
   
 }
