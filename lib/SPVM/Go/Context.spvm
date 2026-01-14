@@ -7,11 +7,9 @@ class Go::Context {
   use Go::Channel;
   use Go::Time;
   use Go::Context::Derived;
-  use Go::Context::Error::Canceled;
-  use Go::Context::Error::DeadlineExceeded;
-  use Fn;
   use Go::Context::Value;
   use Go::Context::Writable;
+  use Fn;
   
   # Fields
   has deadline : ro Go::Time;
@@ -36,9 +34,19 @@ class Go::Context {
     return Go::Context::Writable->new_with_background;
   }
   
+  static method without_cancel : Go::Context ($ctx : Go::Context) {
+    
+    return Go::Context::Writable->new_without_cancel($ctx);
+  }
+  
   static method with_cancel : Go::Context::Derived ($ctx : Go::Context) {
     
     return Go::Context::Writable->new_with_cancel($ctx);
+  }
+  
+  static method with_cancel_cause : Go::Context::Derived ($ctx : Go::Context, $cause : string) {
+    
+    return Go::Context::Writable->new_with_cancel_cause($ctx, $cause);
   }
   
   static method with_deadline : Go::Context::Derived ($ctx : Go::Context, $deadline : Go::Time) {
@@ -46,9 +54,19 @@ class Go::Context {
     return Go::Context::Writable->new_with_deadline($ctx, $deadline);
   }
   
-  static method with_value : Go::Context ($ctx : Go::Context, $key : object, $value : object) {
+  static method with_deadline_cause : Go::Context::Derived ($ctx : Go::Context, $deadline : Go::Time, $cause : string) {
     
-    return Go::Context::Value->new_with_value($ctx, $key, $value);
+    return Go::Context::Writable->new_with_deadline_cause($ctx, $deadline, $cause);
+  }
+  
+  static method with_timeout : Go::Context::Derived ($ctx : Go::Context, $timeout : Go::Duration_1l) {
+    
+    return Go::Context::Writable->new_with_timeout($ctx, $timeout);
+  }
+  
+  static method with_timeout_sec : Go::Context::Derived ($ctx : Go::Context, $timeout_sec : double) {
+    
+    return Go::Context::Writable->new_with_timeout_sec($ctx, $timeout_sec);
   }
   
   # Instance Methods
@@ -65,16 +83,12 @@ class Go::Context {
     
     my $value = (object)undef;
     if ($self->{key} && Fn->to_address($key) eq Fn->to_address($self->{key})) {
-      $value = $self->{value};
+      if ($self->{parent}) {
+        $value = $self->{parent}->value($key);
+      }
     }
     
     return $value;
   }
   
 }
-
-__END__
-
-WithCancel "context canceled"
-WithDeadline" context deadline exceeded"
-

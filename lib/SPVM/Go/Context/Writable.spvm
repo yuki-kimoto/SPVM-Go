@@ -8,6 +8,8 @@ class Go::Context::Writable extends Go::Context {
   use Go::Context::Derived;
   use Go::Duration_1l;
   use Go::Context::Error::Canceled;
+  use Go::Context::Error::DeadlineExceeded;
+  use Go::Context::CancelCallback;
   
   # Fields
   has err : virtual wo int;
@@ -24,15 +26,38 @@ class Go::Context::Writable extends Go::Context {
     return $self;
   }
   
-  static method new_with_cancel : Go::Context::Derived ($ctx : Go::Context) {
-    
-    return &new_with_cancel_cause($ctx, undef);
-  }
-  
-  static method new_with_cancel_cause : Go::Context::Derived ($ctx : Go::Context, $cause : string) {
+  static method new_without_cancel : Go::Context::Writable ($ctx : Go::Context) {
     
     unless ($ctx) {
       die "Go::Context \$ctx must be defined.";
+    }
+    
+    my $self = new Go::Context::Writable;
+    
+    $self->SUPER::init;
+    
+    $self->{parent} = $ctx;
+    
+    return $self;
+  }
+  
+  private static method new_with_cancel_common : Go::Context::Derived ($ctx : Go::Context, $err : int = 0, $cause : string = undef, $deadline : Go::Time = undef) {
+    
+    unless ($ctx) {
+      die "Go::Context \$ctx must be defined.";
+    }
+    
+    unless ($err > 0) {
+      die "[Unexpected Error]\$err must be a positive value.";
+    }
+    
+    unless ($cause) {
+      if ($err == basic_type_id Go::Context::Error::Canceled) {
+        $cause = "context canceled";
+      }
+      elsif ($err == basic_type_id Go::Context::Error::Canceled) {
+        $cause = "context deadline exceeded";
+      }
     }
     
     my $self = new Go::Context::Writable;
@@ -45,13 +70,13 @@ class Go::Context::Writable extends Go::Context {
     
     $self->{done} = Go->make;
     
-    my $err = basic_type_id Go::Context::Error::Canceled;
-    
-    my $cancel = [$err : int, $cause : string, $ctx : Go::Context] method : void () {
+    my $cancel = [$err : int, $cause : string, $ctx : Go::Context] method : void ($cause : string) {
       
       my $children = (List of Go::Context)List->new_ref($ctx->{children});
       
       while (my $child = $children->shift) {
+        
+        unweaken $child->{parent};
         
         if ($child isa Go::Context::Writable) {
           my $child = (Go::Context::Writable)$child;
@@ -62,8 +87,6 @@ class Go::Context::Writable extends Go::Context {
           }
         }
         
-        unweaken $child->{parent};
-        
         $children->push_($child->{children});
       }
       
@@ -73,25 +96,50 @@ class Go::Context::Writable extends Go::Context {
     $_->set_ctx($self);
     $_->set_cancel($cancel);
     
-    return $derived;
+    if ($deadline) {
+      
+      if ($self->{parent} && $self->{parent}{deadline}) {
+        if ($deadline->after($self->{parent}{deadline})) {
+          $deadline = $self->{parent}{deadline}->clone;
+        }
+      }
+      
+      $self->{deadline} = $deadline;
+      
+      Go->go([$deadline : Go::Time, $cancel : Go::Context::CancelCallback, $cause : string] method : void () {
+        
+        my $timeout_duration = $deadline->sub(Go::Time->now);
+        Go->sleep(Go::Duration_1l->to_sec($timeout_duration));
+        
+        $cancel->($cause);
+      });
+    }
+    
+  }
+  
+  static method new_with_cancel : Go::Context::Derived ($ctx : Go::Context) {
+    
+    return &new_with_cancel_common($ctx, basic_type_id Go::Context::Error::Canceled, undef, undef);
+  }
+  
+  static method new_with_cancel_cause : Go::Context::Derived ($ctx : Go::Context, $cause : string) {
+    
+    return &new_with_cancel_common($ctx, basic_type_id Go::Context::Error::Canceled, $cause, undef);
   }
   
   static method new_with_deadline : Go::Context::Derived ($ctx : Go::Context, $deadline : Go::Time) {
     
-    my $derived = &new_with_cancel($ctx);
+    return &new_with_cancel_common($ctx, basic_type_id Go::Context::Error::DeadlineExceeded, undef, $deadline);
+  }
+  
+  static method new_with_deadline_cause : Go::Context::Derived ($ctx : Go::Context, $deadline : Go::Time, $cause : string) {
     
-    die "TODO";
-    
-    return $derived;
+    return &new_with_cancel_common($ctx, basic_type_id Go::Context::Error::DeadlineExceeded, $cause, $deadline);
   }
   
   static method new_with_timeout : Go::Context::Derived ($ctx : Go::Context, $timeout : Go::Duration_1l) {
     
-    my $derived = &new_with_deadline($ctx, Go::Time->now->add($timeout));
-    
-    die "TODO";
-    
-    return $derived;
+    return &new_with_deadline($ctx, Go::Time->now->add($timeout));
   }
   
   static method new_with_timeout_sec : Go::Context::Derived ($ctx : Go::Context, $timeout_sec : double) {

@@ -4,5 +4,6 @@
 class Go::Context::CancelCallback : interface_t {
   version_from Go;
   
-  required method : void ($err : int = 0);
+  required method : void ($cause : string = undef);
+  
 }

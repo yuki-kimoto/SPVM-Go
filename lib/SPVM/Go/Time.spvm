@@ -56,10 +56,10 @@ class Go::Time {
     
     my $self = new Go::Time;
     
-    my $real_timespec = Time::HiRes->clock_gettime_timespec(TIME->CLOCK_REALTIME);
+    my $to_timespec = Time::HiRes->clock_gettime_timespec(TIME->CLOCK_REALTIME);
     
-    $self->{sec} = $real_timespec->tv_sec;
-    $self->{nsec} = $real_timespec->tv_nsec;
+    $self->{sec} = $to_timespec->tv_sec;
+    $self->{nsec} = $to_timespec->tv_nsec;
     
     my $mono_timespec = Time::HiRes->clock_gettime_timespec(TIME->CLOCK_MONOTONIC);
     
@@ -85,15 +85,40 @@ class Go::Time {
     
     my $timespec = Go::Duration_1l->to_timespec($duration);
     
-    my $real_timespec = Sys::Time::Util->add_timespec($self->real_timespec, $timespec);
-    $clone->{sec} = $real_timespec->tv_sec;
-    $clone->{nsec} = $real_timespec->tv_nsec;
+    my $to_timespec = Sys::Time::Util->add_timespec($self->to_timespec, $timespec);
+    $clone->{sec} = $to_timespec->tv_sec;
+    $clone->{nsec} = $to_timespec->tv_nsec;
     
     if ($self->{has_monotonic_time}) {
       $clone->{mono_duration_nsec} += $duration->{nsec};
     }
     
     return $clone;
+  }
+  
+  method sub : Go::Duration_1l ($go_time : Go::Time) {
+    
+    unless ($go_time) {
+      die "Go::Time \$go_time must be defined.";
+    }
+    
+    my $clone = $self->clone;
+    
+    my $sub_nsec = 0L;
+    if ($self->{has_monotonic_time}) {
+      $sub_nsec = $self->{mono_duration_nsec} - $go_time->{mono_duration_nsec};
+    }
+    else {
+      my $timespec = $go_time->to_timespec;
+      
+      my $sub_timespec = Sys::Time::Util->subtract_timespec($self->to_timespec, $timespec);
+      
+      $sub_nsec = Sys::Time::Util->timespec_to_nanoseconds($sub_timespec);
+    }
+    
+    my $sub_duration = Go::Duration_1l->new($sub_nsec);
+    
+    return $sub_duration;
   }
   
   method add_sec : Go::Time ($seconds : double) {
@@ -141,7 +166,7 @@ class Go::Time {
       $tv_interval = $go_time1->{mono_duration_nsec} - $go_time2->{mono_duration_nsec};
     }
     else {
-      $tv_interval = Sys::Time::Util->timespec_interval($go_time1->real_timespec, $go_time2->real_timespec);
+      $tv_interval = Sys::Time::Util->timespec_interval($go_time1->to_timespec, $go_time2->to_timespec);
     }
     
     return $tv_interval;
@@ -158,7 +183,7 @@ class Go::Time {
     return $clone;
   }
   
-  private method real_timespec : Sys::Time::Timespec () {
+  method to_timespec : Sys::Time::Timespec () {
     
     my $ts = Sys::Time::Timespec->new;
     

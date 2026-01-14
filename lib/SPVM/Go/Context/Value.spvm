@@ -54,19 +54,4 @@ class Go::Context::Value extends Go::Context {
     $self->{value} = $value;
   }
   
-  # Instance Methods
-  method value : object ($key : object) {
-    
-    unless ($key) {
-      die "The key \$key must be defined";
-    }
-    
-    my $value = (object)undef;
-    if ($self->{key} && Fn->to_address($key) eq Fn->to_address($self->{key})) {
-      $value = $self->{parent}->value($key);
-    }
-    
-    return $value;
-  }
-  
 }
