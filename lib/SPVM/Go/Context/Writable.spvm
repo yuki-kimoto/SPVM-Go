@@ -72,6 +72,10 @@ class Go::Context::Writable extends Go::Context {
     
     my $cancel = [$err : int, $cause : string, $ctx : Go::Context] method : void ($cause : string) {
       
+      if ($ctx->err > 0) {
+        return;
+      }
+      
       my $children = (List of Go::Context)List->new_ref($ctx->{children});
       
       while (my $child = $children->shift) {
@@ -106,10 +110,12 @@ class Go::Context::Writable extends Go::Context {
       
       $self->{deadline} = $deadline;
       
-      Go->go([$deadline : Go::Time, $cancel : Go::Context::CancelCallback, $cause : string] method : void () {
+      Go->go([$ctx : Go::Context = $self, $deadline : Go::Time, $cancel : Go::Context::CancelCallback, $cause : string] method : void () {
         
         my $timeout_duration = $deadline->sub(Go::Time->now);
-        Go->sleep(Go::Duration_1l->to_sec($timeout_duration));
+        my $sleep_sec = Go::Duration_1l->to_sec($timeout_duration);
+        
+        Go->sleep($sleep_sec);
         
         $cancel->($cause);
       });
