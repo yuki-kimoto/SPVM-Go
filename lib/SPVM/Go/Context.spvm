@@ -72,3 +72,9 @@ class Go::Context {
   }
   
 }
+
+__END__
+
+WithCancel "context canceled"
+WithDeadline" context deadline exceeded"
+
