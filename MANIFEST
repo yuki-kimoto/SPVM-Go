@@ -22,8 +22,6 @@ lib/SPVM/Go/Context/Error/DeadlineExceeded.pm
 lib/SPVM/Go/Context/Error/DeadlineExceeded.spvm
 lib/SPVM/Go/Context/Value.pm
 lib/SPVM/Go/Context/Value.spvm
-lib/SPVM/Go/Context/Writable.pm
-lib/SPVM/Go/Context/Writable.spvm
 lib/SPVM/Go/Coroutine.c
 lib/SPVM/Go/Coroutine.config
 lib/SPVM/Go/Coroutine.native/include/.gitkeep
