@@ -11,11 +11,6 @@ class Go::Context::Writable extends Go::Context {
   use Go::Context::Error::DeadlineExceeded;
   use Go::Context::CancelCallback;
   
-  # Fields
-  has err : virtual wo int;
-  
-  has cause : virtual wo string;
-  
   # Class Methods
   static method new_with_background : Go::Context::Writable () {
     
@@ -55,7 +50,7 @@ class Go::Context::Writable extends Go::Context {
       if ($err == basic_type_id Go::Context::Error::Canceled) {
         $cause = "context canceled";
       }
-      elsif ($err == basic_type_id Go::Context::Error::Canceled) {
+      elsif ($err == basic_type_id Go::Context::Error::DeadlineExceeded) {
         $cause = "context deadline exceeded";
       }
     }
@@ -76,6 +71,9 @@ class Go::Context::Writable extends Go::Context {
         return;
       }
       
+      $ctx->{err} = $err;
+      $ctx->{cause} = $cause;
+      
       my $children = (List of Go::Context)List->new_ref($ctx->{children});
       
       while (my $child = $children->shift) {
@@ -86,8 +84,8 @@ class Go::Context::Writable extends Go::Context {
           my $child = (Go::Context::Writable)$child;
           if ($child->done) {
             $child->done->close;
-            $child->set_err($err);
-            $child->set_cause($cause);
+            $child->{err} = $err;
+            $child->{cause} = $cause;
           }
         }
         

@@ -83,6 +83,9 @@ class Go::Context {
     
     my $value = (object)undef;
     if ($self->{key} && Fn->to_address($key) eq Fn->to_address($self->{key})) {
+      $value = $self->{value};
+    }
+    else {
       if ($self->{parent}) {
         $value = $self->{parent}->value($key);
       }
