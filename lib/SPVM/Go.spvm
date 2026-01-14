@@ -62,6 +62,11 @@ class Go {
     $schedule->schedule($seconds);
   }
   
+  static method sleep_sec : void ($seconds : double = 0) {
+    
+    &sleep($seconds);
+  }
+  
   static method gosched_io_read : void ($fd : int, $timeout : double = 0) {
     
     my $schedule = $GO->{schedule};
@@ -69,11 +74,21 @@ class Go {
     $schedule->schedule_io_read($fd, $timeout);
   }
   
+  static method gosched_io_read_sec : void ($fd : int, $timeout : double = 0) {
+    
+    &gosched_io_read($fd, $timeout);
+  }
+  
   static method gosched_io_write : void ($fd : int, $timeout : double = 0) {
     
     my $schedule = $GO->{schedule};
     
     $schedule->schedule_io_write($fd, $timeout);
+  }
+  
+  static method gosched_io_write_sec : void ($fd : int, $timeout : double = 0) {
+    
+    &gosched_io_write($fd, $timeout);
   }
   
   private method DESTROY : void () {

@@ -86,6 +86,12 @@ $timeout must be less than or equal to Fn->INT_MAX. Otherwise an exception is th
 
 If IO timeout occurs, an exception is thrown set C<eval_error_id> to the basic type ID of the L<Go::Error::IOTimeout|SPVM::Go::Error::IOTimeout> class.
 
+=head2 gosched_io_read_sec
+
+C<static method gosched_io_read_sec : void ($fd : int, $timeout : double = 0);>
+
+Alias for L</"gosched_io_read">, but L</"gosched_io_read"> $timeout argument will be changed.
+
 =head2 gosched_io_write
 
 C<static method gosched_io_write : void ($fd : int, $timeout : double = 0);>
@@ -104,6 +110,12 @@ $timeout must be less than or equal to Fn->INT_MAX. Otherwise an exception is th
 
 If IO timeout occurs, an exception is thrown set C<eval_error_id> to the basic type ID of the L<Go::Error::IOTimeout|SPVM::Go::Error::IOTimeout> class.
 
+=head2 gosched_io_write_sec
+
+C<static method gosched_io_write_sec : void ($fd : int, $timeout : double = 0);>
+
+Alias for L</"gosched_io_write">, but L</"gosched_io_write"> $timeout argument will be changed.
+
 =head2 sleep
 
 C<static method sleep : void ($seconds : double = 0);>
@@ -115,6 +127,12 @@ Exceptions:
 This method must be called from the main thread. Otherwise an exception is thrown.
 
 $seconds must be less than or equal to Fn->INT_MAX. Otherwise an exception is thrown.
+
+=head2 sleep_sec
+
+C<static method sleep_sec : void ($seconds : double = 0);>
+
+Alias for L</"sleep">, but L</"sleep"> $timeout argument will be changed.
 
 =head2 ENV_DEBUG
 
