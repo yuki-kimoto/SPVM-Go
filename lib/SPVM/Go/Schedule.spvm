@@ -52,18 +52,8 @@ class Go::Schedule {
   }
   
   private static method clock_gettime : Sys::Time::Timespec () {
-    my $now_ts = (Sys::Time::Timespec)undef;
     
-    eval { $now_ts = Time::HiRes->clock_gettime_timespec(TIME->CLOCK_MONOTONIC); }
-    
-    if ($@) {
-      if (eval_error_id is_error Error::System) {
-        $now_ts = Time::HiRes->clock_gettime_timespec(TIME->CLOCK_REALTIME);
-      }
-      else {
-        die eval_error_id, $@;
-      }
-    }
+    my $now_ts = Time::HiRes->clock_gettime_timespec(TIME->CLOCK_MONOTONIC);
     
     return $now_ts;
   }
