@@ -23,6 +23,70 @@ class TestCase::Go::Time {
       
     }
     
+    {
+      my $sec = 1;
+      my $nsec = 0;
+      my $go_time = Go::Time->new_from_unix($sec, $nsec);
+      
+      unless ($go_time->unix == $sec) {
+        return 0;
+      }
+      
+      unless ($go_time->nanosecond == $nsec) {
+        return 0;
+      }
+      
+    }
+    
+    {
+      my $sec = 1;
+      my $nsec = 1_000_000_000 - 1;
+      my $go_time = Go::Time->new_from_unix($sec, $nsec);
+      
+      unless ($go_time->unix == $sec) {
+        return 0;
+      }
+      
+      unless ($go_time->nanosecond == $nsec) {
+        return 0;
+      }
+      
+    }
+    
+    # Exception
+    {
+      {
+        my $sec = 1;
+        my $nsec = -1;
+        eval { my $go_time = Go::Time->new_from_unix($sec, $nsec); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $sec = 1;
+        my $nsec = -1;
+        eval { my $go_time = Go::Time->new_from_unix($sec, $nsec); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $sec = 1;
+        my $nsec = 1_000_000_000;
+        eval { my $go_time = Go::Time->new_from_unix($sec, $nsec); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
     return 1;
   }
   
