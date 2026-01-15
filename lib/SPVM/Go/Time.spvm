@@ -76,6 +76,17 @@ class Go::Time {
     return $self->{nsec};
   }
   
+  method unix_nano : long () {
+    
+    my $timespec = Sys::Time::Timespec->new;
+    $timespec->set_tv_sec($self->{sec});
+    $timespec->set_tv_nsec($self->{nsec});
+    
+    my $duration = Go::Duration_1l->new_from_timespec($timespec);
+    
+    return $duration->{nsec};
+  }
+  
   method add : Go::Time ($duration : Go::Duration_1l) {
     
     my $clone = $self->clone;

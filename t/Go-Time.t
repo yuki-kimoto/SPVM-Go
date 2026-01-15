@@ -15,6 +15,8 @@ my $api = SPVM::api();
 
 my $start_memory_blocks_count = $api->get_memory_blocks_count;
 
+ok(SPVM::TestCase::Go::Time->basic);
+
 ok(SPVM::TestCase::Go::Time->new_from_unix);
 
 ok(SPVM::TestCase::Go::Time->now);

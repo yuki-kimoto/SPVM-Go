@@ -4,6 +4,41 @@ class TestCase::Go::Time {
   
   static method basic : int () {
     
+    # unix
+    {
+      my $sec = 1;
+      my $nsec = 2;
+      my $go_time = Go::Time->new_from_unix($sec, $nsec);
+      
+      unless ($go_time->unix == 1) {
+        return 0;
+      }
+    }
+    
+    # nanosecond
+    {
+      my $sec = 1;
+      my $nsec = 2;
+      my $go_time = Go::Time->new_from_unix($sec, $nsec);
+      
+      unless ($go_time->nanosecond == 2) {
+        return 0;
+      }
+    }
+    
+    # unix_nano
+    {
+      my $sec = 1;
+      my $nsec = 2;
+      my $go_time = Go::Time->new_from_unix($sec, $nsec);
+      
+      warn $go_time->unix_nano;
+      
+      unless ($go_time->unix_nano == 1_000_000_002) {
+        return 0;
+      }
+    }
+    
     return 1;
   }
   
