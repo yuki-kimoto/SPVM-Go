@@ -1,3 +1,8 @@
+0.018 2026-01-15
+  [Document and Test Improvement]
+    * Add Go::Time tests and documents.
+    * Add Duration_1l tests and documents.
+    
 0.017 2026-01-15
   [New Features]
     * Add untested and undocumented Go::Context classes.
