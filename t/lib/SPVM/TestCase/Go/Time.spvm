@@ -56,10 +56,6 @@ class TestCase::Go::Time {
         return 0;
       }
       
-      unless ($go_time->nanosecond == $ret->nanosecond) {
-        return 0;
-      }
-      
       unless ($go_time->_has_monotonic_time == $ret->_has_monotonic_time) {
         return 0;
       }
@@ -68,6 +64,36 @@ class TestCase::Go::Time {
         return 0;
       }
       
+    }
+    
+    # NANOSECOND
+    unless (Go::Time->NANOSECOND == 1L) {
+      return 0;
+    }
+    
+    # MICROSECOND
+    unless (Go::Time->MICROSECOND == 1_000L) {
+      return 0;
+    }
+    
+    # MILLISECOND
+    unless (Go::Time->MILLISECOND == 1_000_000L) {
+      return 0;
+    }
+    
+    # SECOND
+    unless (Go::Time->SECOND == 1_000_000_000L) {
+      return 0;
+    }
+    
+    # MINUTE
+    unless (Go::Time->MINUTE == 60_000_000_000L) {
+      return 0;
+    }
+    
+    # HOUR
+    unless (Go::Time->HOUR == 3_600_000_000_000L) {
+      return 0;
     }
     
     return 1;
@@ -289,7 +315,7 @@ class TestCase::Go::Time {
       
       my $ret = $add->sub($go_time);
       
-      unless ($ret->{nsec} = 1) {
+      unless ($ret->{nsec} == 1) {
         return 0;
       }
       
@@ -303,7 +329,7 @@ class TestCase::Go::Time {
       
       my $ret = $add->sub($go_time);
       
-      unless ($ret->{nsec} = 1) {
+      unless ($ret->{nsec} == 1) {
         return 0;
       }
       
@@ -315,9 +341,9 @@ class TestCase::Go::Time {
       
       my $add = $go_time->add(Go::Duration_1l->new(1));
       
-      my $ret = $add->sub(Go::Time->new_from_unix($add->unix, $add->nanosecond));
+      my $ret = $add->sub(Go::Time->new_from_unix($go_time->unix, $go_time->nanosecond));
       
-      unless ($ret->{nsec} = 1) {
+      unless ($ret->{nsec} == 1) {
         return 0;
       }
       
