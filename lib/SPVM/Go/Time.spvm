@@ -105,6 +105,13 @@ class Go::Time {
     return $clone;
   }
   
+  method add_sec : Go::Time ($seconds : double) {
+    
+    my $duration_nsec = Go::Duration_1l->new_from_sec($seconds);
+    
+    return $self->add($duration_nsec);
+  }
+  
   method sub : Go::Duration_1l ($go_time : Go::Time) {
     
     unless ($go_time) {
@@ -124,13 +131,6 @@ class Go::Time {
     }
     
     return $sub_duration;
-  }
-  
-  method add_sec : Go::Time ($seconds : double) {
-    
-    my $duration_nsec = Go::Duration_1l->new_from_sec($seconds);
-    
-    return $self->add($duration_nsec);
   }
   
   method equal : int ($go_time : Go::Time) {

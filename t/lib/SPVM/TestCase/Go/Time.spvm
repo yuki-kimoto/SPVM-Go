@@ -224,6 +224,27 @@ class TestCase::Go::Time {
     return 1;
   }
   
+  static method add_sec : int () {
+    
+    {
+      my $sec = 1;
+      my $nsec = 0;
+      my $go_time = Go::Time->new_from_unix($sec, $nsec);
+      
+      my $ret = $go_time->add_sec(0.5);
+      
+      unless ($ret->unix == 1) {
+        return 0;
+      }
+      
+      unless ($ret->nanosecond == 500_000_000) {
+        return 0;
+      }
+      
+    }
+    
+    return 1;
+  }
   
   static method to_timespec : int () {
     
