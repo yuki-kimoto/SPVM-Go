@@ -60,6 +60,7 @@ README.md
 t/Go-Channel.t
 t/Go-Context.t
 t/Go-Coroutine.t
+t/Go-Duration_1l.t
 t/Go-OS-Signal.t
 t/Go-Poll.t
 t/Go-Select.t
@@ -70,6 +71,7 @@ t/lib/SPVM/TestCase/Go.spvm
 t/lib/SPVM/TestCase/Go/Channel.spvm
 t/lib/SPVM/TestCase/Go/Context.spvm
 t/lib/SPVM/TestCase/Go/Coroutine.spvm
+t/lib/SPVM/TestCase/Go/Duration_1l.spvm
 t/lib/SPVM/TestCase/Go/OS/Signal.spvm
 t/lib/SPVM/TestCase/Go/Poll.spvm
 t/lib/SPVM/TestCase/Go/Select.spvm

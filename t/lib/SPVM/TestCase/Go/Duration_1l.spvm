@@ -1,0 +1,151 @@
+class TestCase::Go::Duration_1l {
+  use Go::Duration_1l;
+  use Fn;
+  use Sys::Time::Timespec;
+  
+  static method basic : int () {
+    
+    # new
+    {
+      my $duration_nsec = Fn->LONG_MAX;
+      my $duration = Go::Duration_1l->new($duration_nsec);
+      
+      unless ($duration->{nsec} == $duration_nsec) {
+        return 0;
+      }
+    }
+    
+    # new_from_timespec
+    {
+      {
+        my $timespec = Sys::Time::Timespec->new;
+        $timespec->set_tv_sec(1);
+        $timespec->set_tv_nsec(2);
+        
+        my $duration = Go::Duration_1l->new_from_timespec($timespec);
+        
+        unless ($duration->{nsec} == 1_000_000_002) {
+          return 0;
+        }
+      }
+      
+      {
+        my $timespec = Sys::Time::Timespec->new;
+        $timespec->set_tv_sec(1);
+        $timespec->set_tv_nsec(0);
+        
+        my $duration = Go::Duration_1l->new_from_timespec($timespec);
+        
+        unless ($duration->{nsec} == 1_000_000_000) {
+          return 0;
+        }
+      }
+      
+      {
+        my $timespec = Sys::Time::Timespec->new;
+        $timespec->set_tv_sec(1);
+        $timespec->set_tv_nsec(999_999_999);
+        
+        my $duration = Go::Duration_1l->new_from_timespec($timespec);
+        
+        unless ($duration->{nsec} == 1_999_999_999) {
+          return 0;
+        }
+      }
+      
+      {
+        my $timespec = Sys::Time::Timespec->new;
+        $timespec->set_tv_sec(-1);
+        $timespec->set_tv_nsec(2);
+        
+        my $duration = Go::Duration_1l->new_from_timespec($timespec);
+        
+        unless ($duration->{nsec} == -999_999_998) {
+          return 0;
+        }
+      }
+      
+    }
+
+    # new_from_timespec
+    {
+      {
+        my $duration = Go::Duration_1l->new_from_sec(1.5);
+        
+        unless ($duration->{nsec} == 1_500_000_000) {
+          return 0;
+        }
+      }
+      
+      {
+        my $duration = Go::Duration_1l->new_from_sec(-1.5);
+        
+        unless ($duration->{nsec} == -1_500_000_000) {
+          return 0;
+        }
+      }
+      
+    }
+
+    # to_timespec
+    {
+      {
+        my $timespec = Sys::Time::Timespec->new;
+        $timespec->set_tv_sec(1);
+        $timespec->set_tv_nsec(999_999_999);
+        
+        my $duration = Go::Duration_1l->new_from_timespec($timespec);
+        my $ret = Go::Duration_1l->to_timespec($duration);
+        
+        unless ($ret->tv_sec == $timespec->tv_sec) {
+          return 0;
+        }
+        
+        unless ($ret->tv_nsec == $timespec->tv_nsec) {
+          return 0;
+        }
+        
+      }
+      {
+        my $timespec = Sys::Time::Timespec->new;
+        $timespec->set_tv_sec(-1);
+        $timespec->set_tv_nsec(999_999_999);
+        
+        my $duration = Go::Duration_1l->new_from_timespec($timespec);
+        my $ret = Go::Duration_1l->to_timespec($duration);
+        
+        unless ($ret->tv_sec == $timespec->tv_sec) {
+          return 0;
+        }
+        
+        unless ($ret->tv_nsec == $timespec->tv_nsec) {
+          return 0;
+        }
+        
+      }
+    }
+    
+    {
+      {
+        my $duration = Go::Duration_1l->new_from_sec(1.5);
+        my $ret = Go::Duration_1l->to_sec($duration);
+        
+        unless ($ret == 1.5) {
+          return 0;
+        }
+      }
+      
+      {
+        my $duration = Go::Duration_1l->new_from_sec(-1.5);
+        my $ret = Go::Duration_1l->to_sec($duration);
+        
+        unless ($ret == -1.5) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    return 1;
+  }
+}

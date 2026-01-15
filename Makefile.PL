@@ -50,6 +50,7 @@ WriteMakefile(
     'SPVM::Sys' => '0.523',
     'SPVM::Time::HiRes' => '0.004',
     'SPVM::Thread' => '0.001',
+    'SPVM::Math' => '1.006',
   },
   TEST_REQUIRES => {
     

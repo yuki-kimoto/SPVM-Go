@@ -7,6 +7,7 @@ class Go::Duration_1l : mulnum_t {
   use Sys::Time::Timespec;
   use Sys::Time::Util;
   use Fn;
+  use Math;
   
   # Fields
   has nsec : long;
@@ -22,7 +23,7 @@ class Go::Duration_1l : mulnum_t {
   
   static method new_from_timespec : Go::Duration_1l ($timespec : Sys::Time::Timespec) {
     
-    my $duration_nsec = Sys::Time::Util->timespec_to_nanoseconds($timespec);
+    my $duration_nsec = &timespec_to_nanoseconds($timespec);
     
     &check_timespec_to_nanoseconds($timespec);
     
@@ -33,9 +34,9 @@ class Go::Duration_1l : mulnum_t {
   
   static method new_from_sec : Go::Duration_1l ($seconds : double) {
     
-    my $timespec = Sys::Time::Util->float_seconds_to_timespec($seconds);
+    my $timespec = &float_seconds_to_timespec($seconds);
     
-    my $duration_nsec = Sys::Time::Util->timespec_to_nanoseconds($timespec);
+    my $duration_nsec = &timespec_to_nanoseconds($timespec);
     
     my $duration = Go::Duration_1l->new($duration_nsec);
     
@@ -51,9 +52,9 @@ class Go::Duration_1l : mulnum_t {
   
   static method to_sec : double ($duration : Go::Duration_1l) {
     
-    my $timespec = Sys::Time::Util->nanoseconds_to_timespec($duration->{nsec});
+    my $timespec = &nanoseconds_to_timespec($duration->{nsec});
     
-    my $seconds = Sys::Time::Util->timespec_to_float_seconds($timespec);
+    my $seconds = &timespec_to_float_seconds($timespec);
     
     return $seconds;
   }
@@ -92,6 +93,59 @@ class Go::Duration_1l : mulnum_t {
       die "Sys::Time::Timespec \$timespec tv_sec must be greater than -$max_duration_sec and less than $max_duration_sec.";
     }
     
+  }
+  
+  # TODO: implement logic in Sys::Time::Util
+  static method timespec_to_nanoseconds : long ($ts : Sys::Time::Timespec) {
+    
+    unless ($ts) {
+      die "\$ts must be defined.";
+    }
+    
+    my $tv_sec = $ts->tv_sec;
+    
+    my $tv_nsec = $ts->tv_nsec;
+    
+    my $nanoseconds = $ts->tv_sec * 1_000_000_000 + $ts->tv_nsec;
+    
+    return $nanoseconds;
+  }
+  
+  # TODO: implement logic in Sys::Time::Util
+  static method float_seconds_to_timespec : Sys::Time::Timespec ($float_seconds : double) {
+      
+    my $NANO_PER_SEC = 1_000_000_000L;
+    
+    my $sec_floor = (long)Math->floor($float_seconds);
+    
+    my $nsec = (long)Math->round(($float_seconds - $sec_floor) * $NANO_PER_SEC);
+    
+    if ($nsec == $NANO_PER_SEC) {
+      $sec_floor++;
+      $nsec = 0L;
+    }
+    
+    my $ts = Sys::Time::Timespec->new;
+    $ts->set_tv_sec($sec_floor);
+    $ts->set_tv_nsec((int)$nsec);
+    
+    return $ts;
+  }
+  
+  # TODO: implement logic in Sys::Time::Util
+  static method timespec_to_float_seconds : double ($ts : Sys::Time::Timespec) {
+    
+    unless ($ts) {
+      die "\$ts must be defined.";
+    }
+    
+    my $tv_sec = $ts->tv_sec;
+    
+    my $tv_nsec = $ts->tv_nsec;
+    
+    my $float_seconds = $tv_sec + (double)$tv_nsec / 1_000_000_000;
+    
+    return $float_seconds;
   }
   
 }
