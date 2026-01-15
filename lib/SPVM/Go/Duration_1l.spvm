@@ -54,9 +54,34 @@ class Go::Duration_1l : mulnum_t {
   
   static method to_timespec : Sys::Time::Timespec ($duration : Go::Duration_1l) {
     
-    my $timespec = Sys::Time::Util->nanoseconds_to_timespec($duration->{nsec});
+    my $timespec = &nanoseconds_to_timespec($duration->{nsec});
     
     return $timespec;
+  }
+  
+  # TODO: fix Sys::Time::Util#nanoseconds_to_timespec
+  private static method nanoseconds_to_timespec : Sys::Time::Timespec ($nanoseconds : long) {
+    
+    my $NANO_PER_SEC = 1_000_000_000L;
+    
+    my $sec = 0L;
+    my $nsec = 0L;
+    if ($nanoseconds >= 0) {
+      $sec = $nanoseconds / $NANO_PER_SEC;
+      $nsec = $nanoseconds % $NANO_PER_SEC;
+    }
+    else {
+      $sec = ($nanoseconds - ($NANO_PER_SEC - 1)) / $NANO_PER_SEC;
+      $nsec = $nanoseconds - $sec * $NANO_PER_SEC;
+    }
+    
+    my $ts = Sys::Time::Timespec->new;
+    
+    $ts->set_tv_sec($sec);
+    
+    $ts->set_tv_nsec($nsec);
+    
+    return $ts;
   }
   
   static method to_sec : double ($duration : Go::Duration_1l) {

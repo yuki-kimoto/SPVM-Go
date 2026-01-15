@@ -348,5 +348,125 @@ class TestCase::Go::Time {
     return 1;
   }
   
+  static method equal : int () {
+    
+    {
+      my $go_time = Go::Time->now;
+      
+      my $ret = $go_time->equal($go_time);
+      
+      unless ($ret) {
+        return 0;
+      }
+      
+    }
+    
+    {
+      my $go_time = Go::Time->now;
+      
+      my $add = $go_time->add(Go::Duration_1l->new(1));
+      
+      my $ret = $add->equal($go_time);
+      
+      if ($ret) {
+        return 0;
+      }
+    }
+    
+    {
+      my $go_time = Go::Time->now;
+      
+      my $add = $go_time->add(Go::Duration_1l->new(-1));
+      
+      my $ret = $add->equal($go_time);
+      
+      if ($ret) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method after : int () {
+    
+    {
+      my $go_time = Go::Time->now;
+      
+      my $ret = $go_time->after($go_time);
+      
+      if ($ret) {
+        return 0;
+      }
+      
+    }
+    
+    {
+      my $go_time = Go::Time->now;
+      
+      my $add = $go_time->add(Go::Duration_1l->new(1));
+      
+      my $ret = $add->after($go_time);
+      
+      unless ($ret) {
+        return 0;
+      }
+    }
+    
+    {
+      my $go_time = Go::Time->now;
+      
+      my $add = $go_time->add(Go::Duration_1l->new(-1));
+      
+      my $ret = $add->after($go_time);
+      
+      if ($ret) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method before : int () {
+    
+    {
+      my $go_time = Go::Time->now;
+      
+      my $ret = $go_time->before($go_time);
+      
+      if ($ret) {
+        return 0;
+      }
+      
+    }
+    
+    {
+      my $go_time = Go::Time->now;
+      
+      my $add = $go_time->add(Go::Duration_1l->new(1));
+      
+      my $ret = $add->before($go_time);
+      
+      if ($ret) {
+        return 0;
+      }
+    }
+    
+    {
+      my $go_time = Go::Time->now;
+      
+      my $add = $go_time->add(Go::Duration_1l->new(-1));
+      
+      my $ret = $add->before($go_time);
+      
+      unless ($ret) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
 }
 
