@@ -99,21 +99,17 @@ class Go::Time {
       die "Go::Time \$go_time must be defined.";
     }
     
-    my $clone = $self->clone;
-    
+    my $sub_duration : Go::Duration_1l;
     my $sub_nsec = 0L;
     if ($self->{has_monotonic_time}) {
-      $sub_nsec = $self->{mono_duration_nsec} - $go_time->{mono_duration_nsec};
+      my $sub_duration_nsec = $self->{mono_duration_nsec} - $go_time->{mono_duration_nsec};
+      $sub_duration = Go::Duration_1l->new($sub_duration_nsec);
     }
     else {
       my $timespec = $go_time->to_timespec;
-      
       my $sub_timespec = Sys::Time::Util->subtract_timespec($self->to_timespec, $timespec);
-      
-      $sub_nsec = Sys::Time::Util->timespec_to_nanoseconds($sub_timespec);
+      $sub_duration = Go::Duration_1l->new_from_timespec($sub_timespec);
     }
-    
-    my $sub_duration = Go::Duration_1l->new($sub_nsec);
     
     return $sub_duration;
   }
