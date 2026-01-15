@@ -53,6 +53,19 @@ class TestCase::Go::Time {
       
     }
     
+    {
+      my $go_time = Go::Time->new_from_unix;
+      
+      unless ($go_time->unix == 0) {
+        return 0;
+      }
+      
+      unless ($go_time->nanosecond == 0) {
+        return 0;
+      }
+      
+    }
+    
     # Exception
     {
       {
