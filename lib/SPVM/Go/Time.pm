@@ -1,4 +1,4 @@
-package SPVM::L<Go::Time|SPVM::Go::Time>;
+package SPVM::Go::Time;
 
 
 
