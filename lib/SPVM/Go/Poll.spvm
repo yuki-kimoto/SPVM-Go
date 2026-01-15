@@ -3,18 +3,21 @@
 
 class Go::Poll {
   version_from Go;
+  
   allow Go::Schedule;
   allow Go::Schedule::Task;
   
   use Go::Coroutine;
-  use List;
   use Sys::Poll::PollfdArray;
   use Sys::Poll::Constant as POLL;
   use Sys::Poll;
   use Format;
+  use List;
   
+  # Fields
   has coroutines_h : Hash of Go::Coroutine;
   
+  # Class Methods
   private static method new : Go::Poll () {
     
     my $self = new Go::Poll;
@@ -24,6 +27,7 @@ class Go::Poll {
     return $self;
   }
   
+  # Instance Methods
   private method check : void () {
     my $poll_coroutines_h = $self->{coroutines_h};
     
