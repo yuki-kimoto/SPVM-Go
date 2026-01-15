@@ -1,0 +1,30 @@
+class TestCase::Go::Time {
+  use Go::Time;
+  
+  static method basic : int () {
+    
+    return 1;
+  }
+  
+  static method new_from_unix : int () {
+    
+    {
+      my $sec = 1;
+      my $nsec = 2;
+      my $go_time = Go::Time->new_from_unix($sec, $nsec);
+      
+      unless ($go_time->unix == $sec) {
+        return 0;
+      }
+      
+      unless ($go_time->nanosecond == $nsec) {
+        return 0;
+      }
+      
+    }
+    
+    return 1;
+  }
+  
+}
+

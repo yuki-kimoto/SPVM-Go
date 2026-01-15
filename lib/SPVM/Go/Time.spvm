@@ -4,6 +4,7 @@
 class Go::Time {
   version_from Go;
   
+  use Sys::Time::Util;
   use Sys::Time::Timespec;
   use Sys::Time::Constant as TIME;
   use Go::Duration_1l;
@@ -37,17 +38,13 @@ class Go::Time {
     
     my $self = new Go::Time;
     
-    my $extra_sec = $nsec / 1_000_000_000;
-    my $rem_nsec  = $nsec % 1_000_000_000;
-    
-    if ($rem_nsec < 0) {
-      $extra_sec -= 1;
-      $rem_nsec += 1_000_000_000;
+    unless ($nsec >= 0 && $nsec < 1_000_000_000) {
+      die "Invalid \$nsec value.";
     }
     
-    $self->{sec} = $sec + $extra_sec;
+    $self->{sec} = $sec;
     
-    $self->{nsec} = $rem_nsec;
+    $self->{nsec} = $nsec;
     
     return $self;
   }
