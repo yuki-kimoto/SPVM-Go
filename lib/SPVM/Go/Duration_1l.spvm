@@ -6,6 +6,7 @@ class Go::Duration_1l : mulnum_t {
   
   use Sys::Time::Timespec;
   use Sys::Time::Util;
+  use Fn;
   
   # Fields
   has nsec : long;
@@ -23,9 +24,21 @@ class Go::Duration_1l : mulnum_t {
     
     my $duration_nsec = Sys::Time::Util->timespec_to_nanoseconds($timespec);
     
+    &check_timespec_to_nanoseconds($timespec);
+    
     my $duration = Go::Duration_1l->new($duration_nsec);
     
     return $duration;
+  }
+  
+  private static method check_timespec_to_nanoseconds : void ($timespec : Sys::Time::Timespec) {
+    
+    my $max_duration_sec = (Fn->LONG_MAX / 1_000_000_000) - 1;
+    
+    unless ($timespec->tv_sec > -$max_duration_sec && $timespec->tv_sec < $max_duration_sec) {
+      die "Sys::Time::Timespec \$timespec tv_sec must be greater than -$max_duration_sec and less than $max_duration_sec.";
+    }
+    
   }
   
   static method new_from_sec : Go::Duration_1l ($seconds : double) {
