@@ -1,6 +1,7 @@
-0.017 2026-01-14
+0.017 2026-01-15
   [New Features]
-    * Add Go::Context class.
+    * Add untested and undocumented Go::Context classes.
+    
     * Add the following methods.
     
       Go#sleep_sec
