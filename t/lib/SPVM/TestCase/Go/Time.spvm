@@ -39,6 +39,37 @@ class TestCase::Go::Time {
       }
     }
     
+    # clone
+    {
+      my $go_time = Go::Time->now;
+      my $ret = $go_time->clone;
+      
+      if ($go_time == $ret) {
+        return 0;
+      }
+      
+      unless ($go_time->unix == $ret->unix) {
+        return 0;
+      }
+      
+      unless ($go_time->nanosecond == $ret->nanosecond) {
+        return 0;
+      }
+      
+      unless ($go_time->nanosecond == $ret->nanosecond) {
+        return 0;
+      }
+      
+      unless ($go_time->_has_monotonic_time == $ret->_has_monotonic_time) {
+        return 0;
+      }
+      
+      unless ($go_time->_mono_duration_nsec == $ret->_mono_duration_nsec) {
+        return 0;
+      }
+      
+    }
+    
     return 1;
   }
   

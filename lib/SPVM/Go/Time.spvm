@@ -173,6 +173,7 @@ class Go::Time {
     return $ts;
   }
   
+  # Never use these "_" methods except for Go::Time tests.
   method _has_monotonic_time : int () {
     return $self->{has_monotonic_time};
   }
