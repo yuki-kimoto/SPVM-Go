@@ -11,7 +11,7 @@ class Go::Duration_1l : mulnum_t {
   # Fields
   has nsec : long;
   
-  # Class Method
+  # Class Methods
   static method new : Go::Duration_1l ($nsec : long = 0) {
     
     my $duration : Go::Duration_1l;
@@ -31,16 +31,6 @@ class Go::Duration_1l : mulnum_t {
     return $duration;
   }
   
-  private static method check_timespec_to_nanoseconds : void ($timespec : Sys::Time::Timespec) {
-    
-    my $max_duration_sec = (Fn->LONG_MAX / 1_000_000_000) - 1;
-    
-    unless ($timespec->tv_sec > -$max_duration_sec && $timespec->tv_sec < $max_duration_sec) {
-      die "Sys::Time::Timespec \$timespec tv_sec must be greater than -$max_duration_sec and less than $max_duration_sec.";
-    }
-    
-  }
-  
   static method new_from_sec : Go::Duration_1l ($seconds : double) {
     
     my $timespec = Sys::Time::Util->float_seconds_to_timespec($seconds);
@@ -57,6 +47,15 @@ class Go::Duration_1l : mulnum_t {
     my $timespec = &nanoseconds_to_timespec($duration->{nsec});
     
     return $timespec;
+  }
+  
+  static method to_sec : double ($duration : Go::Duration_1l) {
+    
+    my $timespec = Sys::Time::Util->nanoseconds_to_timespec($duration->{nsec});
+    
+    my $seconds = Sys::Time::Util->timespec_to_float_seconds($timespec);
+    
+    return $seconds;
   }
   
   # TODO: fix Sys::Time::Util#nanoseconds_to_timespec
@@ -84,13 +83,15 @@ class Go::Duration_1l : mulnum_t {
     return $ts;
   }
   
-  static method to_sec : double ($duration : Go::Duration_1l) {
+  # TODO: implement logic in Sys::Time::Util
+  private static method check_timespec_to_nanoseconds : void ($timespec : Sys::Time::Timespec) {
     
-    my $timespec = Sys::Time::Util->nanoseconds_to_timespec($duration->{nsec});
+    my $max_duration_sec = (Fn->LONG_MAX / 1_000_000_000) - 1;
     
-    my $seconds = Sys::Time::Util->timespec_to_float_seconds($timespec);
+    unless ($timespec->tv_sec > -$max_duration_sec && $timespec->tv_sec < $max_duration_sec) {
+      die "Sys::Time::Timespec \$timespec tv_sec must be greater than -$max_duration_sec and less than $max_duration_sec.";
+    }
     
-    return $seconds;
   }
   
 }

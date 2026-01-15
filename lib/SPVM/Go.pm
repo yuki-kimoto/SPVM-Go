@@ -154,6 +154,8 @@ Casts the value of L</"SPVM_GO_DEBUG> environment variable to int type and retur
 
 =item * L<Go::OS::Signal|SPVM::Go::OS::Signal>
 
+=item * L<Go::Time|SPVM::Go::Time>
+
 =back
 
 =head1 Enviroment Variables
