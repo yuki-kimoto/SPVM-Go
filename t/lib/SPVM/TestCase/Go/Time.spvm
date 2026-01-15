@@ -21,7 +21,14 @@ class TestCase::Go::Time {
         return 0;
       }
       
-      diag "[Test Output]new_from_unix:\n" . dump $go_time;
+      if ($go_time->_has_monotonic_time) {
+        return 0;
+      }
+      
+      unless ($go_time->_mono_duration_nsec == 0) {
+        return 0;
+      }
+      
     }
     
     {
@@ -107,9 +114,13 @@ class TestCase::Go::Time {
   static method now : int () {
     
     {
-      my $now = Go::Time->now;
+      my $go_time = Go::Time->now;
       
-      diag "[Test Output]now:\n" . dump $now;
+      unless ($go_time->_has_monotonic_time) {
+        return 0;
+      }
+      
+      diag "[Test Output]now:\n" . dump $go_time;
     }
     
     return 1;
@@ -129,6 +140,14 @@ class TestCase::Go::Time {
       }
       
       unless ($ret->nanosecond == 0) {
+        return 0;
+      }
+      
+      if ($ret->_has_monotonic_time) {
+        return 0;
+      }
+      
+      unless ($ret->_mono_duration_nsec == 0) {
         return 0;
       }
       

@@ -88,6 +88,7 @@ class Go::Time {
     
     if ($self->{has_monotonic_time}) {
       $clone->{mono_duration_nsec} += $duration->{nsec};
+      $clone->{has_monotonic_time} = 1;
     }
     
     return $clone;
@@ -159,6 +160,14 @@ class Go::Time {
     $ts->set_tv_nsec($self->{nsec});
     
     return $ts;
+  }
+  
+  method _has_monotonic_time : int () {
+    return $self->{has_monotonic_time};
+  }
+  
+  method _mono_duration_nsec : long () {
+    return $self->{mono_duration_nsec};
   }
   
 }
