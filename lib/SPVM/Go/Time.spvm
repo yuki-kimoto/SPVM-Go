@@ -102,7 +102,7 @@ class Go::Time {
     
     my $sub_duration : Go::Duration_1l;
     my $sub_nsec = 0L;
-    if ($self->{has_monotonic_time}) {
+    if ($self->{has_monotonic_time} && $go_time->{has_monotonic_time}) {
       my $sub_duration_nsec = $self->{mono_duration_nsec} - $go_time->{mono_duration_nsec};
       $sub_duration = Go::Duration_1l->new($sub_duration_nsec);
     }
