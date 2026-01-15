@@ -1,5 +1,6 @@
 class TestCase::Go::Time {
   use Go::Time;
+  use Sys::Time::Util;
   
   static method basic : int () {
     
@@ -148,6 +149,38 @@ class TestCase::Go::Time {
       }
       
       unless ($ret->_mono_duration_nsec == 0) {
+        return 0;
+      }
+      
+    }
+    
+    {
+      my $go_time = Go::Time->now;
+      
+      my $go_time_sec = $go_time->unix;
+      my $go_time_nsec = $go_time->nanosecond;
+      my $go_time_mono_duration_nsec = $go_time->_mono_duration_nsec;
+      
+      my $ret = $go_time->add(Go::Duration_1l->new(1));
+      
+      unless ($ret->_has_monotonic_time) {
+        return 0;
+      }
+      
+      unless ($ret->_mono_duration_nsec - $go_time_mono_duration_nsec == 1) {
+        return 0;
+      }
+      
+      my $ret_sec = $ret->unix;
+      my $ret_nsec = $ret->nanosecond;
+      my $ret_mono_duration_nsec = $ret->_mono_duration_nsec;
+      
+      my $diff_timespec = Sys::Time::Util->subtract_timespec($ret->to_timespec, $go_time->to_timespec);
+      unless ($diff_timespec->tv_sec == 0) {
+        return 0;
+      }
+      
+      unless ($diff_timespec->tv_nsec == 1) {
         return 0;
       }
       
