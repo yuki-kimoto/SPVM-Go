@@ -74,8 +74,6 @@ C<static method HOUR : long ();>
 
 Returns 3,600,000,000,000 nanoseconds.
 
-=head1 CLASS METHODS
-
 =head2 new_from_unix
 
 C<static method new_from_unix : L<Go::Time|SPVM::Go::Time> ($sec : long = 0, $nsec : long = 0);>
