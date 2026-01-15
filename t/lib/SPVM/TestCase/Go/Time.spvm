@@ -114,5 +114,28 @@ class TestCase::Go::Time {
     
     return 1;
   }
+  
+  static method add : int () {
+    
+    {
+      my $sec = 1;
+      my $nsec = 900_000_000;
+      my $go_time = Go::Time->new_from_unix($sec, $nsec);
+      
+      my $ret = $go_time->add(Go::Duration_1l->new(100_000_000));
+      
+      unless ($ret->unix == 2) {
+        return 0;
+      }
+      
+      unless ($ret->nanosecond == 0) {
+        return 0;
+      }
+      
+    }
+    
+    return 1;
+  }
+  
 }
 

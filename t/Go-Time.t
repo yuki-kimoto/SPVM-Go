@@ -19,6 +19,8 @@ ok(SPVM::TestCase::Go::Time->new_from_unix);
 
 ok(SPVM::TestCase::Go::Time->now);
 
+ok(SPVM::TestCase::Go::Time->add);
+
 SPVM::Fn->destroy_runtime_permanent_vars;
 
 my $end_memory_blocks_count = $api->get_memory_blocks_count;
