@@ -170,8 +170,9 @@ Converts the internal time to a L<Sys::Time::Timespec|SPVM::Sys::Time::Timespec>
 
 =item * L<Go::Duration_1l|SPVM::Go::Duration_1l>
 
-=back
+=item * L<Sys::Time::Timespec|SPVM::Sys::Time::Timespec>
 
+=back
 
 =head1 Author
 
