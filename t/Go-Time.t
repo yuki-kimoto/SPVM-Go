@@ -25,6 +25,8 @@ ok(SPVM::TestCase::Go::Time->add);
 
 ok(SPVM::TestCase::Go::Time->add_sec);
 
+ok(SPVM::TestCase::Go::Time->sub);
+
 ok(SPVM::TestCase::Go::Time->to_timespec);
 
 SPVM::Fn->destroy_runtime_permanent_vars;

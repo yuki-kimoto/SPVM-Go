@@ -277,6 +277,55 @@ class TestCase::Go::Time {
     return 1;
   }
   
+  static method sub : int () {
+    
+    # Both non-monotonic
+    {
+      my $sec = 1;
+      my $nsec = 2;
+      my $go_time = Go::Time->new_from_unix($sec, $nsec);
+      
+      my $add = $go_time->add(Go::Duration_1l->new(1));
+      
+      my $ret = $add->sub($go_time);
+      
+      unless ($ret->{nsec} = 1) {
+        return 0;
+      }
+      
+    }
+    
+    # Both monotonic
+    {
+      my $go_time = Go::Time->now;
+      
+      my $add = $go_time->add(Go::Duration_1l->new(1));
+      
+      my $ret = $add->sub($go_time);
+      
+      unless ($ret->{nsec} = 1) {
+        return 0;
+      }
+      
+    }
+    
+    # Monotonic and non-monotonic
+    {
+      my $go_time = Go::Time->now;
+      
+      my $add = $go_time->add(Go::Duration_1l->new(1));
+      
+      my $ret = $add->sub(Go::Time->new_from_unix($add->unix, $add->nanosecond));
+      
+      unless ($ret->{nsec} = 1) {
+        return 0;
+      }
+      
+    }
+    
+    return 1;
+  }
+  
   static method to_timespec : int () {
     
     {
