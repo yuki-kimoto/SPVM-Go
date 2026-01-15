@@ -21,6 +21,7 @@ class TestCase::Go::Time {
         return 0;
       }
       
+      diag "[Test Output]new_from_unix:\n" . dump $go_time;
     }
     
     {
@@ -103,5 +104,15 @@ class TestCase::Go::Time {
     return 1;
   }
   
+  static method now : int () {
+    
+    {
+      my $now = Go::Time->now;
+      
+      diag "[Test Output]now:\n" . dump $now;
+    }
+    
+    return 1;
+  }
 }
 

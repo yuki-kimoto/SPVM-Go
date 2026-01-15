@@ -53,16 +53,16 @@ class Go::Time {
     
     my $self = new Go::Time;
     
-    my $to_timespec = Time::HiRes->clock_gettime_timespec(TIME->CLOCK_REALTIME);
-    
-    $self->{sec} = $to_timespec->tv_sec;
-    $self->{nsec} = $to_timespec->tv_nsec;
+    my $timespec = Time::HiRes->clock_gettime_timespec(TIME->CLOCK_REALTIME);
     
     my $mono_timespec = Time::HiRes->clock_gettime_timespec(TIME->CLOCK_MONOTONIC);
     
-    my $mono_duration = Go::Duration_1l->new_from_timespec($mono_timespec);
+    $self->{sec} = $timespec->tv_sec;
+    $self->{nsec} = $timespec->tv_nsec;
     
-    $self->{mono_duration_nsec} = $mono_duration->{nsec};
+    $self->{mono_duration_nsec} = Go::Duration_1l->new_from_timespec($mono_timespec)->{nsec};
+    
+    $self->{has_monotonic_time} = 1;
     
     return $self;
   }
