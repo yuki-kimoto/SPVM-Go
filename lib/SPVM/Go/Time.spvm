@@ -128,26 +128,25 @@ class Go::Time {
     return $self->add($duration_nsec);
   }
   
+  method equal : int ($go_time : Go::Time) {
+    
+    my $sub_duration = $self->sub($go_time);
+    
+    return $sub_duration->{nsec} == 0;
+  }
+  
   method after : int ($go_time : Go::Time) {
     
-    unless ($go_time) {
-      die "The time \$go_time must be defined.";
-    }
+    my $sub_duration = $self->sub($go_time);
     
-    my $tv_interval = &_tv_interval($self, $go_time);
-    
-    return $tv_interval > 0;
+    return $sub_duration->{nsec} > 0;
   }
   
   method before : int ($go_time : Go::Time) {
     
-    unless ($go_time) {
-      die "The time \$go_time must be defined.";
-    }
+    my $sub_duration = $self->sub($go_time);
     
-    my $tv_interval = &_tv_interval($self, $go_time);
-    
-    return $tv_interval < 0;
+    return $sub_duration->{nsec} < 0;
   }
   
   method clone : Go::Time () {
@@ -155,30 +154,6 @@ class Go::Time {
     my $clone = new Go::Time;
     
     copy_fields $clone, $self, Go::Time;
-    
-    return $clone;
-  }
-  
-  private static method _tv_interval : double ($go_time1 : Go::Time, $go_time2 : Go::Time) {
-    
-    my $tv_interval = 0.0;
-    if ($go_time1->{has_monotonic_time} && $go_time2->{has_monotonic_time}) {
-      $tv_interval = $go_time1->{mono_duration_nsec} - $go_time2->{mono_duration_nsec};
-    }
-    else {
-      $tv_interval = Sys::Time::Util->timespec_interval($go_time1->to_timespec, $go_time2->to_timespec);
-    }
-    
-    return $tv_interval;
-  }
-  
-  private static method _timespec_clone : Sys::Time::Timespec ($timespec : Sys::Time::Timespec) {
-    
-    my $clone = Sys::Time::Timespec->new;
-    
-    $clone->set_tv_sec($timespec->tv_sec);
-    
-    $clone->set_tv_nsec($timespec->tv_nsec);
     
     return $clone;
   }
