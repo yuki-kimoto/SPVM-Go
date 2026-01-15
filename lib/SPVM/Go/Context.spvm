@@ -135,7 +135,7 @@ class Go::Context {
         
         unweaken $child->{parent};
         
-        if ($child isa Go::Context) {
+        unless ($child isa Go::Context::Value) {
           if ($child->done) {
             $child->done->close;
             $child->{err} = $err;
