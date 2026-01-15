@@ -15,7 +15,7 @@ class Go::Poll {
   
   has coroutines_h : Hash of Go::Coroutine;
   
-  static method new : Go::Poll () {
+  private static method new : Go::Poll () {
     
     my $self = new Go::Poll;
     
@@ -121,7 +121,7 @@ class Go::Poll {
     return $timeout_occur;
   }
   
-  method DESTROY : void () {
+  private method DESTROY : void () {
     
     my $poll_coroutines_h = $self->{coroutines_h};
     
