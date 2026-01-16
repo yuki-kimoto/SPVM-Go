@@ -29,13 +29,9 @@ ok(SPVM::TestCase::Go::Context->with_deadline);
 
 ok(SPVM::TestCase::Go::Context->with_deadline_cause);
 
-=pod
-
 ok(SPVM::TestCase::Go::Context->with_timeout);
+
 ok(SPVM::TestCase::Go::Context->with_timeout_sec);
-
-
-=cut
 
 SPVM::Fn->destroy_runtime_permanent_vars;
 
