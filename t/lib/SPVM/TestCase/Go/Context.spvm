@@ -141,20 +141,24 @@ class TestCase::Go::Context {
       
       my $derived = Go::Context->with_deadline($ctx_parent, $deadline);
       my $ctx = $derived->ctx;
-
+      
       # Check if the deadline is correctly set
       unless ($ctx->deadline->equal($deadline)) {
         return 0;
       }
-
+      
       # Should not be expired yet
       if ($ctx->err > 0) {
         return 0;
       }
-
+      
       # Wait for the deadline to pass
-      Go->sleep_sec($timeout_sec + 0.1);
-
+      Go->go([$timeout_sec : double] method : void () {
+        Go->sleep_sec($timeout_sec + 0.1);
+      });
+      
+      Go->gosched;
+      
       # Error must be Go::Context::Error::DeadlineExceeded
       unless ($ctx->err == basic_type_id Go::Context::Error::DeadlineExceeded) {
         return 0;
