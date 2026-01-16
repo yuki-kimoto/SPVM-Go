@@ -82,7 +82,10 @@ class TestCase::Go::Context {
     
     {
       my $ctx_p_derived = Go::Context->with_cancel(Go::Context->with_background);
-      my $ctx_c_derived = Go::Context->with_cancel($ctx_p_derived->ctx);
+      my $key = "ID";
+      my $value = "foo";
+      my $ctx_v = Go::Context->with_value($ctx_p_derived->ctx, $key, $value);
+      my $ctx_c_derived = Go::Context->with_cancel($ctx_v);
       my $ctx_gc_derived = Go::Context->with_cancel($ctx_c_derived->ctx);
 
       # Cancel the top-level parent
@@ -90,6 +93,10 @@ class TestCase::Go::Context {
 
       # Grandchild must also be canceled
       unless ($ctx_gc_derived->ctx->err == basic_type_id Go::Context::Error::Canceled) {
+        return 0;
+      }
+      
+      unless ($ctx_gc_derived->ctx->value($key)->(string) eq "foo") {
         return 0;
       }
       
