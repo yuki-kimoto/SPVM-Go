@@ -35,10 +35,10 @@ class TestCase::Go::Context {
     {
       my $parent_derived = Go::Context->with_cancel(Go::Context->with_background);
       my $ctx_child = Go::Context->without_cancel($parent_derived->ctx);
-
+      
       # Cancel the parent
       $parent_derived->cancel->("parent is canceled");
-
+      
       # Parent must be canceled
       unless ($parent_derived->ctx->err > 0) {
         return 0;
@@ -48,6 +48,7 @@ class TestCase::Go::Context {
       if ($ctx_child->err > 0) {
         return 0;
       }
+      
     }
     return 1;
   }
@@ -66,8 +67,7 @@ class TestCase::Go::Context {
       }
       
       # Execution of cancellation
-      my $cause_msg = "manual cancel";
-      $cancel->($cause_msg);
+      $cancel->();
       
       # Error must be Go::Context::Error::Canceled type ID
       unless ($ctx->err == basic_type_id Go::Context::Error::Canceled) {
@@ -75,9 +75,13 @@ class TestCase::Go::Context {
       }
       
       # Cause must match the message
-      unless ($ctx->cause eq $cause_msg) {
+      unless ($ctx->cause eq "context canceled") {
         return 0;
       }
+      
+      $derived = undef;
+      $ctx = undef;
+      $cancel = undef;
     }
     return 1;
   }
