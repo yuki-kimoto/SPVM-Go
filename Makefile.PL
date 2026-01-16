@@ -51,6 +51,7 @@ WriteMakefile(
     'SPVM::Time::HiRes' => '0.004',
     'SPVM::Thread' => '0.001',
     'SPVM::Math' => '1.006',
+    'SPVM::Regex' => '0.255',
   },
   TEST_REQUIRES => {
     
