@@ -87,7 +87,7 @@ class Go::Context {
     return &with_timeout($ctx, $timeout);
   }
   
-  static method new_with_value : Go::Context ($ctx : Go::Context, $key : object, $value : object) {
+  static method with_value : Go::Context ($ctx : Go::Context, $key : object, $value : object) {
     return Go::Context::Value->new_with_value($ctx, $key, $value);
   }
   
@@ -131,7 +131,13 @@ class Go::Context {
       
       my $children = (List of Go::Context)List->new_ref($ctx->{children});
       
-      while (my $child = $children->shift) {
+      while (1) {
+        
+        unless ($children->length) {
+          last;
+        }
+        
+        my $child = $children->shift;
         
         unweaken $child->{parent};
         
@@ -173,6 +179,7 @@ class Go::Context {
       });
     }
     
+    return $derived;
   }
   
   # Instance Methods

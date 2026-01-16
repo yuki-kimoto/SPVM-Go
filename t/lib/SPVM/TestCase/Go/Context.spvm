@@ -1,9 +1,262 @@
 class TestCase::Go::Context {
   use Go::Context;
+  use Go::Context::Derived;
+  use Go::Time;
+  use Go::Duration_1l;
+  use Go::Context::Error::Canceled;
+  use Go::Context::Error::DeadlineExceeded;
+  use Go;
+
+  # Test for with_background method
+  static method with_background : int () {
+    {
+      my $ctx = Go::Context->with_background;
+      
+      # Should be defined
+      unless ($ctx) {
+        return 0;
+      }
+      
+      # Should not have a deadline
+      if ($ctx->deadline) {
+        return 0;
+      }
+      
+      # Error should be 0 (no error)
+      if ($ctx->err > 0) {
+        return 0;
+      }
+    }
+    return 1;
+  }
+
+  # Test for without_cancel (child should not be canceled by parent)
+  static method without_cancel : int () {
+    {
+      my $parent_derived = Go::Context->with_cancel(Go::Context->with_background);
+      my $ctx_child = Go::Context->without_cancel($parent_derived->ctx);
+
+      # Cancel the parent
+      $parent_derived->cancel->("parent is canceled");
+
+      # Parent must be canceled
+      unless ($parent_derived->ctx->err > 0) {
+        return 0;
+      }
+      
+      # Child must NOT be canceled
+      if ($ctx_child->err > 0) {
+        return 0;
+      }
+    }
+    return 1;
+  }
+
+  # Test for with_cancel method and manual cancellation
+  static method with_cancel : int () {
+    {
+      my $ctx_parent = Go::Context->with_background;
+      my $derived = Go::Context->with_cancel($ctx_parent);
+      my $ctx = $derived->ctx;
+      my $cancel = $derived->cancel;
+
+      # Check initial state
+      if ($ctx->err > 0) {
+        return 0;
+      }
+      
+      # Execution of cancellation
+      my $cause_msg = "manual cancel";
+      $cancel->($cause_msg);
+      
+      # Error must be Go::Context::Error::Canceled type ID
+      unless ($ctx->err == basic_type_id Go::Context::Error::Canceled) {
+        return 0;
+      }
+      
+      # Cause must match the message
+      unless ($ctx->cause eq $cause_msg) {
+        return 0;
+      }
+    }
+    return 1;
+  }
   
-  static method basic : int () {
-    
+  # Test for hierarchical cancellation propagation
+  static method with_cancel_hierarchy : int () {
+    {
+      my $ctx_p_derived = Go::Context->with_cancel(Go::Context->with_background);
+      my $ctx_c_derived = Go::Context->with_cancel($ctx_p_derived->ctx);
+      my $ctx_gc_derived = Go::Context->with_cancel($ctx_c_derived->ctx);
+
+      # Cancel the top-level parent
+      $ctx_p_derived->cancel->("root stop");
+
+      # Grandchild must also be canceled
+      unless ($ctx_gc_derived->ctx->err == basic_type_id Go::Context::Error::Canceled) {
+        return 0;
+      }
+    }
+    return 1;
+  }
+
+  # Test for with_cancel_cause
+  static method with_cancel_cause : int () {
+    {
+      my $ctx_parent = Go::Context->with_background;
+      my $cause_msg = "critical error occurred";
+      my $derived = Go::Context->with_cancel_cause($ctx_parent, $cause_msg);
+      my $ctx = $derived->ctx;
+      my $cancel = $derived->cancel;
+
+      # Execute cancellation with the specific cause
+      $cancel->($cause_msg);
+      
+      # Check error type
+      unless ($ctx->err == basic_type_id Go::Context::Error::Canceled) {
+        return 0;
+      }
+      
+      # Check if the custom cause is correctly stored
+      unless ($ctx->cause eq $cause_msg) {
+        return 0;
+      }
+    }
+    return 1;
+  }
+  
+  # Test for with_deadline (using absolute Go::Time)
+  static method with_deadline : int () {
+    {
+      my $ctx_parent = Go::Context->with_background;
+      
+      # Set deadline to 0.1 seconds from now
+      my $timeout_sec = 0.1;
+      my $deadline = Go::Time->now->add_sec($timeout_sec);
+      
+      my $derived = Go::Context->with_deadline($ctx_parent, $deadline);
+      my $ctx = $derived->ctx;
+
+      # Check if the deadline is correctly set
+      unless ($ctx->deadline->equal($deadline)) {
+        return 0;
+      }
+
+      # Should not be expired yet
+      if ($ctx->err > 0) {
+        return 0;
+      }
+
+      # Wait for the deadline to pass
+      Go->sleep_sec($timeout_sec + 0.1);
+
+      # Error must be Go::Context::Error::DeadlineExceeded
+      unless ($ctx->err == basic_type_id Go::Context::Error::DeadlineExceeded) {
+        return 0;
+      }
+    }
+    return 1;
+  }
+  
+  # Test for with_deadline_cause
+  static method with_deadline_cause : int () {
+    {
+      my $ctx_parent = Go::Context->with_background;
+      my $timeout_sec = 0.1;
+      my $deadline = Go::Time->now->add_sec($timeout_sec);
+      my $cause_msg = "database connection timeout";
+      
+      my $derived = Go::Context->with_deadline_cause($ctx_parent, $deadline, $cause_msg);
+      my $ctx = $derived->ctx;
+
+      # Wait for the deadline to pass
+      Go->sleep_sec($timeout_sec + 0.1);
+
+      # Check error type (should be DeadlineExceeded)
+      unless ($ctx->err == basic_type_id Go::Context::Error::DeadlineExceeded) {
+        return 0;
+      }
+      
+      # Check if the custom cause is correctly stored
+      unless ($ctx->cause eq $cause_msg) {
+        return 0;
+      }
+    }
+    return 1;
+  }
+  
+  # Test for with_timeout (using Go::Duration_1l)
+  static method with_timeout : int () {
+    {
+      my $ctx_parent = Go::Context->with_background;
+      
+      # 0.1 seconds in nanoseconds (100,000,000ns)
+      my $timeout_nanos = 100_000_000L;
+      my $duration = Go::Duration_1l->new($timeout_nanos);
+      
+      my $derived = Go::Context->with_timeout($ctx_parent, $duration);
+      my $ctx = $derived->ctx;
+
+      # Should not be expired yet
+      if ($ctx->err > 0) {
+        return 0;
+      }
+
+      # Wait for 0.2 seconds to ensure it expires
+      Go->sleep_sec(0.2);
+
+      # Error must be Go::Context::Error::DeadlineExceeded
+      unless ($ctx->err == basic_type_id Go::Context::Error::DeadlineExceeded) {
+        return 0;
+      }
+    }
+    return 1;
+  }
+
+  # Test for with_timeout_sec (using double)
+  static method with_timeout_sec : int () {
+    {
+      my $ctx_parent = Go::Context->with_background;
+      
+      # Set timeout to 0.1 seconds directly as a double
+      my $timeout_sec = 0.1;
+      my $derived = Go::Context->with_timeout_sec($ctx_parent, $timeout_sec);
+      my $ctx = $derived->ctx;
+
+      # Should not be expired yet
+      if ($ctx->err > 0) {
+        return 0;
+      }
+
+      # Wait for 0.2 seconds to ensure it expires
+      Go->sleep_sec(0.2);
+
+      # Error must be Go::Context::Error::DeadlineExceeded
+      unless ($ctx->err == basic_type_id Go::Context::Error::DeadlineExceeded) {
+        return 0;
+      }
+    }
+    return 1;
+  }
+
+  # Test for value inheritance
+  static method with_value : int () {
+    {
+      my $key = "USER_ID";
+      my $val = "kimocchan";
+      my $ctx_bg = Go::Context->with_background;
+      my $ctx_val = Go::Context->with_value($ctx_bg, $key, $val);
+
+      # Value must be retrievable by key and cast to (string) for eq operator
+      unless ((string)$ctx_val->value($key) eq $val) {
+        return 0;
+      }
+
+      # Non-existent key should return undef
+      if ($ctx_val->value("NON_EXISTENT")) {
+        return 0;
+      }
+    }
     return 1;
   }
 }
-

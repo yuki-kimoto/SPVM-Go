@@ -165,6 +165,7 @@ class Go::Schedule {
       }
     }
     else {
+      
       if ($after > 0) {
         die "\$after(or \$timeout) must be given in a goroutine.";
       }

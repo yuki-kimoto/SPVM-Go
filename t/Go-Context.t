@@ -15,6 +15,22 @@ my $api = SPVM::api();
 
 my $start_memory_blocks_count = $api->get_memory_blocks_count;
 
+ok(SPVM::TestCase::Go::Context->with_background);
+
+=pod
+
+ok(SPVM::TestCase::Go::Context->without_cancel);
+ok(SPVM::TestCase::Go::Context->with_cancel);
+ok(SPVM::TestCase::Go::Context->with_cancel_hierarchy);
+ok(SPVM::TestCase::Go::Context->with_cancel_cause);
+ok(SPVM::TestCase::Go::Context->with_deadline);
+ok(SPVM::TestCase::Go::Context->with_deadline_cause);
+ok(SPVM::TestCase::Go::Context->with_timeout);
+ok(SPVM::TestCase::Go::Context->with_timeout_sec);
+ok(SPVM::TestCase::Go::Context->with_value);
+
+=cut
+
 SPVM::Fn->destroy_runtime_permanent_vars;
 
 my $end_memory_blocks_count = $api->get_memory_blocks_count;
