@@ -19,10 +19,11 @@ ok(SPVM::TestCase::Go::Context->with_background);
 
 ok(SPVM::TestCase::Go::Context->with_cancel);
 
+ok(SPVM::TestCase::Go::Context->with_cancel_cause);
+
 =pod
 
 ok(SPVM::TestCase::Go::Context->with_cancel_hierarchy);
-ok(SPVM::TestCase::Go::Context->with_cancel_cause);
 ok(SPVM::TestCase::Go::Context->with_deadline);
 ok(SPVM::TestCase::Go::Context->with_deadline_cause);
 ok(SPVM::TestCase::Go::Context->with_timeout);
