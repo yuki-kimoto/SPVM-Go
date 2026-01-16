@@ -35,6 +35,9 @@ ok(SPVM::TestCase::Go::Time->after);
 
 ok(SPVM::TestCase::Go::Time->before);
 
+# new_from_rfc3339_nano, to_rfc3339_nano
+ok(SPVM::TestCase::Go::Time->rfc3339_nano);
+
 SPVM::Fn->destroy_runtime_permanent_vars;
 
 my $end_memory_blocks_count = $api->get_memory_blocks_count;

@@ -32,8 +32,6 @@ class TestCase::Go::Time {
       my $nsec = 2;
       my $go_time = Go::Time->new_from_unix($sec, $nsec);
       
-      warn $go_time->unix_nano;
-      
       unless ($go_time->unix_nano == 1_000_000_002) {
         return 0;
       }
@@ -487,6 +485,102 @@ class TestCase::Go::Time {
       my $ret = $add->before($go_time);
       
       unless ($ret) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method rfc3339_nano : int () {
+    
+    # 1. Basic round-trip with full nanoseconds
+    {
+      my $sec = 1737032400L; # 2025-01-16T13:00:00Z
+      my $nsec = 123456789L;
+      my $go_time = Go::Time->new_from_unix($sec, $nsec);
+      
+      my $rfc_str = $go_time->to_rfc3339_nano;
+      unless ($rfc_str eq "2025-01-16T13:00:00.123456789Z") {
+        diag $rfc_str;
+        return 0;
+      }
+      
+      my $back = Go::Time->new_from_rfc3339_nano($rfc_str);
+      unless ($back->unix == $sec && $back->nanosecond == $nsec) {
+        diag;
+        return 0;
+      }
+    }
+    
+    # 2. Case with zero nanoseconds (trailing zeros and dot should be omitted)
+    {
+      my $sec = 1737032400L;
+      my $nsec = 0L;
+      my $go_time = Go::Time->new_from_unix($sec, $nsec);
+      
+      my $rfc_str = $go_time->to_rfc3339_nano;
+      unless ($rfc_str eq "2025-01-16T13:00:00Z") {
+        diag;
+        return 0;
+      }
+      
+      my $back = Go::Time->new_from_rfc3339_nano($rfc_str);
+      unless ($back->unix == $sec && $back->nanosecond == 0) {
+        diag;
+        return 0;
+      }
+    }
+
+    # 3. Case with trailing zeros in nanoseconds (should be trimmed in to_rfc3339_nano)
+    {
+      my $sec = 1737032400L;
+      my $nsec = 123000000L; # 123ms
+      my $go_time = Go::Time->new_from_unix($sec, $nsec);
+      
+      my $rfc_str = $go_time->to_rfc3339_nano;
+      unless ($rfc_str eq "2025-01-16T13:00:00.123Z") {
+        diag;
+        return 0;
+      }
+      
+      my $back = Go::Time->new_from_rfc3339_nano($rfc_str);
+      unless ($back->nanosecond == 123000000L) {
+        diag;
+        return 0;
+      }
+    }
+    
+    # 4. Parsing from a string with shorter precision (e.g., only milliseconds)
+    {
+      my $rfc_str = "2025-01-16T13:00:00.12Z";
+      my $back = Go::Time->new_from_rfc3339_nano($rfc_str);
+      unless ($back->nanosecond == 120000000L) {
+        diag;
+        return 0;
+      }
+    }
+
+    # Exception: Unsupported timezone (not UTC)
+    {
+      eval {
+        my $bad_rfc = "2025-01-16T13:00:00+09:00";
+        Go::Time->new_from_rfc3339_nano($bad_rfc);
+      };
+      unless ($@) {
+        diag;
+        return 0;
+      }
+    }
+
+    # Exception: Invalid format (missing Z)
+    {
+      eval {
+        my $bad_rfc = "2025-01-16T13:00:00";
+        Go::Time->new_from_rfc3339_nano($bad_rfc);
+      };
+      unless ($@) {
+        diag;
         return 0;
       }
     }
