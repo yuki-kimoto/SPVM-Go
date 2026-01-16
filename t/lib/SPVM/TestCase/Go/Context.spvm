@@ -168,6 +168,65 @@ class TestCase::Go::Context {
         return 0;
       }
     }
+    
+    {
+      my $ctx_parent = Go::Context->with_background;
+      
+      # Set deadline to 0.1 seconds from now
+      my $timeout_sec = 0.2;
+      my $deadline = Go::Time->now->add_sec($timeout_sec);
+      
+      my $derived_c1 = Go::Context->with_deadline($ctx_parent, $deadline);
+      my $ctx_c1 = $derived_c1->ctx;
+      
+      my $deadline_c2 = $deadline->add_sec(-0.1);
+      my $derived_c2 = Go::Context->with_deadline($ctx_c1, $deadline_c2);
+      my $ctx_c2 = $derived_c2->ctx;
+      
+      # Check if the deadline is correctly set
+      unless ($ctx_c2->deadline->unix == $deadline_c2->unix) {
+        return 0;
+      }
+      
+      unless ($ctx_c2->deadline->nanosecond == $deadline_c2->nanosecond) {
+        return 0;
+      }
+      
+      unless ($ctx_c2->deadline->_mono_duration_nsec == $deadline_c2->_mono_duration_nsec) {
+        return 0;
+      }
+      
+    }
+    
+    {
+      my $ctx_parent = Go::Context->with_background;
+      
+      # Set deadline to 0.1 seconds from now
+      my $timeout_sec = 0.2;
+      my $deadline = Go::Time->now->add_sec($timeout_sec);
+      
+      my $derived_c1 = Go::Context->with_deadline($ctx_parent, $deadline);
+      my $ctx_c1 = $derived_c1->ctx;
+      
+      my $deadline_c2 = $deadline->add_sec(0.1);
+      my $derived_c2 = Go::Context->with_deadline($ctx_c1, $deadline_c2);
+      my $ctx_c2 = $derived_c2->ctx;
+      
+      # Check if the deadline is correctly set
+      unless ($ctx_c2->deadline->unix == $deadline->unix) {
+        return 0;
+      }
+      
+      unless ($ctx_c2->deadline->nanosecond == $deadline->nanosecond) {
+        return 0;
+      }
+      
+      unless ($ctx_c2->deadline->_mono_duration_nsec == $deadline->_mono_duration_nsec) {
+        return 0;
+      }
+      
+    }
+    
     return 1;
   }
   

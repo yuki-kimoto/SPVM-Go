@@ -160,10 +160,9 @@ class Go::Context {
     $_->set_cancel($cancel);
     
     if ($deadline) {
-      
-      if ($self->{parent} && $self->{parent}{deadline}) {
-        if ($deadline->after($self->{parent}{deadline})) {
-          $deadline = $self->{parent}{deadline}->clone;
+      if ($parent_ctx->{deadline}) {
+        if ($deadline->after($parent_ctx->{deadline})) {
+          $deadline = $parent_ctx->{deadline}->clone;
         }
       }
       
