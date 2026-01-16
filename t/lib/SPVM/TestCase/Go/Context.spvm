@@ -253,7 +253,7 @@ class TestCase::Go::Context {
       my $ctx_val = Go::Context->with_value($ctx_bg, $key, $val);
 
       # Value must be retrievable by key and cast to (string) for eq operator
-      unless ((string)$ctx_val->value($key) eq $val) {
+      unless ($ctx_val->value($key)->(string) eq $val) {
         return 0;
       }
 
@@ -262,6 +262,44 @@ class TestCase::Go::Context {
         return 0;
       }
     }
+
+    {
+      my $key_p = "PARENT_KEY";
+      my $val_p = "parent_val";
+      my $key_c = "CHILD_KEY";
+      my $val_c = "child_val";
+
+      # 1. Create parent context with a value
+      my $ctx_p = Go::Context->with_value(Go::Context->with_background, $key_p, $val_p);
+      
+      # 2. Create child context with another value (inherits from parent)
+      my $ctx_c = Go::Context->with_value($ctx_p, $key_c, $val_c);
+      
+      # 3. Create grandchild context (inherits from child)
+      my $ctx_gc = Go::Context->with_value($ctx_c, "GC_KEY", "gc_val");
+
+      # Check: Grandchild should be able to see parent's value
+      unless ((string)$ctx_gc->value($key_p) eq $val_p) {
+        return 0;
+      }
+
+      # Check: Grandchild should be able to see child's value
+      unless ((string)$ctx_gc->value($key_c) eq $val_c) {
+        return 0;
+      }
+
+      # Check: Parent should NOT be able to see child's value
+      if ($ctx_p->value($key_c)) {
+        return 0;
+      }
+
+      # Check: Non-existent key should return undef
+      if ($ctx_gc->value("UNKNOWN")) {
+        return 0;
+      }
+    }
+    
     return 1;
   }
+  
 }

@@ -4,6 +4,8 @@
 class Go::Context::Value extends Go::Context {
   version_from Go;
   
+  allow Go::Context;
+  
   use List;
   
   # Fields
@@ -32,7 +34,7 @@ class Go::Context::Value extends Go::Context {
   ;
   
   # Class Methods
-  static method new_with_value : Go::Context::Value ($parent_ctx : Go::Context, $key : object, $value : object) {
+  private static method new_with_value : Go::Context::Value ($parent_ctx : Go::Context, $key : object, $value : object) {
     
     unless ($parent_ctx) {
       die "Go::Context \$parent_ctx must be defined.";
