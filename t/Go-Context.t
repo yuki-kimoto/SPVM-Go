@@ -21,14 +21,16 @@ ok(SPVM::TestCase::Go::Context->with_cancel);
 
 ok(SPVM::TestCase::Go::Context->with_cancel_cause);
 
+ok(SPVM::TestCase::Go::Context->without_cancel);
+
+ok(SPVM::TestCase::Go::Context->with_value);
+
 =pod
 
 ok(SPVM::TestCase::Go::Context->with_deadline);
 ok(SPVM::TestCase::Go::Context->with_deadline_cause);
 ok(SPVM::TestCase::Go::Context->with_timeout);
 ok(SPVM::TestCase::Go::Context->with_timeout_sec);
-ok(SPVM::TestCase::Go::Context->with_value);
-ok(SPVM::TestCase::Go::Context->without_cancel);
 
 
 =cut

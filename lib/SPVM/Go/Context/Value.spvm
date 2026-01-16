@@ -32,10 +32,10 @@ class Go::Context::Value extends Go::Context {
   ;
   
   # Class Methods
-  static method new_with_value : Go::Context::Value ($ctx : Go::Context, $key : object, $value : object) {
+  static method new_with_value : Go::Context::Value ($parent_ctx : Go::Context, $key : object, $value : object) {
     
-    unless ($ctx) {
-      die "Go::Context \$ctx must be defined.";
+    unless ($parent_ctx) {
+      die "Go::Context \$parent_ctx must be defined.";
     }
     
     unless ($key) {
@@ -46,12 +46,14 @@ class Go::Context::Value extends Go::Context {
     
     $self->SUPER::init;
     
-    $self->{parent} = $ctx;
-    List->new_ref($ctx->{children})->push($ctx);
+    $self->{parent} = $parent_ctx;
+    List->new_ref($parent_ctx->{children})->push($self);
     weaken $self->{parent};
     
     $self->{key} = $key;
     $self->{value} = $value;
+    
+    return $self;
   }
   
 }
