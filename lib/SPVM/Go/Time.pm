@@ -88,6 +88,22 @@ C<static method now : L<Go::Time|SPVM::Go::Time> ();>
 Creates a new L<Go::Time|SPVM::Go::Time> object representing the current system time. It captures both the wall clock and the monotonic clock.
 See L<time.Now|https://pkg.go.dev/time#Now>.
 
+=head2 new_from_rfc3339_nano
+
+C<static method new_from_rfc3339_nano : L<Go::Time|SPVM::Go::Time> ($rfc3339_string : string);>
+
+Parses an RFC 3339 formatted string with nanoseconds and returns a new L<Go::Time|SPVM::Go::Time> object.
+
+Currently, only the UTC timezone (suffix "Z") is supported. If the timezone is not UTC, the method will C<die>.
+
+Nanoseconds are optional and will be normalized to 9 digits.
+
+Example:
+
+  my $t = Go::Time->new_from_rfc3339_nano("2025-01-16T13:00:00.123456789Z");
+
+See L<time.Parse|https://pkg.go.dev/time#Parse> with L<RFC3339Nano|https://pkg.go.dev/time#pkg-constants>.
+
 =head1 Instance Methods
 
 =head2 unix
@@ -163,6 +179,21 @@ Returns a deep copy of the L<Go::Time|SPVM::Go::Time> object. This method implem
 C<method to_timespec : L<Sys::Time::Timespec|SPVM::Sys::Time::Timespec> ();>
 
 Converts the internal time to a L<Sys::Time::Timespec|SPVM::Sys::Time::Timespec> object.
+
+=head2 to_rfc3339_nano
+
+C<method to_rfc3339_nano : string ();>
+
+Returns a string representing the time in RFC 3339 format with nanoseconds.
+
+Consistent with Go's C<time.RFC3339Nano> format, trailing zeros in the nanosecond part are removed. If the nanosecond part is zero, it is omitted entirely.
+
+Example:
+
+  # 2025-01-16T13:00:00.123456789Z
+  # 2025-01-16T13:00:00Z (if nsec is 0)
+
+See L<Time.Format|https://pkg.go.dev/time#Time.Format>.
 
 =head1 See Also
 
