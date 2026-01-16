@@ -78,11 +78,23 @@ class TestCase::Go::Context {
       unless ($ctx->cause eq "context canceled") {
         return 0;
       }
-      
-      $derived = undef;
-      $ctx = undef;
-      $cancel = undef;
     }
+    
+    {
+      my $ctx_p_derived = Go::Context->with_cancel(Go::Context->with_background);
+      my $ctx_c_derived = Go::Context->with_cancel($ctx_p_derived->ctx);
+      my $ctx_gc_derived = Go::Context->with_cancel($ctx_c_derived->ctx);
+
+      # Cancel the top-level parent
+      $ctx_p_derived->cancel->();
+
+      # Grandchild must also be canceled
+      unless ($ctx_gc_derived->ctx->err == basic_type_id Go::Context::Error::Canceled) {
+        return 0;
+      }
+      
+    }
+    
     return 1;
   }
   
@@ -111,24 +123,6 @@ class TestCase::Go::Context {
     return 1;
   }
   
-  # Test for hierarchical cancellation propagation
-  static method with_cancel_hierarchy : int () {
-    {
-      my $ctx_p_derived = Go::Context->with_cancel(Go::Context->with_background);
-      my $ctx_c_derived = Go::Context->with_cancel($ctx_p_derived->ctx);
-      my $ctx_gc_derived = Go::Context->with_cancel($ctx_c_derived->ctx);
-
-      # Cancel the top-level parent
-      $ctx_p_derived->cancel->("root stop");
-
-      # Grandchild must also be canceled
-      unless ($ctx_gc_derived->ctx->err == basic_type_id Go::Context::Error::Canceled) {
-        return 0;
-      }
-    }
-    return 1;
-  }
-
   # Test for with_deadline (using absolute Go::Time)
   static method with_deadline : int () {
     {

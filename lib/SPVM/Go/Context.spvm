@@ -129,15 +129,16 @@ class Go::Context {
       $that->{err} = $err;
       $that->{cause} = $cause;
       
-      my $children = (List of Go::Context)List->new_ref($that->{children});
+      my $all_children = (List of Go::Context)List->new($that->{children});
+      $that->{children} = new Go::Context[0];
       
       while (1) {
         
-        unless ($children->length) {
+        unless ($all_children->length) {
           last;
         }
         
-        my $child = $children->shift;
+        my $child = $all_children->shift;
         
         unweaken $child->{parent};
         
@@ -149,9 +150,9 @@ class Go::Context {
           }
         }
         
-        $children->push_($child->{children});
+        $all_children->push_($child->{children});
+        $child->{children} = new Go::Context[0];
       }
-      
     };
     
     my $derived = my $_ = Go::Context::Derived->new;
