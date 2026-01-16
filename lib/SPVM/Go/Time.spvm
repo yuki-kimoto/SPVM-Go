@@ -4,11 +4,16 @@
 class Go::Time {
   version_from Go;
   
+  use Go::Duration_1l;
+
+  use Time::Local;
   use Sys;
   use Sys::Time::Util;
   use Sys::Time::Timespec;
   use Sys::Time::Constant as TIME;
-  use Go::Duration_1l;
+  use Sys::Time::Tm;
+  use Re;
+  use Fn;
   
   # Interfaces
   interface Cloneable;
@@ -66,6 +71,63 @@ class Go::Time {
     $self->{has_monotonic_time} = 1;
     
     return $self;
+  }
+  
+  static method new_from_rfc3339_nano : Go::Time ($rfc3339_string : string) {
+    unless ($rfc3339_string) {
+      die "The string \$rfc3339_string must be defined.";
+    }
+    
+    # Only UTC timezone (ending with 'Z') is supported.
+    # Check the suffix using the Re class.
+    unless (Re->m($rfc3339_string, "Z$")) {
+      die "new_from_rfc3339_nano: Only UTC timezone (ending with 'Z') is supported.";
+    }
+    
+    # Parse date and time parts using fixed positions
+    # Example: "2006-01-02T15:04:05.999999999Z"
+    my $year     = (int)Fn->substr($rfc3339_string, 0, 4);
+    my $month    = (int)Fn->substr($rfc3339_string, 5, 2);
+    my $mday     = (int)Fn->substr($rfc3339_string, 8, 2);
+    my $hour     = (int)Fn->substr($rfc3339_string, 11, 2);
+    my $min      = (int)Fn->substr($rfc3339_string, 14, 2);
+    my $sec_part = (int)Fn->substr($rfc3339_string, 17, 2);
+    
+    # Calculate Unix seconds (UTC) using Time::Local->timegm
+    my $tm = Sys::Time::Tm->new;
+    $tm->set_tm_year($year - 1900);
+    $tm->set_tm_mon($month - 1);
+    $tm->set_tm_mday($mday);
+    $tm->set_tm_hour($hour);
+    $tm->set_tm_min($min);
+    $tm->set_tm_sec($sec_part);
+    
+    my $total_sec = Time::Local->timegm($tm);
+    
+    # Parse nanoseconds if the dot exists
+    my $nsec : long = 0L;
+    my $dot_pos = Fn->index($rfc3339_string, ".", 18);
+    if ($dot_pos >= 0) {
+      # Extract digits between '.' and 'Z'
+      my $nsec_part_str = Fn->substr($rfc3339_string, $dot_pos + 1, Fn->length($rfc3339_string) - $dot_pos - 2);
+      
+      # Normalize to 9 digits (nanoseconds precision)
+      # Use the 'copy' operator instead of Fn->copy.
+      my $padded_nsec = copy $nsec_part_str;
+      while (Fn->length($padded_nsec) < 9) {
+        $padded_nsec .= "0";
+      }
+      
+      # Limit to 9 digits in case of extra precision
+      if (Fn->length($padded_nsec) > 9) {
+        $padded_nsec = Fn->substr($padded_nsec, 0, 9);
+      }
+      
+      $nsec = Fn->to_long($padded_nsec);
+    }
+    
+    # Return a new Go::Time object (without monotonic time)
+    return Go::Time->new_from_unix($total_sec, $nsec);
   }
   
   # Instance Methods
@@ -172,6 +234,42 @@ class Go::Time {
     $ts->set_tv_nsec($self->{nsec});
     
     return $ts;
+  }
+  
+  method to_rfc3339_nano : string () {
+    my $sec = $self->{sec};
+    my $nsec = $self->{nsec};
+    
+    # Convert seconds to UTC components using Sys->gmtime
+    my $tm = Sys->gmtime($sec);
+    
+    # Format date and time (RFC 3339: 2006-01-02T15:04:05)
+    # Fn->sprintf takes variadic arguments (object...), so no [] is needed.
+    my $date_str = Fn->sprintf("%04d-%02d-%02dT%02d:%02d:%02d", 
+      $tm->tm_year + 1900,
+      $tm->tm_mon + 1,
+      $tm->tm_mday,
+      $tm->tm_hour,
+      $tm->tm_min,
+      $tm->tm_sec
+    );
+    
+    # Handle nanoseconds part
+    my $nsec_str = "";
+    if ($nsec > 0) {
+      # Format with 9 digits and leading zeros
+      $nsec_str = Fn->sprintf(".%09ld", $nsec);
+      
+      # Trim trailing zeros to match Go's time.RFC3339Nano behavior.
+      # Access characters using array indexing like $nsec_str->[$i].
+      my $i = Fn->length($nsec_str) - 1;
+      while ($i > 0 && $nsec_str->[$i] == '0') {
+        $i--;
+      }
+      $nsec_str = Fn->substr($nsec_str, 0, $i + 1);
+    }
+    
+    return $date_str . $nsec_str . "Z";
   }
   
   # Never use these "_" methods except for Go::Time tests.

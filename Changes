@@ -4,6 +4,9 @@
   [Requirement Changes]
     * Require SPVM::Regex 0.246.
     * Require SPVM::Time::Local 0.112.
+  [New Features]
+    * Add Go::Time#new_from_rfc3339_nano method.
+    * Add Go::Time#to_rfc3339_nano method.
 0.018 2026-01-15
   [Document and Test Improvement]
     * Add Go::Time tests and documents.
