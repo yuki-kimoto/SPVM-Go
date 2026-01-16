@@ -163,6 +163,10 @@ class TestCase::Go::Context {
       unless ($ctx->err == basic_type_id Go::Context::Error::DeadlineExceeded) {
         return 0;
       }
+      
+      unless ($ctx->cause eq "context deadline exceeded") {
+        return 0;
+      }
     }
     return 1;
   }
@@ -177,10 +181,14 @@ class TestCase::Go::Context {
       
       my $derived = Go::Context->with_deadline_cause($ctx_parent, $deadline, $cause_msg);
       my $ctx = $derived->ctx;
-
+      
       # Wait for the deadline to pass
-      Go->sleep_sec($timeout_sec + 0.1);
-
+      Go->go([$timeout_sec : double] method : void () {
+        Go->sleep_sec($timeout_sec + 0.1);
+      });
+      
+      Go->gosched;
+      
       # Check error type (should be DeadlineExceeded)
       unless ($ctx->err == basic_type_id Go::Context::Error::DeadlineExceeded) {
         return 0;
