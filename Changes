@@ -3,6 +3,7 @@
     * Fix Go::Context bugs and add Go::Context tests and documents.
   [Requirement Changes]
     * Require SPVM::Regex 0.246.
+    * Require SPVM::Time::Local 0.112.
 0.018 2026-01-15
   [Document and Test Improvement]
     * Add Go::Time tests and documents.

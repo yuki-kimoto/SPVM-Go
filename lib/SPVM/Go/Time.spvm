@@ -4,6 +4,7 @@
 class Go::Time {
   version_from Go;
   
+  use Sys;
   use Sys::Time::Util;
   use Sys::Time::Timespec;
   use Sys::Time::Constant as TIME;
