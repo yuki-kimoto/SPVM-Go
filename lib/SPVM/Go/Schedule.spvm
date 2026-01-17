@@ -50,29 +50,17 @@ class Go::Schedule {
     return $self;
   }
   
-  private static method is_over_deadline : int ($deadline_base_go_time : Go::Time, $after : double) {
+  private static method is_over_deadline : int ($deadline_base_go_time : Go::Time, $after_sec : double) {
     
     unless ($deadline_base_go_time) {
       die "\$deadline_base_go_time must be defined.";
     }
     
-    my $after_ts = Sys::Time::Util->float_seconds_to_timespec($after);
-    
-    my $deadline = Sys::Time::Util->add_timespec($deadline_base_go_time->to_timespec, $after_ts);
+    my $deadline_go_time = $deadline_base_go_time->add(Go::Duration_1l->new_from_sec($after_sec));
     
     my $now_go_time = Go::Time->now;
     
-    my $is_over_deadline = 0;
-    
-    my $now_sec = $now_go_time->unix;
-    my $now_nsec = $now_go_time->nanosecond;
-    
-    my $deadline_sec = $deadline->tv_sec;
-    my $deadline_nsec = $deadline->tv_nsec;
-    
-    if ($now_sec > $deadline_sec || ($now_sec == $deadline_sec && $now_nsec > $deadline_nsec)) {
-      $is_over_deadline = 1;
-    }
+    my $is_over_deadline = $now_go_time->after($deadline_go_time);
     
     return $is_over_deadline;
   }
