@@ -152,7 +152,6 @@ class Go::Schedule {
         if ($after_duration_nsec > 0) {
           $current_coroutine->{deadline_base_timer} = &clock_gettime;
           my $after_sec = Go::Duration_1l->to_sec(Go::Duration_1l->new($after_duration_nsec));
-          $current_coroutine->{after} = $after_sec;
           $current_coroutine->{after_duration_nsec} = $after_duration_nsec;
         }
       }
