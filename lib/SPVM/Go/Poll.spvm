@@ -93,7 +93,9 @@ class Go::Poll {
           my $deadline_base_io_timeout = $poll_coroutine->{deadline_base_io_timeout};
           
           if ($deadline_base_io_timeout) {
-            $io_timeout_occur = &check_io_timeout($deadline_base_io_timeout, $poll_coroutine->{io_timeout_duration_nsec});
+            
+            my $deadline_base_io_timeout_go_time = Go::Time->new_from_unix($deadline_base_io_timeout->tv_sec, $deadline_base_io_timeout->tv_nsec);
+            $io_timeout_occur = &check_io_timeout($deadline_base_io_timeout_go_time, $poll_coroutine->{io_timeout_duration_nsec});
             
             $poll_coroutine->{io_timeout_occur} = (byte)$io_timeout_occur;
           }
@@ -109,11 +111,9 @@ class Go::Poll {
     }
   }
   
-  private static method check_io_timeout : int ($deadline_base : Sys::Time::Timespec, $timeout_duration_nsec : long) {
+  private static method check_io_timeout : int ($deadline_base_go_time : Go::Time, $timeout_duration_nsec : long) {
     
     my $deadline_now_go_time = Go::Time->now;
-    
-    my $deadline_base_go_time = Go::Time->new_from_unix($deadline_base->tv_sec, $deadline_base->tv_nsec);
     
     my $interval_duration = $deadline_now_go_time->sub($deadline_base_go_time);
     
