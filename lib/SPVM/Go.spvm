@@ -65,23 +65,27 @@ class Go {
     $schedule->schedule($seconds);
   }
   
-  static method sleep_sec : void ($seconds : double = 0) {
+  static method sleep_sec : void ($sec : double = 0) {
     
-    my $duration = Go::Duration_1l->new_from_sec($seconds);
+    my $duration = Go::Duration_1l->new_from_sec($sec);
     
     &sleep($duration);
   }
   
-  static method gosched_io_read : void ($fd : int, $timeout : double = 0) {
+  static method gosched_io_read : void ($fd : int, $timeout_duration : Go::Duration_1l) {
     
     my $schedule = $GO->{schedule};
     
-    $schedule->schedule_io_read($fd, $timeout);
+    my $timeout_sec = Go::Duration_1l->to_sec($timeout_duration);
+    
+    $schedule->schedule_io_read($fd, $timeout_sec);
   }
   
-  static method gosched_io_read_sec : void ($fd : int, $timeout : double = 0) {
+  static method gosched_io_read_sec : void ($fd : int, $timeout_sec : double = 0) {
     
-    &gosched_io_read($fd, $timeout);
+    my $timeoutduration = Go::Duration_1l->new_from_sec($timeout_sec);
+    
+    &gosched_io_read($fd, $timeoutduration);
   }
   
   static method gosched_io_write : void ($fd : int, $timeout : double = 0) {

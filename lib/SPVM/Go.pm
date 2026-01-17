@@ -70,9 +70,9 @@ This method must be called from the main thread. Otherwise an exception is throw
 
 =head2 gosched_io_read
 
-C<static method gosched_io_read : void ($fd : int, $timeout : double = 0);>
+C<static method gosched_io_read : void ($fd : int, $timeout_duration : Go::Duration_1l);>
 
-Suspends the current goroutine for IO reading given the file descriptor $fd and the value of the timeout $timeout.
+Suspends the current goroutine for IO reading given the file descriptor $fd and the value of the timeout nanosecnods $timeout_duration.
 
 The control is transferred to the scheduler.
 
@@ -88,9 +88,9 @@ If IO timeout occurs, an exception is thrown set C<eval_error_id> to the basic t
 
 =head2 gosched_io_read_sec
 
-C<static method gosched_io_read_sec : void ($fd : int, $timeout : double = 0);>
+C<static method gosched_io_read_sec : void ($fd : int, $timeout_sec : double = 0);>
 
-Alias for L</"gosched_io_read">, but L</"gosched_io_read"> $timeout argument will be changed.
+Same as L<"/gosched_io_read">, but the timeout is the seconds timeout_sec.
 
 =head2 gosched_io_write
 
@@ -118,9 +118,9 @@ Alias for L</"gosched_io_write">, but L</"gosched_io_write"> $timeout argument w
 
 =head2 sleep
 
-C<static method sleep : void ($seconds : double = 0);>
+C<static method sleep : void ($duration : Go::Duration_1l)>
 
-Sleeps the seconds $seconds.
+Sleeps the nanoseconds $duration.
 
 Exceptions:
 
@@ -130,9 +130,9 @@ $seconds must be less than or equal to Fn->INT_MAX. Otherwise an exception is th
 
 =head2 sleep_sec
 
-C<static method sleep_sec : void ($seconds : double = 0);>
+C<static method sleep_sec : void ($sec : double = 0);>
 
-Alias for L</"sleep">, but L</"sleep"> $timeout argument will be changed.
+Same as L</"sleep">, but sleeps the seconds $sec.
 
 =head2 ENV_DEBUG
 
