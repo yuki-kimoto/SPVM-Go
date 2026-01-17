@@ -13,6 +13,7 @@ class Go::Poll {
   use Sys::Poll;
   use Format;
   use List;
+  use Go::Time;
   
   # Fields
   has coroutines_h : Hash of Go::Coroutine;
@@ -110,16 +111,16 @@ class Go::Poll {
   
   private static method check_io_timeout : int ($deadline_base : Sys::Time::Timespec, $timeout_duration_nsec : long) {
     
-    my $timeout_sec = Go::Duration_1l->to_sec(Go::Duration_1l->new($timeout_duration_nsec));
+    my $deadline_now_go_time = Go::Time->now;
     
-    my $deadline_now = Go::Schedule->clock_gettime;
+    my $deadline_base_go_time = Go::Time->new_from_unix($deadline_base->tv_sec, $deadline_base->tv_nsec);
     
-    my $interval = Sys::Time::Util->timespec_interval($deadline_base, $deadline_now);
+    my $interval_duration = $deadline_now_go_time->sub($deadline_base_go_time);
     
-    my $timeout_occur = $timeout_sec - $interval < 0;
+    my $timeout_occur = $timeout_duration_nsec - $interval_duration->{nsec} < 0;
     
     if (Go->ENV_DEBUG) {
-      Fn->say_stderr(Format->sprintf("[Go Debug]Check IO timeout(Timeout:%f, ElapsedTime:%f, TimeoutOccur:%d).", [(object)$timeout_sec, $interval, $timeout_occur]));
+      Fn->say_stderr(Format->sprintf("[Go Debug]Check IO timeout(Timeout:%f, ElapsedTime:%f, TimeoutOccur:%d).", [(object)$timeout_duration_nsec, $interval_duration->{nsec}, $timeout_occur]));
     }
     
     return $timeout_occur;
