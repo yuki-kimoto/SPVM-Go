@@ -90,13 +90,10 @@ class Go::Poll {
         
         my $io_timeout_occur = 0;
         unless ($io_ready) {
-          my $deadline_base_io_timeout = $poll_coroutine->{deadline_base_io_timeout};
+          my $deadline_base_io_timeout_go_time = $poll_coroutine->{deadline_base_io_timeout_go_time};
           
-          if ($deadline_base_io_timeout) {
-            
-            my $deadline_base_io_timeout_go_time = Go::Time->new_from_unix($deadline_base_io_timeout->tv_sec, $deadline_base_io_timeout->tv_nsec);
+          if ($deadline_base_io_timeout_go_time) {
             $io_timeout_occur = &check_io_timeout($deadline_base_io_timeout_go_time, $poll_coroutine->{io_timeout_duration_nsec});
-            
             $poll_coroutine->{io_timeout_occur} = (byte)$io_timeout_occur;
           }
         }
@@ -105,7 +102,7 @@ class Go::Poll {
           my $ready_coroutine = (Go::Coroutine)$poll_coroutines_h->delete($address);
           $ready_coroutine->{disable} = 0;
           $ready_coroutine->{fd} = -1;
-          $ready_coroutine->{deadline_base_io_timeout} = undef;
+          $ready_coroutine->{deadline_base_io_timeout_go_time} = undef;
         }
       }
     }

@@ -9,10 +9,9 @@ class Go::Coroutine : pointer {
   allow Go::Channel;
   
   use Callback;
-  
   use Sys::Time::Timespec;
-  
   use Go::Channel;
+  use Go::Time;
   
   # Fields
   has return_back : Go::Coroutine;
@@ -25,7 +24,7 @@ class Go::Coroutine : pointer {
   
   has after_duration_nsec : long;
   
-  has deadline_base_io_timeout : Sys::Time::Timespec;
+  has deadline_base_io_timeout_go_time : Go::Time;
   
   has io_timeout_duration_nsec : long;
   

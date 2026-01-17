@@ -139,7 +139,7 @@ class Go::Schedule {
         # IO timeout
         if ($timeout_duration_nsec > 0) {
           
-          $current_coroutine->{deadline_base_io_timeout} = &clock_gettime;
+          $current_coroutine->{deadline_base_io_timeout_go_time} = Go::Time->now;
           my $timeout_sec = Go::Duration_1l->to_sec(Go::Duration_1l->new($timeout_duration_nsec));
           $current_coroutine->{io_timeout_duration_nsec} = $timeout_duration_nsec;
         }
