@@ -180,9 +180,9 @@ C<method to_timespec : L<Sys::Time::Timespec|SPVM::Sys::Time::Timespec> ();>
 
 Converts the internal time to a L<Sys::Time::Timespec|SPVM::Sys::Time::Timespec> object.
 
-=head2 to_rfc3339_nano
+=head2 format_rfc3339_nano
 
-C<method to_rfc3339_nano : string ();>
+C<method format_rfc3339_nano : string ();>
 
 Returns a string representing the time in RFC 3339 format with nanoseconds.
 

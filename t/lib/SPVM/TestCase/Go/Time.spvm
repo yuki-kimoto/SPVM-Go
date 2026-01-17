@@ -500,7 +500,7 @@ class TestCase::Go::Time {
       my $nsec = 123456789L;
       my $go_time = Go::Time->new_from_unix($sec, $nsec);
       
-      my $rfc_str = $go_time->to_rfc3339_nano;
+      my $rfc_str = $go_time->format_rfc3339_nano;
       unless ($rfc_str eq "2025-01-16T13:00:00.123456789Z") {
         diag $rfc_str;
         return 0;
@@ -519,7 +519,7 @@ class TestCase::Go::Time {
       my $nsec = 0L;
       my $go_time = Go::Time->new_from_unix($sec, $nsec);
       
-      my $rfc_str = $go_time->to_rfc3339_nano;
+      my $rfc_str = $go_time->format_rfc3339_nano;
       unless ($rfc_str eq "2025-01-16T13:00:00Z") {
         diag;
         return 0;
@@ -532,13 +532,13 @@ class TestCase::Go::Time {
       }
     }
 
-    # 3. Case with trailing zeros in nanoseconds (should be trimmed in to_rfc3339_nano)
+    # 3. Case with trailing zeros in nanoseconds (should be trimmed in format_rfc3339_nano)
     {
       my $sec = 1737032400L;
       my $nsec = 123000000L; # 123ms
       my $go_time = Go::Time->new_from_unix($sec, $nsec);
       
-      my $rfc_str = $go_time->to_rfc3339_nano;
+      my $rfc_str = $go_time->format_rfc3339_nano;
       unless ($rfc_str eq "2025-01-16T13:00:00.123Z") {
         diag;
         return 0;

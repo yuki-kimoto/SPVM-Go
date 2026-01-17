@@ -236,7 +236,7 @@ class Go::Time {
     return $ts;
   }
   
-  method to_rfc3339_nano : string () {
+  method format_rfc3339_nano : string () {
     my $sec = $self->{sec};
     my $nsec = $self->{nsec};
     
