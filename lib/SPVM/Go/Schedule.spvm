@@ -142,6 +142,7 @@ class Go::Schedule {
           $current_coroutine->{deadline_base_io_timeout} = &clock_gettime;
           my $timeout_sec = Go::Duration_1l->to_sec(Go::Duration_1l->new($timeout_duration_nsec));
           $current_coroutine->{io_timeout} = $timeout_sec;
+          $current_coroutine->{io_timeout_duration_nsec} = $timeout_duration_nsec;
         }
       }
       else {
@@ -152,6 +153,7 @@ class Go::Schedule {
           $current_coroutine->{deadline_base_timer} = &clock_gettime;
           my $after_sec = Go::Duration_1l->to_sec(Go::Duration_1l->new($after_duration_nsec));
           $current_coroutine->{after} = $after_sec;
+          $current_coroutine->{after_duration_nsec} = $after_duration_nsec;
         }
       }
       
