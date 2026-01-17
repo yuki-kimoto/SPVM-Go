@@ -14,7 +14,6 @@ class Go::Schedule {
   use QList;
   use Go::Schedule::Task;
   use Sys::Time;
-  use Sys::Time::Timespec;
   use Go::Poll;
   use Thread::ID;
   use Thread::ThisThread;
@@ -51,15 +50,15 @@ class Go::Schedule {
     return $self;
   }
   
-  private static method is_over_deadline : int ($deadline_base : Sys::Time::Timespec, $after : double) {
+  private static method is_over_deadline : int ($deadline_base_go_time : Go::Time, $after : double) {
     
-    unless ($deadline_base) {
-      die "\$deadline_base must be defined.";
+    unless ($deadline_base_go_time) {
+      die "\$deadline_base_go_time must be defined.";
     }
     
     my $after_ts = Sys::Time::Util->float_seconds_to_timespec($after);
     
-    my $deadline = Sys::Time::Util->add_timespec($deadline_base, $after_ts);
+    my $deadline = Sys::Time::Util->add_timespec($deadline_base_go_time->to_timespec, $after_ts);
     
     my $now_go_time = Go::Time->now;
     

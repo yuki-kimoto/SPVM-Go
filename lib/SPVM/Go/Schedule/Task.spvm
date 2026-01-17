@@ -71,7 +71,7 @@ class Go::Schedule::Task {
           my $after_sec = Go::Duration_1l->to_sec(Go::Duration_1l->new($coroutine->{after_duration_nsec}));
           
           if ($deadline_base_timer_go_time) {
-            $is_over_deadline = Go::Schedule->is_over_deadline($deadline_base_timer_go_time->to_timespec, $after_sec);
+            $is_over_deadline = Go::Schedule->is_over_deadline($deadline_base_timer_go_time, $after_sec);
             
             if ($is_over_deadline) {
               $coroutine->{deadline_base_timer_go_time} = undef;
