@@ -68,10 +68,9 @@ class Go::Schedule::Task {
           my $is_over_deadline = 0;
           
           my $deadline_base_timer_go_time = $coroutine->{deadline_base_timer_go_time};
-          my $after_sec = Go::Duration_1l->to_sec(Go::Duration_1l->new($coroutine->{after_duration_nsec}));
           
           if ($deadline_base_timer_go_time) {
-            $is_over_deadline = Go::Schedule->is_over_deadline($deadline_base_timer_go_time, $after_sec);
+            $is_over_deadline = &is_over_deadline($deadline_base_timer_go_time, $coroutine->{after_duration_nsec});
             
             if ($is_over_deadline) {
               $coroutine->{deadline_base_timer_go_time} = undef;
@@ -122,6 +121,21 @@ class Go::Schedule::Task {
       
       $loop_count++;
     }
+  }
+  
+  private static method is_over_deadline : int ($deadline_base_go_time : Go::Time, $after_duration_nsec : long) {
+    
+    unless ($deadline_base_go_time) {
+      die "\$deadline_base_go_time must be defined.";
+    }
+    
+    my $deadline_go_time = $deadline_base_go_time->add(Go::Duration_1l->new($after_duration_nsec));
+    
+    my $now_go_time = Go::Time->now;
+    
+    my $is_over_deadline = $now_go_time->after($deadline_go_time);
+    
+    return $is_over_deadline;
   }
   
 }
