@@ -83,21 +83,25 @@ class Go {
   
   static method gosched_io_read_sec : void ($fd : int, $timeout_sec : double = 0) {
     
-    my $timeoutduration = Go::Duration_1l->new_from_sec($timeout_sec);
+    my $timeout_duration = Go::Duration_1l->new_from_sec($timeout_sec);
     
-    &gosched_io_read($fd, $timeoutduration);
+    &gosched_io_read($fd, $timeout_duration);
   }
   
-  static method gosched_io_write : void ($fd : int, $timeout : double = 0) {
+  static method gosched_io_write : void ($fd : int, $timeout_duration : Go::Duration_1l) {
     
     my $schedule = $GO->{schedule};
     
-    $schedule->schedule_io_write($fd, $timeout);
+    my $timeout_sec = Go::Duration_1l->to_sec($timeout_duration);
+    
+    $schedule->schedule_io_write($fd, $timeout_sec);
   }
   
-  static method gosched_io_write_sec : void ($fd : int, $timeout : double = 0) {
+  static method gosched_io_write_sec : void ($fd : int, $timeout_sec : double = 0) {
     
-    &gosched_io_write($fd, $timeout);
+    my $timeout_duration = Go::Duration_1l->new_from_sec($timeout_sec);
+    
+    &gosched_io_write($fd, $timeout_duration);
   }
   
   private method DESTROY : void () {

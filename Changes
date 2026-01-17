@@ -10,6 +10,12 @@
         static method gosched_io_read : void ($fd : int, $timeout : double = 0);
       [After]
         static method gosched_io_read : void ($fd : int, $timeout_duration : Go::Duration_1l);
+    * Change Go#gosched_io_write method definition.
+      [Before]
+        static method gosched_io_write : void ($fd : int, $timeout : double = 0);
+      [After]
+        static method gosched_io_write : void ($fd : int, $timeout_duration : Go::Duration_1l);
+
 
 0.020 2026-01-17
   [Incompatible Changes]

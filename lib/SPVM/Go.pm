@@ -90,11 +90,11 @@ If IO timeout occurs, an exception is thrown set C<eval_error_id> to the basic t
 
 C<static method gosched_io_read_sec : void ($fd : int, $timeout_sec : double = 0);>
 
-Same as L<"/gosched_io_read">, but the timeout is the seconds timeout_sec.
+Same as L<"/gosched_io_read">, but the timeout is the seconds $timeout_sec.
 
 =head2 gosched_io_write
 
-C<static method gosched_io_write : void ($fd : int, $timeout : double = 0);>
+C<static method gosched_io_write : void ($fd : int, $timeout_duration : Go::Duration_1l);>
 
 Suspends the current goroutine for IO writing given the file descriptor $fd and the timeout $timeout.
 
@@ -112,9 +112,9 @@ If IO timeout occurs, an exception is thrown set C<eval_error_id> to the basic t
 
 =head2 gosched_io_write_sec
 
-C<static method gosched_io_write_sec : void ($fd : int, $timeout : double = 0);>
+C<static method gosched_io_write_sec : void ($fd : int, $timeout_sec : double = 0);>
 
-Alias for L</"gosched_io_write">, but L</"gosched_io_write"> $timeout argument will be changed.
+Same as L<"/gosched_io_write">, but the timeout is the seconds $timeout_sec.
 
 =head2 sleep
 

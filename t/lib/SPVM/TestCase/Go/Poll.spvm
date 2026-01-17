@@ -290,7 +290,7 @@ class TestCase::Go::Poll {
       
       if ($@) {
         if (Sys::Socket::Errno->errno == Sys::Socket::Errno->EWOULDBLOCK || Sys::Socket::Errno->errno == Errno->EINTR) {
-          Go->gosched_io_write($socket, $timeout);
+          Go->gosched_io_write_sec($socket, $timeout);
         }
         else {
           die $@;
