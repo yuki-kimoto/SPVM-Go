@@ -15,7 +15,7 @@ my $api = SPVM::api();
 
 my $start_memory_blocks_count = $api->get_memory_blocks_count;
 
-ok(SPVM::TestCase::Go::Context->with_background);
+ok(SPVM::TestCase::Go::Context->background);
 
 ok(SPVM::TestCase::Go::Context->with_cancel);
 

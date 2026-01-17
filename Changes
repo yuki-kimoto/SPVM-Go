@@ -1,5 +1,7 @@
 0.021 2026-01-17
   [Incompatible Changes]
+    * Rename Go::Context#with_background to background.
+  [Incompatible Changes]
     * Change Go#sleep method definition.
       [Before]
         static method sleep : void ($seconds : double = 0);

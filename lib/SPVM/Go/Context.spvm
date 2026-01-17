@@ -31,7 +31,7 @@ class Go::Context {
   has children : Go::Context[];
   
   # Class Methods
-  static method with_background : Go::Context () {
+  static method background : Go::Context () {
     
     my $self = new Go::Context;
     

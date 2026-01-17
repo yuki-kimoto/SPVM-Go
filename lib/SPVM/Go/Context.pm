@@ -19,7 +19,7 @@ It is based on the implementation of C<context.Context> in the Go programming la
   use Go::Context;
   
   # Create a background context
-  my $ctx = Go::Context->with_background;
+  my $ctx = Go::Context->background;
   
   # Create a context with 5 seconds timeout
   my $derived = Go::Context->with_timeout_sec($ctx, 5.0);
@@ -34,9 +34,9 @@ It is based on the implementation of C<context.Context> in the Go programming la
 
 =head1 Class Methods
 
-=head2 with_background
+=head2 background
 
-C<static method with_background : L<Go::Context|SPVM::Go::Context> ();>
+C<static method background : L<Go::Context|SPVM::Go::Context> ();>
 
 Returns a non-nil, empty L<Go::Context|SPVM::Go::Context>. It is never canceled, has no values, and has no deadline. It is typically used by the main function, initialization, and tests.
 
