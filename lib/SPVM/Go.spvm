@@ -8,6 +8,7 @@ class Go {
   use Go::Schedule;
   use Callback;
   use Go::Select;
+  use Go::Duration_1l;
   
   our $GO : Go;
   
@@ -55,16 +56,20 @@ class Go {
     $schedule->schedule;
   }
   
-  static method sleep : void ($seconds : double = 0) {
+  static method sleep : void ($duration : Go::Duration_1l) {
     
     my $schedule = $GO->{schedule};
+    
+    my $seconds = Go::Duration_1l->to_sec($duration);
     
     $schedule->schedule($seconds);
   }
   
   static method sleep_sec : void ($seconds : double = 0) {
     
-    &sleep($seconds);
+    my $duration = Go::Duration_1l->new_from_sec($seconds);
+    
+    &sleep($duration);
   }
   
   static method gosched_io_read : void ($fd : int, $timeout : double = 0) {

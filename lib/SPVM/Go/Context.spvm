@@ -173,7 +173,7 @@ class Go::Context {
         my $timeout_duration = $deadline->sub(Go::Time->now);
         my $sleep_sec = Go::Duration_1l->to_sec($timeout_duration);
         
-        Go->sleep($sleep_sec);
+        Go->sleep_sec($sleep_sec);
         
         $cancel->($cause);
       });

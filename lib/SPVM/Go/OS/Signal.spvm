@@ -140,7 +140,7 @@ class Go::OS::Signal {
           }
         }
         
-        Go->sleep(0.01);
+        Go->sleep_sec(0.01);
       }
       
     });
