@@ -27,8 +27,6 @@ class Go::Coroutine : pointer {
   
   has deadline_base_io_timeout : Sys::Time::Timespec;
   
-  has io_timeout : double;
-  
   has io_timeout_duration_nsec : long;
   
   has io_timeout_occur : byte;
