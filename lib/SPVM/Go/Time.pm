@@ -88,9 +88,9 @@ C<static method now : L<Go::Time|SPVM::Go::Time> ();>
 Creates a new L<Go::Time|SPVM::Go::Time> object representing the current system time. It captures both the wall clock and the monotonic clock.
 See L<time.Now|https://pkg.go.dev/time#Now>.
 
-=head2 new_from_rfc3339_nano
+=head2 parse_rfc3339_nano
 
-C<static method new_from_rfc3339_nano : L<Go::Time|SPVM::Go::Time> ($rfc3339_string : string);>
+C<static method parse_rfc3339_nano : L<Go::Time|SPVM::Go::Time> ($rfc3339_string : string);>
 
 Parses an RFC 3339 formatted string with nanoseconds and returns a new L<Go::Time|SPVM::Go::Time> object.
 
@@ -100,7 +100,7 @@ Nanoseconds are optional and will be normalized to 9 digits.
 
 Example:
 
-  my $t = Go::Time->new_from_rfc3339_nano("2025-01-16T13:00:00.123456789Z");
+  my $t = Go::Time->parse_rfc3339_nano("2025-01-16T13:00:00.123456789Z");
 
 See L<time.Parse|https://pkg.go.dev/time#Parse> with L<RFC3339Nano|https://pkg.go.dev/time#pkg-constants>.
 

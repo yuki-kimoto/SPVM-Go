@@ -35,7 +35,7 @@ ok(SPVM::TestCase::Go::Time->after);
 
 ok(SPVM::TestCase::Go::Time->before);
 
-# new_from_rfc3339_nano, format_rfc3339_nano
+# parse_rfc3339_nano, format_rfc3339_nano
 ok(SPVM::TestCase::Go::Time->rfc3339_nano);
 
 SPVM::Fn->destroy_runtime_permanent_vars;

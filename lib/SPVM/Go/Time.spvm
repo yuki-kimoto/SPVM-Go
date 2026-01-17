@@ -73,7 +73,7 @@ class Go::Time {
     return $self;
   }
   
-  static method new_from_rfc3339_nano : Go::Time ($rfc3339_string : string) {
+  static method parse_rfc3339_nano : Go::Time ($rfc3339_string : string) {
     unless ($rfc3339_string) {
       die "The string \$rfc3339_string must be defined.";
     }
@@ -81,7 +81,7 @@ class Go::Time {
     # Only UTC timezone (ending with 'Z') is supported.
     # Check the suffix using the Re class.
     unless (Re->m($rfc3339_string, "Z$")) {
-      die "new_from_rfc3339_nano: Only UTC timezone (ending with 'Z') is supported.";
+      die "parse_rfc3339_nano: Only UTC timezone (ending with 'Z') is supported.";
     }
     
     # Parse date and time parts using fixed positions

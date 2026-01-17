@@ -506,7 +506,7 @@ class TestCase::Go::Time {
         return 0;
       }
       
-      my $back = Go::Time->new_from_rfc3339_nano($rfc_str);
+      my $back = Go::Time->parse_rfc3339_nano($rfc_str);
       unless ($back->unix == $sec && $back->nanosecond == $nsec) {
         diag;
         return 0;
@@ -525,7 +525,7 @@ class TestCase::Go::Time {
         return 0;
       }
       
-      my $back = Go::Time->new_from_rfc3339_nano($rfc_str);
+      my $back = Go::Time->parse_rfc3339_nano($rfc_str);
       unless ($back->unix == $sec && $back->nanosecond == 0) {
         diag;
         return 0;
@@ -544,7 +544,7 @@ class TestCase::Go::Time {
         return 0;
       }
       
-      my $back = Go::Time->new_from_rfc3339_nano($rfc_str);
+      my $back = Go::Time->parse_rfc3339_nano($rfc_str);
       unless ($back->nanosecond == 123000000L) {
         diag;
         return 0;
@@ -554,7 +554,7 @@ class TestCase::Go::Time {
     # 4. Parsing from a string with shorter precision (e.g., only milliseconds)
     {
       my $rfc_str = "2025-01-16T13:00:00.12Z";
-      my $back = Go::Time->new_from_rfc3339_nano($rfc_str);
+      my $back = Go::Time->parse_rfc3339_nano($rfc_str);
       unless ($back->nanosecond == 120000000L) {
         diag;
         return 0;
@@ -565,7 +565,7 @@ class TestCase::Go::Time {
     {
       eval {
         my $bad_rfc = "2025-01-16T13:00:00+09:00";
-        Go::Time->new_from_rfc3339_nano($bad_rfc);
+        Go::Time->parse_rfc3339_nano($bad_rfc);
       };
       unless ($@) {
         diag;
@@ -577,7 +577,7 @@ class TestCase::Go::Time {
     {
       eval {
         my $bad_rfc = "2025-01-16T13:00:00";
-        Go::Time->new_from_rfc3339_nano($bad_rfc);
+        Go::Time->parse_rfc3339_nano($bad_rfc);
       };
       unless ($@) {
         diag;
