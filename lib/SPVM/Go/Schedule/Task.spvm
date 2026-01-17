@@ -6,7 +6,6 @@ class Go::Schedule::Task {
   allow Go::Schedule;
   
   use Sys::Time;
-  use Sys::Time::Timespec;
   use Sys::Poll::PollfdArray;
   use Sys::Poll::Constant as POLL;
   use Sys::Poll;
