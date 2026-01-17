@@ -51,13 +51,6 @@ class Go::Schedule {
     return $self;
   }
   
-  private static method clock_gettime : Sys::Time::Timespec () {
-    
-    my $now_ts = Time::HiRes->clock_gettime_timespec(TIME->CLOCK_MONOTONIC);
-    
-    return $now_ts;
-  }
-  
   private static method is_over_deadline : int ($deadline_base : Sys::Time::Timespec, $after : double) {
     
     unless ($deadline_base) {
@@ -68,12 +61,12 @@ class Go::Schedule {
     
     my $deadline = Sys::Time::Util->add_timespec($deadline_base, $after_ts);
     
-    my $now_ts = &clock_gettime;
+    my $now_go_time = Go::Time->now;
     
     my $is_over_deadline = 0;
     
-    my $now_sec = $now_ts->tv_sec;
-    my $now_nsec = $now_ts->tv_nsec;
+    my $now_sec = $now_go_time->unix;
+    my $now_nsec = $now_go_time->nanosecond;
     
     my $deadline_sec = $deadline->tv_sec;
     my $deadline_nsec = $deadline->tv_nsec;
@@ -149,7 +142,7 @@ class Go::Schedule {
         
         # Timer
         if ($after_duration_nsec > 0) {
-          $current_coroutine->{deadline_base_timer} = &clock_gettime;
+          $current_coroutine->{deadline_base_timer_go_time} = Go::Time->now;
           my $after_sec = Go::Duration_1l->to_sec(Go::Duration_1l->new($after_duration_nsec));
           $current_coroutine->{after_duration_nsec} = $after_duration_nsec;
         }

@@ -9,7 +9,6 @@ class Go::Coroutine : pointer {
   allow Go::Channel;
   
   use Callback;
-  use Sys::Time::Timespec;
   use Go::Channel;
   use Go::Time;
   
@@ -20,7 +19,7 @@ class Go::Coroutine : pointer {
   
   has finished : byte;
   
-  has deadline_base_timer : Sys::Time::Timespec;
+  has deadline_base_timer_go_time : Go::Time;
   
   has after_duration_nsec : long;
   
