@@ -49,7 +49,9 @@ class Go::OS::Signal {
       die "\$channel must be defined.";
     }
     
-    $NOTIFIED_SIGNALS_H->{"$signal"} //= new Go::Channel[0];
+    unless ($NOTIFIED_SIGNALS_H->{"$signal"}) {
+      $NOTIFIED_SIGNALS_H->{"$signal"} = new Go::Channel[0];
+    }
     
     List->new_ref($NOTIFIED_SIGNALS_H->{"$signal"})->push($channel);
   }
