@@ -70,7 +70,7 @@ int32_t SPVM__Go__Coroutine__init_coroutine(SPVM_ENV* env, SPVM_VALUE* stack) {
     coroutine_stack = env->new_memory_block(env, stack, sizeof(struct coro_stack));
     
     if (!coro_stack_alloc(coroutine_stack, 0)) {
-      return env->die_v2(env, stack, "coro_stack_alloc failed.", __func__, FILE_NAME, __LINE__);
+      return env->die(env, stack, "coro_stack_alloc failed.", __func__, FILE_NAME, __LINE__);
     }
     
     coro_create(coroutine_context, coroutine_handler, obj_self, coroutine_stack->sptr,  coroutine_stack->ssze);
@@ -98,7 +98,7 @@ int32_t SPVM__Go__Coroutine__transfer(SPVM_ENV* env, SPVM_VALUE* stack) {
   void* obj_coroutine_from = stack[0].oval;
   
   if (!obj_coroutine_from) {
-    return env->die_v2(env, stack, "$from must be defined.", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "$from must be defined.", __func__, FILE_NAME, __LINE__);
   }
   
   void** coroutine_from_pointer_items = env->get_pointer(env, stack, obj_coroutine_from);
@@ -108,7 +108,7 @@ int32_t SPVM__Go__Coroutine__transfer(SPVM_ENV* env, SPVM_VALUE* stack) {
   void* obj_coroutine_to = stack[1].oval;
   
   if (!obj_coroutine_to) {
-    return env->die_v2(env, stack, "$to must be defined.", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "$to must be defined.", __func__, FILE_NAME, __LINE__);
   }
   
   void** coroutine_to_pointer_items = env->get_pointer(env, stack, obj_coroutine_to);
