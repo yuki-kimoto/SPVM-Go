@@ -1,3 +1,6 @@
+0.026 2026-02-03
+  [Bug Fix]
+    * Fix timeout duration check in Go to allow values exceeding INT_MAX.
 0.025 2026-02-03
   [Requirement Changes]
     * Require SPVM 0.990126.

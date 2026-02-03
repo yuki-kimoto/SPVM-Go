@@ -97,10 +97,6 @@ class Go::Schedule {
           die "\$after_duration_nsec must be greater than or equal to 0.";
         }
           
-        unless ($timeout_duration_nsec <= Fn->INT_MAX) {
-          die "\$timeout_duration_nsec must be less than or equal to Fn->INT_MAX.";
-        }
-        
         # IO timeout
         if ($timeout_duration_nsec > 0) {
           

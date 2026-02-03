@@ -84,12 +84,13 @@ class TestCase::Go::Poll {
     Go->go([$port : int] method : void () {
       Go->go([$port : int] method : void () {
         my $id = 0;
-        &go_send_and_recv($port, $id, 2);
+        my $timeout = 4;
+        &go_send_and_recv($port, $id, $timeout);
       });
       
       Go->go([$port : int] method : void () {
         my $id = 1;
-        my $timeout = 1.0;
+        my $timeout = 3.0;
         
         eval { &go_send_and_recv($port, $id, 0, $timeout); }
         
