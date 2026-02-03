@@ -230,6 +230,51 @@ class TestCase::Go::Context {
     return 1;
   }
   
+  # Test for with_deadline being canceled halfway through by the parent context
+  static method with_deadline_canceled_halfway : int () {
+    {
+      my $ctx_parent_derived = Go::Context->with_cancel(Go::Context->background);
+      my $ctx_parent = $ctx_parent_derived->ctx;
+      my $cancel_parent = $ctx_parent_derived->cancel;
+      
+      # Set deadline to 1.0 second from now (plenty of time)
+      my $timeout_sec = 1.0;
+      my $deadline = Go::Time->now->add_sec($timeout_sec);
+      
+      my $derived = Go::Context->with_deadline($ctx_parent, $deadline);
+      my $ctx = $derived->ctx;
+      
+      # Initially, no error should exist
+      if ($ctx->err > 0) {
+        return 0;
+      }
+      
+      # Cancel the parent context halfway through
+      Go->go([$cancel_parent : Go::Context::CancelCallback] method : void () {
+        Go->sleep_sec(0.1);
+        $cancel_parent->();
+      });
+      
+      # We need to wait in a goroutine to allow the scheduler to run.
+      # The main thread calls gosched to start the execution of goroutines.
+      Go->go([$ctx : Go::Context] method : void () {
+        Go->sleep_sec(0.3);
+      });
+      
+      # Start goroutines and wait for them to process
+      Go->gosched;
+      
+      # The child context must be canceled because the parent was canceled.
+      unless ($ctx->err == basic_type_id Go::Context::Error::Canceled) {
+        diag;
+        return 0;
+      }
+      
+    }
+    
+    return 1;
+  }
+  
   # Test for with_deadline_cause
   static method with_deadline_cause : int () {
     {

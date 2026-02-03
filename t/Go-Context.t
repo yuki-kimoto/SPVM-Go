@@ -27,6 +27,8 @@ ok(SPVM::TestCase::Go::Context->with_value);
 
 ok(SPVM::TestCase::Go::Context->with_deadline);
 
+ok(SPVM::TestCase::Go::Context->with_deadline_canceled_halfway);
+
 ok(SPVM::TestCase::Go::Context->with_deadline_cause);
 
 ok(SPVM::TestCase::Go::Context->with_timeout);

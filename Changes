@@ -2,6 +2,8 @@
   [Requirement Changes]
     * Require SPVM 0.990126.
     * Support default undef for sleep, gosched_io_read, and gosched_io_write duration arguments.
+  [Changes]
+    * Improve with_deadline to detect parent cancellation using a loop and add a test for halfway cancellation.
     
 0.024 2026-01-30
   [Requirement Changes]

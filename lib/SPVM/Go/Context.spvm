@@ -168,15 +168,29 @@ class Go::Context {
       
       $self->{deadline} = $deadline;
       
-      Go->go([$deadline : Go::Time, $cancel : Go::Context::CancelCallback, $cause : string] method : void () {
+      Go->go([$self : Go::Context, $deadline : Go::Time, $cancel : Go::Context::CancelCallback, $cause : string] method : void () {
         
-        my $timeout_duration = $deadline->sub(Go::Time->now);
-        my $sleep_sec = Go::Duration_1l->to_sec($timeout_duration);
-        
-        Go->sleep_sec($sleep_sec);
-        
-        $cancel->($cause);
+        # Periodic check until the deadline is reached or the context is canceled
+        while (1) {
+          # 1. Exit if the context has already been canceled by another cause
+          if ($self->err > 0) {
+            last;
+          }
+          
+          # 2. Check if the current time has passed the deadline
+          my $now = Go::Time->now;
+          if ($now->after($deadline)) {
+            $cancel->($cause);
+            last;
+          }
+          
+          # 3. Sleep for a short period to allow other goroutines to run 
+          # and to check the cancellation status again soon.
+          # Performance is not a priority here as this will be replaced by libuv's watcher.
+          Go->sleep_sec(0.01);
+        }
       });
+      
     }
     
     return $derived;
