@@ -70,7 +70,7 @@ This method must be called from the main thread. Otherwise an exception is throw
 
 =head2 gosched_io_read
 
-C<static method gosched_io_read : void ($fd : int, $timeout_duration : Go::Duration_1l);>
+C<static method gosched_io_read : void ($fd : int, $timeout_duration : Go::Duration_1l = undef);>
 
 Suspends the current goroutine for IO reading given the file descriptor $fd and the value of the timeout nanosecnods $timeout_duration.
 
@@ -94,7 +94,7 @@ Same as L<"/gosched_io_read">, but the timeout is the seconds $timeout_sec.
 
 =head2 gosched_io_write
 
-C<static method gosched_io_write : void ($fd : int, $timeout_duration : Go::Duration_1l);>
+C<static method gosched_io_write : void ($fd : int, $timeout_duration : Go::Duration_1l = undef);>
 
 Suspends the current goroutine for IO writing given the file descriptor $fd and the timeout $timeout.
 
@@ -118,7 +118,7 @@ Same as L<"/gosched_io_write">, but the timeout is the seconds $timeout_sec.
 
 =head2 sleep
 
-C<static method sleep : void ($duration : Go::Duration_1l)>
+C<static method sleep : void ($duration : Go::Duration_1l = undef)>
 
 Sleeps the nanoseconds $duration.
 
