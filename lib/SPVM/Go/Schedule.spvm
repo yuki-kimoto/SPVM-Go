@@ -62,24 +62,24 @@ class Go::Schedule {
     
     my $schedule_type = &TYPE_IO_READ;
     
-    $self->schedule($schedule_type, $fd, $io_timeout_duration_nsec);
+    $self->schedule($schedule_type, $io_timeout_duration_nsec, $fd);
   }
   
   private method schedule_io_write : void ($fd : int, $io_timeout_duration_nsec : long = 0) {
     
     my $schedule_type = &TYPE_IO_WRITE;
     
-    $self->schedule($schedule_type, $fd, $io_timeout_duration_nsec);
+    $self->schedule($schedule_type, $io_timeout_duration_nsec, $fd);
   }
   
   private method schedule_sleep : int ($io_timeout_duration_nsec : long) {
     
     my $schedule_type = &TYPE_SLEEP;
     
-    $self->schedule($schedule_type, -1, $io_timeout_duration_nsec);
+    $self->schedule($schedule_type, $io_timeout_duration_nsec);
   }
   
-  private method schedule : int ($schedule_type : int = 0, $fd : int = -1, $io_timeout_duration_nsec : long = 0) {
+  private method schedule : int ($schedule_type : int = 0, $io_timeout_duration_nsec : long = 0, $fd : int = -1) {
     
     my $called_from_main_thread = Thread::ID->eq(Thread::ThisThread->get_id, $self->{thread_id});
     
