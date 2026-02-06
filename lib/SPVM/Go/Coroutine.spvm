@@ -19,8 +19,6 @@ class Go::Coroutine : pointer {
   
   has finished : byte;
   
-  has deadline_base_timer_go_time : Go::Time;
-  
   has deadline_base_io_timeout_go_time : Go::Time;
   
   has io_timeout_duration_nsec : long;

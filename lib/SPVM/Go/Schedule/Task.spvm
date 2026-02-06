@@ -66,13 +66,13 @@ class Go::Schedule::Task {
         else {
           my $is_over_deadline = 0;
           
-          my $deadline_base_timer_go_time = $coroutine->{deadline_base_timer_go_time};
+          my $deadline_base_io_timeout_go_time = $coroutine->{deadline_base_io_timeout_go_time};
           
-          if ($deadline_base_timer_go_time) {
-            $is_over_deadline = &is_over_deadline($deadline_base_timer_go_time, $coroutine->{io_timeout_duration_nsec});
+          if ($deadline_base_io_timeout_go_time) {
+            $is_over_deadline = &is_over_deadline($deadline_base_io_timeout_go_time, $coroutine->{io_timeout_duration_nsec});
             
             if ($is_over_deadline) {
-              $coroutine->{deadline_base_timer_go_time} = undef;
+              $coroutine->{deadline_base_io_timeout_go_time} = undef;
             }
             else {
               $coroutines->push($coroutines->shift);
