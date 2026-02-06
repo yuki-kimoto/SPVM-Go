@@ -60,7 +60,7 @@ class Go {
     
     my $schedule = $GO->{schedule};
     
-    $schedule->schedule($duration->{nsec});
+    $schedule->schedule(-1, 0, $duration->{nsec});
   }
   
   static method sleep_sec : void ($sec : double = 0) {

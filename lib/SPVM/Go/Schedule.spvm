@@ -51,25 +51,21 @@ class Go::Schedule {
   }
   
   # Instance Methods
-  private method schedule_io_read : void ($fd : int, $timeout_duration_nsec : long = 0) {
-    
-    my $after_duration_nsec = 0;
+  private method schedule_io_read : void ($fd : int, $io_timeout_duration_nsec : long = 0) {
     
     my $is_write = 0;
     
-    $self->schedule($after_duration_nsec, $fd, $is_write, $timeout_duration_nsec);
+    $self->schedule($fd, $is_write, $io_timeout_duration_nsec);
   }
   
-  private method schedule_io_write : void ($fd : int, $timeout_duration_nsec : long = 0) {
-    
-    my $after_duration_nsec = 0;
+  private method schedule_io_write : void ($fd : int, $io_timeout_duration_nsec : long = 0) {
     
     my $is_write = 1;
     
-    $self->schedule($after_duration_nsec, $fd, $is_write, $timeout_duration_nsec);
+    $self->schedule($fd, $is_write, $io_timeout_duration_nsec);
   }
   
-  private method schedule : int ($after_duration_nsec : long = 0, $fd : int = -1, $is_write : int = 0, $timeout_duration_nsec : long = 0) {
+  private method schedule : int ($fd : int = -1, $is_write : int = 0, $io_timeout_duration_nsec : long = 0) {
     
     my $called_from_main_thread = Thread::ID->eq(Thread::ThisThread->get_id, $self->{thread_id});
     
@@ -80,12 +76,7 @@ class Go::Schedule {
     my $current_coroutine = $self->{current_coroutine};
     
     if ($current_coroutine) {
-      
       my $schedule_task_coroutine = $self->{schedule_task_coroutine};
-      
-      if ($fd >= 0 && $after_duration_nsec > 0) {
-        die "The arguments must not both \$fd is greater than or equal to 0 and \$after_duration_nsec is greater than 0.";
-      }
       
       # IO
       if ($fd >= 0) {
@@ -93,26 +84,21 @@ class Go::Schedule {
         
         $current_coroutine->{is_write} = (byte)$is_write;
         
-        unless ($after_duration_nsec >= 0) {
-          die "\$after_duration_nsec must be greater than or equal to 0.";
-        }
-          
         # IO timeout
-        if ($timeout_duration_nsec > 0) {
+        if ($io_timeout_duration_nsec > 0) {
           
           $current_coroutine->{deadline_base_io_timeout_go_time} = Go::Time->now;
-          my $timeout_sec = Go::Duration_1l->to_sec(Go::Duration_1l->new($timeout_duration_nsec));
-          $current_coroutine->{io_timeout_duration_nsec} = $timeout_duration_nsec;
+          my $timeout_sec = Go::Duration_1l->to_sec(Go::Duration_1l->new($io_timeout_duration_nsec));
+          $current_coroutine->{io_timeout_duration_nsec} = $io_timeout_duration_nsec;
         }
       }
       else {
         $current_coroutine->{fd} = -1;
         
         # Timer
-        if ($after_duration_nsec > 0) {
+        if ($io_timeout_duration_nsec > 0) {
           $current_coroutine->{deadline_base_timer_go_time} = Go::Time->now;
-          my $after_sec = Go::Duration_1l->to_sec(Go::Duration_1l->new($after_duration_nsec));
-          $current_coroutine->{after_duration_nsec} = $after_duration_nsec;
+          $current_coroutine->{io_timeout_duration_nsec} = $io_timeout_duration_nsec;
         }
       }
       
@@ -124,11 +110,6 @@ class Go::Schedule {
       }
     }
     else {
-      
-      if ($after_duration_nsec > 0) {
-        die "\$after_duration_nsec(or \$timeout_duration_nsec) must be given in a goroutine.";
-      }
-      
       my $return_back = Go::Coroutine->new;
       
       my $schedule_task = Go::Schedule::Task->new;
