@@ -87,6 +87,11 @@ class Go::Schedule {
       die "The schedule method in the Go::Schedule class must be called from the main thread.";
     }
     
+    my $deadline = (Go::Time)undef;
+    if ($io_timeout_duration_nsec > 0) {
+      $deadline = Go::Time->now->add(Go::Duration_1l->new($io_timeout_duration_nsec));
+    }
+    
     my $current_coroutine = $self->{current_coroutine};
     
     if ($current_coroutine) {
@@ -94,10 +99,7 @@ class Go::Schedule {
       
       $current_coroutine->{fd} = $fd;
       $current_coroutine->{schedule_type} = (byte)$schedule_type;
-      
-      if ($io_timeout_duration_nsec > 0) {
-        $current_coroutine->{deadline} = Go::Time->now->add(Go::Duration_1l->new($io_timeout_duration_nsec));
-      }
+      $current_coroutine->{deadline} = $deadline;
       
       Go::Coroutine->transfer($current_coroutine, $schedule_task_coroutine);
       
