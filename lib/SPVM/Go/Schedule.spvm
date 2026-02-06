@@ -96,8 +96,6 @@ class Go::Schedule {
       if ($fd >= 0) {
         $current_coroutine->{fd} = $fd;
         
-        $current_coroutine->{is_write} = (byte)($schedule_type == &TYPE_IO_WRITE);
-        
         $current_coroutine->{schedule_type} = (byte)$schedule_type;
         
         # IO timeout

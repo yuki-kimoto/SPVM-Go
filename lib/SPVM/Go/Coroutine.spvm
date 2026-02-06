@@ -29,8 +29,6 @@ class Go::Coroutine : pointer {
   
   has fd : int;
   
-  has is_write : byte;
-  
   has schedule_type : int;
   
   has poll_index : int;

@@ -48,9 +48,9 @@ class Go::Poll {
         
         $poll_fd_array->set_fd($poll_index, $fd);
         
-        my $is_write = $poll_coroutine->{is_write};
+        my $schedule_type = $poll_coroutine->{schedule_type};
         
-        if ($is_write) {
+        if ($schedule_type == Go::Schedule->TYPE_IO_WRITE) {
           $poll_fd_array->set_events($poll_index, POLL->POLLOUT);
         }
         else {
@@ -76,7 +76,7 @@ class Go::Poll {
           $io_ready = 1;
         }
         else {
-          if ($poll_coroutine->{is_write}) {
+          if ($poll_coroutine->{schedule_type} == Go::Schedule->TYPE_IO_WRITE) {
             if ($revent & POLL->POLLOUT) {
               $io_ready = 1;
             }
