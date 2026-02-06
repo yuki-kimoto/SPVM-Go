@@ -90,10 +90,10 @@ class Go::Poll {
         
         my $io_timeout_occur = 0;
         unless ($io_ready) {
-          my $deadline_base = $poll_coroutine->{deadline_base};
+          my $deadline = $poll_coroutine->{deadline};
           
-          if ($deadline_base) {
-            $io_timeout_occur = &check_io_timeout($deadline_base, $poll_coroutine->{io_timeout_duration_nsec});
+          if ($deadline) {
+            $io_timeout_occur = &check_io_timeout($deadline);
             $poll_coroutine->{io_timeout_occur} = (byte)$io_timeout_occur;
           }
         }
@@ -101,23 +101,20 @@ class Go::Poll {
         if ($io_ready || $io_timeout_occur) {
           my $ready_coroutine = (Go::Coroutine)$poll_coroutines_h->delete($address);
           $ready_coroutine->{disable} = 0;
+          $ready_coroutine->{schedule_type} = Go::Schedule->TYPE_NONE;
           $ready_coroutine->{fd} = -1;
-          $ready_coroutine->{deadline_base} = undef;
+          $ready_coroutine->{deadline} = undef;
         }
       }
     }
   }
   
-  private static method check_io_timeout : int ($deadline_base_go_time : Go::Time, $timeout_duration_nsec : long) {
+  private static method check_io_timeout : int ($deadline : Go::Time) {
     
-    my $deadline_now_go_time = Go::Time->now;
-    
-    my $interval_duration = $deadline_now_go_time->sub($deadline_base_go_time);
-    
-    my $timeout_occur = $timeout_duration_nsec - $interval_duration->{nsec} < 0;
+    my $timeout_occur = Go::Time->now->after($deadline);;
     
     if (Go->ENV_DEBUG) {
-      Fn->say_stderr(Format->sprintf("[Go Debug]Check IO timeout(Timeout:%f, ElapsedTime:%f, TimeoutOccur:%d).", [(object)$timeout_duration_nsec, $interval_duration->{nsec}, $timeout_occur]));
+      Fn->say_stderr(Format->sprintf("[Go Debug]Check IO timeout(Deadline:%s, TimeoutOccur:%d).", [$deadline->format_rfc3339_nano, $timeout_occur]));
     }
     
     return $timeout_occur;

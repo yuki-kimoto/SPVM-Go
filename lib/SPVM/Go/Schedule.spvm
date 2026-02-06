@@ -96,8 +96,7 @@ class Go::Schedule {
       $current_coroutine->{schedule_type} = (byte)$schedule_type;
       
       if ($io_timeout_duration_nsec > 0) {
-        $current_coroutine->{deadline_base} = Go::Time->now;
-        $current_coroutine->{io_timeout_duration_nsec} = $io_timeout_duration_nsec;
+        $current_coroutine->{deadline} = Go::Time->now->add(Go::Duration_1l->new($io_timeout_duration_nsec));
       }
       
       Go::Coroutine->transfer($current_coroutine, $schedule_task_coroutine);
