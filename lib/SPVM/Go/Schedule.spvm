@@ -65,6 +65,11 @@ class Go::Schedule {
     $self->schedule($fd, $is_write, $io_timeout_duration_nsec);
   }
   
+  private method schedule_sleep : int ($io_timeout_duration_nsec : long) {
+    
+    $self->schedule(-1, 0, $io_timeout_duration_nsec);
+  }
+  
   private method schedule : int ($fd : int = -1, $is_write : int = 0, $io_timeout_duration_nsec : long = 0) {
     
     my $called_from_main_thread = Thread::ID->eq(Thread::ThisThread->get_id, $self->{thread_id});
