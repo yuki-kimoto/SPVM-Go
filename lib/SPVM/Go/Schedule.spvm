@@ -92,23 +92,19 @@ class Go::Schedule {
     if ($current_coroutine) {
       my $schedule_task_coroutine = $self->{schedule_task_coroutine};
       
+      $current_coroutine->{fd} = $fd;
+      $current_coroutine->{schedule_type} = (byte)$schedule_type;
+      
       # IO
       if ($fd >= 0) {
-        $current_coroutine->{fd} = $fd;
-        
-        $current_coroutine->{schedule_type} = (byte)$schedule_type;
-        
         # IO timeout
         if ($io_timeout_duration_nsec > 0) {
-          
           $current_coroutine->{deadline_base_io_timeout_go_time} = Go::Time->now;
           my $timeout_sec = Go::Duration_1l->to_sec(Go::Duration_1l->new($io_timeout_duration_nsec));
           $current_coroutine->{io_timeout_duration_nsec} = $io_timeout_duration_nsec;
         }
       }
       else {
-        $current_coroutine->{fd} = -1;
-        
         # Timer
         if ($io_timeout_duration_nsec > 0) {
           $current_coroutine->{deadline_base_timer_go_time} = Go::Time->now;
