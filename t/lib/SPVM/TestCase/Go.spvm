@@ -117,14 +117,9 @@ class TestCase::Go {
   
   static method sleep : int () {
     
-    Go->go(method : void () {
-      
-      my $seconds = 1.5;
-      
-      Go->sleep_sec($seconds);
-    });
+    my $seconds = 1.5;
     
-    Go->gosched;
+    Go->sleep_sec($seconds);
     
     return 1;
   }

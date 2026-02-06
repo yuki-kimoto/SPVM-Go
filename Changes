@@ -1,4 +1,8 @@
 0.026 2026-02-03
+  [Changes]
+    * Support automatic scheduler startup for sleep, IO read, and IO write calls from the main thread by re-dispatching tasks.
+    
+0.026 2026-02-03
   [Bug Fix]
     * Fix timeout duration check in Go to allow values exceeding INT_MAX.
     * Add stack trace to exception messages thrown in goroutines by using build_exception_message.
