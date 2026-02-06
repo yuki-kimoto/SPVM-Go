@@ -24,6 +24,13 @@ class Go::Schedule {
   use Sys::Time::Constant as TIME;
   use Format;
   
+  private enum {
+    TYPE_NONE,
+    TYPE_IO_READ,
+    TYPE_IO_WRITE,
+    TYPE_SLEEP,
+  }
+  
   has coroutines : List of Go::Coroutine;
   
   has current_coroutine : Go::Coroutine;
@@ -53,24 +60,26 @@ class Go::Schedule {
   # Instance Methods
   private method schedule_io_read : void ($fd : int, $io_timeout_duration_nsec : long = 0) {
     
-    my $is_write = 0;
+    my $schedule_type = &TYPE_IO_READ;
     
-    $self->schedule($fd, $is_write, $io_timeout_duration_nsec);
+    $self->schedule($schedule_type, $fd, $io_timeout_duration_nsec);
   }
   
   private method schedule_io_write : void ($fd : int, $io_timeout_duration_nsec : long = 0) {
     
-    my $is_write = 1;
+    my $schedule_type = &TYPE_IO_WRITE;
     
-    $self->schedule($fd, $is_write, $io_timeout_duration_nsec);
+    $self->schedule($schedule_type, $fd, $io_timeout_duration_nsec);
   }
   
   private method schedule_sleep : int ($io_timeout_duration_nsec : long) {
     
-    $self->schedule(-1, 0, $io_timeout_duration_nsec);
+    my $schedule_type = &TYPE_SLEEP;
+    
+    $self->schedule($schedule_type, -1, $io_timeout_duration_nsec);
   }
   
-  private method schedule : int ($fd : int = -1, $is_write : int = 0, $io_timeout_duration_nsec : long = 0) {
+  private method schedule : int ($schedule_type : int = 0, $fd : int = -1, $io_timeout_duration_nsec : long = 0) {
     
     my $called_from_main_thread = Thread::ID->eq(Thread::ThisThread->get_id, $self->{thread_id});
     
@@ -87,7 +96,9 @@ class Go::Schedule {
       if ($fd >= 0) {
         $current_coroutine->{fd} = $fd;
         
-        $current_coroutine->{is_write} = (byte)$is_write;
+        $current_coroutine->{is_write} = (byte)($schedule_type == &TYPE_IO_WRITE);
+        
+        $current_coroutine->{schedule_type} = (byte)$schedule_type;
         
         # IO timeout
         if ($io_timeout_duration_nsec > 0) {

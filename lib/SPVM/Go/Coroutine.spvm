@@ -31,6 +31,8 @@ class Go::Coroutine : pointer {
   
   has is_write : byte;
   
+  has schedule_type : int;
+  
   has poll_index : int;
   
   has disable : byte;
