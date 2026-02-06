@@ -69,7 +69,7 @@ class Go::Schedule::Task {
           my $deadline = $coroutine->{deadline};
           
           if ($deadline) {
-            $is_over_deadline = &is_over_deadline($deadline);
+            $is_over_deadline = Go::Time->now->after($deadline);
             
             if ($is_over_deadline) {
               $coroutine->{deadline} = undef;
@@ -120,17 +120,6 @@ class Go::Schedule::Task {
       
       $loop_count++;
     }
-  }
-  
-  private static method is_over_deadline : int ($deadline : Go::Time) {
-    
-    unless ($deadline) {
-      die "\$deadline must be defined.";
-    }
-    
-    my $is_over_deadline = Go::Time->now->after($deadline);;
-    
-    return $is_over_deadline;
   }
   
 }

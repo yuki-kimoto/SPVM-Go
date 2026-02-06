@@ -93,7 +93,7 @@ class Go::Poll {
           my $deadline = $poll_coroutine->{deadline};
           
           if ($deadline) {
-            $io_timeout_occur = &check_io_timeout($deadline);
+            $io_timeout_occur = Go::Time->now->after($deadline);
             $poll_coroutine->{io_timeout_occur} = (byte)$io_timeout_occur;
           }
         }
@@ -107,17 +107,6 @@ class Go::Poll {
         }
       }
     }
-  }
-  
-  private static method check_io_timeout : int ($deadline : Go::Time) {
-    
-    my $timeout_occur = Go::Time->now->after($deadline);;
-    
-    if (Go->ENV_DEBUG) {
-      Fn->say_stderr(Format->sprintf("[Go Debug]Check IO timeout(Deadline:%s, TimeoutOccur:%d).", [$deadline->format_rfc3339_nano, $timeout_occur]));
-    }
-    
-    return $timeout_occur;
   }
   
   private method DESTROY : void () {
