@@ -44,7 +44,7 @@
 #include <string.h>
 
 /*****************************************************************************/
-/* ucontext/setjmp/asm backends                                              */
+/* ucontext/setjmp/__asm__ backends                                              */
 /*****************************************************************************/
 #if CORO_UCONTEXT || CORO_SJLJ || CORO_LOSER || CORO_LINUX || CORO_IRIX || CORO_ASM
 
@@ -90,14 +90,14 @@ coro_init (void)
   coro_transfer (new_coro, create_coro);
 
 #if __GCC_HAVE_DWARF2_CFI_ASM && __amd64
-  /*asm (".cfi_startproc");*/
-  /*asm (".cfi_undefined rip");*/
+  /*__asm__ (".cfi_startproc");*/
+  /*__asm__ (".cfi_undefined rip");*/
 #endif
 
   func ((void *)arg);
 
 #if __GCC_HAVE_DWARF2_CFI_ASM && __amd64
-  /*asm (".cfi_endproc");*/
+  /*__asm__ (".cfi_endproc");*/
 #endif
 
   /* the new coro returned. bad. just abort() for now */
@@ -133,7 +133,7 @@ trampoline (int sig)
     #define CORO_WIN_TIB 1
   #endif
 
-  asm (
+  __asm__ (
        "\t.text\n"
        #if _WIN32 || __CYGWIN__
        "\t.globl _coro_transfer\n"

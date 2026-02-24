@@ -1,3 +1,6 @@
+0.028 2025-02-24
+  [Changes]
+    * Change the C language standard from GNU99 to C99 to improve portability.
 0.027 2026-02-06
   [Changes]
     * Support automatic scheduler startup for sleep, IO read, and IO write calls from the main thread by re-dispatching tasks.
