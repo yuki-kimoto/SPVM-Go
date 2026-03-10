@@ -8,7 +8,9 @@
 
 static const char* FILE_NAME = "Go/Coroutine.c";
 
-static void coroutine_handler (void* obj_self) {
+static void coroutine_handler (void* obj_self_tmp) {
+  
+  SPVM_OBJ* obj_self = obj_self_tmp;
   
   int32_t error_id = 0;
   
@@ -18,7 +20,7 @@ static void coroutine_handler (void* obj_self) {
   
   SPVM_VALUE* stack = pointer_items[3];
   
-  void* obj_task = env->get_field_object_by_name(env, stack, obj_self, "task", &error_id, __func__, FILE_NAME, __LINE__);
+  SPVM_OBJ* obj_task = env->get_field_object_by_name(env, stack, obj_self, "task", &error_id, __func__, FILE_NAME, __LINE__);
   assert(error_id == 0);
   
   void* method = env->get_instance_method(env, stack, obj_task, "");
@@ -32,7 +34,7 @@ static void coroutine_handler (void* obj_self) {
     
     int32_t scope_id = env->enter_scope(env, stack);
     
-    void* obj_full_exception_message = env->build_exception_message(env, stack, 0);
+    SPVM_OBJ* obj_full_exception_message = env->build_exception_message(env, stack, 0);
     
     fprintf(env->api->runtime->get_spvm_stderr(env->runtime), "[An exception thrown in a goroutine is converted to a warning]\n");
     
@@ -44,7 +46,7 @@ static void coroutine_handler (void* obj_self) {
     fprintf(env->api->runtime->get_spvm_stderr(env->runtime), "\n");
   }
   
-  void* obj_return_back = env->get_field_object_by_name(env, stack, obj_self, "return_back", &error_id, __func__, FILE_NAME, __LINE__);
+  SPVM_OBJ* obj_return_back = env->get_field_object_by_name(env, stack, obj_self, "return_back", &error_id, __func__, FILE_NAME, __LINE__);
   assert(error_id == 0);
   
   coro_context* coroutine_context = pointer_items[0];
@@ -66,9 +68,9 @@ int32_t SPVM__Go__Coroutine__init_coroutine(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t error_id = 0;
   
-  void* obj_self = stack[0].oval;
+  SPVM_OBJ* obj_self = stack[0].oval;
   
-  void* obj_task = env->get_field_object_by_name(env, stack, obj_self, "task", &error_id, __func__, FILE_NAME, __LINE__);
+  SPVM_OBJ* obj_task = env->get_field_object_by_name(env, stack, obj_self, "task", &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
   
   coro_context* coroutine_context = env->new_memory_block(env, stack, sizeof(coro_context));
@@ -102,7 +104,7 @@ int32_t SPVM__Go__Coroutine__init_coroutine(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 int32_t SPVM__Go__Coroutine__transfer(SPVM_ENV* env, SPVM_VALUE* stack) {
   
-  void* obj_coroutine_from = stack[0].oval;
+  SPVM_OBJ* obj_coroutine_from = stack[0].oval;
   
   if (!obj_coroutine_from) {
     return env->die(env, stack, "$from must be defined.", __func__, FILE_NAME, __LINE__);
@@ -112,7 +114,7 @@ int32_t SPVM__Go__Coroutine__transfer(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   coro_context* coroutine_context_from = coroutine_from_pointer_items[0];
   
-  void* obj_coroutine_to = stack[1].oval;
+  SPVM_OBJ* obj_coroutine_to = stack[1].oval;
   
   if (!obj_coroutine_to) {
     return env->die(env, stack, "$to must be defined.", __func__, FILE_NAME, __LINE__);
@@ -129,7 +131,7 @@ int32_t SPVM__Go__Coroutine__transfer(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 int32_t SPVM__Go__Coroutine__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
   
-  void* obj_self = stack[0].oval;
+  SPVM_OBJ* obj_self = stack[0].oval;
   
   void** pointer_items = env->get_pointer(env, stack, obj_self);
   
