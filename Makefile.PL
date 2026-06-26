@@ -114,7 +114,7 @@ WriteMakefile(
     'SPVM::Time::HiRes' => '0.005',
     'SPVM::Thread' => '0.009',
     'SPVM::Math' => '1.011',
-    'SPVM::Regex' => '0.259',
+    'SPVM::Regex' => '0.260',
     'SPVM::Time::Local' => '0.117',
   },
 );
