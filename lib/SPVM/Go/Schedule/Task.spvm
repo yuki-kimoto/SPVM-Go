@@ -5,10 +5,7 @@ class Go::Schedule::Task {
   version_from Go;
   allow Go::Schedule;
   
-  use Sys::Time;
-  use Sys::Poll::PollfdArray;
-  use Sys::Poll::Constant as POLL;
-  use Sys::Poll;
+  use Go::Schedule;
   use Format;
   
   has schedule : Go::Schedule;
