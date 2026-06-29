@@ -72,7 +72,7 @@ class Go::Schedule::Task {
         if ($fd >= 0) {
           $coroutine->{disable} = 1;
           my $coroutine_address = Fn->to_address($coroutine);
-          $schedule->{poll}->{coroutines_h}->set($coroutine_address, $coroutine);
+          $schedule->{poll}->{coroutines_h}->{$coroutine_address} = $coroutine;
           
           if (Go->ENV_DEBUG) {
             Fn->say_stderr(Format->sprintf("[Go Debug]Rotate IO goroutine first time (Callback:%p, QueueNum:%d.)", [(object)$coroutine->{task}, $coroutines->length]));
