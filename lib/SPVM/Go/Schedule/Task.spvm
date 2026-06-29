@@ -38,60 +38,58 @@ class Go::Schedule::Task {
         Fn->say_stderr(Format->sprintf("[Go Debug]End goroutine (Callback:%p, QueueNum:%d.)", [(object)$coroutine->{task}, $coroutines->length]));
       }
     }
-    elsif ($coroutine->{disable}) {
+    else {
       $coroutines->push($coroutine);
       
-      if (Go->ENV_DEBUG) {
-        Fn->say_stderr(Format->sprintf("[Go Debug]Rotate IO goroutine (Callback:%p, QueueNum:%d.)", [(object)$coroutine->{task}, $coroutines->length]));
-      }
-    }
-    else {
-      my $is_over_deadline = 0;
-      
-      my $deadline = $coroutine->{deadline};
-      
-      if ($deadline) {
-        $is_over_deadline = Go::Time->now->after($deadline);
+      if ($coroutine->{disable}) {
         
-        if ($is_over_deadline) {
-          $coroutine->{deadline} = undef;
-        }
-        else {
-          $coroutines->push($coroutine);
-          
-          if (Go->ENV_DEBUG) {
-            Fn->say_stderr(Format->sprintf("[Go Debug]Rotate timer goroutine (Callback:%p, QueueNum:%d)", [(object)$coroutine->{task}, $coroutines->length]));
-          }
+        if (Go->ENV_DEBUG) {
+          Fn->say_stderr(Format->sprintf("[Go Debug]Rotate IO goroutine (Callback:%p, QueueNum:%d.)", [(object)$coroutine->{task}, $coroutines->length]));
         }
       }
       else {
-        $is_over_deadline = 1;
-      }
-      
-      my $fd = $coroutine->{fd};
-      if ($fd >= 0) {
-        $coroutine->{disable} = 1;
-        $coroutines->push($coroutine);
-        my $coroutine_address = Fn->to_address($coroutine);
-        $schedule->{poll}->{coroutines_h}->set($coroutine_address, $coroutine);
+        my $is_over_deadline = 0;
         
-        if (Go->ENV_DEBUG) {
-          Fn->say_stderr(Format->sprintf("[Go Debug]Rotate IO goroutine first time (Callback:%p, QueueNum:%d.)", [(object)$coroutine->{task}, $coroutines->length]));
+        my $deadline = $coroutine->{deadline};
+        
+        if ($deadline) {
+          $is_over_deadline = Go::Time->now->after($deadline);
+          
+          if ($is_over_deadline) {
+            $coroutine->{deadline} = undef;
+          }
+          else {
+            if (Go->ENV_DEBUG) {
+              Fn->say_stderr(Format->sprintf("[Go Debug]Rotate timer goroutine (Callback:%p, QueueNum:%d)", [(object)$coroutine->{task}, $coroutines->length]));
+            }
+          }
         }
-      }
-      elsif ($is_over_deadline) {
-        my $schedule_task_coroutine = $schedule->{schedule_task_coroutine};
+        else {
+          $is_over_deadline = 1;
+        }
         
-        $coroutines->push($coroutine);
-        
-        $coroutine->{return_back} = $schedule_task_coroutine;
-        
-        $schedule->{current_coroutine} = $coroutine;
-        
-        Go::Coroutine->transfer($schedule_task_coroutine, $coroutine);
-        
-        if (Go->ENV_DEBUG) {
-          Fn->say_stderr(Format->sprintf("[Go Debug]Start or resume goroutine (Callback:%p, QueueNum:%d.)", [(object)$coroutine->{task}, $coroutines->length]));
+        my $fd = $coroutine->{fd};
+        if ($fd >= 0) {
+          $coroutine->{disable} = 1;
+          my $coroutine_address = Fn->to_address($coroutine);
+          $schedule->{poll}->{coroutines_h}->set($coroutine_address, $coroutine);
+          
+          if (Go->ENV_DEBUG) {
+            Fn->say_stderr(Format->sprintf("[Go Debug]Rotate IO goroutine first time (Callback:%p, QueueNum:%d.)", [(object)$coroutine->{task}, $coroutines->length]));
+          }
+        }
+        elsif ($is_over_deadline) {
+          my $schedule_task_coroutine = $schedule->{schedule_task_coroutine};
+          
+          $coroutine->{return_back} = $schedule_task_coroutine;
+          
+          $schedule->{current_coroutine} = $coroutine;
+          
+          Go::Coroutine->transfer($schedule_task_coroutine, $coroutine);
+          
+          if (Go->ENV_DEBUG) {
+            Fn->say_stderr(Format->sprintf("[Go Debug]Start or resume goroutine (Callback:%p, QueueNum:%d.)", [(object)$coroutine->{task}, $coroutines->length]));
+          }
         }
       }
     }
