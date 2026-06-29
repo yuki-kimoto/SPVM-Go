@@ -101,6 +101,16 @@ class Go::Schedule {
       $current_coroutine->{schedule_type} = (byte)$schedule_type;
       $current_coroutine->{deadline} = $deadline;
       
+      if ($fd >= 0) {
+        $current_coroutine->{disable} = 1;
+        my $current_coroutine_address = Fn->to_address($current_coroutine);
+        $self->{poll}->{coroutines_h}->{$current_coroutine_address} = $current_coroutine;
+        
+        if (Go->ENV_DEBUG) {
+          Fn->say_stderr(Format->sprintf("[Go Debug]Register goroutine wait for IO (Callback:%p, QueueNum:%d.)", [(object)$current_coroutine->{task}, $self->{coroutines}->length]));
+        }
+      }
+      
       Go::Coroutine->transfer($current_coroutine, $schedule_task_coroutine);
       
       if ($current_coroutine->{is_over_deadline}) {
