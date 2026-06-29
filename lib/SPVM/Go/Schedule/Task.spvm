@@ -23,88 +23,81 @@ class Go::Schedule::Task {
     
     my $poll = $schedule->{poll};
     
-    while (1) {
+    my $coroutines = $schedule->{coroutines};
+    
+    $poll->check;
+    
+    my $coroutine = (Go::Coroutine)undef;
+    
+    if ($coroutines->length > 0) {
+      $coroutine = (Go::Coroutine)$coroutines->get(0);
+    }
+    
+    if ($coroutine->{finished}) {
+      $coroutines->shift;
       
-      my $coroutines = $schedule->{coroutines};
+      $schedule->{current_coroutine} = undef;
       
-      if ($coroutines->length == 0) {
-        last;
+      if (Go->ENV_DEBUG) {
+        Fn->say_stderr(Format->sprintf("[Go Debug]End goroutine (Callback:%p, QueueNum:%d.)", [(object)$coroutine->{task}, $coroutines->length]));
       }
+    }
+    elsif ($coroutine->{disable}) {
+      $coroutines->push($coroutines->shift);
       
-      $poll->check;
-      
-      my $coroutine = (Go::Coroutine)undef;
-      
-      if ($coroutines->length > 0) {
-        $coroutine = (Go::Coroutine)$coroutines->get(0);
+      if (Go->ENV_DEBUG) {
+        Fn->say_stderr(Format->sprintf("[Go Debug]Rotate IO goroutine (Callback:%p, QueueNum:%d.)", [(object)$coroutine->{task}, $coroutines->length]));
       }
+    }
+    else {
+      my $is_over_deadline = 0;
       
-      if ($coroutine->{finished}) {
-        $coroutines->shift;
+      my $deadline = $coroutine->{deadline};
+      
+      if ($deadline) {
+        $is_over_deadline = Go::Time->now->after($deadline);
         
-        $schedule->{current_coroutine} = undef;
-        
-        if (Go->ENV_DEBUG) {
-          Fn->say_stderr(Format->sprintf("[Go Debug]End goroutine (Callback:%p, QueueNum:%d.)", [(object)$coroutine->{task}, $coroutines->length]));
-        }
-      }
-      elsif ($coroutine->{disable}) {
-        $coroutines->push($coroutines->shift);
-        
-        if (Go->ENV_DEBUG) {
-          Fn->say_stderr(Format->sprintf("[Go Debug]Rotate IO goroutine (Callback:%p, QueueNum:%d.)", [(object)$coroutine->{task}, $coroutines->length]));
-        }
-      }
-      else {
-        my $is_over_deadline = 0;
-        
-        my $deadline = $coroutine->{deadline};
-        
-        if ($deadline) {
-          $is_over_deadline = Go::Time->now->after($deadline);
-          
-          if ($is_over_deadline) {
-            $coroutine->{deadline} = undef;
-          }
-          else {
-            $coroutines->push($coroutines->shift);
-            
-            if (Go->ENV_DEBUG) {
-              Fn->say_stderr(Format->sprintf("[Go Debug]Rotate timer goroutine (Callback:%p, QueueNum:%d)", [(object)$coroutine->{task}, $coroutines->length]));
-            }
-          }
+        if ($is_over_deadline) {
+          $coroutine->{deadline} = undef;
         }
         else {
-          $is_over_deadline = 1;
-        }
-        
-        my $fd = $coroutine->{fd};
-        if ($fd >= 0) {
-          $coroutine->{disable} = 1;
-          my $coroutine_address = Fn->to_address($coroutine);
-          $schedule->{poll}->{coroutines_h}->set($coroutine_address, $coroutine);
           $coroutines->push($coroutines->shift);
           
           if (Go->ENV_DEBUG) {
-            Fn->say_stderr(Format->sprintf("[Go Debug]Rotate IO goroutine first time (Callback:%p, QueueNum:%d.)", [(object)$coroutine->{task}, $coroutines->length]));
+            Fn->say_stderr(Format->sprintf("[Go Debug]Rotate timer goroutine (Callback:%p, QueueNum:%d)", [(object)$coroutine->{task}, $coroutines->length]));
           }
         }
-        else {
-          if ($is_over_deadline) {
-            
-            my $schedule_task_coroutine = $schedule->{schedule_task_coroutine};
-            
-            $coroutines->push($coroutines->shift);
-            
-            $coroutine->{return_back} = $schedule_task_coroutine;
-            
-            $schedule->{current_coroutine} = $coroutine;
-            
-            Go::Coroutine->transfer($schedule_task_coroutine, $coroutine);
-            
-            if (Go->ENV_DEBUG) {
-              Fn->say_stderr(Format->sprintf("[Go Debug]Start or resume goroutine (Callback:%p, QueueNum:%d.)", [(object)$coroutine->{task}, $coroutines->length]));
-            }
+      }
+      else {
+        $is_over_deadline = 1;
+      }
+      
+      my $fd = $coroutine->{fd};
+      if ($fd >= 0) {
+        $coroutine->{disable} = 1;
+        my $coroutine_address = Fn->to_address($coroutine);
+        $schedule->{poll}->{coroutines_h}->set($coroutine_address, $coroutine);
+        $coroutines->push($coroutines->shift);
+        
+        if (Go->ENV_DEBUG) {
+          Fn->say_stderr(Format->sprintf("[Go Debug]Rotate IO goroutine first time (Callback:%p, QueueNum:%d.)", [(object)$coroutine->{task}, $coroutines->length]));
+        }
+      }
+      else {
+        if ($is_over_deadline) {
+          
+          my $schedule_task_coroutine = $schedule->{schedule_task_coroutine};
+          
+          $coroutines->push($coroutines->shift);
+          
+          $coroutine->{return_back} = $schedule_task_coroutine;
+          
+          $schedule->{current_coroutine} = $coroutine;
+          
+          Go::Coroutine->transfer($schedule_task_coroutine, $coroutine);
+          
+          if (Go->ENV_DEBUG) {
+            Fn->say_stderr(Format->sprintf("[Go Debug]Start or resume goroutine (Callback:%p, QueueNum:%d.)", [(object)$coroutine->{task}, $coroutines->length]));
           }
         }
       }
