@@ -29,11 +29,9 @@ class Go::Schedule::Task {
       die "[Unexpected Error]\$schedule->{coroutines} must has at-least one element.";
     }
     
-    my $coroutine = $coroutines->[0];
+    my $coroutine = $coroutines->shift;
     
     if ($coroutine->{finished}) {
-      $coroutines->shift;
-      
       $schedule->{current_coroutine} = undef;
       
       if (Go->ENV_DEBUG) {
@@ -41,7 +39,7 @@ class Go::Schedule::Task {
       }
     }
     elsif ($coroutine->{disable}) {
-      $coroutines->push($coroutines->shift);
+      $coroutines->push($coroutine);
       
       if (Go->ENV_DEBUG) {
         Fn->say_stderr(Format->sprintf("[Go Debug]Rotate IO goroutine (Callback:%p, QueueNum:%d.)", [(object)$coroutine->{task}, $coroutines->length]));
@@ -59,7 +57,7 @@ class Go::Schedule::Task {
           $coroutine->{deadline} = undef;
         }
         else {
-          $coroutines->push($coroutines->shift);
+          $coroutines->push($coroutine);
           
           if (Go->ENV_DEBUG) {
             Fn->say_stderr(Format->sprintf("[Go Debug]Rotate timer goroutine (Callback:%p, QueueNum:%d)", [(object)$coroutine->{task}, $coroutines->length]));
@@ -73,6 +71,7 @@ class Go::Schedule::Task {
       my $fd = $coroutine->{fd};
       if ($fd >= 0) {
         $coroutine->{disable} = 1;
+        $coroutines->push($coroutine);
         my $coroutine_address = Fn->to_address($coroutine);
         $schedule->{poll}->{coroutines_h}->set($coroutine_address, $coroutine);
         
@@ -83,7 +82,7 @@ class Go::Schedule::Task {
       elsif ($is_over_deadline) {
         my $schedule_task_coroutine = $schedule->{schedule_task_coroutine};
         
-        $coroutines->push($coroutines->shift);
+        $coroutines->push($coroutine);
         
         $coroutine->{return_back} = $schedule_task_coroutine;
         
