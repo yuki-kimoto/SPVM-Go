@@ -25,11 +25,7 @@ class Go::Schedule::Task {
     
     my $coroutines = $schedule->{coroutines};
     
-    my $coroutine = (Go::Coroutine)undef;
-    
-    if ($coroutines->length > 0) {
-      $coroutine = (Go::Coroutine)$coroutines->get(0);
-    }
+    my $coroutine = $coroutines->[0];
     
     if ($coroutine->{finished}) {
       $coroutines->shift;
