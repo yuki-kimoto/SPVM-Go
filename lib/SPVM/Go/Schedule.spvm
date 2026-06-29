@@ -131,7 +131,11 @@ class Go::Schedule {
         Go::Coroutine->transfer($return_back, $schedule_task_coroutine);
       };
       
+      my $poll = $self->{poll};
+      
       while (1) {
+        
+        $poll->check;
         
         $idle_cb->();
         
