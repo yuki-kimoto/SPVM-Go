@@ -50,30 +50,16 @@ class Go::Schedule::Task {
         }
       }
       else {
-        my $is_over_deadline = 0;
+        my $schedule_task_coroutine = $schedule->{schedule_task_coroutine};
         
-        if ($deadline) {
-          $is_over_deadline = Go::Time->now->after($deadline);
-        }
-        else {
-          $is_over_deadline = 1;
-        }
+        $coroutine->{return_back} = $schedule_task_coroutine;
         
-        if ($is_over_deadline) {
-          $coroutine->{deadline} = undef;
-          $coroutine->{disable} = 0;
-          
-          my $schedule_task_coroutine = $schedule->{schedule_task_coroutine};
-          
-          $coroutine->{return_back} = $schedule_task_coroutine;
-          
-          $schedule->{current_coroutine} = $coroutine;
-          
-          Go::Coroutine->transfer($schedule_task_coroutine, $coroutine);
-          
-          if (Go->ENV_DEBUG) {
-            Fn->say_stderr(Format->sprintf("[Go Debug]Start or resume goroutine (Callback:%p, QueueNum:%d.)", [(object)$coroutine->{task}, $coroutines->length]));
-          }
+        $schedule->{current_coroutine} = $coroutine;
+        
+        Go::Coroutine->transfer($schedule_task_coroutine, $coroutine);
+        
+        if (Go->ENV_DEBUG) {
+          Fn->say_stderr(Format->sprintf("[Go Debug]Start or resume goroutine (Callback:%p, QueueNum:%d.)", [(object)$coroutine->{task}, $coroutines->length]));
         }
       }
     }

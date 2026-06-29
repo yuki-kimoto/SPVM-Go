@@ -111,6 +111,10 @@ class Go::Schedule {
         }
       }
       
+      if ($deadline) {
+        $current_coroutine->{disable} = 1;
+      }
+      
       Go::Coroutine->transfer($current_coroutine, $schedule_task_coroutine);
       
       if ($current_coroutine->{is_over_deadline}) {
@@ -145,6 +149,8 @@ class Go::Schedule {
       
       while (1) {
         
+        $self->check_deadlines;
+        
         $poll->check;
         
         $idle_cb->();
@@ -167,9 +173,10 @@ class Go::Schedule {
     my $coroutines = $self->{coroutines};
     
     for my $coroutine (@$coroutines) {
+      my $fd = $coroutine->{fd};
       my $deadline = $coroutine->{deadline};
       
-      if ($deadline) {
+      if ($fd < 0 && $deadline) {
         my $is_over_deadline = 1;
         
         if ($deadline) {
