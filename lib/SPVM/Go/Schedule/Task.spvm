@@ -25,6 +25,10 @@ class Go::Schedule::Task {
     
     my $coroutines = $schedule->{coroutines};
     
+    unless (@$coroutines > 0) {
+      die "[Unexpected Error]\$schedule->{coroutines} must has at-least one element.";
+    }
+    
     my $coroutine = $coroutines->[0];
     
     if ($coroutine->{finished}) {
