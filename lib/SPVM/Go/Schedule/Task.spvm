@@ -31,6 +31,8 @@ class Go::Schedule::Task {
     
     my $coroutine = $coroutines->shift;
     
+    my $deadline = $coroutine->{deadline};
+    
     if ($coroutine->{finished}) {
       $schedule->{current_coroutine} = undef;
       
@@ -50,25 +52,15 @@ class Go::Schedule::Task {
       else {
         my $is_over_deadline = 0;
         
-        my $deadline = $coroutine->{deadline};
-        
         if ($deadline) {
           $is_over_deadline = Go::Time->now->after($deadline);
-          
-          if ($is_over_deadline) {
-            $coroutine->{deadline} = undef;
-          }
-          else {
-            if (Go->ENV_DEBUG) {
-              Fn->say_stderr(Format->sprintf("[Go Debug]Rotate timer goroutine (Callback:%p, QueueNum:%d)", [(object)$coroutine->{task}, $coroutines->length]));
-            }
-          }
         }
         else {
           $is_over_deadline = 1;
         }
         
         if ($is_over_deadline) {
+          $coroutine->{deadline} = undef;
           $coroutine->{disable} = 0;
           
           my $schedule_task_coroutine = $schedule->{schedule_task_coroutine};
