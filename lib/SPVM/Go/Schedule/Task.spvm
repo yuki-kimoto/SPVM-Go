@@ -34,22 +34,25 @@ class Go::Schedule::Task {
     my $deadline = $coroutine->{deadline};
     
     if ($coroutine->{finished}) {
-      $schedule->{current_coroutine} = undef;
-      
       if (Go->ENV_DEBUG) {
-        Fn->say_stderr(Format->sprintf("[Go Debug]End goroutine (Callback:%p, QueueNum:%d.)", [(object)$coroutine->{task}, $coroutines->length]));
+        diag Fn->sprintf("[Go Debug]Finish goroutine. \$task=%p.", $coroutine->{task});
       }
+      
+      $schedule->{current_coroutine} = undef;
     }
     else {
       $coroutines->push($coroutine);
       
       if ($coroutine->{disable}) {
-        
         if (Go->ENV_DEBUG) {
-          Fn->say_stderr(Format->sprintf("[Go Debug]Rotate IO goroutine (Callback:%p, QueueNum:%d.)", [(object)$coroutine->{task}, $coroutines->length]));
+         diag Fn->sprintf("[Go Debug]Skip disabled goroutine. \$task=%p.", $coroutine->{task});
         }
       }
       else {
+        if (Go->ENV_DEBUG) {
+          diag Fn->sprintf("[Go Debug]Restart goroutine. \$task=%p.", $coroutine->{task});
+        }
+        
         my $schedule_task_coroutine = $schedule->{schedule_task_coroutine};
         
         $coroutine->{return_back} = $schedule_task_coroutine;
@@ -57,10 +60,6 @@ class Go::Schedule::Task {
         $schedule->{current_coroutine} = $coroutine;
         
         Go::Coroutine->transfer($schedule_task_coroutine, $coroutine);
-        
-        if (Go->ENV_DEBUG) {
-          Fn->say_stderr(Format->sprintf("[Go Debug]Start or resume goroutine (Callback:%p, QueueNum:%d.)", [(object)$coroutine->{task}, $coroutines->length]));
-        }
       }
     }
   }
