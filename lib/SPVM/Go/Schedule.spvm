@@ -162,6 +162,28 @@ class Go::Schedule {
     }
   }
   
+  private method check_deadlines : void () {
+    
+    my $coroutines = $self->{coroutines};
+    
+    for my $coroutine (@$coroutines) {
+      my $deadline = $coroutine->{deadline};
+      
+      if ($deadline) {
+        my $is_over_deadline = 1;
+        
+        if ($deadline) {
+          $is_over_deadline = Go::Time->now->after($deadline);
+        }
+        
+        if ($is_over_deadline) {
+          $coroutine->{deadline} = undef;
+          $coroutine->{disable} = 0;
+        }
+      }
+    }
+  }
+  
   private method add_task : void ($task : Callback) {
     
     my $coroutine = Go::Coroutine->new($task);
