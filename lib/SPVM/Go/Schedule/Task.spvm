@@ -68,10 +68,7 @@ class Go::Schedule::Task {
           $is_over_deadline = 1;
         }
         
-        my $fd = $coroutine->{fd};
-        if ($fd >= 0) {
-        }
-        elsif ($is_over_deadline) {
+        if ($is_over_deadline) {
           $coroutine->{disable} = 0;
           
           my $schedule_task_coroutine = $schedule->{schedule_task_coroutine};
