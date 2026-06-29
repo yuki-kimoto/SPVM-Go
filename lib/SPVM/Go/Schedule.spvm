@@ -116,13 +116,12 @@ class Go::Schedule {
       }
       
       my $schedule_task = Go::Schedule::Task->new;
-      my $schedule_task_coroutine = (Go::Coroutine)undef;
       while (1) {
         my $return_back = Go::Coroutine->new;
         
         $schedule_task->{schedule} = $self;
         
-        $schedule_task_coroutine = Go::Coroutine->new($schedule_task);
+        my $schedule_task_coroutine = Go::Coroutine->new($schedule_task);
         
         $schedule_task_coroutine->{return_back} = $return_back;
         
@@ -142,10 +141,6 @@ class Go::Schedule {
       $self->{schedule_task_coroutine} = undef;
       
       $self->{current_coroutine} = undef;
-      
-      $schedule_task = undef;
-      
-      $schedule_task_coroutine->{task} = undef;
     }
   }
   
