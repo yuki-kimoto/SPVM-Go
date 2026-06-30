@@ -33,6 +33,8 @@ class Go::Schedule {
     TYPE_IO_READ,
     TYPE_IO_WRITE,
     TYPE_SLEEP,
+    TYPE_CHANNEL_READ,
+    TYPE_CHANNEL_WRITE,
   }
   
   has goroutines : List of Go::Goroutine;
