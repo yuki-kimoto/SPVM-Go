@@ -1,5 +1,5 @@
-class TestCase::Go::Coroutine {
-  use Go::Coroutine;
+class TestCase::Go::Goroutine {
+  use Go::Goroutine;
   use Callback;
   use Point;
   use IntList;
@@ -11,15 +11,15 @@ class TestCase::Go::Coroutine {
     
     $RESULT = IntList->new;
     
-    my $coroutine_return_back = Go::Coroutine->new;
+    my $goroutine_return_back = Go::Goroutine->new;
     
-    my $coroutine = Go::Coroutine->new(method : void () {
+    my $goroutine = Go::Goroutine->new(method : void () {
       $RESULT->push(2);
-    }, $coroutine_return_back);
+    }, $goroutine_return_back);
     
     $RESULT->push(1);
     
-    Go::Coroutine->transfer($coroutine_return_back, $coroutine);
+    Go::Goroutine->transfer($goroutine_return_back, $goroutine);
     
     $RESULT->push(3);
     
@@ -34,17 +34,17 @@ class TestCase::Go::Coroutine {
   
   static method transfer_create_many_objects : int () {
     
-    my $coroutine_return_back = Go::Coroutine->new;
+    my $goroutine_return_back = Go::Goroutine->new;
     
-    my $coroutine = Go::Coroutine->new(method : void () {
+    my $goroutine = Go::Goroutine->new(method : void () {
       
       for (my $i = 0; $i < 100; $i++) {
         my $point = Point->new;
       }
       
-    }, $coroutine_return_back);
+    }, $goroutine_return_back);
     
-    Go::Coroutine->transfer($coroutine_return_back, $coroutine);
+    Go::Goroutine->transfer($goroutine_return_back, $goroutine);
     
     return 1;
   }
@@ -53,17 +53,17 @@ class TestCase::Go::Coroutine {
     
     $RESULT = IntList->new;
     
-    my $coroutines = new Go::Coroutine[2];
+    my $goroutines = new Go::Goroutine[2];
     
-    my $coroutine_return_back = Go::Coroutine->new;
+    my $goroutine_return_back = Go::Goroutine->new;
     
-    my $coroutine0 = Go::Coroutine->new([has coroutines : Go::Coroutine[] = $coroutines] method : void () {
+    my $goroutine0 = Go::Goroutine->new([has goroutines : Go::Goroutine[] = $goroutines] method : void () {
       
       $RESULT->push(2);
       
-      my $coroutines = $self->{coroutines};
+      my $goroutines = $self->{goroutines};
       
-      my $coroutine1 = Go::Coroutine->new([has coroutines : Go::Coroutine[] = $coroutines] method : void () {
+      my $goroutine1 = Go::Goroutine->new([has goroutines : Go::Goroutine[] = $goroutines] method : void () {
         
         $RESULT->push(4);
         
@@ -71,31 +71,31 @@ class TestCase::Go::Coroutine {
         
         $RESULT->push(6);
         
-        Go::Coroutine->transfer($self->{coroutines}[1], $self->{coroutines}[0]);
+        Go::Goroutine->transfer($self->{goroutines}[1], $self->{goroutines}[0]);
         
         $RESULT->push(8);
         
-      }, $coroutines->[0]);
+      }, $goroutines->[0]);
       
-      $coroutines->[1] = $coroutine1;
+      $goroutines->[1] = $goroutine1;
       
       $RESULT->push(3);
       
-      Go::Coroutine->transfer($coroutines->[0], $coroutines->[1]);
+      Go::Goroutine->transfer($goroutines->[0], $goroutines->[1]);
       
       $RESULT->push(7);
       
-      Go::Coroutine->transfer($coroutines->[0], $coroutines->[1]);
+      Go::Goroutine->transfer($goroutines->[0], $goroutines->[1]);
       
       $RESULT->push(9);
       
-    }, $coroutine_return_back);
+    }, $goroutine_return_back);
     
-    $coroutines->[0] = $coroutine0;
+    $goroutines->[0] = $goroutine0;
     
     $RESULT->push(1);
     
-    Go::Coroutine->transfer($coroutine_return_back, $coroutines->[0]);
+    Go::Goroutine->transfer($goroutine_return_back, $goroutines->[0]);
     
     $RESULT->push(10);
     
@@ -105,9 +105,9 @@ class TestCase::Go::Coroutine {
     
     $RESULT = undef;
     
-    $coroutines->[0] = undef;
+    $goroutines->[0] = undef;
     
-    $coroutines->[1] = undef;
+    $goroutines->[1] = undef;
     
     return 1;
   }
@@ -120,20 +120,20 @@ class TestCase::Go::Coroutine {
     
     $RESULT = IntList->new;
     
-    my $coroutine_return_back = Go::Coroutine->new;
+    my $goroutine_return_back = Go::Goroutine->new;
     
-    my $coroutine = Go::Coroutine->new(method : void () {
+    my $goroutine = Go::Goroutine->new(method : void () {
       
       $RESULT->push(2);
       
-      die "Coroutine Error.";
+      die "Goroutine Error.";
       
       $RESULT->push(4);
-    }, $coroutine_return_back);
+    }, $goroutine_return_back);
     
     $RESULT->push(1);
     
-    Go::Coroutine->transfer($coroutine_return_back, $coroutine);
+    Go::Goroutine->transfer($goroutine_return_back, $goroutine);
     
     $RESULT->push(3);
     

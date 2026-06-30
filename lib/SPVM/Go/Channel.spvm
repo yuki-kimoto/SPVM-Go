@@ -78,9 +78,9 @@ class Go::Channel {
       
       &finish_wait($write_wait, $ok);
       
-      my $write_wait_coroutine = $write_wait->{coroutine};
+      my $write_wait_goroutine = $write_wait->{goroutine};
       
-      unless ($write_wait_coroutine) {
+      unless ($write_wait_goroutine) {
         $self->{length}--;
       }
       
@@ -93,15 +93,15 @@ class Go::Channel {
       
       my $schedule = $self->{schedule};
       
-      my $current_coroutine = $schedule->{current_coroutine};
+      my $current_goroutine = $schedule->{current_goroutine};
       
-      unless ($current_coroutine) {
+      unless ($current_goroutine) {
         die "There is no currently running goroutine.";
       }
       
-      $current_coroutine->{disable} = 1;
+      $current_goroutine->{disable} = 1;
       
-      $read_wait->{coroutine} = $current_coroutine;
+      $read_wait->{goroutine} = $current_goroutine;
       
       $self->{read_waits}->push($read_wait);
       
@@ -129,9 +129,9 @@ class Go::Channel {
             
             my $value = $write_wait->{value};
             
-            my $write_wait_coroutine = $write_wait->{coroutine};
+            my $write_wait_goroutine = $write_wait->{goroutine};
             
-            unless ($write_wait_coroutine) {
+            unless ($write_wait_goroutine) {
               $self->{length}--;
             }
             
@@ -167,10 +167,10 @@ class Go::Channel {
         
         $read_wait->{ok} = 1;
         
-        my $read_wait_coroutine = $read_wait->{coroutine};
+        my $read_wait_goroutine = $read_wait->{goroutine};
         
-        if ($read_wait_coroutine) {
-          $read_wait_coroutine->{disable} = 0;
+        if ($read_wait_goroutine) {
+          $read_wait_goroutine->{disable} = 0;
         }
         
         $read_wait->{value} = $value;
@@ -206,15 +206,15 @@ class Go::Channel {
         
         my $schedule = $self->{schedule};
         
-        my $current_coroutine = $schedule->{current_coroutine};
+        my $current_goroutine = $schedule->{current_goroutine};
         
-        unless ($current_coroutine) {
+        unless ($current_goroutine) {
           die "There is no currently running goroutine.";
         }
         
-        $current_coroutine->{disable} = 1;
+        $current_goroutine->{disable} = 1;
         
-        $write_wait->{coroutine} = $current_coroutine;
+        $write_wait->{goroutine} = $current_goroutine;
         
         $self->{write_waits}->push($write_wait);
         
@@ -266,10 +266,10 @@ class Go::Channel {
     
     $wait->{ok} = (byte)$ok;
     
-    my $wait_coroutine = $wait->{coroutine};
+    my $wait_goroutine = $wait->{goroutine};
     
-    if ($wait_coroutine) {
-      $wait_coroutine->{disable} = 0;
+    if ($wait_goroutine) {
+      $wait_goroutine->{disable} = 0;
     }
   }
   

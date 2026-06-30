@@ -21,43 +21,43 @@ class Go::Schedule::Task {
     
     my $schedule = $self->{schedule};
     
-    my $coroutines = $schedule->{coroutines};
+    my $goroutines = $schedule->{goroutines};
     
-    unless (@$coroutines > 0) {
-      die "[Unexpected Error]\$schedule->{coroutines} must has at-least one element.";
+    unless (@$goroutines > 0) {
+      die "[Unexpected Error]\$schedule->{goroutines} must has at-least one element.";
     }
     
-    my $coroutine = $coroutines->shift;
+    my $goroutine = $goroutines->shift;
     
-    my $deadline = $coroutine->{deadline};
+    my $deadline = $goroutine->{deadline};
     
-    if ($coroutine->{finished}) {
+    if ($goroutine->{finished}) {
       if (Go->ENV_DEBUG) {
-        diag Fn->sprintf("[Go Debug]Finish goroutine. \$task=%p.", $coroutine->{task});
+        diag Fn->sprintf("[Go Debug]Finish goroutine. \$task=%p.", $goroutine->{task});
       }
       
-      $schedule->{current_coroutine} = undef;
+      $schedule->{current_goroutine} = undef;
     }
     else {
-      $coroutines->push($coroutine);
+      $goroutines->push($goroutine);
       
-      if ($coroutine->{disable}) {
+      if ($goroutine->{disable}) {
         if (Go->ENV_DEBUG) {
-         diag Fn->sprintf("[Go Debug]Skip disabled goroutine. \$task=%p.", $coroutine->{task});
+         diag Fn->sprintf("[Go Debug]Skip disabled goroutine. \$task=%p.", $goroutine->{task});
         }
       }
       else {
         if (Go->ENV_DEBUG) {
-          diag Fn->sprintf("[Go Debug]Restart goroutine. \$task=%p.", $coroutine->{task});
+          diag Fn->sprintf("[Go Debug]Restart goroutine. \$task=%p.", $goroutine->{task});
         }
         
-        my $schedule_task_coroutine = $schedule->{schedule_task_coroutine};
+        my $schedule_task_goroutine = $schedule->{schedule_task_goroutine};
         
-        $coroutine->{return_back} = $schedule_task_coroutine;
+        $goroutine->{return_back} = $schedule_task_goroutine;
         
-        $schedule->{current_coroutine} = $coroutine;
+        $schedule->{current_goroutine} = $goroutine;
         
-        Go::Coroutine->transfer($schedule_task_coroutine, $coroutine);
+        Go::Goroutine->transfer($schedule_task_goroutine, $goroutine);
       }
     }
   }

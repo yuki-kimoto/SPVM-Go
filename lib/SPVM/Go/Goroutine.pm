@@ -1,4 +1,4 @@
-package SPVM::Go::Coroutine;
+package SPVM::Go::Goroutine;
 
 
 
@@ -6,15 +6,15 @@ package SPVM::Go::Coroutine;
 
 =head1 Name
 
-SPVM::Go::Coroutine - Coroutines
+SPVM::Go::Goroutine - Goroutines
 
 =head1 Description
 
-The Go::Coroutine class in L<SPVM> has methods to manipulate coroutines.
+The Go::Goroutine class in L<SPVM> has methods to manipulate goroutines.
 
 =head1 Usage
 
-  use Go::Coroutine;
+  use Go::Goroutine;
 
 =head1 Copyright & License
 

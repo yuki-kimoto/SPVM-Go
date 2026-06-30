@@ -9,7 +9,7 @@ class Go::Schedule {
   allow Go::Select;
   allow Go::Poll;
   
-  use Go::Coroutine;
+  use Go::Goroutine;
   use List;
   use QList;
   use Go::Schedule::Task;
@@ -31,11 +31,11 @@ class Go::Schedule {
     TYPE_SLEEP,
   }
   
-  has coroutines : List of Go::Coroutine;
+  has goroutines : List of Go::Goroutine;
   
-  has current_coroutine : Go::Coroutine;
+  has current_goroutine : Go::Goroutine;
   
-  has schedule_task_coroutine : Go::Coroutine;
+  has schedule_task_goroutine : Go::Goroutine;
   
   has poll : Go::Poll;
   
@@ -46,9 +46,9 @@ class Go::Schedule {
     
     my $self = new Go::Schedule;
     
-    my $coroutines = QList->new(new Go::Coroutine[0]);
+    my $goroutines = QList->new(new Go::Goroutine[0]);
     
-    $self->{coroutines} = $coroutines;
+    $self->{goroutines} = $goroutines;
     
     $self->{poll} = Go::Poll->new;
     
@@ -92,33 +92,33 @@ class Go::Schedule {
       $deadline = Go::Time->now->add(Go::Duration_1l->new($io_timeout_duration_nsec));
     }
     
-    my $current_coroutine = $self->{current_coroutine};
+    my $current_goroutine = $self->{current_goroutine};
     
-    if ($current_coroutine) {
-      my $schedule_task_coroutine = $self->{schedule_task_coroutine};
+    if ($current_goroutine) {
+      my $schedule_task_goroutine = $self->{schedule_task_goroutine};
       
-      $current_coroutine->{fd} = $fd;
-      $current_coroutine->{schedule_type} = (byte)$schedule_type;
-      $current_coroutine->{deadline} = $deadline;
+      $current_goroutine->{fd} = $fd;
+      $current_goroutine->{schedule_type} = (byte)$schedule_type;
+      $current_goroutine->{deadline} = $deadline;
       
       if ($fd >= 0) {
-        $current_coroutine->{disable} = 1;
-        my $current_coroutine_address = Fn->to_address($current_coroutine);
-        $self->{poll}->{coroutines_h}->{$current_coroutine_address} = $current_coroutine;
+        $current_goroutine->{disable} = 1;
+        my $current_goroutine_address = Fn->to_address($current_goroutine);
+        $self->{poll}->{goroutines_h}->{$current_goroutine_address} = $current_goroutine;
         
         if (Go->ENV_DEBUG) {
-          Fn->say_stderr(Format->sprintf("[Go Debug]Register goroutine wait for IO (Callback:%p, QueueNum:%d.)", [(object)$current_coroutine->{task}, $self->{coroutines}->length]));
+          Fn->say_stderr(Format->sprintf("[Go Debug]Register goroutine wait for IO (Callback:%p, QueueNum:%d.)", [(object)$current_goroutine->{task}, $self->{goroutines}->length]));
         }
       }
       
       if ($deadline) {
-        $current_coroutine->{disable} = 1;
+        $current_goroutine->{disable} = 1;
       }
       
-      Go::Coroutine->transfer($current_coroutine, $schedule_task_coroutine);
+      Go::Goroutine->transfer($current_goroutine, $schedule_task_goroutine);
       
-      if ($current_coroutine->{is_over_deadline}) {
-        $current_coroutine->{is_over_deadline} = 0;
+      if ($current_goroutine->{is_over_deadline}) {
+        $current_goroutine->{is_over_deadline} = 0;
         die Go::Error::IOTimeout "IO timeout occur";
       }
     }
@@ -132,17 +132,17 @@ class Go::Schedule {
       my $idle_cb = [$self : Go::Schedule] method : void () {
         my $schedule_task = Go::Schedule::Task->new;
         
-        my $return_back = Go::Coroutine->new;
+        my $return_back = Go::Goroutine->new;
         
         $schedule_task->{schedule} = $self;
         
-        my $schedule_task_coroutine = Go::Coroutine->new($schedule_task);
+        my $schedule_task_goroutine = Go::Goroutine->new($schedule_task);
         
-        $schedule_task_coroutine->{return_back} = $return_back;
+        $schedule_task_goroutine->{return_back} = $return_back;
         
-        $self->{schedule_task_coroutine} = $schedule_task_coroutine;
+        $self->{schedule_task_goroutine} = $schedule_task_goroutine;
         
-        Go::Coroutine->transfer($return_back, $schedule_task_coroutine);
+        Go::Goroutine->transfer($return_back, $schedule_task_goroutine);
       };
       
       my $poll = $self->{poll};
@@ -155,26 +155,26 @@ class Go::Schedule {
         
         $idle_cb->();
         
-        my $coroutines = $self->{coroutines};
+        my $goroutines = $self->{goroutines};
         
-        if ($coroutines->length == 0) {
+        if ($goroutines->length == 0) {
           last;
         }
       }
       
-      $self->{schedule_task_coroutine} = undef;
+      $self->{schedule_task_goroutine} = undef;
       
-      $self->{current_coroutine} = undef;
+      $self->{current_goroutine} = undef;
     }
   }
   
   private method check_deadlines : void () {
     
-    my $coroutines = $self->{coroutines};
+    my $goroutines = $self->{goroutines};
     
-    for my $coroutine (@$coroutines) {
-      my $fd = $coroutine->{fd};
-      my $deadline = $coroutine->{deadline};
+    for my $goroutine (@$goroutines) {
+      my $fd = $goroutine->{fd};
+      my $deadline = $goroutine->{deadline};
       
       if ($fd < 0 && $deadline) {
         my $is_over_deadline = 1;
@@ -184,8 +184,8 @@ class Go::Schedule {
         }
         
         if ($is_over_deadline) {
-          $coroutine->{deadline} = undef;
-          $coroutine->{disable} = 0;
+          $goroutine->{deadline} = undef;
+          $goroutine->{disable} = 0;
         }
       }
     }
@@ -193,9 +193,9 @@ class Go::Schedule {
   
   private method add_task : void ($task : Callback) {
     
-    my $coroutine = Go::Coroutine->new($task);
+    my $goroutine = Go::Goroutine->new($task);
     
-    $self->{coroutines}->push($coroutine);
+    $self->{goroutines}->push($goroutine);
     
     if (Go->ENV_DEBUG) {
       Fn->say_stderr(Format->sprintf("[Go Debug]Push new goroutine with the callback %p.", [(object)$task]));

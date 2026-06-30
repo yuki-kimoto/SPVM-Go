@@ -1,7 +1,7 @@
 # Copyright (c) 2023 Yuki Kimoto
 # MIT License
 
-class Go::Coroutine : pointer {
+class Go::Goroutine : pointer {
   version_from Go;
   allow Go::Poll;
   allow Go::Schedule;
@@ -13,7 +13,7 @@ class Go::Coroutine : pointer {
   use Go::Time;
   
   # Fields
-  has return_back : Go::Coroutine;
+  has return_back : Go::Goroutine;
   
   has task : Callback;
   
@@ -32,25 +32,25 @@ class Go::Coroutine : pointer {
   has disable : byte;
   
   # Class Methods
-  static method new : Go::Coroutine ($task :  Callback = undef, $return_back : Go::Coroutine = undef) {
+  static method new : Go::Goroutine ($task :  Callback = undef, $return_back : Go::Goroutine = undef) {
     
-    my $self = new Go::Coroutine;
+    my $self = new Go::Goroutine;
     
     $self->{task} = $task;
     
     $self->{return_back} = $return_back;
     
-    $self->init_coroutine;
+    $self->init_goroutine;
     
     $self->{fd} = -1;
     
     return $self;
   }
   
-  native static method transfer : void ($from : Go::Coroutine, $to : Go::Coroutine);
+  native static method transfer : void ($from : Go::Goroutine, $to : Go::Goroutine);
   
   # Instance Methods
-  native private method init_coroutine : void ();
+  native private method init_goroutine : void ();
   
   native method DESTROY : void ();
 }

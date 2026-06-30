@@ -176,7 +176,7 @@ L<SPVM::Go - Github|https://github.com/yuki-kimoto/SPVM-Go>
 
 =item * L<The Go Programming Language|https://go.dev/> - SPVM::Go is a porting of goroutines.
 
-=item * L<Coro> - SPVM::Go uses coroutines.
+=item * L<Coro> - SPVM::Go uses goroutines.
 
 =back
 
