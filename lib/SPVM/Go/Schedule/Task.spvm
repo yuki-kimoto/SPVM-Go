@@ -33,21 +33,26 @@ class Go::Schedule::Task {
       if (Go->ENV_DEBUG) {
         diag Fn->sprintf("[Go Debug]Finish goroutine. \$task=%p.", $goroutine->{task});
       }
-      
-      $schedule->{current_goroutine} = undef;
     }
     else {
-      $goroutines->push($goroutine);
-      
       if ($goroutine->{disable}) {
         if (Go->ENV_DEBUG) {
          diag Fn->sprintf("[Go Debug]Skip disabled goroutine. \$task=%p.", $goroutine->{task});
+        }
+        
+        if ($goroutine->{schedule_type} == Go::Schedule->TYPE_SLEEP) {
+          $goroutines->push($goroutine);
+        }
+        else {
+          $goroutines->push($goroutine);
         }
       }
       else {
         if (Go->ENV_DEBUG) {
           diag Fn->sprintf("[Go Debug]Restart goroutine. \$task=%p.", $goroutine->{task});
         }
+        
+        $goroutines->push($goroutine);
         
         my $schedule_task_goroutine = $schedule->{schedule_task_goroutine};
         
