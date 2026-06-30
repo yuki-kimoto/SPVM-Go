@@ -45,6 +45,8 @@ class Go::Schedule {
   
   has io_wait_goroutines_h : Hash of Go::Goroutine;
   
+  has timer_wait_goroutines_h : Hash of Go::Goroutine;
+  
   # Class Methods
   private static method new : Go::Schedule () {
     
@@ -57,6 +59,8 @@ class Go::Schedule {
     $self->{thread_id} = Thread::ThisThread->get_id;
     
     $self->{io_wait_goroutines_h} = Hash->new;
+    
+    $self->{timer_wait_goroutines_h} = Hash->new;
     
     return $self;
   }
@@ -114,8 +118,8 @@ class Go::Schedule {
           Fn->say_stderr(Format->sprintf("[Go Debug]Register goroutine wait for IO (Callback:%p, QueueNum:%d.)", [(object)$current_goroutine->{task}, $self->{goroutines}->length]));
         }
       }
-      
-      if ($deadline) {
+      elsif ($deadline) {
+        $self->{timer_wait_goroutines_h}->{Fn->to_address($current_goroutine)} = $current_goroutine;
         $current_goroutine->{disable} = 1;
       }
       
@@ -190,6 +194,7 @@ class Go::Schedule {
         if ($is_over_deadline) {
           $goroutine->{deadline} = undef;
           $goroutine->{disable} = 0;
+          $self->{timer_wait_goroutines_h}->delete(Fn->to_address($goroutine));
         }
       }
     }
