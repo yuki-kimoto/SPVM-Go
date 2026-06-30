@@ -21,7 +21,7 @@ class Go::Goroutine : pointer {
   
   has deadline : Go::Time;
   
-  has is_over_deadline : byte;
+  has io_wait_over_deadline : byte;
   
   has fd : int;
   

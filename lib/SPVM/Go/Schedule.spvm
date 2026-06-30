@@ -125,8 +125,8 @@ class Go::Schedule {
       
       Go::Goroutine->transfer($current_goroutine, $schedule_task_goroutine);
       
-      if ($current_goroutine->{is_over_deadline}) {
-        $current_goroutine->{is_over_deadline} = 0;
+      if ($current_goroutine->{io_wait_over_deadline}) {
+        $current_goroutine->{io_wait_over_deadline} = 0;
         die Go::Error::IOTimeout "IO timeout occur";
       }
     }
@@ -266,7 +266,7 @@ class Go::Schedule {
           
           if ($deadline) {
             $is_over_deadline = Go::Time->now->after($deadline);
-            $poll_goroutine->{is_over_deadline} = (byte)$is_over_deadline;
+            $poll_goroutine->{io_wait_over_deadline} = (byte)$is_over_deadline;
           }
         }
         
