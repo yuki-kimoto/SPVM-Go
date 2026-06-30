@@ -43,8 +43,14 @@ class Go::Schedule::Task {
         if ($goroutine->{schedule_type} == Go::Schedule->TYPE_SLEEP) {
           $goroutines->push($goroutine);
         }
-        else {
+        elsif ($goroutine->{schedule_type} == Go::Schedule->TYPE_IO_READ || $goroutine->{schedule_type} == Go::Schedule->TYPE_IO_WRITE) {
           $goroutines->push($goroutine);
+        }
+        elsif ($goroutine->{schedule_type} == Go::Schedule->TYPE_CHANNEL_READ || $goroutine->{schedule_type} == Go::Schedule->TYPE_CHANNEL_WRITE) {
+          $goroutines->push($goroutine);
+        }
+        else {
+          die "[Unexpected Error]Invalid schedule_type.";
         }
       }
       else {
