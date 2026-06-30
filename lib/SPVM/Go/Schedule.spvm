@@ -309,12 +309,15 @@ class Go::Schedule {
   
   method current_goroutine_v2 : Go::Goroutine () {
     
-    my $current_goroutine_v2 = $self->{goroutines}->[0];
-    
-    my $current_goroutine = $self->{current_goroutine};
-    
-    unless ($current_goroutine_v2 == $current_goroutine) {
-      die "[Unexpected Error]current_goroutine incompatibility.";
+    my $current_goroutine_v2 = (Go::Goroutine)undef;
+    if (@{$self->{goroutines}}) {
+      $current_goroutine_v2 = $self->{goroutines}->[-1];
+      
+      my $current_goroutine = $self->{current_goroutine};
+      
+      unless ($current_goroutine_v2 == $current_goroutine) {
+        die "[Unexpected Error]current_goroutine incompatibility.";
+      }
     }
     
     return $current_goroutine_v2;
