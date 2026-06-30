@@ -109,7 +109,11 @@ class Go::Schedule {
       $current_goroutine->{schedule_type} = (byte)$schedule_type;
       $current_goroutine->{deadline} = $deadline;
       
-      if ($fd >= 0) {
+      if ($schedule_type == &TYPE_IO_READ ||$schedule_type == &TYPE_IO_WRITE) {
+        unless ($fd >= 0) {
+          die "The file descriptor \$fd in schedule type TYPE_IO_READ or TYPE_IO_WRITE must be a non-negative value.";
+        }
+        
         $current_goroutine->{disable} = 1;
         my $current_goroutine_address = Fn->to_address($current_goroutine);
         $self->{io_wait_goroutines_h}->{$current_goroutine_address} = $current_goroutine;
@@ -118,7 +122,11 @@ class Go::Schedule {
           Fn->say_stderr(Format->sprintf("[Go Debug]Register goroutine wait for IO (Callback:%p, QueueNum:%d.)", [(object)$current_goroutine->{task}, $self->{goroutines}->length]));
         }
       }
-      elsif ($deadline) {
+      elsif ($schedule_type == &TYPE_SLEEP) {
+        unless ($deadline) {
+          die "The deadline \$deadline in schedule type TYPE_SLEEP must be defined.";
+        }
+        
         $self->{timer_wait_goroutines_h}->{Fn->to_address($current_goroutine)} = $current_goroutine;
         $current_goroutine->{disable} = 1;
       }
