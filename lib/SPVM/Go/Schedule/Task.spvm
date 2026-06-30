@@ -39,19 +39,6 @@ class Go::Schedule::Task {
         if (Go->ENV_DEBUG) {
          diag Fn->sprintf("[Go Debug]Skip disabled goroutine. \$task=%p.", $goroutine->{task});
         }
-        
-        if ($goroutine->{schedule_type} == Go::Schedule->TYPE_SLEEP) {
-          
-        }
-        elsif ($goroutine->{schedule_type} == Go::Schedule->TYPE_IO_READ || $goroutine->{schedule_type} == Go::Schedule->TYPE_IO_WRITE) {
-          
-        }
-        elsif ($goroutine->{schedule_type} == Go::Schedule->TYPE_CHANNEL_READ || $goroutine->{schedule_type} == Go::Schedule->TYPE_CHANNEL_WRITE) {
-          
-        }
-        else {
-          die "[Unexpected Error]Invalid schedule_type.";
-        }
       }
       else {
         if (Go->ENV_DEBUG) {
