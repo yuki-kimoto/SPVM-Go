@@ -178,7 +178,8 @@ class Go::Schedule {
         
         my $goroutines = $self->{goroutines};
         
-        if ($goroutines->length == 0) {
+        my $all_goroutines_length = $goroutines->length + $self->{timer_wait_goroutines_h}->keys_length;
+        if ($all_goroutines_length == 0) {
           last;
         }
       }
@@ -210,6 +211,7 @@ class Go::Schedule {
           $goroutine->{deadline} = undef;
           $goroutine->{disable} = 0;
           $self->{timer_wait_goroutines_h}->delete(Fn->to_address($goroutine));
+          $self->{goroutines}->push($goroutine);
         }
       }
     }

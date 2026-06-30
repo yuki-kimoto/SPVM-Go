@@ -24,7 +24,7 @@ class Go::Schedule::Task {
     my $goroutines = $schedule->{goroutines};
     
     unless (@$goroutines > 0) {
-      die "[Unexpected Error]\$schedule->{goroutines} must has at-least one element.";
+      return;
     }
     
     my $goroutine = $goroutines->shift;
@@ -41,7 +41,7 @@ class Go::Schedule::Task {
         }
         
         if ($goroutine->{schedule_type} == Go::Schedule->TYPE_SLEEP) {
-          $goroutines->push($goroutine);
+          
         }
         elsif ($goroutine->{schedule_type} == Go::Schedule->TYPE_IO_READ || $goroutine->{schedule_type} == Go::Schedule->TYPE_IO_WRITE) {
           $goroutines->push($goroutine);
