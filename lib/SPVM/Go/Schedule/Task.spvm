@@ -47,7 +47,7 @@ class Go::Schedule::Task {
           
         }
         elsif ($goroutine->{schedule_type} == Go::Schedule->TYPE_CHANNEL_READ || $goroutine->{schedule_type} == Go::Schedule->TYPE_CHANNEL_WRITE) {
-          $goroutines->push($goroutine);
+          
         }
         else {
           die "[Unexpected Error]Invalid schedule_type.";

@@ -191,6 +191,9 @@ class Go::Schedule {
           = $goroutines->length
           + $self->{timer_wait_goroutines_h}->keys_length
           + $self->{io_wait_goroutines_h}->keys_length;
+          + $self->{channel_read_waits_length}
+          + $self->{channel_write_waits_length};
+          
         if ($all_goroutines_length == 0) {
           last;
         }

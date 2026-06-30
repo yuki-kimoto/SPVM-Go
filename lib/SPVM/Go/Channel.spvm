@@ -76,7 +76,7 @@ class Go::Channel {
       
       my $ok = 1;
       
-      &finish_wait($write_wait, $ok);
+      $self->finish_wait($write_wait, $ok);
       if ($write_wait) {
         $self->{schedule}{channel_write_waits_length}--;
       }
@@ -126,7 +126,7 @@ class Go::Channel {
             
             my $ok = 1;
             
-            &finish_wait($write_wait, $ok);
+            $self->finish_wait($write_wait, $ok);
             if ($write_wait) {
               $self->{schedule}{channel_write_waits_length}--;
             }
@@ -175,6 +175,7 @@ class Go::Channel {
         
         if ($read_wait_goroutine) {
           $read_wait_goroutine->{disable} = 0;
+          $self->{schedule}{goroutines}->push($read_wait_goroutine);
         }
         
         $read_wait->{value} = $value;
@@ -197,7 +198,7 @@ class Go::Channel {
         
         my $ok = 1;
         
-        &finish_wait($read_wait, $ok);
+        $self->finish_wait($read_wait, $ok);
         if ($read_wait) {
           $self->{schedule}{channel_read_waits_length}--;
         }
@@ -251,7 +252,7 @@ class Go::Channel {
       
       my $ok = 0;
       
-      &finish_wait($read_wait, $ok);
+      $self->finish_wait($read_wait, $ok);
       if ($read_wait) {
         $self->{schedule}{channel_read_waits_length}--;
       }
@@ -268,7 +269,7 @@ class Go::Channel {
     return $self->{length};
   }
   
-  private static method finish_wait : void ($wait : Go::Channel::Wait, $ok : int) {
+  private method finish_wait : void ($wait : Go::Channel::Wait, $ok : int) {
     
     $wait->{finish} = 1;
     
@@ -278,6 +279,7 @@ class Go::Channel {
     
     if ($wait_goroutine) {
       $wait_goroutine->{disable} = 0;
+      $self->{schedule}{goroutines}->push($wait_goroutine);
     }
   }
   
