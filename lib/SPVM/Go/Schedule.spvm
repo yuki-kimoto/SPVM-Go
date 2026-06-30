@@ -51,6 +51,8 @@ class Go::Schedule {
   
   has channel_write_waits_length : int;
   
+  has start_goroutine : Go::Goroutine;
+  
   # Class Methods
   private static method new : Go::Schedule () {
     
@@ -157,12 +159,15 @@ class Go::Schedule {
         });
       }
       
-      my $idle_cb = [$self : Go::Schedule] method : void () {
-        my $schedule_task = Go::Schedule::Task->new;
+      my $schedule_task = Go::Schedule::Task->new;
+      $schedule_task->{schedule} = $self;
+      
+      my $start_goroutine = Go::Goroutine->new;
+      $self->{start_goroutine} = $start_goroutine;
+      
+      my $idle_cb = [$self : Go::Schedule, $schedule_task : Go::Schedule::Task] method : void () {
         
-        my $return_back = Go::Goroutine->new;
-        
-        $schedule_task->{schedule} = $self;
+        my $return_back = $self->{start_goroutine};
         
         my $schedule_task_goroutine = Go::Goroutine->new($schedule_task);
         
@@ -191,6 +196,8 @@ class Go::Schedule {
       $self->{schedule_task_goroutine} = undef;
       
       $self->{current_goroutine} = undef;
+      
+      $self->{start_goroutine} = undef;
     }
   }
   
