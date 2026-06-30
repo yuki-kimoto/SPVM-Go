@@ -132,6 +132,9 @@ class Go::Schedule {
         $self->{timer_wait_goroutines_h}->{Fn->to_address($current_goroutine)} = $current_goroutine;
         $current_goroutine->{disable} = 1;
       }
+      elsif ($schedule_type == &TYPE_CHANNEL_READ ||$schedule_type == &TYPE_CHANNEL_WRITE) {
+        $current_goroutine->{disable} = 1;
+      }
       
       Go::Goroutine->transfer($current_goroutine, $schedule_task_goroutine);
       

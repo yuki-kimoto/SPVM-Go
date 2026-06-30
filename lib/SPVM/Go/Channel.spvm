@@ -141,7 +141,7 @@ class Go::Channel {
           }
         }
         
-        $schedule->schedule;
+        $schedule->schedule(Go::Schedule->TYPE_CHANNEL_READ);
       }
     }
     
@@ -226,7 +226,7 @@ class Go::Channel {
             return;
           }
           
-          $schedule->schedule;
+        $schedule->schedule(Go::Schedule->TYPE_CHANNEL_WRITE);
         }
       }
     }
