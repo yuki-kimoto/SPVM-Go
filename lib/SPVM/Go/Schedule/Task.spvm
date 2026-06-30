@@ -21,8 +21,6 @@ class Go::Schedule::Task {
     
     my $schedule = $self->{schedule};
     
-    my $poll = $schedule->{poll};
-    
     my $coroutines = $schedule->{coroutines};
     
     unless (@$coroutines > 0) {
