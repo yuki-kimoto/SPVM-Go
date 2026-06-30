@@ -29,8 +29,6 @@ class Go::Schedule::Task {
     
     my $goroutine = $goroutines->shift;
     
-    my $deadline = $goroutine->{deadline};
-    
     if ($goroutine->{finished}) {
       if (Go->ENV_DEBUG) {
         diag Fn->sprintf("[Go Debug]Finish goroutine. \$task=%p.", $goroutine->{task});
