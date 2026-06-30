@@ -153,7 +153,7 @@ class Go::Schedule {
       
       while (1) {
         
-        $self->check_deadlines;
+        $self->check_timer;
         
         $self->check_io_wait;
         
@@ -172,7 +172,7 @@ class Go::Schedule {
     }
   }
   
-  private method check_deadlines : void () {
+  private method check_timer : void () {
     
     my $goroutines = $self->{goroutines};
     
