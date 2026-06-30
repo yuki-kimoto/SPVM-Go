@@ -35,9 +35,9 @@ class Go::Schedule::Task {
       }
     }
     else {
-      if ($goroutine->{disable}) {
+      if ($goroutine->{disabled}) {
         if (Go->ENV_DEBUG) {
-         diag Fn->sprintf("[Go Debug]Skip disabled goroutine. \$task=%p.", $goroutine->{task});
+         diag Fn->sprintf("[Go Debug]Skip disabledd goroutine. \$task=%p.", $goroutine->{task});
         }
       }
       else {

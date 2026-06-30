@@ -29,7 +29,7 @@ class Go::Goroutine : pointer {
   
   has poll_index : int;
   
-  has disable : byte;
+  has disabled : byte;
   
   # Class Methods
   static method new : Go::Goroutine ($task :  Callback = undef, $return_back : Go::Goroutine = undef) {
