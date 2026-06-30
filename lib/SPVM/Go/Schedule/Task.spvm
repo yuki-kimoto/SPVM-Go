@@ -44,7 +44,7 @@ class Go::Schedule::Task {
           
         }
         elsif ($goroutine->{schedule_type} == Go::Schedule->TYPE_IO_READ || $goroutine->{schedule_type} == Go::Schedule->TYPE_IO_WRITE) {
-          $goroutines->push($goroutine);
+          
         }
         elsif ($goroutine->{schedule_type} == Go::Schedule->TYPE_CHANNEL_READ || $goroutine->{schedule_type} == Go::Schedule->TYPE_CHANNEL_WRITE) {
           $goroutines->push($goroutine);

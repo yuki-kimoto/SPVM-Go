@@ -178,7 +178,10 @@ class Go::Schedule {
         
         my $goroutines = $self->{goroutines};
         
-        my $all_goroutines_length = $goroutines->length + $self->{timer_wait_goroutines_h}->keys_length;
+        my $all_goroutines_length
+          = $goroutines->length
+          + $self->{timer_wait_goroutines_h}->keys_length
+          + $self->{io_wait_goroutines_h}->keys_length;
         if ($all_goroutines_length == 0) {
           last;
         }
@@ -292,6 +295,7 @@ class Go::Schedule {
           $ready_goroutine->{schedule_type} = Go::Schedule->TYPE_NONE;
           $ready_goroutine->{fd} = -1;
           $ready_goroutine->{deadline} = undef;
+          $self->{goroutines}->push($ready_goroutine);
         }
       }
     }
