@@ -178,13 +178,14 @@ class Go::Schedule {
   
   private method check_timer : void () {
     
-    my $goroutines = $self->{goroutines};
+    my $timer_wait_goroutines_h = $self->{timer_wait_goroutines_h};
     
-    for my $goroutine (@$goroutines) {
-      my $fd = $goroutine->{fd};
+    for my $address (@{$timer_wait_goroutines_h->keys}) {
+      my $goroutine = $timer_wait_goroutines_h->{$address};
+      
       my $deadline = $goroutine->{deadline};
       
-      if ($fd < 0 && $deadline) {
+      if ($deadline) {
         my $is_over_deadline = 1;
         
         if ($deadline) {
