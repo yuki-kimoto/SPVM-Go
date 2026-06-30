@@ -99,8 +99,6 @@ class Go::Channel {
         die "There is no currently running goroutine.";
       }
       
-      $current_goroutine->{disable} = 1;
-      
       $read_wait->{goroutine} = $current_goroutine;
       
       $self->{read_waits}->push($read_wait);
@@ -211,8 +209,6 @@ class Go::Channel {
         unless ($current_goroutine) {
           die "There is no currently running goroutine.";
         }
-        
-        $current_goroutine->{disable} = 1;
         
         $write_wait->{goroutine} = $current_goroutine;
         
