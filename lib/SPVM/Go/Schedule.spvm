@@ -187,14 +187,7 @@ class Go::Schedule {
         
         my $goroutines = $self->{goroutines};
         
-        my $all_goroutines_length
-          = $goroutines->length
-          + $self->{timer_wait_goroutines_h}->keys_length
-          + $self->{io_wait_goroutines_h}->keys_length;
-          + $self->{channel_read_waits_length}
-          + $self->{channel_write_waits_length};
-          
-        if ($all_goroutines_length == 0) {
+        if ($self->get_all_goroutines_length == 0) {
           last;
         }
       }
@@ -325,4 +318,16 @@ class Go::Schedule {
     
   }
   
+  private method get_all_goroutines_length : int () {
+    my $goroutines = $self->{goroutines};
+    
+    my $all_goroutines_length
+      = $goroutines->length
+      + $self->{timer_wait_goroutines_h}->keys_length
+      + $self->{io_wait_goroutines_h}->keys_length;
+      + $self->{channel_read_waits_length}
+      + $self->{channel_write_waits_length};
+      
+    return $all_goroutines_length;
+  }
 }
