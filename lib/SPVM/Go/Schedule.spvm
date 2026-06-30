@@ -7,14 +7,12 @@ class Go::Schedule {
   allow Go::Schedule::Task;
   allow Go::Channel;
   allow Go::Select;
-  allow Go::Poll;
   
   use Go::Goroutine;
   use List;
   use QList;
   use Go::Schedule::Task;
   use Sys::Time;
-  use Go::Poll;
   use Thread::ID;
   use Thread::ThisThread;
   use Go::Error::IOTimeout;
@@ -174,8 +172,6 @@ class Go::Schedule {
         
         Go::Goroutine->transfer($return_back, $schedule_task_goroutine);
       };
-      
-      my $poll = Go::Poll->new($self);
       
       while (1) {
         
