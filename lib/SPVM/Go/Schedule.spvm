@@ -23,6 +23,10 @@ class Go::Schedule {
   use Sys::Time::Util;
   use Sys::Time::Constant as TIME;
   use Format;
+  use Sys::Poll::PollfdArray;
+  use Sys::Poll::Constant as POLL;
+  use Sys::Poll;
+  use Go::Time;
   
   private enum {
     TYPE_NONE,
@@ -151,7 +155,7 @@ class Go::Schedule {
         
         $self->check_deadlines;
         
-        $poll->check;
+        $self->check_io_wait;
         
         $idle_cb->();
         
@@ -186,6 +190,86 @@ class Go::Schedule {
         if ($is_over_deadline) {
           $goroutine->{deadline} = undef;
           $goroutine->{disable} = 0;
+        }
+      }
+    }
+  }
+  
+  private method check_io_wait : void () {
+    my $io_wait_goroutines_h = $self->{io_wait_goroutines_h};
+    
+    my $poll_goroutines_length = $io_wait_goroutines_h->keys_length;
+    
+    if ($poll_goroutines_length > 0) {
+      my $poll_fd_array = Sys::Poll::PollfdArray->new($poll_goroutines_length);
+      
+      my $poll_goroutine_addresses = $io_wait_goroutines_h->keys;
+      
+      my $poll_index = 0;
+      for my $address (@$poll_goroutine_addresses) {
+        
+        my $poll_goroutine = (Go::Goroutine)$io_wait_goroutines_h->get($address);
+        
+        my $fd = $poll_goroutine->{fd};
+        
+        $poll_fd_array->set_fd($poll_index, $fd);
+        
+        my $schedule_type = $poll_goroutine->{schedule_type};
+        
+        if ($schedule_type == Go::Schedule->TYPE_IO_WRITE) {
+          $poll_fd_array->set_events($poll_index, POLL->POLLOUT);
+        }
+        else {
+          $poll_fd_array->set_events($poll_index, POLL->POLLIN);
+        }
+        
+        $poll_goroutine->{poll_index} = $poll_index;
+        
+        $poll_index++;
+      }
+      
+      my $status = Sys::Poll->poll($poll_fd_array, $poll_goroutines_length, 0);
+      
+      for my $address (@$poll_goroutine_addresses) {
+        my $poll_goroutine = (Go::Goroutine)$io_wait_goroutines_h->get($address);
+        
+        my $poll_index = $poll_goroutine->{poll_index};
+        
+        my $revent = $poll_fd_array->revents($poll_index);
+        
+        my $io_ready = 0;
+        if ($revent & (POLL->POLLHUP | POLL->POLLNVAL | POLL->POLLERR)) {
+          $io_ready = 1;
+        }
+        else {
+          if ($poll_goroutine->{schedule_type} == Go::Schedule->TYPE_IO_WRITE) {
+            if ($revent & POLL->POLLOUT) {
+              $io_ready = 1;
+            }
+          }
+          else {
+            if ($revent & POLL->POLLIN) {
+              $io_ready = 1;
+            }
+          }
+        }
+        
+        my $is_over_deadline = 0;
+        unless ($io_ready) {
+          my $deadline = $poll_goroutine->{deadline};
+          
+          if ($deadline) {
+            $is_over_deadline = Go::Time->now->after($deadline);
+            $poll_goroutine->{is_over_deadline} = (byte)$is_over_deadline;
+          }
+        }
+        
+        if ($io_ready || $is_over_deadline) {
+          my $ready_goroutine = (Go::Goroutine)$io_wait_goroutines_h->delete($address);
+          $ready_goroutine->{disable} = 0;
+          $ready_goroutine->{schedule_type} = Go::Schedule->TYPE_NONE;
+          $ready_goroutine->{fd} = -1;
+          $ready_goroutine->{deadline} = undef;
         }
       }
     }

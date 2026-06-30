@@ -40,8 +40,6 @@ lib/SPVM/Go/Goroutine.pm
 lib/SPVM/Go/Goroutine.spvm
 lib/SPVM/Go/OS/Signal.pm
 lib/SPVM/Go/OS/Signal.spvm
-lib/SPVM/Go/Poll.pm
-lib/SPVM/Go/Poll.spvm
 lib/SPVM/Go/Schedule.pm
 lib/SPVM/Go/Schedule.spvm
 lib/SPVM/Go/Schedule/Task.pm
