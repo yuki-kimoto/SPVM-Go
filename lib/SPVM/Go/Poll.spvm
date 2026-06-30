@@ -16,33 +16,37 @@ class Go::Poll {
   use Go::Time;
   
   # Fields
-  has goroutines_h : Hash of Go::Goroutine;
+  has schedule : Go::Schedule;
   
   # Class Methods
-  private static method new : Go::Poll () {
+  private static method new : Go::Poll ($schedule : Go::Schedule) {
     
     my $self = new Go::Poll;
     
-    $self->{goroutines_h} = Hash->new;
+    unless ($schedule) {
+      die "Scheduler  \$schedule must be defined.";
+    }
+    
+    $self->{schedule} = $schedule;
     
     return $self;
   }
   
   # Instance Methods
   private method check : void () {
-    my $poll_goroutines_h = $self->{goroutines_h};
+    my $io_wait_goroutines_h = $self->{schedule}{io_wait_goroutines_h};
     
-    my $poll_goroutines_length = $poll_goroutines_h->keys_length;
+    my $poll_goroutines_length = $io_wait_goroutines_h->keys_length;
     
     if ($poll_goroutines_length > 0) {
       my $poll_fd_array = Sys::Poll::PollfdArray->new($poll_goroutines_length);
       
-      my $poll_goroutine_addresses = $poll_goroutines_h->keys;
+      my $poll_goroutine_addresses = $io_wait_goroutines_h->keys;
       
       my $poll_index = 0;
       for my $address (@$poll_goroutine_addresses) {
         
-        my $poll_goroutine = (Go::Goroutine)$poll_goroutines_h->get($address);
+        my $poll_goroutine = (Go::Goroutine)$io_wait_goroutines_h->get($address);
         
         my $fd = $poll_goroutine->{fd};
         
@@ -65,7 +69,7 @@ class Go::Poll {
       my $status = Sys::Poll->poll($poll_fd_array, $poll_goroutines_length, 0);
       
       for my $address (@$poll_goroutine_addresses) {
-        my $poll_goroutine = (Go::Goroutine)$poll_goroutines_h->get($address);
+        my $poll_goroutine = (Go::Goroutine)$io_wait_goroutines_h->get($address);
         
         my $poll_index = $poll_goroutine->{poll_index};
         
@@ -99,7 +103,7 @@ class Go::Poll {
         }
         
         if ($io_ready || $is_over_deadline) {
-          my $ready_goroutine = (Go::Goroutine)$poll_goroutines_h->delete($address);
+          my $ready_goroutine = (Go::Goroutine)$io_wait_goroutines_h->delete($address);
           $ready_goroutine->{disable} = 0;
           $ready_goroutine->{schedule_type} = Go::Schedule->TYPE_NONE;
           $ready_goroutine->{fd} = -1;
@@ -111,9 +115,9 @@ class Go::Poll {
   
   private method DESTROY : void () {
     
-    my $poll_goroutines_h = $self->{goroutines_h};
+    my $io_wait_goroutines_h = $self->{schedule}{io_wait_goroutines_h};
     
-    my $poll_coroutniens_length = $poll_goroutines_h->keys_length;
+    my $poll_coroutniens_length = $io_wait_goroutines_h->keys_length;
     
     unless ($poll_coroutniens_length == 0) {
       die "[Unexpected Error]The number of goroutines for IO must be 0 in DESTROY.";
