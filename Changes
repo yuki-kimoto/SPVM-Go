@@ -1,3 +1,12 @@
+0.031 2026-06-30
+  [Internal Changes]
+    * Remove Go::Poll class.
+    * Rename Go::Coroutine to Go::Goroutine.
+    * Rename Go::Goroutine#disable field to disabled.
+    * Add TYPE_CHANNEL_READ and TYPE_CHANNEL_WRITE constants to Go::Schedule.
+    * Prepare using libuv.
+    * Remove disabled goroutines from ready goroutine queue.
+    
 0.030 2026-06-26
   [Requirement Changes]
     * Require SPVM 0.990191.
