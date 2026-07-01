@@ -113,6 +113,10 @@ Flags starting with C<-D> can be retrieved from C<defines> field without the -D 
 
   cp .tmp/Coro-6.57/Coro/libcoro/coro.c lib/SPVM/Resource/Coro.native/src/
 
+=head2 Apply Patch
+
+  patch -p1 < coro_fix.patch
+
 =head1 Repository
 
 L<SPVM::Resource::Coro - Github|https://github.com/yuki-kimoto/SPVM-Resource-Coro>
