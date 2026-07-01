@@ -37,7 +37,7 @@
  * http://www.gnu.org/software/pth/rse-pmt.ps. So most of the credit must
  * go to Ralf S. Engelschall <rse@engelschall.com>.
  *
- * This goroutine library is very much stripped down. You should either
+ * This coroutine library is very much stripped down. You should either
  * build your own process abstraction using it or - better - just use GNU
  * Portable Threads, http://www.gnu.org/software/pth/.
  *
@@ -88,7 +88,7 @@
  * 2016-11-18 disable cfi_undefined again - backtraces might be worse, but
  *            compile compatibility is improved.
  * 2018-08-14 use a completely different pthread strategy that should allow
- *            sharing of goroutines among different threads. this would
+ *            sharing of coroutines among different threads. this would
  *            undefined behaviour before as mutexes would be unlocked on
  *            a different thread. overall, this might be slower than
  *            using a pipe for synchronisation, but pipes eat fd's...
@@ -105,7 +105,7 @@ extern "C" {
  * This library consists of only three files
  * coro.h, coro.c and LICENSE (and optionally README)
  *
- * It implements what is known as goroutines, in a hopefully
+ * It implements what is known as coroutines, in a hopefully
  * portable way.
  *
  * All compiletime symbols must be defined both when including coro.h
@@ -122,7 +122,7 @@ extern "C" {
  * -DCORO_SJLJ
  *
  *    This flavour uses SUSv2's setjmp/longjmp and sigaltstack functions to
- *    do it's job. Goroutine creation is much slower than UCONTEXT, but
+ *    do it's job. coroutine creation is much slower than UCONTEXT, but
  *    context switching is a bit cheaper. It should work on almost all unices.
  *
  * -DCORO_LINUX
@@ -182,19 +182,19 @@ extern "C" {
 #include <stddef.h>
 
 /*
- * This is the type for the initialization function of a new goroutine.
+ * This is the type for the initialization function of a new coroutine.
  */
 typedef void (*coro_func)(void *);
 
 /*
- * A goroutine state is saved in the following structure. Treat it as an
+ * A coroutine state is saved in the following structure. Treat it as an
  * opaque type. errno and sigmask might be saved, but don't rely on it,
  * implement your own switching primitive if you need that.
  */
 typedef struct coro_context coro_context;
 
 /*
- * This function creates a new goroutine. Apart from a pointer to an
+ * This function creates a new coroutine. Apart from a pointer to an
  * uninitialised coro_context, it expects a pointer to the entry function
  * and the single pointer value that is given to it as argument.
  *
@@ -208,13 +208,13 @@ typedef struct coro_context coro_context;
  * will work.
  */
 void coro_create (coro_context *ctx, /* an uninitialised coro_context */
-                  coro_func coro,    /* the goroutine code to be executed */
+                  coro_func coro,    /* the coroutine code to be executed */
                   void *arg,         /* a single pointer passed to the coro */
                   void *sptr,        /* start of stack area */
                   size_t ssze);      /* size of stack area in bytes */
 
 /*
- * The following prototype defines the goroutine switching function. It is
+ * The following prototype defines the coroutine switching function. It is
  * sometimes implemented as a macro, so watch out.
  *
  * This function is thread-safe and reentrant.
@@ -224,7 +224,7 @@ void coro_transfer (coro_context *prev, coro_context *next);
 #endif
 
 /*
- * The following prototype defines the goroutine destroy function. It
+ * The following prototype defines the coroutine destroy function. It
  * is sometimes implemented as a macro, so watch out. It also serves no
  * purpose unless you want to use the CORO_PTHREAD backend, where it is
  * used to clean up the thread. You are responsible for freeing the stack

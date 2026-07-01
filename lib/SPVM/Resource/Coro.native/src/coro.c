@@ -497,7 +497,7 @@ coro_create (coro_context *ctx, coro_func coro, void *arg, void *sptr, size_t ss
 /*****************************************************************************/
 #elif CORO_PTHREAD
 
-/* this mutex will be locked by the running goroutine */
+/* this mutex will be locked by the running coroutine */
 pthread_mutex_t coro_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 struct coro_init_args
