@@ -96,6 +96,8 @@ Typical flags include:
 
 The actual flags applied are determined at build-time by detecting the target platform and specific system requirements (such as thread support and stack alignment).
 
+Flags starting with C<-D> can be retrieved from C<defines> field without the -D prefix.
+
 =head1 How to Create Resource
 
 =head2 Donwload
