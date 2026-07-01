@@ -1,4 +1,4 @@
-package SPVM::Go::Resource::Coro;
+package SPVM::Resource::Coro;
 
 
 
@@ -8,11 +8,11 @@ package SPVM::Go::Resource::Coro;
 
 =head1 Name
 
-SPVM::Go::Resource::Coro - Short Description
+SPVM::Resource::Coro - Short Description
 
 =head1 Description
 
-Go::Resource::Coro class in L<SPVM> is a L<resource|SPVM::Document::Resource> class for something.
+Resource::Coro class in L<SPVM> is a L<resource|SPVM::Document::Resource> class for something.
 
 =head1 Usage
 
@@ -20,7 +20,7 @@ MyClass.config:
   
   my $config = SPVM::Builder::Config->new_c99;
   
-  $config->use_resource('Go::Resource::Coro');
+  $config->use_resource('Resource::Coro');
   
   $config;
 

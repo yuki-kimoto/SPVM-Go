@@ -10,7 +10,7 @@ class Go::Goroutine : pointer {
   use Callback;
   use Go::Channel;
   use Go::Time;
-  use Go::Resource::Coro;
+  use Resource::Coro;
   
   # Fields
   has return_back : Go::Goroutine;
