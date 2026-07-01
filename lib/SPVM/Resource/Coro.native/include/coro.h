@@ -122,7 +122,7 @@ extern "C" {
  * -DCORO_SJLJ
  *
  *    This flavour uses SUSv2's setjmp/longjmp and sigaltstack functions to
- *    do it's job. coroutine creation is much slower than UCONTEXT, but
+ *    do it's job. Coroutine creation is much slower than UCONTEXT, but
  *    context switching is a bit cheaper. It should work on almost all unices.
  *
  * -DCORO_LINUX
