@@ -44,7 +44,7 @@
 #include <string.h>
 
 /*****************************************************************************/
-/* ucontext/setjmp/__asm__ backends                                              */
+/* ucontext/setjmp/asm backends                                              */
 /*****************************************************************************/
 #if CORO_UCONTEXT || CORO_SJLJ || CORO_LOSER || CORO_LINUX || CORO_IRIX || CORO_ASM
 
