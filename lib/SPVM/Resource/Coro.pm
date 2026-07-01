@@ -22,6 +22,8 @@ MyClass.config:
   
   $config->use_resource('Resource::Coro');
   
+  $config->add_define(@{$config->get_resource('Resource::Coro')->config->defines});
+  
   $config;
 
 MyClass.c:
