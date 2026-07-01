@@ -48,7 +48,7 @@ L<libcoro|http://software.schmorp.de/pkg/libcoro.html>
 
 =head1 Original Product Version
 
-Latest version (No versioning scheme). Use the code bundled in L<Coro 6.57|https://metacpan.org/release/MLEHMANN/Coro-6.57> on CPAN.
+Use the code bundled in L<Coro 6.57|https://metacpan.org/release/MLEHMANN/Coro-6.57> on CPAN.
 
 =head1 Language
 
