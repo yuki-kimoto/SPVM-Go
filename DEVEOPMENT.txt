@@ -1,0 +1,12 @@
+# Setup target directory
+mkdir -p .tmp
+
+# Clone repo
+git clone https://github.com/libuv/libuv.git .tmp/libuv
+
+# Checkout specific tag and create branch
+git -C .tmp/libuv checkout tags/v1.52.1 -b branch_v1.52.1
+
+# List branches
+git -C .tmp/libuv branch
+
