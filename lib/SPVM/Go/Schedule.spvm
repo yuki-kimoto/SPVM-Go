@@ -7,6 +7,7 @@ class Go::Schedule {
   allow Go::Schedule::Task;
   allow Go::Channel;
   allow Go::Select;
+  allow Go::UV;
   
   use Go::Goroutine;
   use List;
@@ -179,9 +180,7 @@ class Go::Schedule {
         
         $shcedule_cb->();
         
-        my $goroutines = $self->{goroutines};
-        
-        if ($self->get_all_goroutines_length == 0) {
+        unless ($self->{uv}->loop_alive) {
           last;
         }
       }
@@ -312,16 +311,4 @@ class Go::Schedule {
     
   }
   
-  private method get_all_goroutines_length : int () {
-    my $goroutines = $self->{goroutines};
-    
-    my $all_goroutines_length
-      = $goroutines->length
-      + $self->{uv}{timer_wait_goroutines_h}->keys_length
-      + $self->{uv}{io_wait_goroutines_h}->keys_length;
-      + $self->{uv}{channel_read_waits_length}
-      + $self->{uv}{channel_write_waits_length};
-      
-    return $all_goroutines_length;
-  }
 }

@@ -30,4 +30,16 @@ class Go::UV {
     return $self;
   }
   
+  private method loop_alive : int () {
+    my $goroutines = $self->{schedule}{goroutines};
+    
+    my $all_goroutines_length
+      = $goroutines->length
+      + $self->{timer_wait_goroutines_h}->keys_length
+      + $self->{io_wait_goroutines_h}->keys_length;
+      + $self->{channel_read_waits_length}
+      + $self->{channel_write_waits_length};
+      
+    return $all_goroutines_length ? 1 : 0;
+  }
 }
