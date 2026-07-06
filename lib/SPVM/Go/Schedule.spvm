@@ -112,6 +112,12 @@ class Go::Schedule {
         }
         
         $current_goroutine->{disabled} = 1;
+        if ($self->{uv}{io_wait_goroutines_h}->{$current_goroutine_address}) {
+          die "[Unexpected Error]Disabled IO wait goroutine already exists.";
+        }
+        if ($self->{uv}{timer_wait_goroutines_h}->{$current_goroutine_address}) {
+          die "[Unexpected Error]Disabled Timer wait goroutine already exists.";
+        }
         $self->{uv}{io_wait_goroutines_h}->{$current_goroutine_address} = $current_goroutine;
         
         if (Go->ENV_DEBUG) {
@@ -123,8 +129,16 @@ class Go::Schedule {
           die "The deadline \$deadline in schedule type TYPE_SLEEP must be defined.";
         }
         
-        $self->{uv}{timer_wait_goroutines_h}->{$current_goroutine_address} = $current_goroutine;
         $current_goroutine->{disabled} = 1;
+        
+        if ($self->{uv}{io_wait_goroutines_h}->{$current_goroutine_address}) {
+          die "[Unexpected Error]Disabled IO wait goroutine already exists.";
+        }
+        if ($self->{uv}{timer_wait_goroutines_h}->{$current_goroutine_address}) {
+          die "[Unexpected Error]Disabled Timer wait goroutine already exists.";
+        }
+        
+        $self->{uv}{timer_wait_goroutines_h}->{$current_goroutine_address} = $current_goroutine;
       }
       elsif ($schedule_type == &TYPE_CHANNEL_READ) {
         $current_goroutine->{disabled} = 1;
