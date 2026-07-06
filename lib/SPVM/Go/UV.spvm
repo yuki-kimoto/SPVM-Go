@@ -42,4 +42,34 @@ class Go::UV {
       
     return $all_goroutines_length ? 1 : 0;
   }
+  
+  private method check_timer : void () {
+    
+    my $schedule = $self->{schedule};
+    
+    my $timer_wait_goroutines_h = $self->{timer_wait_goroutines_h};
+    
+    my $addreses = $timer_wait_goroutines_h->keys;
+    for my $address (@$addreses) {
+      my $goroutine = $timer_wait_goroutines_h->{$address};
+      
+      my $deadline = $goroutine->{deadline};
+      
+      if ($deadline) {
+        my $is_over_deadline = 1;
+        
+        if ($deadline) {
+          $is_over_deadline = Go::Time->now->after($deadline);
+        }
+        
+        if ($is_over_deadline) {
+          $goroutine->{deadline} = undef;
+          $goroutine->{disabled} = 0;
+          $self->{timer_wait_goroutines_h}->delete(Fn->to_address($goroutine));
+          $schedule->{goroutines}->push($goroutine);
+        }
+      }
+    }
+  }
+  
 }
