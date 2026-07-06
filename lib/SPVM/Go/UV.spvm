@@ -9,12 +9,16 @@ class Go::UV {
   # Fields
   has timer_wait_goroutines_h : Hash of Go::Goroutine;
   
+  has io_wait_goroutines_h : Hash of Go::Goroutine;
+  
   # Class Methods
   static method new : Go::UV () {
     
     my $self = new Go::UV;
     
     $self->{timer_wait_goroutines_h} = Hash->new;
+    
+    $self->{io_wait_goroutines_h} = Hash->new;
     
     return $self;
   }

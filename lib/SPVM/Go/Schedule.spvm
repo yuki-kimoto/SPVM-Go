@@ -44,8 +44,6 @@ class Go::Schedule {
   
   has thread_id : Thread::ID;
   
-  has io_wait_goroutines_h : Hash of Go::Goroutine;
-  
   has channel_read_waits_length : int;
   
   has channel_write_waits_length : int;
@@ -62,8 +60,6 @@ class Go::Schedule {
     $self->{goroutines} = $goroutines;
     
     $self->{thread_id} = Thread::ThisThread->get_id;
-    
-    $self->{io_wait_goroutines_h} = Hash->new;
     
     $self->{uv} = Go::UV->new;
     
@@ -121,7 +117,7 @@ class Go::Schedule {
         
         $current_goroutine->{disabled} = 1;
         my $current_goroutine_address = Fn->to_address($current_goroutine);
-        $self->{io_wait_goroutines_h}->{$current_goroutine_address} = $current_goroutine;
+        $self->{uv}{io_wait_goroutines_h}->{$current_goroutine_address} = $current_goroutine;
         
         if (Go->ENV_DEBUG) {
           Fn->say_stderr(Format->sprintf("[Go Debug]Register goroutine wait for IO (Callback:%p, QueueNum:%d.)", [(object)$current_goroutine->{task}, $self->{goroutines}->length]));
@@ -223,7 +219,7 @@ class Go::Schedule {
   }
   
   private method check_io : void () {
-    my $io_wait_goroutines_h = $self->{io_wait_goroutines_h};
+    my $io_wait_goroutines_h = $self->{uv}{io_wait_goroutines_h};
     
     my $poll_goroutines_length = $io_wait_goroutines_h->keys_length;
     
@@ -321,7 +317,7 @@ class Go::Schedule {
     my $all_goroutines_length
       = $goroutines->length
       + $self->{uv}{timer_wait_goroutines_h}->keys_length
-      + $self->{io_wait_goroutines_h}->keys_length;
+      + $self->{uv}{io_wait_goroutines_h}->keys_length;
       + $self->{channel_read_waits_length}
       + $self->{channel_write_waits_length};
       
