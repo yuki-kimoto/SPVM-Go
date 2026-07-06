@@ -142,11 +142,9 @@ class Go::Schedule {
       }
       elsif ($schedule_type == &TYPE_CHANNEL_READ) {
         $current_goroutine->{disabled} = 1;
-        $self->{uv}{channel_read_waits_length}++;
       }
       elsif ($schedule_type == &TYPE_CHANNEL_WRITE) {
         $current_goroutine->{disabled} = 1;
-        $self->{uv}{channel_write_waits_length}++;
       }
       
       Go::Goroutine->transfer($current_goroutine, $schedule_task_goroutine);

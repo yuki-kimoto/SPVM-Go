@@ -16,10 +16,6 @@ class Go::UV {
   
   has disabled_goroutines_h : Hash of Go::Goroutine;
   
-  has channel_read_waits_length : int;
-  
-  has channel_write_waits_length : int;
-  
   # Class Methods
   static method new : Go::UV () {
     
@@ -36,10 +32,6 @@ class Go::UV {
     my $all_goroutines_length
       = $goroutines->length
       + $self->{disabled_goroutines_h}->keys_length;
-      
-      # TODO
-      # + $self->{channel_read_waits_length}
-      # + $self->{channel_write_waits_length};
       
     return $all_goroutines_length ? 1 : 0;
   }

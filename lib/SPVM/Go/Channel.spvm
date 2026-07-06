@@ -77,9 +77,6 @@ class Go::Channel {
       my $ok = 1;
       
       $self->finish_wait($write_wait, $ok);
-      if ($write_wait) {
-        $self->{schedule}{uv}{channel_write_waits_length}--;
-      }
       
       my $write_wait_goroutine = $write_wait->{goroutine};
       
@@ -127,9 +124,6 @@ class Go::Channel {
             my $ok = 1;
             
             $self->finish_wait($write_wait, $ok);
-            if ($write_wait) {
-              $self->{schedule}{uv}{channel_write_waits_length}--;
-            }
             
             my $value = $write_wait->{value};
             
@@ -199,9 +193,6 @@ class Go::Channel {
         my $ok = 1;
         
         $self->finish_wait($read_wait, $ok);
-        if ($read_wait) {
-          $self->{schedule}{uv}{channel_read_waits_length}--;
-        }
         
         $read_wait->{value} = $value;
         
@@ -253,9 +244,6 @@ class Go::Channel {
       my $ok = 0;
       
       $self->finish_wait($read_wait, $ok);
-      if ($read_wait) {
-        $self->{schedule}{uv}{channel_read_waits_length}--;
-      }
     }
     
     $self->{closed} = 1;
