@@ -35,8 +35,10 @@ class Go::UV {
     $self->{io_wait_goroutines_h} = Hash->new;
     
     $self->{timer_cb} = [$self : Go::UV] method : void ($goroutine : Go::Goroutine) {
+      $goroutine->{fd} = -1;
       $goroutine->{deadline} = undef;
       $goroutine->{disabled} = 0;
+      $goroutine->{schedule_type} = Go::Schedule->TYPE_NONE;
       $self->{timer_wait_goroutines_h}->delete(Fn->to_address($goroutine));
       $self->{schedule}{goroutines}->push($goroutine);
     };
