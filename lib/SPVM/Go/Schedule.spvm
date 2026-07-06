@@ -10,17 +10,16 @@ class Go::Schedule {
   allow Go::UV;
   
   use Go::Goroutine;
-  use List;
-  use QList;
   use Go::Schedule::Task;
-  use Sys::Time;
-  use Thread::ID;
-  use Thread::ThisThread;
   use Go::Error::IOTimeout;
-  use Error::System;
-  use Format;
   use Go::Time;
   use Go::UV;
+  
+  use Format;
+  use List;
+  use QList;
+  use Thread::ID;
+  use Thread::ThisThread;
   
   private enum {
     TYPE_NONE,
