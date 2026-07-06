@@ -7,6 +7,7 @@ class Go::Time {
   use Go::Duration_1l;
 
   use Time::Local;
+  use Time::HiRes;
   use Sys;
   use Sys::Time::Util;
   use Sys::Time::Timespec;
