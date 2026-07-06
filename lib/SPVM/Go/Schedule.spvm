@@ -158,12 +158,12 @@ class Go::Schedule {
         });
       }
       
-      my $schedule_task = Go::Schedule::Task->new;
-      $schedule_task->{schedule} = $self;
-      
-      my $start_goroutine = Go::Goroutine->new;
-      
-      my $idle_cb = [$self : Go::Schedule, $schedule_task : Go::Schedule::Task, $start_goroutine : Go::Goroutine] method : void () {
+      my $shcedule_cb = [$self : Go::Schedule] method : void () {
+        
+        my $schedule_task = Go::Schedule::Task->new;
+        $schedule_task->{schedule} = $self;
+        
+        my $start_goroutine = Go::Goroutine->new;
         
         my $schedule_task_goroutine = Go::Goroutine->new($schedule_task);
         
@@ -180,7 +180,7 @@ class Go::Schedule {
         
         $self->check_io_wait;
         
-        $idle_cb->();
+        $shcedule_cb->();
         
         my $goroutines = $self->{goroutines};
         
