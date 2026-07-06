@@ -16,8 +16,6 @@ class Go::UV {
   
   has timer_wait_goroutines_h : Hash of Go::Goroutine;
   
-  has io_wait_goroutines_h : Hash of Go::Goroutine;
-  
   has channel_read_waits_length : int;
   
   has channel_write_waits_length : int;
@@ -29,7 +27,7 @@ class Go::UV {
     
     $self->{timer_wait_goroutines_h} = Hash->new;
     
-    $self->{io_wait_goroutines_h} = Hash->new;
+    $self->{timer_wait_goroutines_h} = Hash->new;
     
     return $self;
   }
@@ -40,7 +38,7 @@ class Go::UV {
     my $all_goroutines_length
       = $goroutines->length
       + $self->{timer_wait_goroutines_h}->keys_length
-      + $self->{io_wait_goroutines_h}->keys_length;
+      + $self->{timer_wait_goroutines_h}->keys_length;
       + $self->{channel_read_waits_length}
       + $self->{channel_write_waits_length};
       
@@ -57,7 +55,7 @@ class Go::UV {
     for my $address (@$addreses) {
       my $goroutine = $timer_wait_goroutines_h->{$address};
       unless ($goroutine->{schedule_type} == Go::Schedule->TYPE_SLEEP) {
-        die "[Unexpected Error]\$goroutine->{schedule_type} must be TYPE_SLEEP.";
+        next;
       }
       
       my $deadline = $goroutine->{deadline};
@@ -80,22 +78,22 @@ class Go::UV {
     
     my $schedule = $self->{schedule};
     
-    my $io_wait_goroutines_h = $self->{io_wait_goroutines_h};
+    my $timer_wait_goroutines_h = $self->{timer_wait_goroutines_h};
     
-    my $goroutines_length = $io_wait_goroutines_h->keys_length;
+    my $goroutines_length = $timer_wait_goroutines_h->keys_length;
     
     if ($goroutines_length > 0) {
       my $poll_fd_array = Sys::Poll::PollfdArray->new($goroutines_length);
       
-      my $goroutine_addresses = $io_wait_goroutines_h->keys;
+      my $goroutine_addresses = $timer_wait_goroutines_h->keys;
       
       my $poll_index = 0;
       for my $address (@$goroutine_addresses) {
         
-        my $goroutine = (Go::Goroutine)$io_wait_goroutines_h->get($address);
+        my $goroutine = (Go::Goroutine)$timer_wait_goroutines_h->get($address);
         
         unless ($goroutine->{schedule_type} == Go::Schedule->TYPE_IO_READ || $goroutine->{schedule_type} == Go::Schedule->TYPE_IO_WRITE) {
-          die "[Unexpected Error]\$goroutine->{schedule_type} must be TYPE_IO_READ or TYPE_IO_WRITE.";
+          next;
         }
         
         my $fd = $goroutine->{fd};
@@ -119,10 +117,10 @@ class Go::UV {
       my $status = Sys::Poll->poll($poll_fd_array, $goroutines_length, 0);
       
       for my $address (@$goroutine_addresses) {
-        my $goroutine = (Go::Goroutine)$io_wait_goroutines_h->get($address);
+        my $goroutine = (Go::Goroutine)$timer_wait_goroutines_h->get($address);
         
         unless ($goroutine->{schedule_type} == Go::Schedule->TYPE_IO_READ || $goroutine->{schedule_type} == Go::Schedule->TYPE_IO_WRITE) {
-          die "[Unexpected Error]\$goroutine->{schedule_type} must be TYPE_IO_READ or TYPE_IO_WRITE.";
+          next;
         }
         
         my $poll_index = $goroutine->{poll_index};
@@ -157,7 +155,7 @@ class Go::UV {
         }
         
         if ($io_ready || $is_over_deadline) {
-          $io_wait_goroutines_h->delete($address);
+          $timer_wait_goroutines_h->delete($address);
           $goroutine->{disabled} = 0;
           $goroutine->{schedule_type} = Go::Schedule->TYPE_NONE;
           $goroutine->{fd} = -1;
