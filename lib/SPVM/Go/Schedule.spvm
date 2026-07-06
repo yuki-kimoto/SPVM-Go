@@ -105,13 +105,13 @@ class Go::Schedule {
       $current_goroutine->{schedule_type} = (byte)$schedule_type;
       $current_goroutine->{deadline} = $deadline;
       
+      my $current_goroutine_address = Fn->to_address($current_goroutine);
       if ($schedule_type == &TYPE_IO_READ ||$schedule_type == &TYPE_IO_WRITE) {
         unless ($fd >= 0) {
           die "The file descriptor \$fd in schedule type TYPE_IO_READ or TYPE_IO_WRITE must be a non-negative value.";
         }
         
         $current_goroutine->{disabled} = 1;
-        my $current_goroutine_address = Fn->to_address($current_goroutine);
         $self->{uv}{io_wait_goroutines_h}->{$current_goroutine_address} = $current_goroutine;
         
         if (Go->ENV_DEBUG) {
@@ -123,7 +123,7 @@ class Go::Schedule {
           die "The deadline \$deadline in schedule type TYPE_SLEEP must be defined.";
         }
         
-        $self->{uv}{timer_wait_goroutines_h}->{Fn->to_address($current_goroutine)} = $current_goroutine;
+        $self->{uv}{timer_wait_goroutines_h}->{$current_goroutine_address} = $current_goroutine;
         $current_goroutine->{disabled} = 1;
       }
       elsif ($schedule_type == &TYPE_CHANNEL_READ) {
