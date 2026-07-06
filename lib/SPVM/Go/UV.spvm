@@ -41,8 +41,10 @@ class Go::UV {
       = $goroutines->length
       + $self->{timer_wait_goroutines_h}->keys_length
       + $self->{io_wait_goroutines_h}->keys_length;
-      + $self->{channel_read_waits_length}
-      + $self->{channel_write_waits_length};
+      
+      # TODO
+      # + $self->{channel_read_waits_length}
+      # + $self->{channel_write_waits_length};
       
     return $all_goroutines_length ? 1 : 0;
   }
