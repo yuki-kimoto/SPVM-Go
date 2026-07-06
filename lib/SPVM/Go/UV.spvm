@@ -8,6 +8,8 @@ class Go::UV {
   allow Go::Channel;
   
   # Fields
+  has schedule : Go::Schedule;
+  
   has timer_wait_goroutines_h : Hash of Go::Goroutine;
   
   has io_wait_goroutines_h : Hash of Go::Goroutine;

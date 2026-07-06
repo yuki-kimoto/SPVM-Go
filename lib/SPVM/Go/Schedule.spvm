@@ -57,7 +57,12 @@ class Go::Schedule {
     
     $self->{thread_id} = Thread::ThisThread->get_id;
     
-    $self->{uv} = Go::UV->new;
+    my $uv = Go::UV->new;
+    
+    $self->{uv} = $uv;
+    
+    $uv->{schedule} = $self;
+    weaken $uv->{schedule};
     
     return $self;
   }
