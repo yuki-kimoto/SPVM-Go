@@ -10,8 +10,8 @@ git -C .tmp/libuv checkout tags/v1.52.1 -b branch_v1.52.1
 # List branches
 git -C .tmp/libuv branch
 
-cp -r .tmp/libuv/src/. lib/SPVM/Go/Goroutine.native/src/
+cp -r .tmp/libuv/src/. lib/SPVM/Go/UV.native/src/
 
-cp -r .tmp/libuv/include/. lib/SPVM/Go/Goroutine.native/include/
+cp -r .tmp/libuv/include/. lib/SPVM/Go/UV.native/include/
 
-rsync -avm --include='*.h' --include='*/' --exclude='*' .tmp/libuv/src/ lib/SPVM/Go/Goroutine.native/include/
+rsync -avm --include='*.h' --include='*/' --exclude='*' .tmp/libuv/src/ lib/SPVM/Go/UV.native/include/

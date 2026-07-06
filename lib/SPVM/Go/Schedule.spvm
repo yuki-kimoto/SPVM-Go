@@ -25,6 +25,7 @@ class Go::Schedule {
   use Sys::Poll::Constant as POLL;
   use Sys::Poll;
   use Go::Time;
+  use Go::UV;
   
   private enum {
     TYPE_NONE,
