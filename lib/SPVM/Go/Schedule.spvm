@@ -176,9 +176,9 @@ class Go::Schedule {
       
       while (1) {
         
-        $self->check_sleep;
+        $self->check_timer;
         
-        $self->check_io_wait;
+        $self->check_io;
         
         $shcedule_cb->();
         
@@ -195,7 +195,7 @@ class Go::Schedule {
     }
   }
   
-  private method check_sleep : void () {
+  private method check_timer : void () {
     
     my $timer_wait_goroutines_h = $self->{timer_wait_goroutines_h};
     
@@ -222,7 +222,7 @@ class Go::Schedule {
     }
   }
   
-  private method check_io_wait : void () {
+  private method check_io : void () {
     my $io_wait_goroutines_h = $self->{io_wait_goroutines_h};
     
     my $poll_goroutines_length = $io_wait_goroutines_h->keys_length;
