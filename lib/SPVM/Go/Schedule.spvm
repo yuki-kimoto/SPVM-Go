@@ -161,36 +161,9 @@ class Go::Schedule {
         });
       }
       
-      my $shcedule_cb = [$self : Go::Schedule] method : void () {
-        
-        my $schedule_task = Go::Schedule::Task->new;
-        $schedule_task->{schedule} = $self;
-        
-        my $start_goroutine = Go::Goroutine->new;
-        
-        my $schedule_task_goroutine = Go::Goroutine->new($schedule_task);
-        
-        $schedule_task_goroutine->{return_back} = $start_goroutine;
-        
-        $self->{schedule_task_goroutine} = $schedule_task_goroutine;
-        
-        Go::Goroutine->transfer($start_goroutine, $schedule_task_goroutine);
-      };
-      
       my $uv = $self->{uv};
       
-      while (1) {
-        
-        $uv->check_timer;
-        
-        $uv->check_io;
-        
-        $shcedule_cb->();
-        
-        unless ($uv->loop_alive) {
-          last;
-        }
-      }
+      $uv->run;
       
       $self->{schedule_task_goroutine} = undef;
       

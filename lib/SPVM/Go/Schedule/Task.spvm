@@ -4,6 +4,7 @@
 class Go::Schedule::Task {
   version_from Go;
   allow Go::Schedule;
+  allow Go::UV;
   
   use Go::Schedule;
   use Format;
