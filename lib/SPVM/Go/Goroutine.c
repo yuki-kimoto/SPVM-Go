@@ -5,13 +5,8 @@
 
 #include "spvm_native.h"
 #include "coro.h"
-#include "uv.h"
 
 static const char* FILE_NAME = "Go/Goroutine.c";
-
-static void uv_test () {
-  uv_tcp_t handle;
-}
 
 static void goroutine_handler (void* obj_self_tmp) {
   
