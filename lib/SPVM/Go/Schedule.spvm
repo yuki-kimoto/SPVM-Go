@@ -44,10 +44,6 @@ class Go::Schedule {
   
   has thread_id : Thread::ID;
   
-  has channel_read_waits_length : int;
-  
-  has channel_write_waits_length : int;
-  
   has uv : Go::UV;
   
   # Class Methods
@@ -133,11 +129,11 @@ class Go::Schedule {
       }
       elsif ($schedule_type == &TYPE_CHANNEL_READ) {
         $current_goroutine->{disabled} = 1;
-        $self->{channel_read_waits_length}++;
+        $self->{uv}{channel_read_waits_length}++;
       }
       elsif ($schedule_type == &TYPE_CHANNEL_WRITE) {
         $current_goroutine->{disabled} = 1;
-        $self->{channel_write_waits_length}++;
+        $self->{uv}{channel_write_waits_length}++;
       }
       
       Go::Goroutine->transfer($current_goroutine, $schedule_task_goroutine);
@@ -318,8 +314,8 @@ class Go::Schedule {
       = $goroutines->length
       + $self->{uv}{timer_wait_goroutines_h}->keys_length
       + $self->{uv}{io_wait_goroutines_h}->keys_length;
-      + $self->{channel_read_waits_length}
-      + $self->{channel_write_waits_length};
+      + $self->{uv}{channel_read_waits_length}
+      + $self->{uv}{channel_write_waits_length};
       
     return $all_goroutines_length;
   }

@@ -5,11 +5,16 @@ class Go::UV {
   version_from Go;
   
   allow Go::Schedule;
+  allow Go::Channel;
   
   # Fields
   has timer_wait_goroutines_h : Hash of Go::Goroutine;
   
   has io_wait_goroutines_h : Hash of Go::Goroutine;
+  
+  has channel_read_waits_length : int;
+  
+  has channel_write_waits_length : int;
   
   # Class Methods
   static method new : Go::UV () {
