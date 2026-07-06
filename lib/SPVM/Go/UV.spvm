@@ -154,12 +154,7 @@ class Go::UV {
         }
         
         if ($io_ready || $is_over_deadline) {
-          $disabled_goroutines_h->delete($address);
-          $goroutine->{disabled} = 0;
-          $goroutine->{schedule_type} = Go::Schedule->TYPE_NONE;
-          $goroutine->{fd} = -1;
-          $goroutine->{deadline} = undef;
-          $schedule->{goroutines}->push($goroutine);
+          $self->awake_goroutine($goroutine);
         }
       }
     }
