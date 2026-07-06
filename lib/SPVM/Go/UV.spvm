@@ -10,7 +10,6 @@ class Go::UV {
   use Sys::Poll::PollfdArray;
   use Sys::Poll::Constant as POLL;
   use Sys::Poll;
-  use Go::UV::Callback::Timer;
   
   # Fields
   has schedule : Go::Schedule;
@@ -23,8 +22,6 @@ class Go::UV {
   
   has channel_write_waits_length : int;
   
-  has timer_cb : Go::UV::Callback::Timer;
-  
   # Class Methods
   static method new : Go::UV () {
     
@@ -33,15 +30,6 @@ class Go::UV {
     $self->{timer_wait_goroutines_h} = Hash->new;
     
     $self->{io_wait_goroutines_h} = Hash->new;
-    
-    $self->{timer_cb} = [$self : Go::UV] method : void ($goroutine : Go::Goroutine) {
-      $goroutine->{fd} = -1;
-      $goroutine->{deadline} = undef;
-      $goroutine->{disabled} = 0;
-      $goroutine->{schedule_type} = Go::Schedule->TYPE_NONE;
-      $self->{timer_wait_goroutines_h}->delete(Fn->to_address($goroutine));
-      $self->{schedule}{goroutines}->push($goroutine);
-    };
     
     return $self;
   }
@@ -79,7 +67,7 @@ class Go::UV {
         }
         
         if ($is_over_deadline) {
-          $self->{timer_cb}->($goroutine);
+          $self->awake_goroutine($goroutine);
         }
       }
     }
@@ -169,4 +157,12 @@ class Go::UV {
     }
   }
   
+  private method awake_goroutine : void ($goroutine : Go::Goroutine) {
+    $goroutine->{fd} = -1;
+    $goroutine->{deadline} = undef;
+    $goroutine->{disabled} = 0;
+    $goroutine->{schedule_type} = Go::Schedule->TYPE_NONE;
+    $self->{timer_wait_goroutines_h}->delete(Fn->to_address($goroutine));
+    $self->{schedule}{goroutines}->push($goroutine);
+  }
 }
