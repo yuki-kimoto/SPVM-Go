@@ -79,23 +79,23 @@ class Go::UV {
     
     my $io_wait_goroutines_h = $self->{io_wait_goroutines_h};
     
-    my $poll_goroutines_length = $io_wait_goroutines_h->keys_length;
+    my $goroutines_length = $io_wait_goroutines_h->keys_length;
     
-    if ($poll_goroutines_length > 0) {
-      my $poll_fd_array = Sys::Poll::PollfdArray->new($poll_goroutines_length);
+    if ($goroutines_length > 0) {
+      my $poll_fd_array = Sys::Poll::PollfdArray->new($goroutines_length);
       
-      my $poll_goroutine_addresses = $io_wait_goroutines_h->keys;
+      my $goroutine_addresses = $io_wait_goroutines_h->keys;
       
       my $poll_index = 0;
-      for my $address (@$poll_goroutine_addresses) {
+      for my $address (@$goroutine_addresses) {
         
-        my $poll_goroutine = (Go::Goroutine)$io_wait_goroutines_h->get($address);
+        my $goroutine = (Go::Goroutine)$io_wait_goroutines_h->get($address);
         
-        my $fd = $poll_goroutine->{fd};
+        my $fd = $goroutine->{fd};
         
         $poll_fd_array->set_fd($poll_index, $fd);
         
-        my $schedule_type = $poll_goroutine->{schedule_type};
+        my $schedule_type = $goroutine->{schedule_type};
         
         if ($schedule_type == Go::Schedule->TYPE_IO_WRITE) {
           $poll_fd_array->set_events($poll_index, POLL->POLLOUT);
@@ -104,17 +104,17 @@ class Go::UV {
           $poll_fd_array->set_events($poll_index, POLL->POLLIN);
         }
         
-        $poll_goroutine->{poll_index} = $poll_index;
+        $goroutine->{poll_index} = $poll_index;
         
         $poll_index++;
       }
       
-      my $status = Sys::Poll->poll($poll_fd_array, $poll_goroutines_length, 0);
+      my $status = Sys::Poll->poll($poll_fd_array, $goroutines_length, 0);
       
-      for my $address (@$poll_goroutine_addresses) {
-        my $poll_goroutine = (Go::Goroutine)$io_wait_goroutines_h->get($address);
+      for my $address (@$goroutine_addresses) {
+        my $goroutine = (Go::Goroutine)$io_wait_goroutines_h->get($address);
         
-        my $poll_index = $poll_goroutine->{poll_index};
+        my $poll_index = $goroutine->{poll_index};
         
         my $revent = $poll_fd_array->revents($poll_index);
         
@@ -123,7 +123,7 @@ class Go::UV {
           $io_ready = 1;
         }
         else {
-          if ($poll_goroutine->{schedule_type} == Go::Schedule->TYPE_IO_WRITE) {
+          if ($goroutine->{schedule_type} == Go::Schedule->TYPE_IO_WRITE) {
             if ($revent & POLL->POLLOUT) {
               $io_ready = 1;
             }
@@ -137,21 +137,21 @@ class Go::UV {
         
         my $is_over_deadline = 0;
         unless ($io_ready) {
-          my $deadline = $poll_goroutine->{deadline};
+          my $deadline = $goroutine->{deadline};
           
           if ($deadline) {
             $is_over_deadline = Go::Time->now->after($deadline);
-            $poll_goroutine->{io_wait_over_deadline} = (byte)$is_over_deadline;
+            $goroutine->{io_wait_over_deadline} = (byte)$is_over_deadline;
           }
         }
         
         if ($io_ready || $is_over_deadline) {
-          my $ready_goroutine = (Go::Goroutine)$io_wait_goroutines_h->delete($address);
-          $ready_goroutine->{disabled} = 0;
-          $ready_goroutine->{schedule_type} = Go::Schedule->TYPE_NONE;
-          $ready_goroutine->{fd} = -1;
-          $ready_goroutine->{deadline} = undef;
-          $schedule->{goroutines}->push($ready_goroutine);
+          $io_wait_goroutines_h->delete($address);
+          $goroutine->{disabled} = 0;
+          $goroutine->{schedule_type} = Go::Schedule->TYPE_NONE;
+          $goroutine->{fd} = -1;
+          $goroutine->{deadline} = undef;
+          $schedule->{goroutines}->push($goroutine);
         }
       }
     }
