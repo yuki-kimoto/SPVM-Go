@@ -10,6 +10,7 @@ class Go::UV {
   use Sys::Poll::PollfdArray;
   use Sys::Poll::Constant as POLL;
   use Sys::Poll;
+  use Go::UV::Callback::Timer;
   
   # Fields
   has schedule : Go::Schedule;
@@ -22,6 +23,8 @@ class Go::UV {
   
   has channel_write_waits_length : int;
   
+  has timer_cb : Go::UV::Callback::Timer;
+  
   # Class Methods
   static method new : Go::UV () {
     
@@ -30,6 +33,13 @@ class Go::UV {
     $self->{timer_wait_goroutines_h} = Hash->new;
     
     $self->{io_wait_goroutines_h} = Hash->new;
+    
+    $self->{timer_cb} = [$self : Go::UV] method : void ($goroutine : Go::Goroutine) {
+      $goroutine->{deadline} = undef;
+      $goroutine->{disabled} = 0;
+      $self->{timer_wait_goroutines_h}->delete(Fn->to_address($goroutine));
+      $self->{schedule}{goroutines}->push($goroutine);
+    };
     
     return $self;
   }
