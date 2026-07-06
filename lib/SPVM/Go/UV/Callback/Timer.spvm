@@ -3,8 +3,10 @@
 
 class Go::UV::Callback::Timer : interface_t {
   
+  use Go::Goroutine;
   
-  static method my_method : void () {
+  required method : void ($goroutine : Go::Goroutine) {
     
   }
+  
 }

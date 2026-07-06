@@ -77,10 +77,7 @@ class Go::UV {
         }
         
         if ($is_over_deadline) {
-          $goroutine->{deadline} = undef;
-          $goroutine->{disabled} = 0;
-          $self->{timer_wait_goroutines_h}->delete(Fn->to_address($goroutine));
-          $schedule->{goroutines}->push($goroutine);
+          $self->{timer_cb}->($goroutine);
         }
       }
     }
