@@ -263,11 +263,10 @@ class Go::Channel {
     
     $wait->{ok} = (byte)$ok;
     
-    my $wait_goroutine = $wait->{goroutine};
+    my $goroutine = $wait->{goroutine};
     
-    if ($wait_goroutine) {
-      $wait_goroutine->{disabled} = 0;
-      $self->{schedule}{goroutines}->push($wait_goroutine);
+    if ($goroutine) {
+      $self->{schedule}{uv}->awake_goroutine($goroutine);
     }
   }
   
