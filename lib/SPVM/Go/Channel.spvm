@@ -161,15 +161,8 @@ class Go::Channel {
       if ($self->{read_waits}->length) {
         my $read_wait = (Go::Channel::Wait)$self->{read_waits}->shift;
         
-        $read_wait->{finish} = 1;
-        
-        $read_wait->{ok} = 1;
-        
-        my $read_wait_goroutine = $read_wait->{goroutine};
-        
-        if ($read_wait_goroutine) {
-          $self->{schedule}{uv}->awake_goroutine($read_wait_goroutine);
-        }
+        my $ok = 1;
+        $self->finish_wait($read_wait, $ok);
         
         $read_wait->{value} = $value;
         
