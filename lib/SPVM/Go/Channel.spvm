@@ -139,7 +139,7 @@ class Go::Channel {
           }
         }
         
-        $schedule->schedule(Go::Schedule->TYPE_CHANNEL_READ);
+        $schedule->schedule_channel_read($read_wait);
       }
     }
     
@@ -222,7 +222,7 @@ class Go::Channel {
             return;
           }
           
-          $schedule->schedule(Go::Schedule->TYPE_CHANNEL_WRITE);
+          $schedule->schedule_channel_write($write_wait);
         }
       }
     }

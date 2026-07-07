@@ -83,7 +83,21 @@ class Go::Schedule {
     $self->schedule($schedule_type, $io_timeout_duration_nsec);
   }
   
-  private method schedule : int ($schedule_type : int = 0, $io_timeout_duration_nsec : long = 0, $fd : int = -1) {
+  private method schedule_channel_read : void ($read_wait : Go::Channel::Wait) {
+    
+    my $schedule_type = &TYPE_CHANNEL_READ;
+    
+    $self->schedule($schedule_type, 0, -1, $read_wait);
+  }
+  
+  private method schedule_channel_write : void ($write_wait : Go::Channel::Wait) {
+    
+    my $schedule_type = &TYPE_CHANNEL_WRITE;
+    
+    $self->schedule($schedule_type, 0, -1, $write_wait);
+  }
+  
+  private method schedule : int ($schedule_type : int = 0, $io_timeout_duration_nsec : long = 0, $fd : int = -1, $wait : Go::Channel::Wait = undef) {
     
     my $called_from_main_thread = Thread::ID->eq(Thread::ThisThread->get_id, $self->{thread_id});
     
