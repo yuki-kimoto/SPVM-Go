@@ -118,7 +118,7 @@ class Go::Channel {
         }
         
         if ($self->{write_waits}->length) {
-          if ($read_wait == $self->{read_waits}->get(0)) {
+          if ($read_wait == $self->{read_waits}->[0]) {
             my $write_wait = (Go::Channel::Wait)$self->{write_waits}->shift;
             
             my $ok = 1;
@@ -168,8 +168,7 @@ class Go::Channel {
         my $read_wait_goroutine = $read_wait->{goroutine};
         
         if ($read_wait_goroutine) {
-          $read_wait_goroutine->{disabled} = 0;
-          $self->{schedule}{goroutines}->push($read_wait_goroutine);
+          $self->{schedule}{uv}->awake_goroutine($read_wait_goroutine);
         }
         
         $read_wait->{value} = $value;
@@ -223,7 +222,7 @@ class Go::Channel {
             return;
           }
           
-        $schedule->schedule(Go::Schedule->TYPE_CHANNEL_WRITE);
+          $schedule->schedule(Go::Schedule->TYPE_CHANNEL_WRITE);
         }
       }
     }
