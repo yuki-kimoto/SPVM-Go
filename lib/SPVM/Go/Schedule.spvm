@@ -175,9 +175,7 @@ class Go::Schedule {
         });
       }
       
-      my $uv = $self->{uv};
-      
-      $uv->run;
+      $self->run;
       
       $self->{schedule_task_goroutine} = undef;
       
@@ -204,6 +202,38 @@ class Go::Schedule {
     $goroutine->{schedule_type} = Go::Schedule->TYPE_NONE;
     $self->{uv}{disabled_goroutines_h}->delete(Fn->to_address($goroutine));
     $self->{goroutines}->push($goroutine);
+  }
+  
+  private method run : void () {
+    
+    my $shcedule_cb = [$self : Go::Schedule] method : void () {
+      
+      my $schedule_task = Go::Schedule::Task->new;
+      $schedule_task->{schedule} = $self;
+      
+      my $start_goroutine = Go::Goroutine->new;
+      
+      my $schedule_task_goroutine = Go::Goroutine->new($schedule_task);
+      
+      $schedule_task_goroutine->{return_back} = $start_goroutine;
+      
+      $self->{schedule_task_goroutine} = $schedule_task_goroutine;
+      
+      Go::Goroutine->transfer($start_goroutine, $schedule_task_goroutine);
+    };
+    
+    while (1) {
+      
+      $self->{uv}->check_timer;
+      
+      $self->{uv}->check_io;
+      
+      $shcedule_cb->();
+      
+      unless ($self->{uv}->loop_alive) {
+        last;
+      }
+    }
   }
   
 }
