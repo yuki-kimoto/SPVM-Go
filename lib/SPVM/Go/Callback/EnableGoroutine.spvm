@@ -1,0 +1,10 @@
+# Copyright (c) 2026 Yuki Kimoto
+# MIT License
+
+class Go::Callback::EnableGoroutine : interface_t {
+  
+  use Go::Goroutine;
+  
+  require method : void ($goroutine : Go::Goroutine);
+  
+}
