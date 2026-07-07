@@ -108,51 +108,11 @@ class Go::Schedule {
     my $current_goroutine = $self->{current_goroutine};
     
     if ($current_goroutine) {
-      my $schedule_task_goroutine = $self->{schedule_task_goroutine};
-      
       unless ($schedule_type == &TYPE_NONE) {
-        
-        $current_goroutine->{schedule_type} = (byte)$schedule_type;
-        
-        my $current_goroutine_address = Fn->to_address($current_goroutine);
-        if ($schedule_type == &TYPE_IO_READ ||$schedule_type == &TYPE_IO_WRITE) {
-          unless ($fd >= 0) {
-            die "The file descriptor \$fd in schedule type TYPE_IO_READ or TYPE_IO_WRITE must be a non-negative value.";
-          }
-          
-          $current_goroutine->{fd} = $fd;
-          
-          my $deadline = (Go::Time)undef;
-          if ($io_timeout_duration_nsec > 0) {
-            $deadline = Go::Time->now->add(Go::Duration_1l->new($io_timeout_duration_nsec));
-          }
-          $current_goroutine->{deadline} = $deadline;
-          
-          if (Go->ENV_DEBUG) {
-            Fn->say_stderr(Format->sprintf("[Go Debug]Register goroutine wait for IO (Callback:%p, QueueNum:%d.)", [(object)$current_goroutine->{task}, $self->{goroutines}->length]));
-          }
-        }
-        elsif ($schedule_type == &TYPE_TIMER) {
-          my $deadline = (Go::Time)undef;
-          if ($io_timeout_duration_nsec > 0) {
-            $deadline = Go::Time->now->add(Go::Duration_1l->new($io_timeout_duration_nsec));
-          }
-          $current_goroutine->{deadline} = $deadline;
-          
-          unless ($deadline) {
-            die "The deadline \$deadline in schedule type TYPE_TIMER must be defined.";
-          }
-          
-          if (Go->ENV_DEBUG) {
-            Fn->say_stderr(Format->sprintf("[Go Debug]Register goroutine wait for timer (Callback:%p, QueueNum:%d.)", [(object)$current_goroutine->{task}, $self->{goroutines}->length]));
-          }
-        }
-        if ($self->{uv}{disabled_goroutines_h}->{$current_goroutine_address}) {
-          die "[Unexpected Error]Disabled goroutine already exists.";
-        }
-        $self->{uv}{disabled_goroutines_h}->{$current_goroutine_address} = $current_goroutine;
-        $current_goroutine->{disabled} = 1;
+        $self->disable_goroutine($current_goroutine, $schedule_type, $io_timeout_duration_nsec, $fd, $wait);
       }
+      
+      my $schedule_task_goroutine = $self->{schedule_task_goroutine};
       
       Go::Goroutine->transfer($current_goroutine, $schedule_task_goroutine);
       
@@ -186,6 +146,52 @@ class Go::Schedule {
       Fn->say_stderr(Format->sprintf("[Go Debug]Push new goroutine with the callback %p.", [(object)$task]));
     }
     
+  }
+  
+  private method disable_goroutine : void ($goroutine : Go::Goroutine, $schedule_type : int = 0, $io_timeout_duration_nsec : long = 0, $fd : int = -1, $wait : Go::Channel::Wait = undef) {
+    
+    my $schedule_task_goroutine = $self->{schedule_task_goroutine};
+    
+    $goroutine->{schedule_type} = (byte)$schedule_type;
+    
+    my $goroutine_address = Fn->to_address($goroutine);
+    if ($schedule_type == &TYPE_IO_READ ||$schedule_type == &TYPE_IO_WRITE) {
+      unless ($fd >= 0) {
+        die "The file descriptor \$fd in schedule type TYPE_IO_READ or TYPE_IO_WRITE must be a non-negative value.";
+      }
+      
+      $goroutine->{fd} = $fd;
+      
+      my $deadline = (Go::Time)undef;
+      if ($io_timeout_duration_nsec > 0) {
+        $deadline = Go::Time->now->add(Go::Duration_1l->new($io_timeout_duration_nsec));
+      }
+      $goroutine->{deadline} = $deadline;
+      
+      if (Go->ENV_DEBUG) {
+        Fn->say_stderr(Format->sprintf("[Go Debug]Register goroutine wait for IO (Callback:%p, QueueNum:%d.)", [(object)$goroutine->{task}, $self->{goroutines}->length]));
+      }
+    }
+    elsif ($schedule_type == &TYPE_TIMER) {
+      my $deadline = (Go::Time)undef;
+      if ($io_timeout_duration_nsec > 0) {
+        $deadline = Go::Time->now->add(Go::Duration_1l->new($io_timeout_duration_nsec));
+      }
+      $goroutine->{deadline} = $deadline;
+      
+      unless ($deadline) {
+        die "The deadline \$deadline in schedule type TYPE_TIMER must be defined.";
+      }
+      
+      if (Go->ENV_DEBUG) {
+        Fn->say_stderr(Format->sprintf("[Go Debug]Register goroutine wait for timer (Callback:%p, QueueNum:%d.)", [(object)$goroutine->{task}, $self->{goroutines}->length]));
+      }
+    }
+    if ($self->{uv}{disabled_goroutines_h}->{$goroutine_address}) {
+      die "[Unexpected Error]Disabled goroutine already exists.";
+    }
+    $self->{uv}{disabled_goroutines_h}->{$goroutine_address} = $goroutine;
+    $goroutine->{disabled} = 1;
   }
   
   private method enable_goroutine : void ($goroutine : Go::Goroutine) {
