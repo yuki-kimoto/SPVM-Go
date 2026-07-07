@@ -59,7 +59,7 @@ class Go::UV {
         }
         
         if ($is_over_deadline) {
-          $self->enable_goroutine($goroutine);
+          $schedule->enable_goroutine($goroutine);
         }
       }
     }
@@ -131,18 +131,9 @@ class Go::UV {
       }
       
       if ($io_ready || $is_over_deadline) {
-        $self->enable_goroutine($goroutine);
+        $schedule->enable_goroutine($goroutine);
       }
     }
-  }
-  
-  private method enable_goroutine : void ($goroutine : Go::Goroutine) {
-    $goroutine->{fd} = -1;
-    $goroutine->{deadline} = undef;
-    $goroutine->{disabled} = 0;
-    $goroutine->{schedule_type} = Go::Schedule->TYPE_NONE;
-    $self->{disabled_goroutines_h}->delete(Fn->to_address($goroutine));
-    $self->{schedule}{goroutines}->push($goroutine);
   }
   
   private method run : void () {

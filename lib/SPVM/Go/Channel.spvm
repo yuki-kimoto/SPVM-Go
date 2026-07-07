@@ -258,7 +258,7 @@ class Go::Channel {
     my $goroutine = $wait->{goroutine};
     
     if ($goroutine) {
-      $self->{schedule}{uv}->enable_goroutine($goroutine);
+      $self->{schedule}->enable_goroutine($goroutine);
     }
   }
   
