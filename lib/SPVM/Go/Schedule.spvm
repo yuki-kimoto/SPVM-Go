@@ -105,14 +105,14 @@ class Go::Schedule {
       die "The schedule method in the Go::Schedule class must be called from the main thread.";
     }
     
-    my $deadline = (Go::Time)undef;
-    if ($io_timeout_duration_nsec > 0) {
-      $deadline = Go::Time->now->add(Go::Duration_1l->new($io_timeout_duration_nsec));
-    }
-    
     my $current_goroutine = $self->{current_goroutine};
     
     if ($current_goroutine) {
+      my $deadline = (Go::Time)undef;
+      if ($io_timeout_duration_nsec > 0) {
+        $deadline = Go::Time->now->add(Go::Duration_1l->new($io_timeout_duration_nsec));
+      }
+      
       my $schedule_task_goroutine = $self->{schedule_task_goroutine};
       
       $current_goroutine->{fd} = $fd;
