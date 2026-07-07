@@ -10,6 +10,7 @@ class Go::UV {
   use Sys::Poll::PollfdArray;
   use Sys::Poll::Constant as POLL;
   use Sys::Poll;
+  use Callback;
   
   # Fields
   has schedule : Go::Schedule;
@@ -136,4 +137,19 @@ class Go::UV {
     }
   }
   
+  private method run : void ($shcedule_cb : Callback) {
+    
+    while (1) {
+      
+      $self->check_timer;
+      
+      $self->check_io;
+      
+      $shcedule_cb->();
+      
+      unless ($self->loop_alive) {
+        last;
+      }
+    }
+  }
 }

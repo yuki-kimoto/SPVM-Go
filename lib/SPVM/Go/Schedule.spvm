@@ -222,18 +222,7 @@ class Go::Schedule {
       Go::Goroutine->transfer($start_goroutine, $schedule_task_goroutine);
     };
     
-    while (1) {
-      
-      $self->{uv}->check_timer;
-      
-      $self->{uv}->check_io;
-      
-      $shcedule_cb->();
-      
-      unless ($self->{uv}->loop_alive) {
-        last;
-      }
-    }
+    $self->{uv}->run($shcedule_cb);
   }
   
 }
