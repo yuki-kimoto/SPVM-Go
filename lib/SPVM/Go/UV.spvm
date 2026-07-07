@@ -11,6 +11,7 @@ class Go::UV {
   use Sys::Poll::Constant as POLL;
   use Sys::Poll;
   use Callback;
+  use Go::Callback::EnableGoroutine;
   
   # Fields
   has schedule : Go::Schedule;
@@ -46,7 +47,7 @@ class Go::UV {
     my $addreses = $disabled_goroutines_h->keys;
     for my $address (@$addreses) {
       my $goroutine = $disabled_goroutines_h->{$address};
-      unless ($goroutine->{schedule_type} == Go::Schedule->TYPE_SLEEP) {
+      unless ($goroutine->{schedule_type} == Go::Schedule->TYPE_TIMER) {
         next;
       }
       
@@ -137,7 +138,7 @@ class Go::UV {
     }
   }
   
-  private method run : void ($shcedule_cb : Callback) {
+  private method run : void ($shcedule_cb : Callback, $enable_goroutine_cb : Go::Callback::EnableGoroutine) {
     
     while (1) {
       

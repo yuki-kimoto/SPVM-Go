@@ -5,6 +5,6 @@ class Go::Callback::EnableGoroutine : interface_t {
   
   use Go::Goroutine;
   
-  require method : void ($goroutine : Go::Goroutine);
+  required method : void ($goroutine : Go::Goroutine);
   
 }
