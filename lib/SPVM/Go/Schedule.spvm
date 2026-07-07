@@ -108,52 +108,52 @@ class Go::Schedule {
     my $current_goroutine = $self->{current_goroutine};
     
     if ($current_goroutine) {
-      my $deadline = (Go::Time)undef;
-      if ($io_timeout_duration_nsec > 0) {
-        $deadline = Go::Time->now->add(Go::Duration_1l->new($io_timeout_duration_nsec));
-      }
-      
       my $schedule_task_goroutine = $self->{schedule_task_goroutine};
       
-      $current_goroutine->{fd} = $fd;
-      $current_goroutine->{schedule_type} = (byte)$schedule_type;
-      $current_goroutine->{deadline} = $deadline;
-      
       unless ($schedule_type == &TYPE_NONE) {
+        my $deadline = (Go::Time)undef;
+        if ($io_timeout_duration_nsec > 0) {
+          $deadline = Go::Time->now->add(Go::Duration_1l->new($io_timeout_duration_nsec));
+        }
+        
+        $current_goroutine->{fd} = $fd;
+        $current_goroutine->{schedule_type} = (byte)$schedule_type;
+        $current_goroutine->{deadline} = $deadline;
+        
         $current_goroutine->{disabled} = 1;
-      }
-      
-      my $current_goroutine_address = Fn->to_address($current_goroutine);
-      if ($schedule_type == &TYPE_IO_READ ||$schedule_type == &TYPE_IO_WRITE) {
-        unless ($fd >= 0) {
-          die "The file descriptor \$fd in schedule type TYPE_IO_READ or TYPE_IO_WRITE must be a non-negative value.";
-        }
         
-        if ($self->{uv}{disabled_goroutines_h}->{$current_goroutine_address}) {
-          die "[Unexpected Error]Disabled IO wait goroutine already exists.";
+        my $current_goroutine_address = Fn->to_address($current_goroutine);
+        if ($schedule_type == &TYPE_IO_READ ||$schedule_type == &TYPE_IO_WRITE) {
+          unless ($fd >= 0) {
+            die "The file descriptor \$fd in schedule type TYPE_IO_READ or TYPE_IO_WRITE must be a non-negative value.";
+          }
+          
+          if ($self->{uv}{disabled_goroutines_h}->{$current_goroutine_address}) {
+            die "[Unexpected Error]Disabled IO wait goroutine already exists.";
+          }
+          if ($self->{uv}{disabled_goroutines_h}->{$current_goroutine_address}) {
+            die "[Unexpected Error]Disabled Timer wait goroutine already exists.";
+          }
+          $self->{uv}{disabled_goroutines_h}->{$current_goroutine_address} = $current_goroutine;
+          
+          if (Go->ENV_DEBUG) {
+            Fn->say_stderr(Format->sprintf("[Go Debug]Register goroutine wait for IO (Callback:%p, QueueNum:%d.)", [(object)$current_goroutine->{task}, $self->{goroutines}->length]));
+          }
         }
-        if ($self->{uv}{disabled_goroutines_h}->{$current_goroutine_address}) {
-          die "[Unexpected Error]Disabled Timer wait goroutine already exists.";
+        elsif ($schedule_type == &TYPE_TIMER) {
+          unless ($deadline) {
+            die "The deadline \$deadline in schedule type TYPE_TIMER must be defined.";
+          }
+          
+          if ($self->{uv}{disabled_goroutines_h}->{$current_goroutine_address}) {
+            die "[Unexpected Error]Disabled IO wait goroutine already exists.";
+          }
+          if ($self->{uv}{disabled_goroutines_h}->{$current_goroutine_address}) {
+            die "[Unexpected Error]Disabled Timer wait goroutine already exists.";
+          }
+          
+          $self->{uv}{disabled_goroutines_h}->{$current_goroutine_address} = $current_goroutine;
         }
-        $self->{uv}{disabled_goroutines_h}->{$current_goroutine_address} = $current_goroutine;
-        
-        if (Go->ENV_DEBUG) {
-          Fn->say_stderr(Format->sprintf("[Go Debug]Register goroutine wait for IO (Callback:%p, QueueNum:%d.)", [(object)$current_goroutine->{task}, $self->{goroutines}->length]));
-        }
-      }
-      elsif ($schedule_type == &TYPE_TIMER) {
-        unless ($deadline) {
-          die "The deadline \$deadline in schedule type TYPE_TIMER must be defined.";
-        }
-        
-        if ($self->{uv}{disabled_goroutines_h}->{$current_goroutine_address}) {
-          die "[Unexpected Error]Disabled IO wait goroutine already exists.";
-        }
-        if ($self->{uv}{disabled_goroutines_h}->{$current_goroutine_address}) {
-          die "[Unexpected Error]Disabled Timer wait goroutine already exists.";
-        }
-        
-        $self->{uv}{disabled_goroutines_h}->{$current_goroutine_address} = $current_goroutine;
       }
       
       Go::Goroutine->transfer($current_goroutine, $schedule_task_goroutine);
