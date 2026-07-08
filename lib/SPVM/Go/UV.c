@@ -43,6 +43,7 @@ int32_t SPVM__Go__UV__run_nowait(SPVM_ENV* env, SPVM_VALUE* stack) {
 typedef struct {
   SPVM_ENV* env;
   SPVM_VALUE* stack;
+  SPVM_OBJ* obj_uv;
   SPVM_OBJ* obj_goroutine;
 } SPVM__Go__UV__HANDLE_DATA;
 
@@ -62,7 +63,8 @@ static void on_timer_callback(uv_timer_t* handle) {
 
 int32_t SPVM__Go__UV__timer(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t error_id = 0;
-  SPVM_OBJ* obj_goroutine = stack[0].oval;
+  SPVM_OBJ* obj_self = stack[0].oval;
+  SPVM_OBJ* obj_goroutine = stack[1].oval;
   
   uv_timer_t* timer_handle = env->new_memory_block(env, stack, sizeof(uv_timer_t));
   uv_timer_init(uv_loop, timer_handle);
@@ -70,6 +72,7 @@ int32_t SPVM__Go__UV__timer(SPVM_ENV* env, SPVM_VALUE* stack) {
   SPVM__Go__UV__HANDLE_DATA* handle_data = env->new_memory_block(env, stack, sizeof(SPVM__Go__UV__HANDLE_DATA));
   handle_data->env = env;
   handle_data->stack = stack;
+  handle_data->obj_uv = obj_self;
   handle_data->obj_goroutine = obj_goroutine;
   
   timer_handle->data = handle_data;
