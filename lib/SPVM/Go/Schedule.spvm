@@ -4,13 +4,11 @@
 class Go::Schedule {
   version_from Go;
   allow Go;
-  allow Go::Schedule::Task;
   allow Go::Channel;
   allow Go::Select;
   allow Go::UV;
   
   use Go::Goroutine;
-  use Go::Schedule::Task;
   use Go::Error::IOTimeout;
   use Go::Time;
   use Go::UV;
