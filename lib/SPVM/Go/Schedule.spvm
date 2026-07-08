@@ -32,7 +32,7 @@ class Go::Schedule {
   
   has current_goroutine : Go::Goroutine;
   
-  has start_goroutine : Go::Goroutine;
+  has return_back_goroutine : Go::Goroutine;
   
   has thread_id : Thread::ID;
   
@@ -110,9 +110,9 @@ class Go::Schedule {
         $self->disable_goroutine($current_goroutine, $schedule_type, $timeout_duration_nsec, $fd, $wait);
       }
       
-      my $start_goroutine = $self->{start_goroutine};
+      my $return_back_goroutine = $self->{return_back_goroutine};
       
-      Go::Goroutine->transfer($current_goroutine, $start_goroutine);
+      Go::Goroutine->transfer($current_goroutine, $return_back_goroutine);
       
       if ($current_goroutine->{io_wait_over_deadline}) {
         $current_goroutine->{io_wait_over_deadline} = 0;
@@ -128,7 +128,7 @@ class Go::Schedule {
       
       $self->run;
       
-      $self->{start_goroutine} = undef;
+      $self->{return_back_goroutine} = undef;
       
       $self->{current_goroutine} = undef;
     }
@@ -148,7 +148,7 @@ class Go::Schedule {
   
   private method disable_goroutine : void ($goroutine : Go::Goroutine, $schedule_type : int = 0, $timeout_duration_nsec : long = 0, $fd : int = -1, $wait : Go::Channel::Wait = undef) {
     
-    my $satart_goroutine = $self->{start_goroutine};
+    my $satart_goroutine = $self->{return_back_goroutine};
     
     $goroutine->{schedule_type} = (byte)$schedule_type;
     
@@ -206,11 +206,11 @@ class Go::Schedule {
   
   private method run : void () {
     
-    my $start_goroutine = Go::Goroutine->new;
+    my $return_back_goroutine = Go::Goroutine->new;
     
-    $self->{start_goroutine} = $start_goroutine;
+    $self->{return_back_goroutine} = $return_back_goroutine;
     
-    my $shcedule_cb = [$self : Go::Schedule, $start_goroutine : Go::Goroutine] method : void () {
+    my $shcedule_cb = [$self : Go::Schedule, $return_back_goroutine : Go::Goroutine] method : void () {
       
       my $goroutines = $self->{goroutines};
       
@@ -238,11 +238,11 @@ class Go::Schedule {
           
           $goroutines->push($goroutine);
           
-          $goroutine->{return_back} = $start_goroutine;
+          $goroutine->{return_back} = $return_back_goroutine;
           
           $self->{current_goroutine} = $goroutine;
           
-          Go::Goroutine->transfer($start_goroutine, $goroutine);
+          Go::Goroutine->transfer($return_back_goroutine, $goroutine);
         }
       }
       
