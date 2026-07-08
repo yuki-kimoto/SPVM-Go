@@ -224,11 +224,6 @@ class Go::Schedule {
       Go::Goroutine->transfer($start_goroutine, $schedule_task_goroutine);
     };
     
-    my $enable_goroutine_cb = [$self : Go::Schedule] method : void ($goroutine : Go::Goroutine) {
-      
-      $self->enable_goroutine($goroutine);
-    };
-    
     $self->{uv}->run($shcedule_cb);
   }
   
