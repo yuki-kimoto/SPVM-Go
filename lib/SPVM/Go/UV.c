@@ -12,8 +12,6 @@ void boot_Go__UV(void) {
   
 }
 
-static uv_loop_t* uv_loop = NULL;
-
 int32_t SPVM__Go__UV__run_default(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   uv_loop_t* uv_loop = uv_default_loop();
@@ -92,6 +90,7 @@ int32_t SPVM__Go__UV__timer(SPVM_ENV* env, SPVM_VALUE* stack) {
   SPVM_OBJ* obj_self = stack[0].oval;
   SPVM_OBJ* obj_goroutine = stack[1].oval;
   
+  uv_loop_t* uv_loop = uv_default_loop();
   uv_timer_t* timer_handle = env->new_memory_block(env, stack, sizeof(uv_timer_t));
   uv_timer_init(uv_loop, timer_handle);
   
