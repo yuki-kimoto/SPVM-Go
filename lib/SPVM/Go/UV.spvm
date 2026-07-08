@@ -108,7 +108,7 @@ class Go::UV {
     }
   }
   
-  private method run : void ($shcedule_cb : Callback) {
+  private method run : void () {
     
     while (1) {
       
