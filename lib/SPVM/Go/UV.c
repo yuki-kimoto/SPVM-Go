@@ -104,3 +104,50 @@ int32_t SPVM__Go__UV__timer(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   return 0;
 }
+
+static void SPVM__Go__UV__on_idle_callback(uv_idle_t* handle) {
+  int32_t error_id = 0;
+  
+  SPVM__Go__UV__HANDLE_DATA* handle_data = (SPVM__Go__UV__HANDLE_DATA*)handle->data;
+  
+  SPVM_ENV* env = handle_data->env;
+  SPVM_VALUE* stack = handle_data->stack;
+  SPVM_OBJ* obj_uv = handle_data->obj_uv;
+  
+  SPVM_OBJ* obj_schedule = env->get_field_object_by_name(env, stack, obj_uv, "schedule", &error_id, __func__, FILE_NAME, __LINE__);
+  if (!obj_schedule) {
+    spvm_diag("[Unexcepted Error]Can't get Go::Schedule object.");
+    abort();
+  }
+  
+  stack[0].oval = obj_schedule;
+
+  env->call_instance_method_by_name(env, stack, "process_next_goroutine", 1, &error_id, __func__, FILE_NAME, __LINE__);
+  if (!(error_id == 0)) {
+    spvm_diag("[Unexcepted Error]process_next_goroutine method failed.");
+    abort();
+  }
+  
+  uv_idle_stop(handle);
+  uv_close((uv_handle_t*)handle, SPVM__Go__UV__on_close_callback);
+}
+
+int32_t SPVM__Go__UV__idle(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  SPVM_OBJ* obj_self = stack[0].oval;
+  
+  uv_loop_t* uv_loop = uv_default_loop();
+  uv_idle_t* idle_handle = env->new_memory_block(env, stack, sizeof(uv_idle_t));
+  uv_idle_init(uv_loop, idle_handle);
+  
+  SPVM__Go__UV__HANDLE_DATA* handle_data = env->new_memory_block(env, stack, sizeof(SPVM__Go__UV__HANDLE_DATA));
+  handle_data->env = env;
+  handle_data->stack = stack;
+  handle_data->obj_uv = obj_self;
+  
+  idle_handle->data = handle_data;
+  
+  uv_idle_start(idle_handle, SPVM__Go__UV__on_idle_callback);
+  
+  return 0;
+}
