@@ -121,18 +121,27 @@ static void SPVM__Go__UV__on_idle_callback(uv_idle_t* handle) {
   }
   
   stack[0].oval = obj_schedule;
-
   env->call_instance_method_by_name(env, stack, "process_next_goroutine", 1, &error_id, __func__, FILE_NAME, __LINE__);
   if (!(error_id == 0)) {
-    spvm_diag("[Unexcepted Error]process_next_goroutine method failed.");
+    spvm_diag("[Unexcepted Error]Go::UV#process_next_goroutine method failed.");
     abort();
   }
   
-  uv_idle_stop(handle);
-  uv_close((uv_handle_t*)handle, SPVM__Go__UV__on_close_callback);
+  stack[0].oval = obj_uv;
+  env->call_instance_method_by_name(env, stack, "loop_alive", 1, &error_id, __func__, FILE_NAME, __LINE__);
+  if (!(error_id == 0)) {
+    spvm_diag("[Unexcepted Error]Go::UV#loop_alive method failed.");
+    abort();
+  }
+  int32_t loop_alive = stack[0].ival;
+  
+  if (!loop_alive) {
+    uv_idle_stop(handle);
+    uv_close((uv_handle_t*)handle, SPVM__Go__UV__on_close_callback);
+  }
 }
 
-int32_t SPVM__Go__UV__idle(SPVM_ENV* env, SPVM_VALUE* stack) {
+int32_t SPVM__Go__UV__idle_start(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   SPVM_OBJ* obj_self = stack[0].oval;
   

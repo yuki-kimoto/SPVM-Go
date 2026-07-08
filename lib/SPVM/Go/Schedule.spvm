@@ -247,6 +247,8 @@ class Go::Schedule {
     
     $self->{return_back_goroutine} = $return_back_goroutine;
     
+    $self->{uv}->idle_start;
+    
     $self->{uv}->run;
   }
   

@@ -112,11 +112,9 @@ class Go::UV {
     
     while (1) {
       
-      $self->run_nowait;
-      
       $self->check_io;
       
-      $self->{schedule}->process_next_goroutine;
+      $self->run_nowait;
       
       unless ($self->loop_alive) {
         last;
@@ -126,7 +124,7 @@ class Go::UV {
   
   private native method timer : void ($goroutine : Go::Goroutine);
   
-  private native method idle : void ();
+  private native method idle_start : void ();
   
   private method read : void ($goroutine : Go::Goroutine) { die "TODO"; }
   
