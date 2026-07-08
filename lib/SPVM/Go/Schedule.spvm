@@ -34,7 +34,7 @@ class Go::Schedule {
   
   has current_goroutine : Go::Goroutine;
   
-  has schedule_task_goroutine : Go::Goroutine;
+  has start_goroutine : Go::Goroutine;
   
   has thread_id : Thread::ID;
   
@@ -112,9 +112,9 @@ class Go::Schedule {
         $self->disable_goroutine($current_goroutine, $schedule_type, $timeout_duration_nsec, $fd, $wait);
       }
       
-      my $schedule_task_goroutine = $self->{schedule_task_goroutine};
+      my $start_goroutine = $self->{start_goroutine};
       
-      Go::Goroutine->transfer($current_goroutine, $schedule_task_goroutine);
+      Go::Goroutine->transfer($current_goroutine, $start_goroutine);
       
       if ($current_goroutine->{io_wait_over_deadline}) {
         $current_goroutine->{io_wait_over_deadline} = 0;
@@ -130,7 +130,7 @@ class Go::Schedule {
       
       $self->run;
       
-      $self->{schedule_task_goroutine} = undef;
+      $self->{start_goroutine} = undef;
       
       $self->{current_goroutine} = undef;
     }
@@ -150,7 +150,7 @@ class Go::Schedule {
   
   private method disable_goroutine : void ($goroutine : Go::Goroutine, $schedule_type : int = 0, $timeout_duration_nsec : long = 0, $fd : int = -1, $wait : Go::Channel::Wait = undef) {
     
-    my $schedule_task_goroutine = $self->{schedule_task_goroutine};
+    my $satart_goroutine = $self->{start_goroutine};
     
     $goroutine->{schedule_type} = (byte)$schedule_type;
     
@@ -208,20 +208,46 @@ class Go::Schedule {
   
   private method run : void () {
     
-    my $shcedule_cb = [$self : Go::Schedule] method : void () {
+    my $start_goroutine = Go::Goroutine->new;
+    
+    $self->{start_goroutine} = $start_goroutine;
+    
+    my $shcedule_cb = [$self : Go::Schedule, $start_goroutine : Go::Goroutine] method : void () {
       
-      my $schedule_task = Go::Schedule::Task->new;
-      $schedule_task->{schedule} = $self;
+      my $goroutines = $self->{goroutines};
       
-      my $start_goroutine = Go::Goroutine->new;
+      unless (@$goroutines > 0) {
+        return;
+      }
       
-      my $schedule_task_goroutine = Go::Goroutine->new($schedule_task);
+      my $goroutine = $goroutines->shift;
       
-      $schedule_task_goroutine->{return_back} = $start_goroutine;
+      if ($goroutine->{finished}) {
+        if (Go->ENV_DEBUG) {
+          diag Fn->sprintf("[Go Debug]Finish goroutine. \$task=%p.", $goroutine->{task});
+        }
+      }
+      else {
+        if ($goroutine->{disabled}) {
+          if (Go->ENV_DEBUG) {
+           diag Fn->sprintf("[Go Debug]Skip disabled goroutine. \$task=%p.", $goroutine->{task});
+          }
+        }
+        else {
+          if (Go->ENV_DEBUG) {
+            diag Fn->sprintf("[Go Debug]Restart goroutine. \$task=%p.", $goroutine->{task});
+          }
+          
+          $goroutines->push($goroutine);
+          
+          $goroutine->{return_back} = $start_goroutine;
+          
+          $self->{current_goroutine} = $goroutine;
+          
+          Go::Goroutine->transfer($start_goroutine, $goroutine);
+        }
+      }
       
-      $self->{schedule_task_goroutine} = $schedule_task_goroutine;
-      
-      Go::Goroutine->transfer($start_goroutine, $schedule_task_goroutine);
     };
     
     $self->{uv}->run($shcedule_cb);
