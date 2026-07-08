@@ -116,7 +116,7 @@ class Go::UV {
       
       $self->check_io;
       
-      $shcedule_cb->();
+      $self->{schedule}->process_next_goroutine;
       
       unless ($self->loop_alive) {
         last;

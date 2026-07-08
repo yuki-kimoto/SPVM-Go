@@ -202,6 +202,45 @@ class Go::Schedule {
     $self->{goroutines}->push($goroutine);
   }
   
+  private method process_next_goroutine : void () {
+    
+    my $goroutines = $self->{goroutines};
+    
+    unless (@$goroutines > 0) {
+      return;
+    }
+    
+    my $goroutine = $goroutines->shift;
+    
+    if ($goroutine->{finished}) {
+      if (Go->ENV_DEBUG) {
+        diag Fn->sprintf("[Go Debug]Finish goroutine. \$task=%p.", $goroutine->{task});
+      }
+    }
+    else {
+      if ($goroutine->{disabled}) {
+        if (Go->ENV_DEBUG) {
+         diag Fn->sprintf("[Go Debug]Skip disabled goroutine. \$task=%p.", $goroutine->{task});
+        }
+      }
+      else {
+        if (Go->ENV_DEBUG) {
+          diag Fn->sprintf("[Go Debug]Restart goroutine. \$task=%p.", $goroutine->{task});
+        }
+        
+        $goroutines->push($goroutine);
+        
+        my $return_back_goroutine = $self->{return_back_goroutine};
+        
+        $goroutine->{return_back} = $return_back_goroutine;
+        
+        $self->{current_goroutine} = $goroutine;
+        
+        Go::Goroutine->transfer($return_back_goroutine, $goroutine);
+      }
+    }
+  }
+  
   private method run : void () {
     
     my $return_back_goroutine = Go::Goroutine->new;
