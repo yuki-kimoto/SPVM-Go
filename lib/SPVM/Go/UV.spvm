@@ -154,7 +154,7 @@ class Go::UV {
     }
   }
   
-  private method timer : void ($goroutine : Go::Goroutine) { die "TODO"; }
+  private native method timer : void ($goroutine : Go::Goroutine);
   
   private method read : void ($goroutine : Go::Goroutine) { die "TODO"; }
   
