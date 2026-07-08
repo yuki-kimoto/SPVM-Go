@@ -11,8 +11,6 @@ Changes
 DEVEOPMENT.txt
 lib/SPVM/Go.pm
 lib/SPVM/Go.spvm
-lib/SPVM/Go/Callback/EnableGoroutine.pm
-lib/SPVM/Go/Callback/EnableGoroutine.spvm
 lib/SPVM/Go/Channel.pm
 lib/SPVM/Go/Channel.spvm
 lib/SPVM/Go/Channel/Wait.pm

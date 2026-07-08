@@ -11,7 +11,6 @@ class Go::UV {
   use Sys::Poll::Constant as POLL;
   use Sys::Poll;
   use Callback;
-  use Go::Callback::EnableGoroutine;
   
   # Fields
   has schedule : Go::Schedule;
@@ -109,7 +108,7 @@ class Go::UV {
     }
   }
   
-  private method run : void ($shcedule_cb : Callback, $enable_goroutine_cb : Go::Callback::EnableGoroutine) {
+  private method run : void ($shcedule_cb : Callback) {
     
     while (1) {
       
