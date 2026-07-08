@@ -210,7 +210,7 @@ class Go::Schedule {
     
     $self->{return_back_goroutine} = $return_back_goroutine;
     
-    my $shcedule_cb = [$self : Go::Schedule, $return_back_goroutine : Go::Goroutine] method : void () {
+    my $shcedule_cb = [$self : Go::Schedule] method : void () {
       
       my $goroutines = $self->{goroutines};
       
@@ -237,6 +237,8 @@ class Go::Schedule {
           }
           
           $goroutines->push($goroutine);
+          
+          my $return_back_goroutine = $self->{return_back_goroutine};
           
           $goroutine->{return_back} = $return_back_goroutine;
           
