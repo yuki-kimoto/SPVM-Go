@@ -16,3 +16,12 @@ static void uv_test () {
   uv_tcp_t handle;
 }
 
+int32_t SPVM__Go__UV__run_default(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  return 0;
+}
+
+int32_t SPVM__Go__UV__run_nowait(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  return 0;
+}
