@@ -148,8 +148,6 @@ class Go::Schedule {
   
   private method disable_goroutine : void ($goroutine : Go::Goroutine, $schedule_type : int = 0, $timeout_duration_nsec : long = 0, $fd : int = -1, $wait : Go::Channel::Wait = undef) {
     
-    my $satart_goroutine = $self->{return_back_goroutine};
-    
     $goroutine->{schedule_type} = (byte)$schedule_type;
     
     my $goroutine_address = Fn->to_address($goroutine);
