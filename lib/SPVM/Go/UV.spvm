@@ -38,35 +38,6 @@ class Go::UV {
     return $all_goroutines_length ? 1 : 0;
   }
   
-  private method check_timer : void () {
-    
-    my $schedule = $self->{schedule};
-    
-    my $disabled_goroutines_h = $self->{disabled_goroutines_h};
-    
-    my $addreses = $disabled_goroutines_h->keys;
-    for my $address (@$addreses) {
-      my $goroutine = $disabled_goroutines_h->{$address};
-      unless ($goroutine->{schedule_type} == Go::Schedule->TYPE_TIMER) {
-        next;
-      }
-      
-      my $deadline = $goroutine->{deadline};
-      
-      if ($deadline) {
-        my $is_over_deadline = 1;
-        
-        if ($deadline) {
-          $is_over_deadline = Go::Time->now->after($deadline);
-        }
-        
-        if ($is_over_deadline) {
-          $schedule->enable_goroutine($goroutine);
-        }
-      }
-    }
-  }
-  
   private method check_io : void () {
     
     my $schedule = $self->{schedule};
