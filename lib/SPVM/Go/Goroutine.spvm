@@ -22,6 +22,8 @@ class Go::Goroutine : pointer {
   
   has deadline : Go::Time;
   
+  has timeout_duration_nsec : long;
+  
   has io_wait_over_deadline : byte;
   
   has fd : int;

@@ -62,25 +62,25 @@ class Go::Schedule {
   }
   
   # Instance Methods
-  private method schedule_io_read : void ($fd : int, $io_timeout_duration_nsec : long = 0) {
+  private method schedule_io_read : void ($fd : int, $timeout_duration_nsec : long = 0) {
     
     my $schedule_type = &TYPE_IO_READ;
     
-    $self->schedule($schedule_type, $io_timeout_duration_nsec, $fd);
+    $self->schedule($schedule_type, $timeout_duration_nsec, $fd);
   }
   
-  private method schedule_io_write : void ($fd : int, $io_timeout_duration_nsec : long = 0) {
+  private method schedule_io_write : void ($fd : int, $timeout_duration_nsec : long = 0) {
     
     my $schedule_type = &TYPE_IO_WRITE;
     
-    $self->schedule($schedule_type, $io_timeout_duration_nsec, $fd);
+    $self->schedule($schedule_type, $timeout_duration_nsec, $fd);
   }
   
-  private method schedule_timer : int ($io_timeout_duration_nsec : long) {
+  private method schedule_timer : int ($timeout_duration_nsec : long) {
     
     my $schedule_type = &TYPE_TIMER;
     
-    $self->schedule($schedule_type, $io_timeout_duration_nsec);
+    $self->schedule($schedule_type, $timeout_duration_nsec);
   }
   
   private method schedule_channel_read : void ($read_wait : Go::Channel::Wait) {
@@ -97,7 +97,7 @@ class Go::Schedule {
     $self->schedule($schedule_type, 0, -1, $write_wait);
   }
   
-  private method schedule : int ($schedule_type : int = 0, $io_timeout_duration_nsec : long = 0, $fd : int = -1, $wait : Go::Channel::Wait = undef) {
+  private method schedule : int ($schedule_type : int = 0, $timeout_duration_nsec : long = 0, $fd : int = -1, $wait : Go::Channel::Wait = undef) {
     
     my $called_from_main_thread = Thread::ID->eq(Thread::ThisThread->get_id, $self->{thread_id});
     
@@ -109,7 +109,7 @@ class Go::Schedule {
     
     if ($current_goroutine) {
       unless ($schedule_type == &TYPE_NONE) {
-        $self->disable_goroutine($current_goroutine, $schedule_type, $io_timeout_duration_nsec, $fd, $wait);
+        $self->disable_goroutine($current_goroutine, $schedule_type, $timeout_duration_nsec, $fd, $wait);
       }
       
       my $schedule_task_goroutine = $self->{schedule_task_goroutine};
@@ -123,8 +123,8 @@ class Go::Schedule {
     }
     else {
       unless ($schedule_type == &TYPE_NONE) {
-        $self->add_task([$self : Go::Schedule, $schedule_type : int, $io_timeout_duration_nsec : long, $fd : int] method : void () {
-          $self->schedule($schedule_type, $io_timeout_duration_nsec, $fd);
+        $self->add_task([$self : Go::Schedule, $schedule_type : int, $timeout_duration_nsec : long, $fd : int] method : void () {
+          $self->schedule($schedule_type, $timeout_duration_nsec, $fd);
         });
       }
       
@@ -148,7 +148,7 @@ class Go::Schedule {
     
   }
   
-  private method disable_goroutine : void ($goroutine : Go::Goroutine, $schedule_type : int = 0, $io_timeout_duration_nsec : long = 0, $fd : int = -1, $wait : Go::Channel::Wait = undef) {
+  private method disable_goroutine : void ($goroutine : Go::Goroutine, $schedule_type : int = 0, $timeout_duration_nsec : long = 0, $fd : int = -1, $wait : Go::Channel::Wait = undef) {
     
     my $schedule_task_goroutine = $self->{schedule_task_goroutine};
     
@@ -163,10 +163,11 @@ class Go::Schedule {
       $goroutine->{fd} = $fd;
       
       my $deadline = (Go::Time)undef;
-      if ($io_timeout_duration_nsec > 0) {
-        $deadline = Go::Time->now->add(Go::Duration_1l->new($io_timeout_duration_nsec));
+      if ($timeout_duration_nsec > 0) {
+        $deadline = Go::Time->now->add(Go::Duration_1l->new($timeout_duration_nsec));
       }
       $goroutine->{deadline} = $deadline;
+      $goroutine->{timeout_duration_nsec} = $timeout_duration_nsec;
       
       if (Go->ENV_DEBUG) {
         Fn->say_stderr(Format->sprintf("[Go Debug]Register goroutine wait for IO (Callback:%p, QueueNum:%d.)", [(object)$goroutine->{task}, $self->{goroutines}->length]));
@@ -174,10 +175,11 @@ class Go::Schedule {
     }
     elsif ($schedule_type == &TYPE_TIMER) {
       my $deadline = (Go::Time)undef;
-      if ($io_timeout_duration_nsec > 0) {
-        $deadline = Go::Time->now->add(Go::Duration_1l->new($io_timeout_duration_nsec));
+      if ($timeout_duration_nsec > 0) {
+        $deadline = Go::Time->now->add(Go::Duration_1l->new($timeout_duration_nsec));
       }
       $goroutine->{deadline} = $deadline;
+      $goroutine->{timeout_duration_nsec} = $timeout_duration_nsec;
       
       unless ($deadline) {
         die "The deadline \$deadline in schedule type TYPE_TIMER must be defined.";
