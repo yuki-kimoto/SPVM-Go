@@ -164,8 +164,8 @@ class Go::UV {
   
   private method async_send : void ($goroutine : Go::Goroutine) { die "TODO"; }
   
-  private native method run_default : void ();
+  private native method run_default : int ();
   
-  private native method run_nowait : void ();
+  private native method run_nowait : int ();
   
 }

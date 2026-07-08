@@ -18,9 +18,7 @@ int32_t SPVM__Go__UV__run_default(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t status = uv_run(uv_loop, UV_RUN_DEFAULT);
   
-  if (!(status == 0)) {
-    return env->die(env, stack, "[uv Error]uv_run failed. $mode=%d", __func__, FILE_NAME, __LINE__, UV_RUN_DEFAULT);
-  }
+  stack[0].ival = status;
   
   return 0;
 }
@@ -31,9 +29,7 @@ int32_t SPVM__Go__UV__run_nowait(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t status = uv_run(uv_loop, UV_RUN_NOWAIT);
   
-  if (!(status == 0)) {
-    return env->die(env, stack, "[uv Error]uv_run failed. $mode=%d", __func__, FILE_NAME, __LINE__, UV_RUN_NOWAIT);
-  }
+  stack[0].ival = status;
   
   return 0;
 }
