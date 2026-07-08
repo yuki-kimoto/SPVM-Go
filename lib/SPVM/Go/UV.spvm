@@ -142,7 +142,7 @@ class Go::UV {
     
     while (1) {
       
-      $self->check_timer;
+      $self->run_nowait;
       
       $self->check_io;
       

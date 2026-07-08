@@ -180,6 +180,7 @@ class Go::Schedule {
       }
       $goroutine->{deadline} = $deadline;
       $goroutine->{timeout_duration_nsec} = $timeout_duration_nsec;
+      $self->{uv}->timer($goroutine);
       
       unless ($deadline) {
         die "The deadline \$deadline in schedule type TYPE_TIMER must be defined.";
