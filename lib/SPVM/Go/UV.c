@@ -39,8 +39,6 @@ typedef struct {
   SPVM_VALUE* stack;
   SPVM_OBJ* obj_uv;
   SPVM_OBJ* obj_goroutine;
-  uv_timer_t* timer_handle;
-  uv_poll_t* poll_handle;
   uv_handle_t* related_handle;
 } SPVM__Go__UV__HANDLE_DATA;
 
@@ -234,9 +232,6 @@ int32_t SPVM__Go__UV__poll(SPVM_ENV* env, SPVM_VALUE* stack) {
     timer_handle_data->obj_goroutine = obj_goroutine;
     
     timer_handle->data = timer_handle_data;
-    
-    poll_handle_data->poll_handle = poll_handle;
-    poll_handle_data->timer_handle = timer_handle;
     
     poll_handle_data->related_handle = timer_handle;
     timer_handle_data->related_handle = poll_handle;
