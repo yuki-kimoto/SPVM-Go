@@ -56,7 +56,7 @@ static void SPVM__Go__UV__close_cb(uv_handle_t* handle) {
   env->free_memory_block(env, stack, handle);
 }
 
-static void SPVM__Go__UV__enable_goroutine_cb(uv_timer_t* handle) {
+static void SPVM__Go__UV__enable_goroutine_cb(uv_handle_t* handle) {
   
   int32_t error_id = 0;
   
@@ -105,6 +105,14 @@ static void SPVM__Go__UV__enable_goroutine_cb(uv_timer_t* handle) {
   }
   
   uv_close((uv_handle_t*)handle, SPVM__Go__UV__close_cb);
+}
+
+static void SPVM__Go__UV__enable_goroutine_cb_for_poll(uv_poll_t* handle, int status, int events) {
+  SPVM__Go__UV__enable_goroutine_cb((uv_handle_t*)handle);
+}
+
+static void SPVM__Go__UV__enable_goroutine_cb_for_timer(uv_timer_t* handle) {
+  SPVM__Go__UV__enable_goroutine_cb((uv_handle_t*)handle);
 }
 
 int32_t SPVM__Go__UV__timer(SPVM_ENV* env, SPVM_VALUE* stack) {
@@ -220,7 +228,7 @@ int32_t SPVM__Go__UV__poll(SPVM_ENV* env, SPVM_VALUE* stack) {
   poll_handle->data = handle_data;
   
   int32_t poll_events = (schedule_type == schedule_type_io_read) ? UV_READABLE : UV_WRITABLE;
-  uv_poll_start(poll_handle, poll_events, SPVM__Go__UV__enable_goroutine_cb);
+  uv_poll_start(poll_handle, poll_events, SPVM__Go__UV__enable_goroutine_cb_for_poll);
   
   int64_t timeout_nsec = env->get_field_long_by_name(env, stack, obj_goroutine, "timeout_duration_nsec", &error_id, __func__, FILE_NAME, __LINE__);
   if (timeout_nsec > 0) {
@@ -231,7 +239,7 @@ int32_t SPVM__Go__UV__poll(SPVM_ENV* env, SPVM_VALUE* stack) {
     handle_data->timer_handle = timer_handle;
     
     int64_t timeout_msec = timeout_nsec / 1000000;
-    uv_timer_start(timer_handle, SPVM__Go__UV__enable_goroutine_cb, timeout_msec, 0);
+    uv_timer_start(timer_handle, SPVM__Go__UV__enable_goroutine_cb_for_timer, timeout_msec, 0);
   }
   
   return 0;
