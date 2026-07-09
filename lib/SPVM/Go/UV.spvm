@@ -126,7 +126,7 @@ class Go::UV {
   
   private native method idle_start : void ();
   
-  private method poll : void ($goroutine : Go::Goroutine) { die "TODO"; }
+  private native method poll : void ($goroutine : Go::Goroutine);
   
   private method async : void ($goroutine : Go::Goroutine) { die "TODO"; }
   
