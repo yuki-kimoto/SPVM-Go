@@ -233,8 +233,8 @@ int32_t SPVM__Go__UV__poll(SPVM_ENV* env, SPVM_VALUE* stack) {
     
     timer_handle->data = timer_handle_data;
     
-    poll_handle_data->related_handle = timer_handle;
-    timer_handle_data->related_handle = poll_handle;
+    poll_handle_data->related_handle = (uv_handle_t*)timer_handle;
+    timer_handle_data->related_handle = (uv_handle_t*)poll_handle;
     
     int64_t timeout_msec = timeout_nsec / 1000000;
     uv_timer_start(timer_handle, SPVM__Go__UV__enable_goroutine_cb_for_timer, timeout_msec, 0);
