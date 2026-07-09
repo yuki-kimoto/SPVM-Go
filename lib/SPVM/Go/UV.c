@@ -105,7 +105,7 @@ int32_t SPVM__Go__UV__timer(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 }
 
-static void SPVM__Go__UV__on_idle_callback(uv_idle_t* handle) {
+static void SPVM__Go__UV__process_goroutine_cb(uv_idle_t* handle) {
   int32_t error_id = 0;
   
   SPVM__Go__UV__HANDLE_DATA* handle_data = (SPVM__Go__UV__HANDLE_DATA*)handle->data;
@@ -156,7 +156,7 @@ int32_t SPVM__Go__UV__idle_start(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   idle_handle->data = handle_data;
   
-  uv_idle_start(idle_handle, SPVM__Go__UV__on_idle_callback);
+  uv_idle_start(idle_handle, SPVM__Go__UV__process_goroutine_cb);
   
   return 0;
 }
