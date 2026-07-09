@@ -37,11 +37,6 @@ class Go::UV {
     return $all_goroutines_length ? 1 : 0;
   }
   
-  private method run : void () {
-    
-    $self->run_default;
-  }
-  
   private native method timer : void ($goroutine : Go::Goroutine);
   
   private native method idle_start : void ();
@@ -52,8 +47,5 @@ class Go::UV {
   
   private method async_send : void ($goroutine : Go::Goroutine) { die "TODO"; }
   
-  private native method run_default : int ();
-  
-  private native method run_nowait : int ();
-  
+  private native method run : void ();
 }
