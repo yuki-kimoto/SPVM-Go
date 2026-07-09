@@ -112,8 +112,6 @@ class Go::UV {
     
     while (1) {
       
-      $self->check_io;
-      
       $self->run_nowait;
       
       unless ($self->loop_alive) {

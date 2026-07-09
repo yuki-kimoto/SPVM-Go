@@ -164,6 +164,7 @@ class Go::Schedule {
       }
       $goroutine->{deadline} = $deadline;
       $goroutine->{timeout_duration_nsec} = $timeout_duration_nsec;
+      $self->{uv}->poll($goroutine);
       
       if (Go->ENV_DEBUG) {
         Fn->say_stderr(Format->sprintf("[Go Debug]Register goroutine wait for IO (Callback:%p, QueueNum:%d.)", [(object)$goroutine->{task}, $self->{goroutines}->length]));
