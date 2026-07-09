@@ -124,7 +124,7 @@ int32_t SPVM__Go__UV__timer(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int64_t timeout_nsec = env->get_field_long_by_name(env, stack, obj_goroutine, "timeout_duration_nsec", &error_id, __func__, FILE_NAME, __LINE__);
   int64_t timeout_msec = timeout_nsec / 1000000;
-  uv_timer_start(timer_handle, SPVM__Go__UV__enable_goroutine_cb, timeout_msec, 0);
+  uv_timer_start(timer_handle, SPVM__Go__UV__enable_goroutine_cb_for_timer, timeout_msec, 0);
   
   return 0;
 }
