@@ -42,6 +42,15 @@ typedef struct {
   uv_handle_t* related_handle;
 } SPVM__Go__UV__HANDLE_DATA;
 
+static void SPVM__Go__UV__uv_close_safe(uv_handle_t* handle, uv_close_cb close_cb) {
+  
+  if (handle) {
+    if (!uv_is_closing(handle)) {
+      uv_close(handle, close_cb);
+    }
+  }
+}
+
 static void SPVM__Go__UV__close_cb(uv_handle_t* handle) {
   SPVM__Go__UV__HANDLE_DATA* handle_data = (SPVM__Go__UV__HANDLE_DATA*)handle->data;
   
@@ -91,10 +100,10 @@ static void SPVM__Go__UV__enable_goroutine_cb(uv_handle_t* handle) {
         abort();
       }
     }
-    uv_close(related_handle, SPVM__Go__UV__close_cb);
+    SPVM__Go__UV__uv_close_safe(related_handle, SPVM__Go__UV__close_cb);
   }
   
-  uv_close((uv_handle_t*)handle, SPVM__Go__UV__close_cb);
+  SPVM__Go__UV__uv_close_safe((uv_handle_t*)handle, SPVM__Go__UV__close_cb);
 }
 
 static void SPVM__Go__UV__enable_goroutine_cb_for_poll(uv_poll_t* handle, int status, int events) {
@@ -161,7 +170,7 @@ static void SPVM__Go__UV__process_goroutine_cb(uv_idle_t* handle) {
   
   if (!loop_alive) {
     uv_idle_stop(handle);
-    uv_close((uv_handle_t*)handle, SPVM__Go__UV__close_cb);
+    SPVM__Go__UV__uv_close_safe((uv_handle_t*)handle, SPVM__Go__UV__close_cb);
   }
 }
 
