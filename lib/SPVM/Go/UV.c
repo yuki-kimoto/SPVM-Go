@@ -8,10 +8,6 @@
 
 static const char* FILE_NAME = "Go/UV.c";
 
-void boot_Go__UV(void) {
-  
-}
-
 int32_t SPVM__Go__UV__run(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   uv_loop_t* uv_loop = uv_default_loop();
