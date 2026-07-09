@@ -207,7 +207,7 @@ int32_t SPVM__Go__UV__poll(SPVM_ENV* env, SPVM_VALUE* stack) {
   }
   int32_t schedule_type_io_read = stack[0].ival;
   
-  uv_poll_init(uv_loop, poll_handle, fd);
+  uv_poll_init_socket(uv_loop, poll_handle, fd);
   
   SPVM__Go__UV__HANDLE_DATA* poll_handle_data = env->new_memory_block(env, stack, sizeof(SPVM__Go__UV__HANDLE_DATA));
   poll_handle_data->env = env;
