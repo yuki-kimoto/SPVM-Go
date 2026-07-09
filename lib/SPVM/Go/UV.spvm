@@ -41,7 +41,7 @@ class Go::UV {
     
     while (1) {
       
-      $self->run_nowait;
+      $self->run_default;
       
       unless ($self->loop_alive) {
         last;
