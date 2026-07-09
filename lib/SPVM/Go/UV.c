@@ -125,13 +125,13 @@ int32_t SPVM__Go__UV__timer(SPVM_ENV* env, SPVM_VALUE* stack) {
   uv_timer_t* timer_handle = env->new_memory_block(env, stack, sizeof(uv_timer_t));
   uv_timer_init(uv_loop, timer_handle);
   
-  SPVM__Go__UV__HANDLE_DATA* handle_data = env->new_memory_block(env, stack, sizeof(SPVM__Go__UV__HANDLE_DATA));
-  handle_data->env = env;
-  handle_data->stack = stack;
-  handle_data->obj_uv = obj_self;
-  handle_data->obj_goroutine = obj_goroutine;
+  SPVM__Go__UV__HANDLE_DATA* timer_handle_data = env->new_memory_block(env, stack, sizeof(SPVM__Go__UV__HANDLE_DATA));
+  timer_handle_data->env = env;
+  timer_handle_data->stack = stack;
+  timer_handle_data->obj_uv = obj_self;
+  timer_handle_data->obj_goroutine = obj_goroutine;
   
-  timer_handle->data = handle_data;
+  timer_handle->data = timer_handle_data;
   
   int64_t timeout_nsec = env->get_field_long_by_name(env, stack, obj_goroutine, "timeout_duration_nsec", &error_id, __func__, FILE_NAME, __LINE__);
   int64_t timeout_msec = timeout_nsec / 1000000;
