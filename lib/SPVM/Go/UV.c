@@ -39,6 +39,8 @@ typedef struct {
   SPVM_VALUE* stack;
   SPVM_OBJ* obj_uv;
   SPVM_OBJ* obj_goroutine;
+  uv_timer_t* timer_handle;
+  uv_poll_t* poll_handle;
 } SPVM__Go__UV__HANDLE_DATA;
 
 static void SPVM__Go__UV__close_cb(uv_handle_t* handle) {
@@ -74,8 +76,29 @@ static void SPVM__Go__UV__enable_goroutine_cb(uv_timer_t* handle) {
   
   env->call_instance_method_by_name(env, stack, "enable_goroutine", 2, &error_id, __func__, FILE_NAME, __LINE__);
   if (!(error_id == 0)) {
-    spvm_diag("[Unexcepted Error]enable_goroutine method faeild.");
+    spvm_diag("[Unexcepted Error]enable_goroutine method failed.");
     abort();
+  }
+  
+  // IO timeout
+  uv_poll_t* poll_handle = handle_data->poll_handle;
+  uv_timer_t* timer_handle = handle_data->timer_handle;
+  if (poll_handle) {
+    if (handle == timer_handle) {
+      env->set_field_int_by_name(env, stack, obj_goroutine, "io_wait_over_deadline", 1, &error_id, __func__, FILE_NAME, __LINE__);
+      if (!(error_id == 0)) {
+        spvm_diag("[Unexcepted Error]Setting 'io_wait_over_deadline' field failed.");
+        abort();
+      }
+      uv_close((uv_handle_t*)poll_handle, SPVM__Go__UV__close_cb);
+    }
+  }
+  
+  // IO read/write
+  if (timer_handle) {
+    if (handle == poll_handle) {
+      uv_close((uv_handle_t*)timer_handle, SPVM__Go__UV__close_cb);
+    }
   }
   
   uv_close((uv_handle_t*)handle, SPVM__Go__UV__close_cb);
@@ -195,6 +218,18 @@ int32_t SPVM__Go__UV__poll(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t poll_events = (schedule_type == schedule_type_io_read) ? UV_READABLE : UV_WRITABLE;
   uv_poll_start(poll_handle, poll_events, SPVM__Go__UV__enable_goroutine_cb);
+  
+  int64_t timeout_nsec = env->get_field_long_by_name(env, stack, obj_goroutine, "timeout_duration_nsec", &error_id, __func__, FILE_NAME, __LINE__);
+  if (timeout_nsec > 0) {
+    uv_timer_t* timer_handle = env->new_memory_block(env, stack, sizeof(uv_timer_t));
+    uv_timer_init(uv_loop, timer_handle);
+    
+    handle_data->poll_handle = poll_handle;
+    handle_data->timer_handle = timer_handle;
+    
+    int64_t timeout_msec = timeout_nsec / 1000000;
+    uv_timer_start(timer_handle, SPVM__Go__UV__enable_goroutine_cb, timeout_msec, 0);
+  }
   
   return 0;
 }
