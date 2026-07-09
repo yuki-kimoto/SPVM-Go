@@ -50,10 +50,8 @@ static void SPVM__Go__UV__close_cb(uv_handle_t* handle) {
   SPVM_ENV* env = handle_data->env;
   SPVM_VALUE* stack = handle_data->stack;
   
-  if (handle_data) {
-    env->free_memory_block(env, stack, handle_data);
-    handle->data = NULL;
-  }
+  env->free_memory_block(env, stack, handle_data);
+  handle->data = NULL;
   env->free_memory_block(env, stack, handle);
 }
 
