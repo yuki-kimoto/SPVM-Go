@@ -82,25 +82,18 @@ static void SPVM__Go__UV__enable_goroutine_cb(uv_handle_t* handle) {
     abort();
   }
   
-  // IO timeout
-  uv_poll_t* poll_handle = handle_data->poll_handle;
-  uv_timer_t* timer_handle = handle_data->timer_handle;
-  if (poll_handle) {
-    if (handle == timer_handle) {
+  uv_handle_t* related_handle = handle_data->related_handle;
+  if (related_handle) {
+    int32_t handle_type = uv_handle_get_type((uv_handle_t*)handle);
+    if (handle_type == UV_TIMER) {
+      // IO timeout
       env->set_field_int_by_name(env, stack, obj_goroutine, "io_wait_over_deadline", 1, &error_id, __func__, FILE_NAME, __LINE__);
       if (!(error_id == 0)) {
         spvm_diag("[Unexcepted Error]Setting 'io_wait_over_deadline' field failed.");
         abort();
       }
-      uv_close((uv_handle_t*)poll_handle, SPVM__Go__UV__close_cb);
     }
-  }
-  
-  // IO read/write
-  if (timer_handle) {
-    if (handle == poll_handle) {
-      uv_close((uv_handle_t*)timer_handle, SPVM__Go__UV__close_cb);
-    }
+    uv_close(related_handle, SPVM__Go__UV__close_cb);
   }
   
   uv_close((uv_handle_t*)handle, SPVM__Go__UV__close_cb);
