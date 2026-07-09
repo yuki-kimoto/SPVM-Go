@@ -172,7 +172,7 @@ int32_t SPVM__Go__UV__idle_start(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 }
 
-int32_t SPVM__Go__UV__poll(SPVM_ENV* env, SPVM_VALUE* stack) {
+int32_t SPVM__Go__UV__poll_socket(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t error_id = 0;
   SPVM_OBJ* obj_self = stack[0].oval;
