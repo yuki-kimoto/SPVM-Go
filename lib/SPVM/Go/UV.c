@@ -41,7 +41,7 @@ typedef struct {
   SPVM_OBJ* obj_goroutine;
 } SPVM__Go__UV__HANDLE_DATA;
 
-static void SPVM__Go__UV__on_close_callback(uv_handle_t* handle) {
+static void SPVM__Go__UV__close_cb(uv_handle_t* handle) {
   SPVM__Go__UV__HANDLE_DATA* handle_data = (SPVM__Go__UV__HANDLE_DATA*)handle->data;
   
   SPVM_ENV* env = handle_data->env;
@@ -51,7 +51,7 @@ static void SPVM__Go__UV__on_close_callback(uv_handle_t* handle) {
   env->free_memory_block(env, stack, handle);
 }
 
-static void SPVM__Go__UV__on_timer_callback(uv_timer_t* handle) {
+static void SPVM__Go__UV__enable_goroutine_cb(uv_timer_t* handle) {
   
   int32_t error_id = 0;
   
@@ -78,7 +78,7 @@ static void SPVM__Go__UV__on_timer_callback(uv_timer_t* handle) {
     abort();
   }
   
-  uv_close((uv_handle_t*)handle, SPVM__Go__UV__on_close_callback);
+  uv_close((uv_handle_t*)handle, SPVM__Go__UV__close_cb);
 }
 
 int32_t SPVM__Go__UV__timer(SPVM_ENV* env, SPVM_VALUE* stack) {
@@ -100,7 +100,7 @@ int32_t SPVM__Go__UV__timer(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int64_t timeout_nsec = env->get_field_long_by_name(env, stack, obj_goroutine, "timeout_duration_nsec", &error_id, __func__, FILE_NAME, __LINE__);
   int64_t timeout_msec = timeout_nsec / 1000000;
-  uv_timer_start(timer_handle, SPVM__Go__UV__on_timer_callback, timeout_msec, 0);
+  uv_timer_start(timer_handle, SPVM__Go__UV__enable_goroutine_cb, timeout_msec, 0);
   
   return 0;
 }
@@ -137,7 +137,7 @@ static void SPVM__Go__UV__on_idle_callback(uv_idle_t* handle) {
   
   if (!loop_alive) {
     uv_idle_stop(handle);
-    uv_close((uv_handle_t*)handle, SPVM__Go__UV__on_close_callback);
+    uv_close((uv_handle_t*)handle, SPVM__Go__UV__close_cb);
   }
 }
 
