@@ -39,14 +39,7 @@ class Go::UV {
   
   private method run : void () {
     
-    while (1) {
-      
-      $self->run_default;
-      
-      unless ($self->loop_alive) {
-        last;
-      }
-    }
+    $self->run_default;
   }
   
   private native method timer : void ($goroutine : Go::Goroutine);
