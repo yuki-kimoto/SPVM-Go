@@ -41,6 +41,7 @@ typedef struct {
   SPVM_OBJ* obj_goroutine;
   uv_timer_t* timer_handle;
   uv_poll_t* poll_handle;
+  uv_handle_t* related_handle;
 } SPVM__Go__UV__HANDLE_DATA;
 
 static void SPVM__Go__UV__close_cb(uv_handle_t* handle) {
@@ -219,13 +220,13 @@ int32_t SPVM__Go__UV__poll(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   uv_poll_init(uv_loop, poll_handle, fd);
   
-  SPVM__Go__UV__HANDLE_DATA* handle_data = env->new_memory_block(env, stack, sizeof(SPVM__Go__UV__HANDLE_DATA));
-  handle_data->env = env;
-  handle_data->stack = stack;
-  handle_data->obj_uv = obj_self;
-  handle_data->obj_goroutine = obj_goroutine;
+  SPVM__Go__UV__HANDLE_DATA* poll_handle_data = env->new_memory_block(env, stack, sizeof(SPVM__Go__UV__HANDLE_DATA));
+  poll_handle_data->env = env;
+  poll_handle_data->stack = stack;
+  poll_handle_data->obj_uv = obj_self;
+  poll_handle_data->obj_goroutine = obj_goroutine;
   
-  poll_handle->data = handle_data;
+  poll_handle->data = poll_handle_data;
   
   int32_t poll_events = (schedule_type == schedule_type_io_read) ? UV_READABLE : UV_WRITABLE;
   uv_poll_start(poll_handle, poll_events, SPVM__Go__UV__enable_goroutine_cb_for_poll);
@@ -235,8 +236,9 @@ int32_t SPVM__Go__UV__poll(SPVM_ENV* env, SPVM_VALUE* stack) {
     uv_timer_t* timer_handle = env->new_memory_block(env, stack, sizeof(uv_timer_t));
     uv_timer_init(uv_loop, timer_handle);
     
-    handle_data->poll_handle = poll_handle;
-    handle_data->timer_handle = timer_handle;
+    poll_handle_data->poll_handle = poll_handle;
+    poll_handle_data->timer_handle = timer_handle;
+    poll_handle_data->related_handle = timer_handle;
     
     int64_t timeout_msec = timeout_nsec / 1000000;
     uv_timer_start(timer_handle, SPVM__Go__UV__enable_goroutine_cb_for_timer, timeout_msec, 0);
