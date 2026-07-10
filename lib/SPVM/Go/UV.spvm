@@ -43,9 +43,9 @@ class Go::UV {
   
   private native method poll_socket : void ($goroutine : Go::Goroutine);
   
-  private method async : void ($goroutine : Go::Goroutine) { die "TODO"; }
+  private native method async : void ($goroutine : Go::Goroutine);
   
-  private method async_send : void ($goroutine : Go::Goroutine) { die "TODO"; }
+  private native method async_send : void ($goroutine : Go::Goroutine);
   
   private native method run : void ();
 }
