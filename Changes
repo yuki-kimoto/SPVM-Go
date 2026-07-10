@@ -1,12 +1,12 @@
-0.032 2026-07-30
-  [Requirement Changes]
-    * Require SPVM::Resource::Coro 0.001.
+0.033 2026-07-30
   [Internal Changes]
     * Use libuv for timer, IO read/write, channel read/write.
   [Perfromance Improvement]
     * The scheduler does not use busy-waiting or idle-looping. Instead, it registers
+0.032 2026-07-30
+  [Requirement Changes]
+    * Require SPVM::Resource::Coro 0.001.
 the operation with the libuv event loop and suspends the Goroutine.
-
 0.031 2026-06-30
   [Internal Changes]
     * Remove Go::Poll class.
