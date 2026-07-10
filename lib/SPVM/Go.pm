@@ -10,9 +10,7 @@ SPVM::Go - Goroutines of The Go Programming Language
 
 =head1 Description
 
-Go class in L<SPVM> has methods to create goroutines and manipulate channels.
-
-Goroutines and channels are features of the Go programming language.
+Go class in L<SPVM> provide the features of goroutines and channels in Go language.
 
 =head1 Usage
 
@@ -35,6 +33,42 @@ Goroutines and channels are features of the Go programming language.
   });
   
   Go->gosched;
+
+=head1 Details
+
+L<Go|SPVM::Go> class provides a runtime environment that implements Goroutines
+and Channels, mimicking the behavior of the Go programming language.
+
+Unlike standard polling-based implementations that consume CPU cycles while
+waiting, this module leverages the high-performance event loop provided by
+L<libuv|https://libuv.org/>.
+
+=head2 Efficient Waiting via Event Loop
+
+When a Goroutine performs an operation that requires waiting, such as:
+
+=over 2
+
+=item * Timer-based waiting (e.g., C<time.sleep>)
+
+=item * I/O operations (e.g., reading/writing sockets)
+
+=item * Channel communication (waiting for data or space)
+
+=back
+
+The runtime does not use busy-waiting or idle-looping. Instead, it registers
+the operation with the libuv event loop and suspends the Goroutine.
+
+The event loop puts the process into a low-power wait state, consuming virtually
+zero CPU resources while waiting for the OS to signal that the event is ready.
+Once the event occurs (e.g., a timer expires, data arrives, or a channel becomes
+ready), the event loop notifies the runtime, which then resumes the Goroutine
+efficiently.
+
+This architecture ensures high scalability and low CPU usage, allowing for
+thousands of concurrent Goroutines to coexist within a single SPVM process
+without significant overhead.
 
 =head1 Class Methods
 
