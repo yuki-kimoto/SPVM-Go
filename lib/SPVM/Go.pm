@@ -57,13 +57,13 @@ When a Goroutine performs an operation that requires waiting, such as:
 
 =back
 
-The runtime does not use busy-waiting or idle-looping. Instead, it registers
+The scheduler does not use busy-waiting or idle-looping. Instead, it registers
 the operation with the libuv event loop and suspends the Goroutine.
 
 The event loop puts the process into a low-power wait state, consuming virtually
 zero CPU resources while waiting for the OS to signal that the event is ready.
 Once the event occurs (e.g., a timer expires, data arrives, or a channel becomes
-ready), the event loop notifies the runtime, which then resumes the Goroutine
+ready), the event loop notifies the scheduler, which then resumes the Goroutine
 efficiently.
 
 This architecture ensures high scalability and low CPU usage, allowing for
