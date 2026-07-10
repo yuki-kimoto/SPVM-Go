@@ -187,6 +187,10 @@ class Go::Schedule {
         Fn->say_stderr(Format->sprintf("[Go Debug]Register goroutine wait for timer (Callback:%p, QueueNum:%d.)", [(object)$goroutine->{task}, $self->{goroutines}->length]));
       }
     }
+    if ($schedule_type == &TYPE_CHANNEL_READ ||$schedule_type == &TYPE_CHANNEL_WRITE) {
+      $self->{uv}->async($goroutine);
+    }
+    
     if ($self->{uv}{disabled_goroutines_h}->{$goroutine_address}) {
       die "[Unexpected Error]Disabled goroutine already exists.";
     }
