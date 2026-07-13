@@ -41,7 +41,7 @@ class Go::UV {
   
   private native method idle_start : void ();
   
-  private native method poll_socket : void ($goroutine : Go::Goroutine);
+  private native method poll : void ($goroutine : Go::Goroutine);
   
   private native method async : void ($goroutine : Go::Goroutine);
   
