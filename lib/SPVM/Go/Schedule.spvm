@@ -55,9 +55,6 @@ class Go::Schedule {
     
     $self->{uv} = $uv;
     
-    $uv->{schedule} = $self;
-    weaken $uv->{schedule};
-    
     $self->{disabled_goroutines_h} = Hash->new;
     
     return $self;

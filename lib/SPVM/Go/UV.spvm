@@ -4,13 +4,8 @@
 class Go::UV {
   version_from Go;
   
-  allow Go::Schedule;
-  
   use Go::UV::Handle;
   use Go::UV::Callback::LoopAlive;
-  
-  # Fields
-  has schedule : Go::Schedule;
   
   # Class Methods
   static method new : Go::UV () {
