@@ -29,8 +29,6 @@ class Go::Goroutine : pointer {
   
   has schedule_type : int;
   
-  has poll_index : int;
-  
   has uv_async_handle : Address;
   
   # Class Methods
