@@ -3,6 +3,8 @@
 
 class Go::UV::Event {
   
+  use Callback;
+  
   # Enumerations
   enum {
     UV_UNKNOWN_HANDLE,
@@ -36,6 +38,8 @@ class Go::UV::Event {
   has io_timeout_occurred : byte;
   
   has async_handle : Address;
+  
+  has cb : Callback;
   
   # Class Methods
   static method new : void () {
