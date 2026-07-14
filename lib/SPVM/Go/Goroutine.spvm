@@ -31,6 +31,8 @@ class Go::Goroutine : pointer {
   
   has async_handle : Address;
   
+  has cb : Callback;
+  
   # Class Methods
   static method new : Go::Goroutine ($task :  Callback = undef, $return_back : Go::Goroutine = undef) {
     
