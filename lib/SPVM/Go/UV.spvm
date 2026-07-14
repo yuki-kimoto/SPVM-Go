@@ -19,15 +19,15 @@ class Go::UV {
     return $self;
   }
   
-  native method timer : void ($uv_task : Go::UV::Handle);
+  native method timer : void ($uv_handle : Go::UV::Handle);
   
-  native method idle : void ($uv_task : Go::UV::Handle);
+  native method idle : void ($uv_handle : Go::UV::Handle);
   
-  native method poll : void ($uv_task : Go::UV::Handle);
+  native method poll : void ($uv_handle : Go::UV::Handle);
   
-  native method async : void ($uv_task : Go::UV::Handle);
+  native method async : void ($uv_handle : Go::UV::Handle);
   
-  native method async_send : void ($uv_task : Go::UV::Handle);
+  native method async_send : void ($uv_handle : Go::UV::Handle);
   
   native method run : void ();
   

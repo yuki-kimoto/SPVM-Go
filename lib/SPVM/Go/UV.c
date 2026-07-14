@@ -21,7 +21,7 @@ typedef struct {
   SPVM_ENV* env;
   SPVM_VALUE* stack;
   SPVM_OBJ* obj_uv;
-  SPVM_OBJ* obj_uv_task;
+  SPVM_OBJ* obj_uv_handle;
   uv_handle_t* related_handle;
 } SPVM__Go__UV__HANDLE_DATA;
 
@@ -45,9 +45,9 @@ static void SPVM__Go__UV__enable_goroutine_cb(uv_handle_t* handle) {
   SPVM_ENV* env = handle_data->env;
   SPVM_VALUE* stack = handle_data->stack;
   SPVM_OBJ* obj_uv = handle_data->obj_uv;
-  SPVM_OBJ* obj_uv_task = handle_data->obj_uv_task;
+  SPVM_OBJ* obj_uv_handle = handle_data->obj_uv_handle;
   
-  SPVM_OBJ* obj_cb = env->get_field_object_by_name(env, stack, obj_uv_task, "cb", &error_id, __func__, FILE_NAME, __LINE__);
+  SPVM_OBJ* obj_cb = env->get_field_object_by_name(env, stack, obj_uv_handle, "cb", &error_id, __func__, FILE_NAME, __LINE__);
   assert(obj_cb);
   stack[0].oval = obj_cb;
   env->call_instance_method_by_name(env, stack, "", 1, &error_id, __func__, FILE_NAME, __LINE__);
@@ -61,7 +61,7 @@ static void SPVM__Go__UV__enable_goroutine_cb(uv_handle_t* handle) {
     int32_t handle_type = uv_handle_get_type((uv_handle_t*)handle);
     if (handle_type == UV_TIMER) {
       // IO timeout
-      env->set_field_int_by_name(env, stack, obj_uv_task, "io_timeout_occurred", 1, &error_id, __func__, FILE_NAME, __LINE__);
+      env->set_field_int_by_name(env, stack, obj_uv_handle, "io_timeout_occurred", 1, &error_id, __func__, FILE_NAME, __LINE__);
       if (!(error_id == 0)) {
         spvm_diag("[Unexcepted Error]Setting 'io_timeout_occurred' field failed.");
         abort();
@@ -84,7 +84,7 @@ static void SPVM__Go__UV__enable_goroutine_cb_for_timer(uv_timer_t* handle) {
 int32_t SPVM__Go__UV__timer(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t error_id = 0;
   SPVM_OBJ* obj_self = stack[0].oval;
-  SPVM_OBJ* obj_uv_task = stack[1].oval;
+  SPVM_OBJ* obj_uv_handle = stack[1].oval;
   
   uv_loop_t* uv_loop = uv_default_loop();
   uv_timer_t* timer_handle = env->new_memory_block(env, stack, sizeof(uv_timer_t));
@@ -94,11 +94,11 @@ int32_t SPVM__Go__UV__timer(SPVM_ENV* env, SPVM_VALUE* stack) {
   timer_handle_data->env = env;
   timer_handle_data->stack = stack;
   timer_handle_data->obj_uv = obj_self;
-  timer_handle_data->obj_uv_task = obj_uv_task;
+  timer_handle_data->obj_uv_handle = obj_uv_handle;
   
   timer_handle->data = timer_handle_data;
   
-  int64_t timeout_msec = env->get_field_long_by_name(env, stack, obj_uv_task, "timeout_msec", &error_id, __func__, FILE_NAME, __LINE__);
+  int64_t timeout_msec = env->get_field_long_by_name(env, stack, obj_uv_handle, "timeout_msec", &error_id, __func__, FILE_NAME, __LINE__);
   uv_timer_start(timer_handle, SPVM__Go__UV__enable_goroutine_cb_for_timer, timeout_msec, 0);
   
   return 0;
@@ -112,7 +112,7 @@ static void SPVM__Go__UV__idle_cb(uv_idle_t* handle) {
   SPVM_ENV* env = handle_data->env;
   SPVM_VALUE* stack = handle_data->stack;
   SPVM_OBJ* obj_uv = handle_data->obj_uv;
-  SPVM_OBJ* obj_uv_task = handle_data->obj_uv_task;
+  SPVM_OBJ* obj_uv_handle = handle_data->obj_uv_handle;
   
   SPVM_OBJ* obj_schedule = env->get_field_object_by_name(env, stack, obj_uv, "schedule", &error_id, __func__, FILE_NAME, __LINE__);
   if (!obj_schedule) {
@@ -144,7 +144,7 @@ static void SPVM__Go__UV__idle_cb(uv_idle_t* handle) {
 int32_t SPVM__Go__UV__idle(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   SPVM_OBJ* obj_self = stack[0].oval;
-  SPVM_OBJ* obj_uv_task = stack[1].oval;
+  SPVM_OBJ* obj_uv_handle = stack[1].oval;
   
   uv_loop_t* uv_loop = uv_default_loop();
   uv_idle_t* idle_handle = env->new_memory_block(env, stack, sizeof(uv_idle_t));
@@ -154,7 +154,7 @@ int32_t SPVM__Go__UV__idle(SPVM_ENV* env, SPVM_VALUE* stack) {
   handle_data->env = env;
   handle_data->stack = stack;
   handle_data->obj_uv = obj_self;
-  handle_data->obj_uv_task = obj_uv_task;
+  handle_data->obj_uv_handle = obj_uv_handle;
   
   idle_handle->data = handle_data;
   
@@ -167,15 +167,15 @@ int32_t SPVM__Go__UV__poll(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t error_id = 0;
   SPVM_OBJ* obj_self = stack[0].oval;
-  SPVM_OBJ* obj_uv_task = stack[1].oval;
+  SPVM_OBJ* obj_uv_handle = stack[1].oval;
   
   uv_loop_t* uv_loop = uv_default_loop();
   uv_poll_t* poll_handle = env->new_memory_block(env, stack, sizeof(uv_poll_t));
-  int32_t fd = env->get_field_int_by_name(env, stack, obj_uv_task, "fd", &error_id, __func__, FILE_NAME, __LINE__);
+  int32_t fd = env->get_field_int_by_name(env, stack, obj_uv_handle, "fd", &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) {
     return error_id;
   }
-  int32_t schedule_type = env->get_field_int_by_name(env, stack, obj_uv_task, "schedule_type", &error_id, __func__, FILE_NAME, __LINE__);
+  int32_t schedule_type = env->get_field_int_by_name(env, stack, obj_uv_handle, "schedule_type", &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) {
     return error_id;
   }
@@ -191,14 +191,14 @@ int32_t SPVM__Go__UV__poll(SPVM_ENV* env, SPVM_VALUE* stack) {
   poll_handle_data->env = env;
   poll_handle_data->stack = stack;
   poll_handle_data->obj_uv = obj_self;
-  poll_handle_data->obj_uv_task = obj_uv_task;
+  poll_handle_data->obj_uv_handle = obj_uv_handle;
   
   poll_handle->data = poll_handle_data;
   
   int32_t poll_events = (schedule_type == schedule_type_io_read) ? UV_READABLE : UV_WRITABLE;
   uv_poll_start(poll_handle, poll_events, SPVM__Go__UV__enable_goroutine_cb_for_poll);
   
-  int64_t timeout_msec = env->get_field_long_by_name(env, stack, obj_uv_task, "timeout_msec", &error_id, __func__, FILE_NAME, __LINE__);
+  int64_t timeout_msec = env->get_field_long_by_name(env, stack, obj_uv_handle, "timeout_msec", &error_id, __func__, FILE_NAME, __LINE__);
   if (timeout_msec > 0) {
     uv_timer_t* timer_handle = env->new_memory_block(env, stack, sizeof(uv_timer_t));
     uv_timer_init(uv_loop, timer_handle);
@@ -207,7 +207,7 @@ int32_t SPVM__Go__UV__poll(SPVM_ENV* env, SPVM_VALUE* stack) {
     timer_handle_data->env = env;
     timer_handle_data->stack = stack;
     timer_handle_data->obj_uv = obj_self;
-    timer_handle_data->obj_uv_task = obj_uv_task;
+    timer_handle_data->obj_uv_handle = obj_uv_handle;
     
     timer_handle->data = timer_handle_data;
     
@@ -230,7 +230,7 @@ int32_t SPVM__Go__UV__async(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t error_id = 0;
   
   SPVM_OBJ* obj_self = stack[0].oval;
-  SPVM_OBJ* obj_uv_task = stack[1].oval;
+  SPVM_OBJ* obj_uv_handle = stack[1].oval;
   
   uv_loop_t* uv_loop = uv_default_loop();
   uv_async_t* address = env->new_memory_block(env, stack, sizeof(uv_async_t));
@@ -240,14 +240,14 @@ int32_t SPVM__Go__UV__async(SPVM_ENV* env, SPVM_VALUE* stack) {
   handle_data->env = env;
   handle_data->stack = stack;
   handle_data->obj_uv = obj_self;
-  handle_data->obj_uv_task = obj_uv_task;
+  handle_data->obj_uv_handle = obj_uv_handle;
   
   address->data = handle_data;
   
   SPVM_OBJ* obj_address = env->new_pointer_object_by_name(env, stack, "Address", address, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
   
-  env->set_field_object_by_name(env, stack, obj_uv_task, "address", obj_address, &error_id, __func__, FILE_NAME, __LINE__);
+  env->set_field_object_by_name(env, stack, obj_uv_handle, "address", obj_address, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
   
   return 0;
@@ -257,16 +257,16 @@ int32_t SPVM__Go__UV__async_send(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t error_id = 0;
   
-  SPVM_OBJ* obj_uv_task = stack[1].oval;
+  SPVM_OBJ* obj_uv_handle = stack[1].oval;
   
-  SPVM_OBJ* obj_address = env->get_field_object_by_name(env, stack, obj_uv_task, "address", &error_id, __func__, FILE_NAME, __LINE__);
+  SPVM_OBJ* obj_address = env->get_field_object_by_name(env, stack, obj_uv_handle, "address", &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
   
   uv_async_t* address = (uv_async_t*)env->get_pointer(env, stack, obj_address);
   
   uv_async_send(address);
   
-  env->set_field_object_by_name(env, stack, obj_uv_task, "address", NULL, &error_id, __func__, FILE_NAME, __LINE__);
+  env->set_field_object_by_name(env, stack, obj_uv_handle, "address", NULL, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
   
   return 0;
