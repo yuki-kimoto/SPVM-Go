@@ -21,8 +21,6 @@ class Go::Goroutine : pointer {
   
   has disabled : byte;
   
-  has deadline : Go::Time;
-  
   has timeout_duration_nsec : long;
   
   has io_timeout_occurred : byte;

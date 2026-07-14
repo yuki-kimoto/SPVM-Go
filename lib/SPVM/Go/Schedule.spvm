@@ -162,7 +162,6 @@ class Go::Schedule {
       if ($timeout_duration_nsec > 0) {
         $deadline = Go::Time->now->add(Go::Duration_1l->new($timeout_duration_nsec));
       }
-      $goroutine->{deadline} = $deadline;
       $goroutine->{timeout_duration_nsec} = $timeout_duration_nsec;
       $self->{uv}->poll($goroutine);
       
@@ -175,7 +174,6 @@ class Go::Schedule {
       if ($timeout_duration_nsec > 0) {
         $deadline = Go::Time->now->add(Go::Duration_1l->new($timeout_duration_nsec));
       }
-      $goroutine->{deadline} = $deadline;
       $goroutine->{timeout_duration_nsec} = $timeout_duration_nsec;
       $self->{uv}->timer($goroutine);
       
@@ -200,7 +198,6 @@ class Go::Schedule {
   
   private method enable_goroutine : void ($goroutine : Go::Goroutine) {
     $goroutine->{fd} = -1;
-    $goroutine->{deadline} = undef;
     $goroutine->{disabled} = 0;
     $goroutine->{schedule_type} = Go::Schedule->TYPE_NONE;
     $self->{uv}{disabled_goroutines_h}->delete(Fn->to_address($goroutine));
