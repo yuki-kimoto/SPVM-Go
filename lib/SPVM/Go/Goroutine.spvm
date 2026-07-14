@@ -21,13 +21,13 @@ class Go::Goroutine : pointer {
   
   has disabled : byte;
   
-  has timeout_duration_nsec : long;
+  has schedule_type : int;
   
-  has io_timeout_occurred : byte;
+  has timeout_duration_nsec : long;
   
   has fd : int;
   
-  has schedule_type : int;
+  has io_timeout_occurred : byte;
   
   has uv_async_handle : Address;
   
