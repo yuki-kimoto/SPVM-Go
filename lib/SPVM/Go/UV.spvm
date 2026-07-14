@@ -7,6 +7,7 @@ class Go::UV {
   allow Go::Schedule;
   
   use Go::UV::Handle;
+  use Go::UV::Callback::LoopAlive;
   
   # Fields
   has schedule : Go::Schedule;

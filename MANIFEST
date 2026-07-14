@@ -190,8 +190,10 @@ lib/SPVM/Go/UV.native/src/win/winsock.c
 lib/SPVM/Go/UV.native/src/win/winsock.h
 lib/SPVM/Go/UV.pm
 lib/SPVM/Go/UV.spvm
-lib/SPVM/Go/UV/Task.pm
-lib/SPVM/Go/UV/Task.spvm
+lib/SPVM/Go/UV/Callback/LoopAlive.pm
+lib/SPVM/Go/UV/Callback/LoopAlive.spvm
+lib/SPVM/Go/UV/Handle.pm
+lib/SPVM/Go/UV/Handle.spvm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files

@@ -270,6 +270,10 @@ class Go::Schedule {
       $schedule->process_next_goroutine;
     });
     
+    $uv_handle->set_loop_alive_cb([$schedule : Go::Schedule = $self] method : int () {
+      return $schedule->loop_alive;
+    });
+    
     $self->{uv}->idle($uv_handle);
     
     $self->{uv}->run;

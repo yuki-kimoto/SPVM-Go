@@ -123,16 +123,12 @@ static void SPVM__Go__UV__idle_cb(uv_idle_t* handle) {
     abort();
   }
   
-  SPVM_OBJ* obj_schedule = env->get_field_object_by_name(env, stack, obj_uv, "schedule", &error_id, __func__, FILE_NAME, __LINE__);
-  if (!obj_schedule) {
-    spvm_diag("[Unexcepted Error]Can't get Go::Schedule object.");
-    abort();
-  }
-  
-  stack[0].oval = obj_schedule;
-  env->call_instance_method_by_name(env, stack, "loop_alive", 1, &error_id, __func__, FILE_NAME, __LINE__);
+  SPVM_OBJ* obj_loop_alive_cb = env->get_field_object_by_name(env, stack, obj_uv_handle, "loop_alive_cb", &error_id, __func__, FILE_NAME, __LINE__);
+  assert(obj_loop_alive_cb);
+  stack[0].oval = obj_loop_alive_cb;
+  env->call_instance_method_by_name(env, stack, "", 1, &error_id, __func__, FILE_NAME, __LINE__);
   if (!(error_id == 0)) {
-    spvm_diag("[Unexcepted Error]Go::UV#loop_alive method failed.");
+    spvm_diag("[Unexcepted Error]Callback 'loop_alive_cb' failed.");
     abort();
   }
   int32_t loop_alive = stack[0].ival;
