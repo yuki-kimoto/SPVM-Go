@@ -151,6 +151,9 @@ class Go::Schedule {
     $goroutine->{schedule_type} = (byte)$schedule_type;
     
     my $goroutine_address = Fn->to_address($goroutine);
+    my $enable_goroutine_cb = [$goroutine : Go::Goroutine, $schedule : Go::Schedule = $self] method : void () {
+      $schedule->enable_goroutine($goroutine);
+    };
     if ($schedule_type == &TYPE_IO_READ ||$schedule_type == &TYPE_IO_WRITE) {
       unless ($fd >= 0) {
         die "The file descriptor \$fd in schedule type TYPE_IO_READ or TYPE_IO_WRITE must be a non-negative value.";
@@ -163,6 +166,8 @@ class Go::Schedule {
         $deadline = Go::Time->now->add(Go::Duration_1l->new($timeout_duration_nsec));
       }
       $goroutine->{timeout_msec} = $timeout_duration_nsec / 1000000;
+      $goroutine->{cb} = $enable_goroutine_cb;
+      
       $self->{uv}->poll($goroutine);
       
       if (Go->ENV_DEBUG) {
@@ -176,10 +181,7 @@ class Go::Schedule {
       }
       $goroutine->{timeout_msec} = $timeout_duration_nsec / 1000000;
       
-      $goroutine->{cb} = [$goroutine : Go::Goroutine, $schedule : Go::Schedule = $self] method : void () {
-        $schedule->enable_goroutine($goroutine);
-      };
-      weaken $goroutine->{cb};
+      $goroutine->{cb} = $enable_goroutine_cb;
       
       $self->{uv}->timer($goroutine);
       
@@ -192,6 +194,8 @@ class Go::Schedule {
       }
     }
     if ($schedule_type == &TYPE_CHANNEL_READ ||$schedule_type == &TYPE_CHANNEL_WRITE) {
+      $goroutine->{cb} = $enable_goroutine_cb;
+      
       $self->{uv}->async($goroutine);
     }
     
@@ -206,6 +210,7 @@ class Go::Schedule {
     $goroutine->{fd} = -1;
     $goroutine->{disabled} = 0;
     $goroutine->{schedule_type} = Go::Schedule->TYPE_NONE;
+    $goroutine->{cb} = undef;
     $self->{uv}{disabled_goroutines_h}->delete(Fn->to_address($goroutine));
     $self->{goroutines}->push($goroutine);
   }

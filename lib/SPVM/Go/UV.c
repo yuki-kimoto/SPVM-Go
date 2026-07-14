@@ -54,12 +54,12 @@ static void SPVM__Go__UV__enable_goroutine_cb(uv_handle_t* handle) {
   }
   assert(obj_schedule);
   
-  stack[0].oval = obj_schedule;
-  stack[1].oval = obj_goroutine;
-  
-  env->call_instance_method_by_name(env, stack, "enable_goroutine", 2, &error_id, __func__, FILE_NAME, __LINE__);
+  SPVM_OBJ* obj_cb = env->get_field_object_by_name(env, stack, obj_goroutine, "cb", &error_id, __func__, FILE_NAME, __LINE__);
+  assert(obj_cb);
+  stack[0].oval = obj_cb;
+  env->call_instance_method_by_name(env, stack, "", 1, &error_id, __func__, FILE_NAME, __LINE__);
   if (!(error_id == 0)) {
-    spvm_diag("[Unexcepted Error]enable_goroutine method failed.");
+    spvm_diag("[Unexcepted Error]Callback 'cb' failed.");
     abort();
   }
   
