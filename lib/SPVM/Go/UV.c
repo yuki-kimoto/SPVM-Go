@@ -141,7 +141,7 @@ static void SPVM__Go__UV__idle_cb(uv_idle_t* handle) {
   }
 }
 
-int32_t SPVM__Go__UV__idle_start(SPVM_ENV* env, SPVM_VALUE* stack) {
+int32_t SPVM__Go__UV__idle(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   SPVM_OBJ* obj_self = stack[0].oval;
   SPVM_OBJ* obj_uv_task = stack[1].oval;

@@ -21,7 +21,7 @@ class Go::UV {
   
   native method timer : void ($uv_task : Go::UV::Task);
   
-  native method idle_start : void ($uv_task : Go::UV::Task);
+  native method idle : void ($uv_task : Go::UV::Task);
   
   native method poll : void ($uv_task : Go::UV::Task);
   

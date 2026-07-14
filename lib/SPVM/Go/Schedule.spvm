@@ -266,7 +266,7 @@ class Go::Schedule {
     
     my $uv_task = Go::UV::Task->new;
     
-    $self->{uv}->idle_start($uv_task);
+    $self->{uv}->idle($uv_task);
     
     $self->{uv}->run;
   }
