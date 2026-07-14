@@ -3,8 +3,46 @@
 
 class Go::UV::Event {
   
+  # Enumerations
+  enum {
+    UV_UNKNOWN_HANDLE,
+    UV_ASYNC,
+    UV_CHECK,
+    UV_FS_EVENT,
+    UV_FS_POLL,
+    UV_HANDLE,
+    UV_IDLE,
+    UV_NAMED_PIPE,
+    UV_POLL,
+    UV_PREPARE,
+    UV_PROCESS,
+    UV_STREAM,
+    UV_TCP,
+    UV_TIMER,
+    UV_TTY,
+    UV_UDP,
+    UV_SIGNAL,
+    UV_FILE,
+    UV_HANDLE_TYPE_MAX
+  };
   
-  static method my_method : void () {
+  # Fields
+  has handle_type : int;
+  
+  has timeout_msec : long;
+  
+  has fd : int;
+  
+  has io_timeout_occurred : byte;
+  
+  has uv_async_handle : Address;
+  
+  # Class Methods
+  static method new : void () {
     
+    my $self = new Go::UV::Event;
+    
+    return $self;
   }
+  
 }

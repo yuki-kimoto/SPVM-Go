@@ -23,7 +23,7 @@ class Go::Goroutine : pointer {
   
   has schedule_type : int;
   
-  has timeout_duration_nsec : long;
+  has timeout_msec : long;
   
   has fd : int;
   

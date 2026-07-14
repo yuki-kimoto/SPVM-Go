@@ -105,8 +105,7 @@ int32_t SPVM__Go__UV__timer(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   timer_handle->data = timer_handle_data;
   
-  int64_t timeout_nsec = env->get_field_long_by_name(env, stack, obj_goroutine, "timeout_duration_nsec", &error_id, __func__, FILE_NAME, __LINE__);
-  int64_t timeout_msec = timeout_nsec / 1000000;
+  int64_t timeout_msec = env->get_field_long_by_name(env, stack, obj_goroutine, "timeout_msec", &error_id, __func__, FILE_NAME, __LINE__);
   uv_timer_start(timer_handle, SPVM__Go__UV__enable_goroutine_cb_for_timer, timeout_msec, 0);
   
   return 0;
@@ -203,8 +202,8 @@ int32_t SPVM__Go__UV__poll(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t poll_events = (schedule_type == schedule_type_io_read) ? UV_READABLE : UV_WRITABLE;
   uv_poll_start(poll_handle, poll_events, SPVM__Go__UV__enable_goroutine_cb_for_poll);
   
-  int64_t timeout_nsec = env->get_field_long_by_name(env, stack, obj_goroutine, "timeout_duration_nsec", &error_id, __func__, FILE_NAME, __LINE__);
-  if (timeout_nsec > 0) {
+  int64_t timeout_msec = env->get_field_long_by_name(env, stack, obj_goroutine, "timeout_msec", &error_id, __func__, FILE_NAME, __LINE__);
+  if (timeout_msec > 0) {
     uv_timer_t* timer_handle = env->new_memory_block(env, stack, sizeof(uv_timer_t));
     uv_timer_init(uv_loop, timer_handle);
     
@@ -219,7 +218,6 @@ int32_t SPVM__Go__UV__poll(SPVM_ENV* env, SPVM_VALUE* stack) {
     poll_handle_data->related_handle = (uv_handle_t*)timer_handle;
     timer_handle_data->related_handle = (uv_handle_t*)poll_handle;
     
-    int64_t timeout_msec = timeout_nsec / 1000000;
     uv_timer_start(timer_handle, SPVM__Go__UV__enable_goroutine_cb_for_timer, timeout_msec, 0);
   }
   
