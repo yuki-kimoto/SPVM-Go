@@ -47,13 +47,6 @@ static void SPVM__Go__UV__enable_goroutine_cb(uv_handle_t* handle) {
   SPVM_OBJ* obj_uv = handle_data->obj_uv;
   SPVM_OBJ* obj_goroutine = handle_data->obj_goroutine;
   
-  SPVM_OBJ* obj_schedule = env->get_field_object_by_name(env, stack, obj_uv, "schedule", &error_id, __func__, FILE_NAME, __LINE__);
-  if (!obj_schedule) {
-    spvm_diag("[Unexcepted Error]Can't get Go::Schedule object.");
-    abort();
-  }
-  assert(obj_schedule);
-  
   SPVM_OBJ* obj_cb = env->get_field_object_by_name(env, stack, obj_goroutine, "cb", &error_id, __func__, FILE_NAME, __LINE__);
   assert(obj_cb);
   stack[0].oval = obj_cb;
