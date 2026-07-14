@@ -1,7 +1,7 @@
 # Copyright (c) 2023 Yuki Kimoto
 # MIT License
 
-class Go::Goroutine : pointer {
+class Go::Goroutine extends Go::UV::Task: pointer {
   version_from Go;
   allow Go::Schedule;
   allow Go::Channel;
@@ -20,18 +20,6 @@ class Go::Goroutine : pointer {
   has finished : byte;
   
   has disabled : byte;
-  
-  has schedule_type : int;
-  
-  has timeout_msec : long;
-  
-  has fd : int;
-  
-  has io_timeout_occurred : byte;
-  
-  has async_handle : Address;
-  
-  has cb : Callback;
   
   # Class Methods
   static method new : Go::Goroutine ($task :  Callback = undef, $return_back : Go::Goroutine = undef) {

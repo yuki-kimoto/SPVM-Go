@@ -26,14 +26,16 @@ class Go::UV::Task {
     UV_SIGNAL,
     UV_FILE,
     UV_HANDLE_TYPE_MAX
-  };
+  }
   
   enum {
     UV_READABLE = 1,
     UV_WRITABLE = 2,
-  };
+  }
   
   # Fields
+  has schedule_type : int;
+  
   has handle_type : int;
   
   has event_type : int;
@@ -49,9 +51,9 @@ class Go::UV::Task {
   has cb : Callback;
   
   # Class Methods
-  static method new : void () {
+  static method new : Go::UV::Task () {
     
-    my $self = new Go::UV::Event;
+    my $self = new Go::UV::Task;
     
     return $self;
   }
