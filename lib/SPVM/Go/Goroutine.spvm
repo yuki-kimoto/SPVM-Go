@@ -43,4 +43,5 @@ class Go::Goroutine extends Go::UV::Handle: pointer {
   native private method init_goroutine : void ();
   
   native method DESTROY : void ();
+  
 }

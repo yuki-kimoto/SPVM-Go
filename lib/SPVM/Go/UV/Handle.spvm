@@ -34,8 +34,6 @@ class Go::UV::Handle {
   }
   
   # Fields
-  has schedule_type : int;
-  
   has handle_type : int;
   
   has event_type : int;

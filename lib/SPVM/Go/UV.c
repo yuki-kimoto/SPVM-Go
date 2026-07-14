@@ -173,15 +173,10 @@ int32_t SPVM__Go__UV__poll(SPVM_ENV* env, SPVM_VALUE* stack) {
   if (error_id) {
     return error_id;
   }
-  int32_t schedule_type = env->get_field_int_by_name(env, stack, obj_uv_handle, "schedule_type", &error_id, __func__, FILE_NAME, __LINE__);
+  int32_t event_type = env->get_field_int_by_name(env, stack, obj_uv_handle, "event_type", &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) {
     return error_id;
   }
-  env->call_class_method_by_name(env, stack, "Go::Schedule", "TYPE_IO_READ", 0, &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) {
-    return error_id;
-  }
-  int32_t schedule_type_io_read = stack[0].ival;
   
   uv_poll_init(uv_loop, poll_handle, fd);
   
@@ -193,8 +188,7 @@ int32_t SPVM__Go__UV__poll(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   poll_handle->data = poll_handle_data;
   
-  int32_t poll_events = (schedule_type == schedule_type_io_read) ? UV_READABLE : UV_WRITABLE;
-  uv_poll_start(poll_handle, poll_events, SPVM__Go__UV__enable_goroutine_cb_for_poll);
+  uv_poll_start(poll_handle, event_type, SPVM__Go__UV__enable_goroutine_cb_for_poll);
   
   int64_t timeout_msec = env->get_field_long_by_name(env, stack, obj_uv_handle, "timeout_msec", &error_id, __func__, FILE_NAME, __LINE__);
   if (timeout_msec > 0) {
