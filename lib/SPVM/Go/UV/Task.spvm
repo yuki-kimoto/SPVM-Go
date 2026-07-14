@@ -28,8 +28,15 @@ class Go::UV::Task {
     UV_HANDLE_TYPE_MAX
   };
   
+  enum {
+    UV_READABLE = 1,
+    UV_WRITABLE = 2,
+  };
+  
   # Fields
   has handle_type : int;
+  
+  has event_type : int;
   
   has timeout_msec : long;
   
