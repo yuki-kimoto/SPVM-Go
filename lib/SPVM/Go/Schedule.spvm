@@ -114,8 +114,8 @@ class Go::Schedule {
       
       Go::Goroutine->transfer($current_goroutine, $return_back_goroutine);
       
-      if ($current_goroutine->{io_wait_over_deadline}) {
-        $current_goroutine->{io_wait_over_deadline} = 0;
+      if ($current_goroutine->{io_timeout_occurred}) {
+        $current_goroutine->{io_timeout_occurred} = 0;
         die Go::Error::IOTimeout "IO timeout occur";
       }
     }

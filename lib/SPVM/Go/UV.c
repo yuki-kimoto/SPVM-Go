@@ -68,9 +68,9 @@ static void SPVM__Go__UV__enable_goroutine_cb(uv_handle_t* handle) {
     int32_t handle_type = uv_handle_get_type((uv_handle_t*)handle);
     if (handle_type == UV_TIMER) {
       // IO timeout
-      env->set_field_int_by_name(env, stack, obj_goroutine, "io_wait_over_deadline", 1, &error_id, __func__, FILE_NAME, __LINE__);
+      env->set_field_int_by_name(env, stack, obj_goroutine, "io_timeout_occurred", 1, &error_id, __func__, FILE_NAME, __LINE__);
       if (!(error_id == 0)) {
-        spvm_diag("[Unexcepted Error]Setting 'io_wait_over_deadline' field failed.");
+        spvm_diag("[Unexcepted Error]Setting 'io_timeout_occurred' field failed.");
         abort();
       }
     }
