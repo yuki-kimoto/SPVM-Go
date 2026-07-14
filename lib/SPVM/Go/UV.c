@@ -112,6 +112,7 @@ static void SPVM__Go__UV__idle_cb(uv_idle_t* handle) {
   SPVM_ENV* env = handle_data->env;
   SPVM_VALUE* stack = handle_data->stack;
   SPVM_OBJ* obj_uv = handle_data->obj_uv;
+  SPVM_OBJ* obj_uv_task = handle_data->obj_uv_task;
   
   SPVM_OBJ* obj_schedule = env->get_field_object_by_name(env, stack, obj_uv, "schedule", &error_id, __func__, FILE_NAME, __LINE__);
   if (!obj_schedule) {
@@ -143,6 +144,7 @@ static void SPVM__Go__UV__idle_cb(uv_idle_t* handle) {
 int32_t SPVM__Go__UV__idle_start(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   SPVM_OBJ* obj_self = stack[0].oval;
+  SPVM_OBJ* obj_uv_task = stack[1].oval;
   
   uv_loop_t* uv_loop = uv_default_loop();
   uv_idle_t* idle_handle = env->new_memory_block(env, stack, sizeof(uv_idle_t));
@@ -152,6 +154,7 @@ int32_t SPVM__Go__UV__idle_start(SPVM_ENV* env, SPVM_VALUE* stack) {
   handle_data->env = env;
   handle_data->stack = stack;
   handle_data->obj_uv = obj_self;
+  handle_data->obj_uv_task = obj_uv_task;
   
   idle_handle->data = handle_data;
   
