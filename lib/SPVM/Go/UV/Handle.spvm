@@ -46,7 +46,7 @@ class Go::UV::Handle {
   
   has io_timeout_occurred : byte;
   
-  has async_handle : Address;
+  has address : Address;
   
   has cb : Callback;
   
