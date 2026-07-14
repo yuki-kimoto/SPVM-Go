@@ -1,7 +1,7 @@
 # Copyright (c) 2026 Yuki Kimoto
 # MIT License
 
-class Go::UV::Event {
+class Go::UV::Task {
   
   use Callback;
   
