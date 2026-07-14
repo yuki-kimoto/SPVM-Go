@@ -19,6 +19,8 @@ class Go::Goroutine : pointer {
   
   has finished : byte;
   
+  has disabled : byte;
+  
   has deadline : Go::Time;
   
   has timeout_duration_nsec : long;
@@ -30,8 +32,6 @@ class Go::Goroutine : pointer {
   has schedule_type : int;
   
   has poll_index : int;
-  
-  has disabled : byte;
   
   has uv_async_handle : Address;
   
