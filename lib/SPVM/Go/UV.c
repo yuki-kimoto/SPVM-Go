@@ -126,7 +126,7 @@ static void SPVM__Go__UV__idle_cb(uv_idle_t* handle) {
     abort();
   }
   
-  stack[0].oval = obj_uv;
+  stack[0].oval = obj_schedule;
   env->call_instance_method_by_name(env, stack, "loop_alive", 1, &error_id, __func__, FILE_NAME, __LINE__);
   if (!(error_id == 0)) {
     spvm_diag("[Unexcepted Error]Go::UV#loop_alive method failed.");

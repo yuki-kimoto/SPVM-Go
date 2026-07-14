@@ -269,4 +269,14 @@ class Go::Schedule {
     $self->{uv}->run;
   }
   
+  private method loop_alive : int () {
+    my $goroutines = $self->{goroutines};
+    
+    my $all_goroutines_length
+      = $goroutines->length
+      + $self->{disabled_goroutines_h}->keys_length;
+      
+    return $all_goroutines_length ? 1 : 0;
+  }
+
 }

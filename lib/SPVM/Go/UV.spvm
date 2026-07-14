@@ -5,12 +5,7 @@ class Go::UV {
   version_from Go;
   
   allow Go::Schedule;
-  allow Go::Channel;
   
-  use Sys::Poll::PollfdArray;
-  use Sys::Poll::Constant as POLL;
-  use Sys::Poll;
-  use Callback;
   use Go::UV::Task;
   
   # Fields
@@ -24,25 +19,16 @@ class Go::UV {
     return $self;
   }
   
-  private method loop_alive : int () {
-    my $uv_tasks = $self->{schedule}{goroutines};
-    
-    my $all_goroutines_length
-      = $uv_tasks->length
-      + $self->{schedule}{disabled_goroutines_h}->keys_length;
-      
-    return $all_goroutines_length ? 1 : 0;
-  }
+  native method timer : void ($uv_task : Go::UV::Task);
   
-  private native method timer : void ($uv_task : Go::UV::Task);
+  native method idle_start : void ();
   
-  private native method idle_start : void ();
+  native method poll : void ($uv_task : Go::UV::Task);
   
-  private native method poll : void ($uv_task : Go::UV::Task);
+  native method async : void ($uv_task : Go::UV::Task);
   
-  private native method async : void ($uv_task : Go::UV::Task);
+  native method async_send : void ($uv_task : Go::UV::Task);
   
-  private native method async_send : void ($uv_task : Go::UV::Task);
+  native method run : void ();
   
-  private native method run : void ();
 }
