@@ -32,6 +32,8 @@ class Go::Schedule {
   
   has current_goroutine : Go::Goroutine;
   
+  has disabled_goroutines_h : Hash of Go::Goroutine;
+  
   has return_back_goroutine : Go::Goroutine;
   
   has thread_id : Thread::ID;
@@ -55,6 +57,8 @@ class Go::Schedule {
     
     $uv->{schedule} = $self;
     weaken $uv->{schedule};
+    
+    $self->{disabled_goroutines_h} = Hash->new;
     
     return $self;
   }
@@ -199,10 +203,10 @@ class Go::Schedule {
       $self->{uv}->async($goroutine);
     }
     
-    if ($self->{uv}{disabled_goroutines_h}->{$goroutine_address}) {
+    if ($self->{disabled_goroutines_h}->{$goroutine_address}) {
       die "[Unexpected Error]Disabled goroutine already exists.";
     }
-    $self->{uv}{disabled_goroutines_h}->{$goroutine_address} = $goroutine;
+    $self->{disabled_goroutines_h}->{$goroutine_address} = $goroutine;
     $goroutine->{disabled} = 1;
   }
   
@@ -211,7 +215,7 @@ class Go::Schedule {
     $goroutine->{disabled} = 0;
     $goroutine->{schedule_type} = Go::Schedule->TYPE_NONE;
     $goroutine->{cb} = undef;
-    $self->{uv}{disabled_goroutines_h}->delete(Fn->to_address($goroutine));
+    $self->{disabled_goroutines_h}->delete(Fn->to_address($goroutine));
     $self->{goroutines}->push($goroutine);
   }
   

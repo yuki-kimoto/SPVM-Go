@@ -15,14 +15,10 @@ class Go::UV {
   # Fields
   has schedule : Go::Schedule;
   
-  has disabled_goroutines_h : Hash of Go::Goroutine;
-  
   # Class Methods
   static method new : Go::UV () {
     
     my $self = new Go::UV;
-    
-    $self->{disabled_goroutines_h} = Hash->new;
     
     return $self;
   }
@@ -32,7 +28,7 @@ class Go::UV {
     
     my $all_goroutines_length
       = $goroutines->length
-      + $self->{disabled_goroutines_h}->keys_length;
+      + $self->{schedule}{disabled_goroutines_h}->keys_length;
       
     return $all_goroutines_length ? 1 : 0;
   }
