@@ -35,7 +35,7 @@ class Go::UV::Event {
   
   has io_timeout_occurred : byte;
   
-  has uv_async_handle : Address;
+  has async_handle : Address;
   
   # Class Methods
   static method new : void () {

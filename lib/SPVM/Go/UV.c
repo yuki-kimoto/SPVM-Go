@@ -251,7 +251,7 @@ int32_t SPVM__Go__UV__async(SPVM_ENV* env, SPVM_VALUE* stack) {
   SPVM_OBJ* obj_async_handle = env->new_pointer_object_by_name(env, stack, "Address", async_handle, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
   
-  env->set_field_object_by_name(env, stack, obj_goroutine, "uv_async_handle", obj_async_handle, &error_id, __func__, FILE_NAME, __LINE__);
+  env->set_field_object_by_name(env, stack, obj_goroutine, "async_handle", obj_async_handle, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
   
   return 0;
@@ -263,14 +263,14 @@ int32_t SPVM__Go__UV__async_send(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   SPVM_OBJ* obj_goroutine = stack[1].oval;
   
-  SPVM_OBJ* obj_async_handle = env->get_field_object_by_name(env, stack, obj_goroutine, "uv_async_handle", &error_id, __func__, FILE_NAME, __LINE__);
+  SPVM_OBJ* obj_async_handle = env->get_field_object_by_name(env, stack, obj_goroutine, "async_handle", &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
   
   uv_async_t* async_handle = (uv_async_t*)env->get_pointer(env, stack, obj_async_handle);
   
   uv_async_send(async_handle);
   
-  env->set_field_object_by_name(env, stack, obj_goroutine, "uv_async_handle", NULL, &error_id, __func__, FILE_NAME, __LINE__);
+  env->set_field_object_by_name(env, stack, obj_goroutine, "async_handle", NULL, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
   
   return 0;
