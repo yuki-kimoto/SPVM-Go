@@ -1,7 +1,7 @@
 # Copyright (c) 2023 Yuki Kimoto
 # MIT License
 
-class Go::Goroutine extends Go::UV::Task: pointer {
+class Go::Goroutine extends Go::UV::Handle: pointer {
   version_from Go;
   allow Go::Schedule;
   allow Go::Channel;

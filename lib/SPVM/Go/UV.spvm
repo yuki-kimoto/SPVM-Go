@@ -6,7 +6,7 @@ class Go::UV {
   
   allow Go::Schedule;
   
-  use Go::UV::Task;
+  use Go::UV::Handle;
   
   # Fields
   has schedule : Go::Schedule;
@@ -19,15 +19,15 @@ class Go::UV {
     return $self;
   }
   
-  native method timer : void ($uv_task : Go::UV::Task);
+  native method timer : void ($uv_task : Go::UV::Handle);
   
-  native method idle : void ($uv_task : Go::UV::Task);
+  native method idle : void ($uv_task : Go::UV::Handle);
   
-  native method poll : void ($uv_task : Go::UV::Task);
+  native method poll : void ($uv_task : Go::UV::Handle);
   
-  native method async : void ($uv_task : Go::UV::Task);
+  native method async : void ($uv_task : Go::UV::Handle);
   
-  native method async_send : void ($uv_task : Go::UV::Task);
+  native method async_send : void ($uv_task : Go::UV::Handle);
   
   native method run : void ();
   

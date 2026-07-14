@@ -264,7 +264,7 @@ class Go::Schedule {
     
     $self->{return_back_goroutine} = $return_back_goroutine;
     
-    my $uv_task = Go::UV::Task->new;
+    my $uv_task = Go::UV::Handle->new;
     
     $self->{uv}->idle($uv_task);
     
