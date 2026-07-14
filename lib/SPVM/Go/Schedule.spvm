@@ -266,6 +266,10 @@ class Go::Schedule {
     
     my $uv_handle = Go::UV::Handle->new;
     
+    $uv_handle->set_cb([$schedule : Go::Schedule = $self] method : void () {
+      $schedule->process_next_goroutine;
+    });
+    
     $self->{uv}->idle($uv_handle);
     
     $self->{uv}->run;

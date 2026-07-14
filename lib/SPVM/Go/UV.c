@@ -114,16 +114,18 @@ static void SPVM__Go__UV__idle_cb(uv_idle_t* handle) {
   SPVM_OBJ* obj_uv = handle_data->obj_uv;
   SPVM_OBJ* obj_uv_handle = handle_data->obj_uv_handle;
   
-  SPVM_OBJ* obj_schedule = env->get_field_object_by_name(env, stack, obj_uv, "schedule", &error_id, __func__, FILE_NAME, __LINE__);
-  if (!obj_schedule) {
-    spvm_diag("[Unexcepted Error]Can't get Go::Schedule object.");
+  SPVM_OBJ* obj_cb = env->get_field_object_by_name(env, stack, obj_uv_handle, "cb", &error_id, __func__, FILE_NAME, __LINE__);
+  assert(obj_cb);
+  stack[0].oval = obj_cb;
+  env->call_instance_method_by_name(env, stack, "", 1, &error_id, __func__, FILE_NAME, __LINE__);
+  if (!(error_id == 0)) {
+    spvm_diag("[Unexcepted Error]Callback 'cb' failed.");
     abort();
   }
   
-  stack[0].oval = obj_schedule;
-  env->call_instance_method_by_name(env, stack, "process_next_goroutine", 1, &error_id, __func__, FILE_NAME, __LINE__);
-  if (!(error_id == 0)) {
-    spvm_diag("[Unexcepted Error]Go::UV#process_next_goroutine method failed.");
+  SPVM_OBJ* obj_schedule = env->get_field_object_by_name(env, stack, obj_uv, "schedule", &error_id, __func__, FILE_NAME, __LINE__);
+  if (!obj_schedule) {
+    spvm_diag("[Unexcepted Error]Can't get Go::Schedule object.");
     abort();
   }
   
