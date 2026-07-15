@@ -1,0 +1,193 @@
+package SPVM::Go::UV::ConfigBuilder;
+
+use strict;
+use warnings;
+
+sub new {
+  my $class = shift;
+  
+  my $self = {
+    @_
+  };
+  
+  return bless $self, ref $class || $class;
+}
+
+sub create_config {
+  
+  my ($self) = @_;
+  
+  my $config = SPVM::Builder::Config->new_c99;
+
+  my @libuv_source_files;
+  my @libuv_defines;
+  my @libuv_libs;
+
+  my @libuv_common_source_files = qw(
+    fs-poll.c
+    idna.c
+    inet.c
+    random.c
+    strscpy.c
+    strtok.c
+    thread-common.c
+    threadpool.c
+    timer.c
+    uv-common.c
+    uv-data-getter-setters.c
+    version.c
+  );
+  push @libuv_source_files, @libuv_common_source_files;
+
+  if ($^O eq 'MSWin32') {
+    push @libuv_defines, qw(WIN32_LEAN_AND_MEAN _WIN32_WINNT=0x0A00 _CRT_DECLARE_NONSTDC_NAMES=0);
+    my @libuv_windows_source_files = qw(
+      win/async.c
+      win/core.c
+      win/detect-wakeup.c
+      win/dl.c
+      win/error.c
+      win/fs.c
+      win/fs-event.c
+      win/getaddrinfo.c
+      win/getnameinfo.c
+      win/handle.c
+      win/loop-watcher.c
+      win/pipe.c
+      win/thread.c
+      win/poll.c
+      win/process.c
+      win/process-stdio.c
+      win/signal.c
+      win/snprintf.c
+      win/stream.c
+      win/tcp.c
+      win/tty.c
+      win/udp.c
+      win/util.c
+      win/winapi.c
+      win/winsock.c
+    );
+    push @libuv_source_files, @libuv_windows_source_files;
+    push @libuv_libs, qw(
+      psapi
+      user32
+      advapi32
+      iphlpapi
+      userenv
+      ws2_32
+      dbghelp
+      ole32
+      shell32
+    )
+  }
+  else {
+    push @libuv_defines, qw(_FILE_OFFSET_BITS=64 _LARGEFILE_SOURCE);
+    my @libuv_unix_source_files = qw(
+      unix/async.c
+      unix/core.c
+      unix/dl.c
+      unix/fs.c
+      unix/getaddrinfo.c
+      unix/getnameinfo.c
+      unix/loop-watcher.c
+      unix/loop.c
+      unix/pipe.c
+      unix/poll.c
+      unix/process.c
+      unix/random-devurandom.c
+      unix/signal.c
+      unix/stream.c
+      unix/tcp.c
+      unix/thread.c
+      unix/tty.c
+      unix/udp.c
+    );
+    push @libuv_source_files, @libuv_unix_source_files;
+    
+    if ($^O eq 'linux') {
+      push @libuv_defines, qw(_GNU_SOURCE _POSIX_C_SOURCE=200112);
+      my @libuv_linux_source_files = qw(
+        unix/linux.c
+        unix/procfs-exepath.c
+        unix/random-getrandom.c
+        unix/random-sysctl-linux.c
+        unix/proctitle.c
+      );
+      push @libuv_source_files, @libuv_linux_source_files;
+      push @libuv_libs, qw(
+        dl
+        rt
+      )
+    }
+    elsif ($^O eq 'darwin') {
+      push @libuv_defines, qw(_DARWIN_UNLIMITED_SELECT=1 _DARWIN_USE_64_BIT_INODE=1);
+      my @libuv_mac_source_files = qw(
+        unix/proctitle.c
+        unix/darwin.c
+        unix/darwin-proctitle.c
+        unix/fsevents.c
+        unix/bsd-ifaddrs.c
+        unix/kqueue.c
+        unix/random-getentropy.c
+      );
+      push @libuv_source_files, @libuv_mac_source_files;
+    }
+  }
+  
+  $config->add_define(@libuv_defines);
+  $config->add_source_file(@libuv_source_files);
+  $config->add_lib(@libuv_libs);
+  
+  $config;
+}
+
+1;
+
+=head1 Name
+
+SPVM::Go::UV::ConfigBuilder - Config Builder for Go::UV.
+
+=head1 Description
+
+SPVM::Go::UV::ConfigBuilder class is a config builder for L<Go::UV|SPVM::Go::UV>.
+
+This class is a Perl module.
+
+=head1 Usage
+
+  my $ssl_config_builder = SPVM::Go::UV::ConfigBuilder->new;
+  
+  $ssl_config_builder->build_config($config);
+
+=head1 Class Methods
+
+=head2 new
+
+  my $ssl_config_builder = SPVM::Go::UV::ConfigBuilder->new;
+
+Create a new L<SPVM::Go::UV::ConfigBuilder> object and returns it.
+
+=head1 Instance Methods
+
+=head2 build_config
+
+  $ssl_config_builder->build_config($config);
+
+Builds the config $config to bind L<Go::UV|SPVM::Go::UV>.
+
+$config is a L<SPVM::Builder::Config> object.
+
+=head1 See Also
+
+=over 2
+
+=item * L<SPVM::Go::UV>
+
+=back
+
+=head1 Copyright & License
+
+Copyright (c) 2023 Yuki Kimoto
+
+MIT License

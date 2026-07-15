@@ -193,7 +193,9 @@ lib/SPVM/Go/UV.pm
 lib/SPVM/Go/UV.spvm
 lib/SPVM/Go/UV/Callback/LoopAlive.pm
 lib/SPVM/Go/UV/Callback/LoopAlive.spvm
+lib/SPVM/Go/UV/ConfigBuilder.pm
 lib/SPVM/Go/UV/Constant.c
+lib/SPVM/Go/UV/Constant.config
 lib/SPVM/Go/UV/Constant.pm
 lib/SPVM/Go/UV/Constant.spvm
 lib/SPVM/Go/UV/Handle.pm
