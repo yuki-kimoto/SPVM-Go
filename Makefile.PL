@@ -132,7 +132,8 @@ package MY {
       
       $options->{native_classes} = [
         'Go::Goroutine',
-        'Go::UV'
+        'Go::UV',
+        'Go::UV::Constant',
       ];
       
       $options->{precompile_classes} = [

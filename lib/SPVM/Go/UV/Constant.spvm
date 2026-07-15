@@ -1,0 +1,222 @@
+class Go::UV::Constant {
+  native static method UV_VERSION_MAJOR : int ();
+
+  native static method UV_VERSION_MINOR : int ();
+
+  native static method UV_VERSION_PATCH : int ();
+
+  native static method UV_VERSION_IS_RELEASE : int ();
+
+  native static method UV_VERSION_HEX : int ();
+
+  native static method UV_VERSION_SUFFIX : string ();
+
+  native static method UV_E2BIG : int ();
+
+  native static method UV_EACCES : int ();
+
+  native static method UV_EADDRINUSE : int ();
+
+  native static method UV_EADDRNOTAVAIL : int ();
+
+  native static method UV_EAFNOSUPPORT : int ();
+
+  native static method UV_EAGAIN : int ();
+
+  native static method UV_EAI_ADDRFAMILY : int ();
+
+  native static method UV_EAI_AGAIN : int ();
+
+  native static method UV_EAI_BADFLAGS : int ();
+
+  native static method UV_EAI_BADHINTS : int ();
+
+  native static method UV_EAI_CANCELED : int ();
+
+  native static method UV_EAI_FAIL : int ();
+
+  native static method UV_EAI_FAMILY : int ();
+
+  native static method UV_EAI_MEMORY : int ();
+
+  native static method UV_EAI_NODATA : int ();
+
+  native static method UV_EAI_NONAME : int ();
+
+  native static method UV_EAI_OVERFLOW : int ();
+
+  native static method UV_EAI_PROTOCOL : int ();
+
+  native static method UV_EAI_SERVICE : int ();
+
+  native static method UV_EAI_SOCKTYPE : int ();
+
+  native static method UV_EALREADY : int ();
+
+  native static method UV_EBADF : int ();
+
+  native static method UV_EBUSY : int ();
+
+  native static method UV_ECANCELED : int ();
+
+  native static method UV_ECHARSET : int ();
+
+  native static method UV_ECONNABORTED : int ();
+
+  native static method UV_ECONNREFUSED : int ();
+
+  native static method UV_ECONNRESET : int ();
+
+  native static method UV_EDESTADDRREQ : int ();
+
+  native static method UV_EEXIST : int ();
+
+  native static method UV_EFAULT : int ();
+
+  native static method UV_EFBIG : int ();
+
+  native static method UV_EHOSTUNREACH : int ();
+
+  native static method UV_EINTR : int ();
+
+  native static method UV_EINVAL : int ();
+
+  native static method UV_EIO : int ();
+
+  native static method UV_EISCONN : int ();
+
+  native static method UV_EISDIR : int ();
+
+  native static method UV_ELOOP : int ();
+
+  native static method UV_EMFILE : int ();
+
+  native static method UV_EMSGSIZE : int ();
+
+  native static method UV_ENAMETOOLONG : int ();
+
+  native static method UV_ENETDOWN : int ();
+
+  native static method UV_ENETUNREACH : int ();
+
+  native static method UV_ENFILE : int ();
+
+  native static method UV_ENOBUFS : int ();
+
+  native static method UV_ENODEV : int ();
+
+  native static method UV_ENOENT : int ();
+
+  native static method UV_ENOMEM : int ();
+
+  native static method UV_ENONET : int ();
+
+  native static method UV_ENOPROTOOPT : int ();
+
+  native static method UV_ENOSPC : int ();
+
+  native static method UV_ENOSYS : int ();
+
+  native static method UV_ENOTCONN : int ();
+
+  native static method UV_ENOTDIR : int ();
+
+  native static method UV_ENOTEMPTY : int ();
+
+  native static method UV_ENOTSOCK : int ();
+
+  native static method UV_ENOTSUP : int ();
+
+  native static method UV_EPERM : int ();
+
+  native static method UV_EPIPE : int ();
+
+  native static method UV_EPROTO : int ();
+
+  native static method UV_EPROTONOSUPPORT : int ();
+
+  native static method UV_EPROTOTYPE : int ();
+
+  native static method UV_ERANGE : int ();
+
+  native static method UV_EROFS : int ();
+
+  native static method UV_ESHUTDOWN : int ();
+
+  native static method UV_ESPIPE : int ();
+
+  native static method UV_ESRCH : int ();
+
+  native static method UV_ETIMEDOUT : int ();
+
+  native static method UV_ETXTBSY : int ();
+
+  native static method UV_EXDEV : int ();
+
+  native static method UV_UNKNOWN : int ();
+
+  native static method UV_EOF : int ();
+
+  native static method UV_ENXIO : int ();
+
+  native static method UV_EMLINK : int ();
+
+  native static method UV_ASYNC : int ();
+
+  native static method UV_CHECK : int ();
+
+  native static method UV_FS_EVENT : int ();
+
+  native static method UV_FS_POLL : int ();
+
+  native static method UV_IDLE : int ();
+
+  native static method UV_NAMED_PIPE : int ();
+
+  native static method UV_POLL : int ();
+
+  native static method UV_PREPARE : int ();
+
+  native static method UV_PROCESS : int ();
+
+  native static method UV_STREAM : int ();
+
+  native static method UV_TCP : int ();
+
+  native static method UV_TIMER : int ();
+
+  native static method UV_TTY : int ();
+
+  native static method UV_UDP : int ();
+
+  native static method UV_SIGNAL : int ();
+
+  native static method UV_FILE : int ();
+
+  native static method UV_RUN_DEFAULT : int ();
+
+  native static method UV_RUN_ONCE : int ();
+
+  native static method UV_RUN_NOWAIT : int ();
+
+  native static method UV_LOOP_BLOCK_SIGNAL : int ();
+
+  native static method UV_READABLE : int ();
+
+  native static method UV_WRITABLE : int ();
+
+  native static method UV_DISCONNECT : int ();
+
+  native static method UV_PRIORITIZED : int ();
+
+  native static method UV_TTY_MODE_NORMAL : int ();
+
+  native static method UV_TTY_MODE_RAW : int ();
+
+  native static method UV_TTY_MODE_IO : int ();
+
+  native static method UV_JOIN_GROUP : int ();
+
+  native static method UV_LEAVE_GROUP : int ();
+
+}

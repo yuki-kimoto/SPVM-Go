@@ -8,6 +8,7 @@
 .github/workflows/windows-latest.yml
 .gitignore
 Changes
+constants.txt
 DEVEOPMENT.txt
 lib/SPVM/Go.pm
 lib/SPVM/Go.spvm
@@ -192,6 +193,9 @@ lib/SPVM/Go/UV.pm
 lib/SPVM/Go/UV.spvm
 lib/SPVM/Go/UV/Callback/LoopAlive.pm
 lib/SPVM/Go/UV/Callback/LoopAlive.spvm
+lib/SPVM/Go/UV/Constant.c
+lib/SPVM/Go/UV/Constant.pm
+lib/SPVM/Go/UV/Constant.spvm
 lib/SPVM/Go/UV/Handle.pm
 lib/SPVM/Go/UV/Handle.spvm
 LICENSE
