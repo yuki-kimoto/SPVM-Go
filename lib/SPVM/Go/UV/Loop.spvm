@@ -35,4 +35,6 @@ class Go::UV::Loop : pointer {
   
   native method idle_stop : void ($uv_handle : Go::UV::Handle);
   
+  native method handle_close : void ($uv_handle : Go::UV::Handle);
+  
 }

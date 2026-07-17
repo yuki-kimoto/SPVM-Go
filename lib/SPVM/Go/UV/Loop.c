@@ -233,6 +233,18 @@ int32_t SPVM__Go__UV__Loop__idle_stop(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 }
 
+int32_t SPVM__Go__UV__Loop__handle_close(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  SPVM_OBJ* obj_uv_loop = stack[0].oval;
+  SPVM_OBJ* obj_uv_handle = stack[1].oval;
+  
+  uv_handle_t* uv_handle = env->get_pointer(env, stack, obj_uv_handle);
+  
+  uv_close(uv_handle, SPVM__Go__UV__Loop__close_cb_none);
+  
+  return 0;
+}
+
 void SPVM__Go__UV__Loop__destroy_handle(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   SPVM_OBJ* obj_uv_loop = stack[0].oval;
