@@ -13,6 +13,10 @@ typedef struct {
   uv_handle_t* related_handle;
 } SPVM__Go__UV__Loop__HANDLE_DATA;
 
+static void SPVM__Go__UV__Loop__close_cb_none(uv_handle_t* handle) {
+  
+}
+
 static void SPVM__Go__UV__Loop__close_cb(uv_handle_t* handle) {
   SPVM__Go__UV__Loop__HANDLE_DATA* handle_data = (SPVM__Go__UV__Loop__HANDLE_DATA*)handle->data;
   
