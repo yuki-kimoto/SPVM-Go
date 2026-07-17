@@ -276,24 +276,14 @@ class Go::Schedule {
       unless ($schedule->loop_alive) {
         $schedule->{uv_loop}->handle_idle_stop($uv_handle);
         $schedule->{uv_loop}->handle_close($uv_handle);
-        
-        warn;
       }
     });
     
-    warn;
-    
     $uv_loop->handle_idle_start($uv_handle_idle);
-    
-    warn;
     
     $uv_loop->run(UV_CONST->UV_RUN_DEFAULT);
     
-    warn;
-    
     $uv_loop->handle_destroy($uv_handle_idle);
-    
-    warn;
   }
   
   private method loop_alive : int () {

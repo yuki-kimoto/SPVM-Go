@@ -248,29 +248,20 @@ int32_t SPVM__Go__UV__Loop__handle_close(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 }
 
-void SPVM__Go__UV__Loop__handle_destroy(SPVM_ENV* env, SPVM_VALUE* stack) {
-  
-  spvm_warn("");
+int32_t SPVM__Go__UV__Loop__handle_destroy(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   SPVM_OBJ* obj_uv_loop = stack[0].oval;
   SPVM_OBJ* obj_uv_handle = stack[1].oval;
   
-  spvm_warn("");
-  
   uv_handle_t* uv_handle = env->get_pointer(env, stack, obj_uv_handle);
   
-  spvm_warn("");
-  
   SPVM__Go__UV__Loop__HANDLE_DATA* uv_handle_data = (SPVM__Go__UV__Loop__HANDLE_DATA*)uv_handle->data;
-  
-  spvm_warn("");
   
   env->free_memory_block(env, stack, uv_handle_data);
   uv_handle->data = NULL;
   env->free_memory_block(env, stack, uv_handle);
   
-  spvm_warn("");
-  
+  return 0;
 }
 
 int32_t SPVM__Go__UV__Loop__poll(SPVM_ENV* env, SPVM_VALUE* stack) {
