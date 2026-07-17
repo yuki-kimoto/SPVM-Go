@@ -12,6 +12,7 @@ class Go::Schedule {
   use Go::Error::IOTimeout;
   use Go::Time;
   use Go::UV;
+  use Go::UV::Loop;
   
   use Format;
   use List;
@@ -261,6 +262,8 @@ class Go::Schedule {
     my $return_back_goroutine = Go::Goroutine->new;
     
     $self->{return_back_goroutine} = $return_back_goroutine;
+    
+    my $uv_loop = Go::UV::Loop->new;
     
     my $uv_handle = Go::UV::Handle->new;
     
