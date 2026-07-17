@@ -200,6 +200,10 @@ lib/SPVM/Go/UV/Constant.pm
 lib/SPVM/Go/UV/Constant.spvm
 lib/SPVM/Go/UV/Handle.pm
 lib/SPVM/Go/UV/Handle.spvm
+lib/SPVM/Go/UV/Loop.c
+lib/SPVM/Go/UV/Loop.config
+lib/SPVM/Go/UV/Loop.pm
+lib/SPVM/Go/UV/Loop.spvm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files

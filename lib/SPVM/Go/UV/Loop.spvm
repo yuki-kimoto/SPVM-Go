@@ -1,0 +1,10 @@
+# Copyright (c) 2026 Yuki Kimoto
+# MIT License
+
+class Go::UV::Loop : pointer {
+  
+  native static method new : Go::UV::Loop ();
+  
+  native method DESTROY : void ();
+  
+}
