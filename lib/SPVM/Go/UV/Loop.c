@@ -10,6 +10,9 @@ int32_t SPVM__Go__UV__Loop__new(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t error_id = 0;
   
+  // Force libuv global initialization
+  uv_default_loop();
+  
   uv_loop_t* uv_loop = env->new_memory_block(env, stack, sizeof(uv_loop_t));
   
   uv_loop_init(uv_loop);
