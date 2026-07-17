@@ -1,19 +1,11 @@
 package SPVM::Go::UV::ConfigBuilder;
 
+use parent 'SPVM::Builder::ConfigBuilder';
+
 use strict;
 use warnings;
 
-sub new {
-  my $class = shift;
-  
-  my $self = {
-    @_
-  };
-  
-  return bless $self, ref $class || $class;
-}
-
-sub create_config {
+sub build_config {
   
   my ($self) = @_;
   
@@ -146,25 +138,25 @@ sub create_config {
 
 =head1 Name
 
-SPVM::Go::UV::ConfigBuilder - Config Builder for Go::UV.
+SPVM::Go::UV::ConfigBuilder - Config Builder for C<libuv>.
 
 =head1 Description
 
-SPVM::Go::UV::ConfigBuilder class is a config builder for L<Go::UV|SPVM::Go::UV>.
+SPVM::Go::UV::ConfigBuilder class is a config builder for C<libuv>.
 
 This class is a Perl module.
 
 =head1 Usage
 
-  my $ssl_config_builder = SPVM::Go::UV::ConfigBuilder->new;
+  my $config_builder = SPVM::Go::UV::ConfigBuilder->new;
   
-  $ssl_config_builder->build_config($config);
+  my $config = $config_builder->build_config;
 
 =head1 Class Methods
 
 =head2 new
 
-  my $ssl_config_builder = SPVM::Go::UV::ConfigBuilder->new;
+  my $config_builder = SPVM::Go::UV::ConfigBuilder->new;
 
 Create a new L<SPVM::Go::UV::ConfigBuilder> object and returns it.
 
@@ -172,11 +164,9 @@ Create a new L<SPVM::Go::UV::ConfigBuilder> object and returns it.
 
 =head2 build_config
 
-  $ssl_config_builder->build_config($config);
+  my $config = $config_builder->build_config;
 
-Builds the config $config to bind L<Go::UV|SPVM::Go::UV>.
-
-$config is a L<SPVM::Builder::Config> object.
+Builds L<SPVM::Builder::Config> object for C<libuv>, and returns it.
 
 =head1 See Also
 
