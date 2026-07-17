@@ -183,7 +183,7 @@ int32_t SPVM__Go__UV__Loop__idle(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 }
 
-int32_t SPVM__Go__UV__Loop__new_handle_idle(SPVM_ENV* env, SPVM_VALUE* stack) {
+int32_t SPVM__Go__UV__Loop__handle_idle_new(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t error_id = 0;
   
@@ -209,7 +209,7 @@ int32_t SPVM__Go__UV__Loop__new_handle_idle(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 }
 
-int32_t SPVM__Go__UV__Loop__idle_start(SPVM_ENV* env, SPVM_VALUE* stack) {
+int32_t SPVM__Go__UV__Loop__handle_idle_start(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   SPVM_OBJ* obj_uv_loop = stack[0].oval;
   SPVM_OBJ* obj_uv_handle = stack[1].oval;
@@ -221,7 +221,7 @@ int32_t SPVM__Go__UV__Loop__idle_start(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 }
 
-int32_t SPVM__Go__UV__Loop__idle_stop(SPVM_ENV* env, SPVM_VALUE* stack) {
+int32_t SPVM__Go__UV__Loop__handle_idle_stop(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   SPVM_OBJ* obj_uv_loop = stack[0].oval;
   SPVM_OBJ* obj_uv_handle = stack[1].oval;
@@ -245,7 +245,7 @@ int32_t SPVM__Go__UV__Loop__handle_close(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 }
 
-void SPVM__Go__UV__Loop__destroy_handle(SPVM_ENV* env, SPVM_VALUE* stack) {
+void SPVM__Go__UV__Loop__handle_destroy(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   SPVM_OBJ* obj_uv_loop = stack[0].oval;
   SPVM_OBJ* obj_uv_handle = stack[1].oval;
