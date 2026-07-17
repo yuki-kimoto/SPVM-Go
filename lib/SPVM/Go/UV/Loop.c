@@ -9,7 +9,6 @@ static const char* FILE_NAME = "Go/UV/Loop.c";
 typedef struct {
   SPVM_ENV* env;
   SPVM_VALUE* stack;
-  SPVM_OBJ* obj_uv_loop;
   SPVM_OBJ* obj_uv_handle;
   uv_handle_t* related_handle;
 } SPVM__Go__UV__Loop__HANDLE_DATA;
@@ -33,7 +32,6 @@ static void SPVM__Go__UV__Loop__enable_goroutine_cb(uv_handle_t* handle) {
   
   SPVM_ENV* env = handle_data->env;
   SPVM_VALUE* stack = handle_data->stack;
-  SPVM_OBJ* obj_uv_loop = handle_data->obj_uv_loop;
   SPVM_OBJ* obj_uv_handle = handle_data->obj_uv_handle;
   
   SPVM_OBJ* obj_cb = env->get_field_object_by_name(env, stack, obj_uv_handle, "cb", &error_id, __func__, FILE_NAME, __LINE__);
@@ -95,7 +93,6 @@ int32_t SPVM__Go__UV__Loop__timer(SPVM_ENV* env, SPVM_VALUE* stack) {
   SPVM__Go__UV__Loop__HANDLE_DATA* timer_handle_data = env->new_memory_block(env, stack, sizeof(SPVM__Go__UV__Loop__HANDLE_DATA));
   timer_handle_data->env = env;
   timer_handle_data->stack = stack;
-  timer_handle_data->obj_uv_loop = obj_uv_loop;
   timer_handle_data->obj_uv_handle = obj_uv_handle;
   
   timer_handle->data = timer_handle_data;
@@ -114,7 +111,6 @@ static void SPVM__Go__UV__Loop__idle_cb(uv_idle_t* handle) {
   
   SPVM_ENV* env = handle_data->env;
   SPVM_VALUE* stack = handle_data->stack;
-  SPVM_OBJ* obj_uv_loop = handle_data->obj_uv_loop;
   SPVM_OBJ* obj_uv_handle = handle_data->obj_uv_handle;
   
   SPVM_OBJ* obj_cb = env->get_field_object_by_name(env, stack, obj_uv_handle, "cb", &error_id, __func__, FILE_NAME, __LINE__);
@@ -154,7 +150,6 @@ int32_t SPVM__Go__UV__Loop__idle(SPVM_ENV* env, SPVM_VALUE* stack) {
   SPVM__Go__UV__Loop__HANDLE_DATA* handle_data = env->new_memory_block(env, stack, sizeof(SPVM__Go__UV__Loop__HANDLE_DATA));
   handle_data->env = env;
   handle_data->stack = stack;
-  handle_data->obj_uv_loop = obj_uv_loop;
   handle_data->obj_uv_handle = obj_uv_handle;
   
   idle_handle->data = handle_data;
@@ -186,7 +181,6 @@ int32_t SPVM__Go__UV__Loop__poll(SPVM_ENV* env, SPVM_VALUE* stack) {
   SPVM__Go__UV__Loop__HANDLE_DATA* poll_handle_data = env->new_memory_block(env, stack, sizeof(SPVM__Go__UV__Loop__HANDLE_DATA));
   poll_handle_data->env = env;
   poll_handle_data->stack = stack;
-  poll_handle_data->obj_uv_loop = obj_uv_loop;
   poll_handle_data->obj_uv_handle = obj_uv_handle;
   
   poll_handle->data = poll_handle_data;
@@ -201,7 +195,6 @@ int32_t SPVM__Go__UV__Loop__poll(SPVM_ENV* env, SPVM_VALUE* stack) {
     SPVM__Go__UV__Loop__HANDLE_DATA* timer_handle_data = env->new_memory_block(env, stack, sizeof(SPVM__Go__UV__Loop__HANDLE_DATA));
     timer_handle_data->env = env;
     timer_handle_data->stack = stack;
-    timer_handle_data->obj_uv_loop = obj_uv_loop;
     timer_handle_data->obj_uv_handle = obj_uv_handle;
     
     timer_handle->data = timer_handle_data;
@@ -234,7 +227,6 @@ int32_t SPVM__Go__UV__Loop__async(SPVM_ENV* env, SPVM_VALUE* stack) {
   SPVM__Go__UV__Loop__HANDLE_DATA* handle_data = env->new_memory_block(env, stack, sizeof(SPVM__Go__UV__Loop__HANDLE_DATA));
   handle_data->env = env;
   handle_data->stack = stack;
-  handle_data->obj_uv_loop = obj_uv_loop;
   handle_data->obj_uv_handle = obj_uv_handle;
   
   address->data = handle_data;
