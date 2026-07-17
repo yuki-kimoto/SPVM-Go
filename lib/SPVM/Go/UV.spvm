@@ -7,6 +7,7 @@ class Go::UV {
   use Go::UV::Handle;
   use Go::UV::Callback::LoopAlive;
   use Go::UV::Constant;
+  use Go::UV::Loop;
   
   # Class Methods
   static method new : Go::UV () {

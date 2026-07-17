@@ -134,6 +134,7 @@ package MY {
         'Go::Goroutine',
         'Go::UV',
         'Go::UV::Constant',
+        'Go::UV::Loop',
       ];
       
       $options->{precompile_classes} = [
