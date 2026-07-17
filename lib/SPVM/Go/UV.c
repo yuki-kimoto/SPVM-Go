@@ -81,6 +81,9 @@ int32_t SPVM__Go__UV__run(SPVM_ENV* env, SPVM_VALUE* stack) {
   uv_loop_t* uv_loop = env->get_pointer(env, stack, obj_uv_loop);
   assert(uv_loop);
   
+  // For global loop initialization
+  uv_default_loop();
+  
   int32_t status = uv_run(uv_loop, uv_run_mode);
   
   return 0;
