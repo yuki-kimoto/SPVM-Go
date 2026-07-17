@@ -3,8 +3,8 @@
 
 class Go::UV::Callback::Handle : interface_t {
   
-  use Go::UV::Callback::Handle;
+  use Go::UV::Handle;
   
-  method method : void ($uv_handle : Go::UV::Callback::Handle);
+  required method : void ($uv_handle : Go::UV::Handle);
   
 }
