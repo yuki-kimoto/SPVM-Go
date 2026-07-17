@@ -7,5 +7,8 @@ class Go::UV {
   use Go::UV::Loop;
   
   # Class Methods
-  native static method default_loop : Go::UV::Loop ();
+  static method default_loop : Go::UV::Loop () {
+    return Go::UV::Loop->default_loop;
+  }
+  
 }

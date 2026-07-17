@@ -3,6 +3,8 @@
 
 class Go::UV::Loop : pointer {
   
+  allow Go::UV;
+  
   use Go::UV::Handle;
   use Go::UV::Callback::LoopAlive;
   use Go::UV::Constant;
@@ -22,5 +24,7 @@ class Go::UV::Loop : pointer {
   native method async : void ($uv_handle : Go::UV::Handle);
   
   native method run : void ($uv_run_mode : int);
+  
+  private native static method default_loop : Go::UV::Loop ();
   
 }
