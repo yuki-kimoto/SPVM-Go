@@ -27,4 +27,12 @@ class Go::UV::Loop : pointer {
   
   private native static method default_loop : Go::UV::Loop ();
   
+  private native method new_handle_idle : Go::UV::Handle ();
+  
+  native method idle_start : void ($uv_handle : Go::UV::Handle);
+  
+  native method idle_stop : void ($uv_handle : Go::UV::Handle);
+  
+  
+  
 }

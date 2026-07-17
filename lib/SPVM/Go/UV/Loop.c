@@ -159,6 +159,56 @@ int32_t SPVM__Go__UV__Loop__idle(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 }
 
+int32_t SPVM__Go__UV__Loop__new_handle_idle(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t error_id = 0;
+  
+  SPVM_OBJ* obj_uv_loop = stack[0].oval;
+  
+  uv_loop_t* uv_loop = env->get_pointer(env, stack, obj_uv_loop);
+  uv_idle_t* uv_handle = env->new_memory_block(env, stack, sizeof(uv_idle_t));
+  uv_idle_init(uv_loop, uv_handle);
+  
+  SPVM__Go__UV__Loop__HANDLE_DATA* handle_data = env->new_memory_block(env, stack, sizeof(SPVM__Go__UV__Loop__HANDLE_DATA));
+  handle_data->env = env;
+  handle_data->stack = stack;
+  
+  uv_handle->data = handle_data;
+  
+  SPVM_OBJ* obj_uv_handle = env->new_pointer_object_by_name(env, stack, "Go::UV::Handle", uv_handle, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) return error_id;
+  
+  handle_data->obj_uv_handle = obj_uv_handle;
+  
+  stack[0].oval = obj_uv_handle;
+  
+  return 0;
+}
+
+int32_t SPVM__Go__UV__Loop__idle_start(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  SPVM_OBJ* obj_uv_loop = stack[0].oval;
+  SPVM_OBJ* obj_uv_handle = stack[1].oval;
+  
+  uv_idle_t* uv_handle = env->get_pointer(env, stack, obj_uv_handle);
+  
+  uv_idle_start(uv_handle, SPVM__Go__UV__Loop__idle_cb);
+  
+  return 0;
+}
+
+int32_t SPVM__Go__UV__Loop__idle_stop(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  SPVM_OBJ* obj_uv_loop = stack[0].oval;
+  SPVM_OBJ* obj_uv_handle = stack[1].oval;
+  
+  uv_idle_t* uv_handle = env->get_pointer(env, stack, obj_uv_handle);
+  
+  uv_idle_stop(uv_handle);
+  
+  return 0;
+}
+
 int32_t SPVM__Go__UV__Loop__poll(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t error_id = 0;

@@ -1,7 +1,7 @@
 # Copyright (c) 2026 Yuki Kimoto
 # MIT License
 
-class Go::UV::Handle {
+class Go::UV::Handle : pointer {
   
   use Callback;
   
@@ -45,6 +45,8 @@ class Go::UV::Handle {
   has io_timeout_occurred : byte;
   
   has address : Address;
+  
+  has related_handle_address : Address;
   
   has cb : rw Callback;
   
