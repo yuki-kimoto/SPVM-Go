@@ -4,29 +4,8 @@
 class Go::UV {
   version_from Go;
   
-  use Go::UV::Handle;
-  use Go::UV::Callback::LoopAlive;
-  use Go::UV::Constant;
   use Go::UV::Loop;
   
   # Class Methods
-  static method new : Go::UV () {
-    
-    my $self = new Go::UV;
-    
-    return $self;
-  }
-  
-  native method async_send : void ($uv_handle : Go::UV::Handle);
-  
-  native method timer : void ($uv_loop : Go::UV::Loop, $uv_handle : Go::UV::Handle);
-  
-  native method idle : void ($uv_loop : Go::UV::Loop, $uv_handle : Go::UV::Handle);
-  
-  native method poll : void ($uv_loop : Go::UV::Loop, $uv_handle : Go::UV::Handle);
-  
-  native method async : void ($uv_loop : Go::UV::Loop, $uv_handle : Go::UV::Handle);
-  
-  native method run : void ($uv_loop : Go::UV::Loop, $uv_run_mode : int);
-  
+  native static method default_loop : Go::UV::Loop ();
 }

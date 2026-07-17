@@ -3,8 +3,24 @@
 
 class Go::UV::Loop : pointer {
   
-  native static method new : Go::UV::Loop ();
+  use Go::UV::Handle;
+  use Go::UV::Callback::LoopAlive;
+  use Go::UV::Constant;
   
+  # Instance Methods
   native method DESTROY : void ();
+  
+  # Instance Methods
+  native method async_send : void ($uv_handle : Go::UV::Handle);
+  
+  native method timer : void ($uv_handle : Go::UV::Handle);
+  
+  native method idle : void ($uv_handle : Go::UV::Handle);
+  
+  native method poll : void ($uv_handle : Go::UV::Handle);
+  
+  native method async : void ($uv_handle : Go::UV::Handle);
+  
+  native method run : void ($uv_run_mode : int);
   
 }

@@ -40,8 +40,6 @@ class Go::Schedule {
   
   has thread_id : Thread::ID;
   
-  has uv : Go::UV;
-  
   has uv_loop : Go::UV::Loop;
   
   # Class Methods
@@ -55,11 +53,9 @@ class Go::Schedule {
     
     $self->{thread_id} = Thread::ThisThread->get_id;
     
-    my $uv = Go::UV->new;
-    
-    $self->{uv} = $uv;
-    
     $self->{disabled_goroutines_h} = Hash->new;
+    
+    $self->{uv_loop} = Go::UV->default_loop;
     
     return $self;
   }
@@ -174,7 +170,7 @@ class Go::Schedule {
       $goroutine->{event_type} = $schedule_type == &TYPE_IO_READ ? Go::UV::Handle->UV_READABLE : Go::UV::Handle->UV_WRITABLE;
       
       my $uv_loop = $self->{uv_loop};
-      $self->{uv}->poll($uv_loop, $goroutine);
+      $uv_loop->poll($goroutine);
       
       if (Go->ENV_DEBUG) {
         Fn->say_stderr(Format->sprintf("[Go Debug]Register goroutine wait for IO (Callback:%p, QueueNum:%d.)", [(object)$goroutine->{task}, $self->{goroutines}->length]));
@@ -192,7 +188,7 @@ class Go::Schedule {
       $goroutine->{handle_type} = Go::UV::Handle->UV_TIMER;
       
       my $uv_loop = $self->{uv_loop};
-      $self->{uv}->timer($uv_loop, $goroutine);
+      $uv_loop->timer($goroutine);
       
       unless ($deadline) {
         die "The deadline \$deadline in schedule type TYPE_TIMER must be defined.";
@@ -206,7 +202,7 @@ class Go::Schedule {
       $goroutine->{cb} = $enable_goroutine_cb;
       $goroutine->{handle_type} = Go::UV::Handle->UV_ASYNC;
       my $uv_loop = $self->{uv_loop};
-      $self->{uv}->async($uv_loop, $goroutine);
+      $uv_loop->async($goroutine);
     }
     
     if ($self->{disabled_goroutines_h}->{$goroutine_address}) {
@@ -269,8 +265,7 @@ class Go::Schedule {
     
     $self->{return_back_goroutine} = $return_back_goroutine;
     
-    my $uv_loop = Go::UV::Loop->new;
-    $self->{uv_loop} = $uv_loop;
+    my $uv_loop = $self->{uv_loop};
     
     my $uv_handle = Go::UV::Handle->new;
     
@@ -282,11 +277,9 @@ class Go::Schedule {
       return $schedule->loop_alive;
     });
     
-    weaken $self->{uv_loop};
+    $uv_loop->idle($uv_handle);
     
-    $self->{uv}->idle($uv_loop, $uv_handle);
-    
-    $self->{uv}->run($uv_loop, UV_CONST->UV_RUN_DEFAULT);
+    $uv_loop->run(UV_CONST->UV_RUN_DEFAULT);
   }
   
   private method loop_alive : int () {
