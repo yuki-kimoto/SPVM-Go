@@ -27,5 +27,6 @@ class Go::UV {
   
   native method async : void ($uv_loop : Go::UV::Loop, $uv_handle : Go::UV::Handle);
   
-  native method run : void ($uv_loop : Go::UV::Loop);
+  native method run : void ($uv_loop : Go::UV::Loop, $uv_run_mode : int);
+  
 }

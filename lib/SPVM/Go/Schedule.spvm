@@ -13,6 +13,7 @@ class Go::Schedule {
   use Go::Time;
   use Go::UV;
   use Go::UV::Loop;
+  use Go::UV::Constant as UV_CONST;
   
   use Format;
   use List;
@@ -285,7 +286,7 @@ class Go::Schedule {
     
     $self->{uv}->idle($uv_loop, $uv_handle);
     
-    $self->{uv}->run($uv_loop);
+    $self->{uv}->run($uv_loop, UV_CONST->UV_RUN_DEFAULT);
   }
   
   private method loop_alive : int () {
