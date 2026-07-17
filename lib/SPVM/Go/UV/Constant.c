@@ -32,7 +32,7 @@ int32_t SPVM__Go__UV__Constant__UV_VERSION_HEX(SPVM_ENV* env, SPVM_VALUE* stack)
 }
 
 int32_t SPVM__Go__UV__Constant__UV_VERSION_SUFFIX(SPVM_ENV* env, SPVM_VALUE* stack) {
-  stack[0].sval = env->new_string_nolen(env, stack, UV_VERSION_SUFFIX);
+  stack[0].oval = env->new_string_nolen(env, stack, UV_VERSION_SUFFIX);
   return 0;
 }
 
