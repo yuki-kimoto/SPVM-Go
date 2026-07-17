@@ -19,13 +19,13 @@ class Go::UV {
   
   native method async_send : void ($uv_handle : Go::UV::Handle);
   
-  native method timer_v2 : void ($uv_loop : Go::UV::Loop, $uv_handle : Go::UV::Handle);
+  native method timer : void ($uv_loop : Go::UV::Loop, $uv_handle : Go::UV::Handle);
   
-  native method idle_v2 : void ($uv_loop : Go::UV::Loop, $uv_handle : Go::UV::Handle);
+  native method idle : void ($uv_loop : Go::UV::Loop, $uv_handle : Go::UV::Handle);
   
-  native method poll_v2 : void ($uv_loop : Go::UV::Loop, $uv_handle : Go::UV::Handle);
+  native method poll : void ($uv_loop : Go::UV::Loop, $uv_handle : Go::UV::Handle);
   
-  native method async_v2 : void ($uv_loop : Go::UV::Loop, $uv_handle : Go::UV::Handle);
+  native method async : void ($uv_loop : Go::UV::Loop, $uv_handle : Go::UV::Handle);
   
-  native method run_v2 : void ($uv_loop : Go::UV::Loop);
+  native method run : void ($uv_loop : Go::UV::Loop);
 }

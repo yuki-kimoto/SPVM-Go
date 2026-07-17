@@ -72,7 +72,7 @@ static void SPVM__Go__UV__enable_goroutine_cb_for_timer(uv_timer_t* handle) {
   SPVM__Go__UV__enable_goroutine_cb((uv_handle_t*)handle);
 }
 
-int32_t SPVM__Go__UV__run_v2(SPVM_ENV* env, SPVM_VALUE* stack) {
+int32_t SPVM__Go__UV__run(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   SPVM_OBJ* obj_self = stack[0].oval;
   SPVM_OBJ* obj_uv_loop = stack[1].oval;
@@ -85,7 +85,7 @@ int32_t SPVM__Go__UV__run_v2(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 }
 
-int32_t SPVM__Go__UV__timer_v2(SPVM_ENV* env, SPVM_VALUE* stack) {
+int32_t SPVM__Go__UV__timer(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t error_id = 0;
   SPVM_OBJ* obj_self = stack[0].oval;
   SPVM_OBJ* obj_uv_loop = stack[1].oval;
@@ -145,7 +145,7 @@ static void SPVM__Go__UV__idle_cb(uv_idle_t* handle) {
   }
 }
 
-int32_t SPVM__Go__UV__idle_v2(SPVM_ENV* env, SPVM_VALUE* stack) {
+int32_t SPVM__Go__UV__idle(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   SPVM_OBJ* obj_self = stack[0].oval;
   SPVM_OBJ* obj_uv_loop = stack[1].oval;
@@ -168,7 +168,7 @@ int32_t SPVM__Go__UV__idle_v2(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 }
 
-int32_t SPVM__Go__UV__poll_v2(SPVM_ENV* env, SPVM_VALUE* stack) {
+int32_t SPVM__Go__UV__poll(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t error_id = 0;
   SPVM_OBJ* obj_self = stack[0].oval;
@@ -225,7 +225,7 @@ static void SPVM__Go__UV__enable_goroutine_cb_for_async(uv_async_t* handle) {
   SPVM__Go__UV__enable_goroutine_cb((uv_handle_t*)handle);
 }
 
-int32_t SPVM__Go__UV__async_v2(SPVM_ENV* env, SPVM_VALUE* stack) {
+int32_t SPVM__Go__UV__async(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t error_id = 0;
   
