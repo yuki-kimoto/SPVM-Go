@@ -17,17 +17,7 @@ class Go::UV {
     return $self;
   }
   
-  native method timer : void ($uv_handle : Go::UV::Handle);
-  
-  native method idle : void ($uv_handle : Go::UV::Handle);
-  
-  native method poll : void ($uv_handle : Go::UV::Handle);
-  
-  native method async : void ($uv_handle : Go::UV::Handle);
-  
   native method async_send : void ($uv_handle : Go::UV::Handle);
-  
-  native method run : void ();
   
   native method timer_v2 : void ($uv_loop : Go::UV::Loop, $uv_handle : Go::UV::Handle);
   

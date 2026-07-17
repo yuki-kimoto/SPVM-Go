@@ -83,9 +83,11 @@ int32_t SPVM__Go__UV__run(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 int32_t SPVM__Go__UV__run_v2(SPVM_ENV* env, SPVM_VALUE* stack) {
   
-  SPVM_OBJ* obj_uv_loop = stack[0].oval;
+  SPVM_OBJ* obj_self = stack[0].oval;
+  SPVM_OBJ* obj_uv_loop = stack[1].oval;
   
   uv_loop_t* uv_loop = env->get_pointer(env, stack, obj_uv_loop);
+  assert(uv_loop);
   
   int32_t status = uv_run(uv_loop, UV_RUN_DEFAULT);
   
