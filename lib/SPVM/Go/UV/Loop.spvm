@@ -8,7 +8,8 @@ class Go::UV::Loop : pointer {
   use Go::UV::Handle;
   use Go::UV::Callback::LoopAlive;
   use Go::UV::Constant;
-  
+  use Go::UV::Callback::Handle;
+
   # Instance Methods
   native method DESTROY : void ();
   
@@ -25,12 +26,13 @@ class Go::UV::Loop : pointer {
   
   native method run : void ($uv_run_mode : int);
   
-  private native static method default_loop : Go::UV::Loop ();
+  # For Go::UV
+  native static method default_loop : Go::UV::Loop ();
   
   # For Go::UV::Handle
-  private native method handle_idle_new : Go::UV::Handle ();
+  native method handle_idle_new : Go::UV::Handle ();
   
-  private native method handle_destroy : void ($uv_handle : Go::UV::Handle);
+  native method handle_destroy : void ($uv_handle : Go::UV::Handle);
   
   native method handle_idle_start : void ($uv_handle : Go::UV::Handle);
   

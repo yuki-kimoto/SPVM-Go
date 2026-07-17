@@ -154,13 +154,13 @@ static void SPVM__Go__UV__Loop__idle_start_cb(uv_idle_t* handle) {
   SPVM_OBJ* obj_cb = env->get_field_object_by_name(env, stack, obj_uv_handle, "cb", &error_id, __func__, FILE_NAME, __LINE__);
   assert(obj_cb);
   stack[0].oval = obj_cb;
-  env->call_instance_method_by_name(env, stack, "", 1, &error_id, __func__, FILE_NAME, __LINE__);
+  stack[1].oval = obj_uv_handle;
+  env->call_instance_method_by_name(env, stack, "", 2, &error_id, __func__, FILE_NAME, __LINE__);
   if (!(error_id == 0)) {
     spvm_diag("[Unexcepted Error]Callback 'cb' failed.");
     abort();
   }
 }
-
 
 int32_t SPVM__Go__UV__Loop__idle(SPVM_ENV* env, SPVM_VALUE* stack) {
   
@@ -213,6 +213,7 @@ int32_t SPVM__Go__UV__Loop__handle_idle_start(SPVM_ENV* env, SPVM_VALUE* stack) 
   
   SPVM_OBJ* obj_uv_loop = stack[0].oval;
   SPVM_OBJ* obj_uv_handle = stack[1].oval;
+  SPVM_OBJ* obj_cb = stack[2].oval;
   
   uv_idle_t* uv_handle = env->get_pointer(env, stack, obj_uv_handle);
   
@@ -228,7 +229,9 @@ int32_t SPVM__Go__UV__Loop__handle_idle_stop(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   uv_idle_t* uv_handle = env->get_pointer(env, stack, obj_uv_handle);
   
-  uv_idle_stop(uv_handle);
+  int32_t status = uv_idle_stop(uv_handle);
+  
+  assert(status == 0);
   
   return 0;
 }
@@ -247,16 +250,27 @@ int32_t SPVM__Go__UV__Loop__handle_close(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 void SPVM__Go__UV__Loop__handle_destroy(SPVM_ENV* env, SPVM_VALUE* stack) {
   
+  spvm_warn("");
+  
   SPVM_OBJ* obj_uv_loop = stack[0].oval;
   SPVM_OBJ* obj_uv_handle = stack[1].oval;
   
+  spvm_warn("");
+  
   uv_handle_t* uv_handle = env->get_pointer(env, stack, obj_uv_handle);
   
+  spvm_warn("");
+  
   SPVM__Go__UV__Loop__HANDLE_DATA* uv_handle_data = (SPVM__Go__UV__Loop__HANDLE_DATA*)uv_handle->data;
+  
+  spvm_warn("");
   
   env->free_memory_block(env, stack, uv_handle_data);
   uv_handle->data = NULL;
   env->free_memory_block(env, stack, uv_handle);
+  
+  spvm_warn("");
+  
 }
 
 int32_t SPVM__Go__UV__Loop__poll(SPVM_ENV* env, SPVM_VALUE* stack) {

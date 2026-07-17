@@ -191,6 +191,8 @@ lib/SPVM/Go/UV.native/src/win/winsock.c
 lib/SPVM/Go/UV.native/src/win/winsock.h
 lib/SPVM/Go/UV.pm
 lib/SPVM/Go/UV.spvm
+lib/SPVM/Go/UV/Callback/Handle.pm
+lib/SPVM/Go/UV/Callback/Handle.spvm
 lib/SPVM/Go/UV/Callback/LoopAlive.pm
 lib/SPVM/Go/UV/Callback/LoopAlive.spvm
 lib/SPVM/Go/UV/ConfigBuilder.pm

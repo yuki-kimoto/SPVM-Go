@@ -49,7 +49,7 @@ class Go::UV::Handle : pointer {
   
   has related_handle_address : Address;
   
-  has cb : rw Callback;
+  has cb : rw Go::UV::Callback::Handle;
   
   has loop_alive_cb : rw Go::UV::Callback::LoopAlive;
   
