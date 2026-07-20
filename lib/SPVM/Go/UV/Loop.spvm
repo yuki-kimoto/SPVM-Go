@@ -18,8 +18,6 @@ class Go::UV::Loop : pointer {
   
   native method timer : void ($uv_handle : Go::UV::Handle);
   
-  native method idle : void ($uv_handle : Go::UV::Handle);
-  
   native method poll : void ($uv_handle : Go::UV::Handle);
   
   native method async : void ($uv_handle : Go::UV::Handle);
