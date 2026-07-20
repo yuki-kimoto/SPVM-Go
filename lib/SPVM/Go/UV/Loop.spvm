@@ -14,8 +14,6 @@ class Go::UV::Loop : pointer {
   native method DESTROY : void ();
   
   # Instance Methods
-  native method async_send : void ($uv_handle : Go::UV::Handle);
-  
   native method timer : void ($uv_handle : Go::UV::Handle);
   
   native method poll : void ($uv_handle : Go::UV::Handle);
@@ -38,4 +36,5 @@ class Go::UV::Loop : pointer {
   
   native method handle_close : void ($uv_handle : Go::UV::Handle);
   
+  native method handle_async_send : void ($uv_handle : Go::UV::Handle);
 }
