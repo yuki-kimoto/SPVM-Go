@@ -7,6 +7,7 @@ class Go::UV::Loop : pointer {
   
   use Go::UV::Handle;
   use Go::UV::Handle::Idle;
+  use Go::UV::Handle::Async;
   use Go::UV::Callback::LoopAlive;
   use Go::UV::Constant;
   use Go::UV::Callback::Handle;
@@ -23,7 +24,9 @@ class Go::UV::Loop : pointer {
   
   native method run : void ($uv_run_mode : int);
   
-  native method idle_init : void ($uv_handle : Go::UV::Handle);
+  native method idle_init : void ($uv_handle : Go::UV::Handle::Idle);
+  
+  native method async_init : void ($uv_handle : Go::UV::Handle::Async);
   
   # For Go::UV
   native static method default_loop : Go::UV::Loop ();
@@ -40,4 +43,7 @@ class Go::UV::Loop : pointer {
   native method handle_async_send : void ($uv_handle : Go::UV::Handle);
   
   native method handle_destroy : void ($uv_handle : Go::UV::Handle);
+  
+  native method handle_async_new : Go::UV::Handle::Async ();
+  
 }

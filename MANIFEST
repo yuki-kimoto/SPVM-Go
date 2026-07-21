@@ -202,6 +202,8 @@ lib/SPVM/Go/UV/Constant.pm
 lib/SPVM/Go/UV/Constant.spvm
 lib/SPVM/Go/UV/Handle.pm
 lib/SPVM/Go/UV/Handle.spvm
+lib/SPVM/Go/UV/Handle/Async.pm
+lib/SPVM/Go/UV/Handle/Async.spvm
 lib/SPVM/Go/UV/Handle/Idle.pm
 lib/SPVM/Go/UV/Handle/Idle.spvm
 lib/SPVM/Go/UV/Loop.c
