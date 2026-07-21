@@ -26,8 +26,6 @@ class Go::UV::Loop : pointer {
   
   native method idle_init : void ($uv_handle : Go::UV::Handle::Idle);
   
-  native method async_init : void ($uv_handle : Go::UV::Handle::Async);
-  
   # For Go::UV
   native static method default_loop : Go::UV::Loop ();
   
