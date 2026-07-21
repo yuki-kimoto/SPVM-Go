@@ -183,10 +183,6 @@ class Go::Schedule {
       }
       
       my $timeout_msec = $timeout_duration_nsec / 1000000;
-      $goroutine->{timeout_msec} = $timeout_msec;
-      
-      $goroutine->{handle_type} = Go::UV::Handle->UV_TIMER;
-      
       my $uv_loop = $self->{uv_loop};
       $uv_loop->timer($goroutine, $enable_goroutine_cb, $timeout_msec, 0);
       
