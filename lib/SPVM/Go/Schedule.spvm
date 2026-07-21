@@ -194,7 +194,7 @@ class Go::Schedule {
         Fn->say_stderr(Format->sprintf("[Go Debug]Register goroutine wait for timer (Callback:%p, QueueNum:%d.)", [(object)$goroutine->{task}, $self->{goroutines}->length]));
       }
     }
-    if ($schedule_type == &TYPE_CHANNEL_READ ||$schedule_type == &TYPE_CHANNEL_WRITE) {
+    elsif ($schedule_type == &TYPE_CHANNEL_READ ||$schedule_type == &TYPE_CHANNEL_WRITE) {
       $goroutine->{handle_type} = Go::UV::Handle->UV_ASYNC;
       my $uv_loop = $self->{uv_loop};
       $uv_loop->async($goroutine, $enable_goroutine_cb);
