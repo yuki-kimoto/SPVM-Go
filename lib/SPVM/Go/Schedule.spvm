@@ -278,7 +278,7 @@ class Go::Schedule {
       }
     };
     
-    my $uv_handle_idle = $uv_loop->handle_idle_new;
+    my $uv_handle_idle = $uv_loop->new_idle;
     
     $uv_loop->handle_idle_start($uv_handle_idle, $process_next_goroutine_cb);
     

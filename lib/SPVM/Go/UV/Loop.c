@@ -133,7 +133,7 @@ static void SPVM__Go__UV__Loop__cb(uv_idle_t* handle) {
   }
 }
 
-int32_t SPVM__Go__UV__Loop__handle_idle_new(SPVM_ENV* env, SPVM_VALUE* stack) {
+int32_t SPVM__Go__UV__Loop__new_idle(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t error_id = 0;
   
