@@ -270,7 +270,6 @@ class Go::Schedule {
     my $uv_loop = $self->{uv_loop};
     
     my $uv_handle_idle = $uv_loop->handle_idle_new;
-    $uv_loop->idle_init($uv_handle_idle);
     
     $uv_handle_idle->set_cb([$schedule : Go::Schedule = $self] method : void ($uv_handle : Go::UV::Handle::Idle) {
       $schedule->process_next_goroutine;
