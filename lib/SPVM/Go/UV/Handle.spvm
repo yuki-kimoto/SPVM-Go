@@ -51,9 +51,7 @@ class Go::UV::Handle : pointer {
   
   has cb : rw Go::UV::Callback::Handle;
   
-  has loop_alive_cb : rw Go::UV::Callback::LoopAlive;
-  
-  has loop : Go::UV::Loop;
+  has loop : ro Go::UV::Loop;
   
   # Class Methods
   static method new : Go::UV::Handle () {
