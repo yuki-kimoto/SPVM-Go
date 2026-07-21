@@ -166,7 +166,6 @@ class Go::Schedule {
         $deadline = Go::Time->now->add(Go::Duration_1l->new($timeout_duration_nsec));
       }
       $goroutine->{timeout_msec} = $timeout_duration_nsec / 1000000;
-      $goroutine->{cb} = $enable_goroutine_cb;
       $goroutine->{handle_type} = Go::UV::Handle->UV_POLL;
       $goroutine->{event_type} = $schedule_type == &TYPE_IO_READ ? Go::UV::Handle->UV_READABLE : Go::UV::Handle->UV_WRITABLE;
       
@@ -184,8 +183,6 @@ class Go::Schedule {
       }
       $goroutine->{timeout_msec} = $timeout_duration_nsec / 1000000;
       
-      $goroutine->{cb} = $enable_goroutine_cb;
-      
       $goroutine->{handle_type} = Go::UV::Handle->UV_TIMER;
       
       my $uv_loop = $self->{uv_loop};
@@ -200,7 +197,6 @@ class Go::Schedule {
       }
     }
     if ($schedule_type == &TYPE_CHANNEL_READ ||$schedule_type == &TYPE_CHANNEL_WRITE) {
-      $goroutine->{cb} = $enable_goroutine_cb;
       $goroutine->{handle_type} = Go::UV::Handle->UV_ASYNC;
       my $uv_loop = $self->{uv_loop};
       $uv_loop->async($goroutine, $enable_goroutine_cb);
