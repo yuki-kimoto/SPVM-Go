@@ -206,6 +206,8 @@ lib/SPVM/Go/UV/Handle/Async.pm
 lib/SPVM/Go/UV/Handle/Async.spvm
 lib/SPVM/Go/UV/Handle/Idle.pm
 lib/SPVM/Go/UV/Handle/Idle.spvm
+lib/SPVM/Go/UV/Handle/Timer.pm
+lib/SPVM/Go/UV/Handle/Timer.spvm
 lib/SPVM/Go/UV/Loop.c
 lib/SPVM/Go/UV/Loop.config
 lib/SPVM/Go/UV/Loop.pm
