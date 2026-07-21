@@ -143,7 +143,7 @@ int32_t SPVM__Go__UV__Loop__handle_idle_new(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   uv_handle->data = handle_data;
   
-  SPVM_OBJ* obj_uv_handle = env->new_pointer_object_by_name(env, stack, "Go::UV::Handle", uv_handle, &error_id, __func__, FILE_NAME, __LINE__);
+  SPVM_OBJ* obj_uv_handle = env->new_pointer_object_by_name(env, stack, "Go::UV::Handle::Idle", uv_handle, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) return error_id;
   
   handle_data->obj_uv_handle = obj_uv_handle;

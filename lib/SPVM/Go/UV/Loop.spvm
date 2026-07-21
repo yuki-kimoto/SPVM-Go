@@ -6,10 +6,11 @@ class Go::UV::Loop : pointer {
   allow Go::UV;
   
   use Go::UV::Handle;
+  use Go::UV::Handle::Idle;
   use Go::UV::Callback::LoopAlive;
   use Go::UV::Constant;
   use Go::UV::Callback::Handle;
-
+  
   # Instance Methods
   native method DESTROY : void ();
   
@@ -28,15 +29,15 @@ class Go::UV::Loop : pointer {
   native static method default_loop : Go::UV::Loop ();
   
   # For Go::UV::Handle
-  native method handle_idle_new : Go::UV::Handle ();
+  native method handle_idle_new : Go::UV::Handle::Idle ();
   
-  native method handle_destroy : void ($uv_handle : Go::UV::Handle);
+  native method handle_idle_start : void ($uv_handle : Go::UV::Handle::Idle);
   
-  native method handle_idle_start : void ($uv_handle : Go::UV::Handle);
-  
-  native method handle_idle_stop : void ($uv_handle : Go::UV::Handle);
+  native method handle_idle_stop : void ($uv_handle : Go::UV::Handle::Idle);
   
   native method handle_close : void ($uv_handle : Go::UV::Handle);
   
   native method handle_async_send : void ($uv_handle : Go::UV::Handle);
+  
+  native method handle_destroy : void ($uv_handle : Go::UV::Handle);
 }

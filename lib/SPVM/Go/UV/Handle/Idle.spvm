@@ -1,0 +1,14 @@
+# Copyright (c) 2026 Yuki Kimoto
+# MIT License
+
+class Go::UV::Handle::Idle extends Go::UV::Handle {
+  
+  # Class Methods
+  static method new : Go::UV::Handle::Idle () {
+    
+    my $self = new Go::UV::Handle::Idle;
+    
+    return $self;
+  }
+  
+}
