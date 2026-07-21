@@ -10,7 +10,6 @@ typedef struct {
   SPVM_ENV* env;
   SPVM_VALUE* stack;
   SPVM_OBJ* obj_uv_handle;
-  SPVM_OBJ* obj_cb;
   uv_handle_t* related_handle;
 } SPVM__Go__UV__Loop__HANDLE_DATA;
 
@@ -102,7 +101,6 @@ int32_t SPVM__Go__UV__Loop__timer(SPVM_ENV* env, SPVM_VALUE* stack) {
   timer_handle_data->env = env;
   timer_handle_data->stack = stack;
   timer_handle_data->obj_uv_handle = obj_uv_handle;
-  timer_handle_data->obj_cb = obj_cb;
   env->set_field_object_by_name(env, stack, obj_uv_handle, "cb", obj_cb, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
   
@@ -261,7 +259,6 @@ int32_t SPVM__Go__UV__Loop__poll(SPVM_ENV* env, SPVM_VALUE* stack) {
   poll_handle_data->env = env;
   poll_handle_data->stack = stack;
   poll_handle_data->obj_uv_handle = obj_uv_handle;
-  poll_handle_data->obj_cb = obj_cb;
   env->set_field_object_by_name(env, stack, obj_uv_handle, "cb", obj_cb, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
   
@@ -313,7 +310,6 @@ int32_t SPVM__Go__UV__Loop__async(SPVM_ENV* env, SPVM_VALUE* stack) {
   handle_data->env = env;
   handle_data->stack = stack;
   handle_data->obj_uv_handle = obj_uv_handle;
-  handle_data->obj_cb = obj_cb;
   env->set_field_object_by_name(env, stack, obj_uv_handle, "cb", obj_cb, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
   
