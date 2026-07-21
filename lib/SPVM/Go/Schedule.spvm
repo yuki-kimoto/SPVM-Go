@@ -203,7 +203,7 @@ class Go::Schedule {
       $goroutine->{cb} = $enable_goroutine_cb;
       $goroutine->{handle_type} = Go::UV::Handle->UV_ASYNC;
       my $uv_loop = $self->{uv_loop};
-      $uv_loop->async($goroutine);
+      $uv_loop->async($goroutine, $enable_goroutine_cb);
     }
     
     if ($self->{disabled_goroutines_h}->{$goroutine_address}) {

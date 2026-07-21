@@ -281,6 +281,7 @@ int32_t SPVM__Go__UV__Loop__async(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   SPVM_OBJ* obj_uv_loop = stack[0].oval;
   SPVM_OBJ* obj_uv_handle = stack[1].oval;
+  SPVM_OBJ* obj_cb = stack[2].oval;
   
   uv_loop_t* uv_loop = env->get_pointer(env, stack, obj_uv_loop);
   uv_async_t* address = env->new_memory_block(env, stack, sizeof(uv_async_t));
@@ -290,6 +291,7 @@ int32_t SPVM__Go__UV__Loop__async(SPVM_ENV* env, SPVM_VALUE* stack) {
   handle_data->env = env;
   handle_data->stack = stack;
   handle_data->obj_uv_handle = obj_uv_handle;
+  handle_data->obj_cb = obj_cb;
   
   address->data = handle_data;
   
