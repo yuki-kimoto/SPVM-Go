@@ -4,6 +4,7 @@
 class Go::UV::Loop : pointer {
   
   allow Go::UV;
+  allow Go::UV::Handle;
   
   use Go::UV::Handle;
   use Go::UV::Handle::Idle;
@@ -45,10 +46,10 @@ class Go::UV::Loop : pointer {
   
   native method handle_async_send_v2 : void ($uv_handle : Go::UV::Handle);
   
-  native method handle_destroy : void ($uv_handle : Go::UV::Handle);
-  
   native method handle_timer_start : void ($uv_handle : Go::UV::Handle::Timer, $timeout : long, $repeat : long);
   
   native method handle_timer_stop : void ($uv_handle : Go::UV::Handle::Timer);
+  
+  private native method handle_destroy : void ($uv_handle : Go::UV::Handle);
   
 }

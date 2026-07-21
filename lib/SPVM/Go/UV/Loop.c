@@ -173,6 +173,9 @@ int32_t SPVM__Go__UV__Loop__new_idle(SPVM_ENV* env, SPVM_VALUE* stack) {
     return env->die(env, stack, "uv_idle_init failed. status=%d.", __func__, FILE_NAME, __LINE__, status);
   }
   
+  env->set_field_object_by_name(env, stack, obj_uv_handle, "loop", obj_uv_loop, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) { return error_id; }
+  
   stack[0].oval = obj_uv_handle;
   
   return 0;
@@ -430,6 +433,9 @@ int32_t SPVM__Go__UV__Loop__new_async(SPVM_ENV* env, SPVM_VALUE* stack) {
     return env->die(env, stack, "uv_async_init failed. status=%d.", __func__, FILE_NAME, __LINE__, status);
   }
   
+  env->set_field_object_by_name(env, stack, obj_uv_handle, "loop", obj_uv_loop, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) { return error_id; }
+  
   stack[0].oval = obj_uv_handle;
   
   return 0;
@@ -460,6 +466,9 @@ int32_t SPVM__Go__UV__Loop__new_timer(SPVM_ENV* env, SPVM_VALUE* stack) {
   if (!(status == 0)) {
     return env->die(env, stack, "uv_timer_init failed. status=%d.", __func__, FILE_NAME, __LINE__, status);
   }
+  
+  env->set_field_object_by_name(env, stack, obj_uv_handle, "loop", obj_uv_loop, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) { return error_id; }
   
   stack[0].oval = obj_uv_handle;
   

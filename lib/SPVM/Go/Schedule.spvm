@@ -277,8 +277,6 @@ class Go::Schedule {
     $uv_loop->handle_idle_start($uv_handle_idle, $process_next_goroutine_cb);
     
     $uv_loop->run(UV_CONST->UV_RUN_DEFAULT);
-    
-    $uv_loop->handle_destroy($uv_handle_idle);
   }
   
   private method loop_alive : int () {
