@@ -108,7 +108,7 @@ int32_t SPVM__Go__UV__Loop__timer(SPVM_ENV* env, SPVM_VALUE* stack) {
 }
 
 
-static void SPVM__Go__UV__Loop__idle_start_cb(uv_idle_t* handle) {
+static void SPVM__Go__UV__Loop__cb(uv_idle_t* handle) {
   int32_t error_id = 0;
   
   SPVM__Go__UV__Loop__HANDLE_DATA* handle_data = (SPVM__Go__UV__Loop__HANDLE_DATA*)handle->data;
@@ -162,7 +162,7 @@ int32_t SPVM__Go__UV__Loop__handle_idle_start(SPVM_ENV* env, SPVM_VALUE* stack) 
   
   uv_idle_t* uv_handle = env->get_pointer(env, stack, obj_uv_handle);
   
-  uv_idle_start(uv_handle, SPVM__Go__UV__Loop__idle_start_cb);
+  uv_idle_start(uv_handle, SPVM__Go__UV__Loop__cb);
   
   return 0;
 }
