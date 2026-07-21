@@ -230,6 +230,9 @@ int32_t SPVM__Go__UV__Loop__poll(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t error_id = 0;
   SPVM_OBJ* obj_uv_loop = stack[0].oval;
   SPVM_OBJ* obj_uv_handle = stack[1].oval;
+  SPVM_OBJ* obj_cb = stack[2].oval;
+  
+  assert(obj_cb);
   
   uv_loop_t* uv_loop = env->get_pointer(env, stack, obj_uv_loop);
   uv_poll_t* poll_handle = env->new_memory_block(env, stack, sizeof(uv_poll_t));
@@ -248,6 +251,7 @@ int32_t SPVM__Go__UV__Loop__poll(SPVM_ENV* env, SPVM_VALUE* stack) {
   poll_handle_data->env = env;
   poll_handle_data->stack = stack;
   poll_handle_data->obj_uv_handle = obj_uv_handle;
+  poll_handle_data->obj_cb = obj_cb;
   
   poll_handle->data = poll_handle_data;
   

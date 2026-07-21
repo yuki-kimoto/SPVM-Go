@@ -171,7 +171,7 @@ class Go::Schedule {
       $goroutine->{event_type} = $schedule_type == &TYPE_IO_READ ? Go::UV::Handle->UV_READABLE : Go::UV::Handle->UV_WRITABLE;
       
       my $uv_loop = $self->{uv_loop};
-      $uv_loop->poll($goroutine);
+      $uv_loop->poll($goroutine, $enable_goroutine_cb);
       
       if (Go->ENV_DEBUG) {
         Fn->say_stderr(Format->sprintf("[Go Debug]Register goroutine wait for IO (Callback:%p, QueueNum:%d.)", [(object)$goroutine->{task}, $self->{goroutines}->length]));

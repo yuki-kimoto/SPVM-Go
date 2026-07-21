@@ -19,7 +19,7 @@ class Go::UV::Loop : pointer {
   # Instance Methods
   native method timer : void ($uv_handle : Go::UV::Handle, $cb : Go::UV::Callback::Handle);
   
-  native method poll : void ($uv_handle : Go::UV::Handle);
+  native method poll : void ($uv_handle : Go::UV::Handle, $cb : Go::UV::Callback::Handle);
   
   native method async : void ($uv_handle : Go::UV::Handle, $cb : Go::UV::Callback::Handle);
   
