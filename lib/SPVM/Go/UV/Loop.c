@@ -121,8 +121,8 @@ static void SPVM__Go__UV__Loop__cb(uv_idle_t* handle) {
   SPVM_ENV* env = handle_data->env;
   SPVM_VALUE* stack = handle_data->stack;
   SPVM_OBJ* obj_uv_handle = handle_data->obj_uv_handle;
+  SPVM_OBJ* obj_cb = handle_data->obj_cb;
   
-  SPVM_OBJ* obj_cb = env->get_field_object_by_name(env, stack, obj_uv_handle, "cb", &error_id, __func__, FILE_NAME, __LINE__);
   assert(obj_cb);
   stack[0].oval = obj_cb;
   stack[1].oval = obj_uv_handle;
