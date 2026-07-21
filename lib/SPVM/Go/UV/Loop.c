@@ -68,7 +68,7 @@ static void SPVM__Go__UV__Loop__enable_goroutine_cb_for_timer(uv_timer_t* handle
   SPVM__Go__UV__Loop__enable_goroutine_cb((uv_handle_t*)handle);
 }
 
-static void SPVM__Go__UV__Loop__enable_goroutine_cb_for_poll(uv_poll_t* handle) {
+static void SPVM__Go__UV__Loop__enable_goroutine_cb_for_poll(uv_poll_t* handle, int status, int event) {
   SPVM__Go__UV__Loop__enable_goroutine_cb((uv_handle_t*)handle);
 }
 
