@@ -61,6 +61,10 @@ class Go::UV::Handle : pointer {
     return $self;
   }
   
+  method close : void () {
+    $self->loop->handle_close($self);
+  }
+  
   method DESTROY : void () {
     $self->{loop}->handle_destroy($self);
   }

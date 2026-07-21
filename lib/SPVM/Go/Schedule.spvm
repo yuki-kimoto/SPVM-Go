@@ -154,6 +154,12 @@ class Go::Schedule {
     my $enable_goroutine_cb = [$goroutine : Go::Goroutine, $schedule : Go::Schedule = $self] method : void ($uv_handle : Go::UV::Handle) {
       $schedule->enable_goroutine($goroutine);
     };
+    
+    my $enable_goroutine_cb_v2 = [$goroutine : Go::Goroutine, $schedule : Go::Schedule = $self] method : void ($uv_handle : Go::UV::Handle) {
+      $schedule->enable_goroutine($goroutine);
+      $uv_handle->close;
+    };
+    
     if ($schedule_type == &TYPE_IO_READ ||$schedule_type == &TYPE_IO_WRITE) {
       unless ($fd >= 0) {
         die "The file descriptor \$fd in schedule type TYPE_IO_READ or TYPE_IO_WRITE must be a non-negative value.";
@@ -268,7 +274,7 @@ class Go::Schedule {
       
       unless ($schedule->loop_alive) {
         $uv_idle->stop;
-        $schedule->{uv_loop}->handle_close($uv_idle);
+        $uv_idle->close;
       }
     };
     
