@@ -269,18 +269,20 @@ class Go::Schedule {
     
     my $uv_loop = $self->{uv_loop};
     
-    my $uv_handle_idle = $uv_loop->handle_idle_new;
-    
-    $uv_handle_idle->set_cb([$schedule : Go::Schedule = $self] method : void ($uv_handle : Go::UV::Handle::Idle) {
+    my $process_next_goroutine_cb = [$schedule : Go::Schedule = $self] method : void ($uv_handle : Go::UV::Handle::Idle) {
       $schedule->process_next_goroutine;
       
       unless ($schedule->loop_alive) {
         $schedule->{uv_loop}->handle_idle_stop($uv_handle);
         $schedule->{uv_loop}->handle_close($uv_handle);
       }
-    });
+    };
     
-    $uv_loop->handle_idle_start($uv_handle_idle);
+    my $uv_handle_idle = $uv_loop->handle_idle_new;
+    
+    $uv_handle_idle->set_cb($process_next_goroutine_cb);
+    
+    $uv_loop->handle_idle_start($uv_handle_idle, $process_next_goroutine_cb);
     
     $uv_loop->run(UV_CONST->UV_RUN_DEFAULT);
     

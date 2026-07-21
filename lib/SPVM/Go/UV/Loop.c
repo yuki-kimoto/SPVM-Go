@@ -170,7 +170,11 @@ int32_t SPVM__Go__UV__Loop__handle_idle_start(SPVM_ENV* env, SPVM_VALUE* stack) 
   SPVM_OBJ* obj_uv_handle = stack[1].oval;
   SPVM_OBJ* obj_cb = stack[2].oval;
   
+  assert(obj_cb);
+  
   uv_idle_t* uv_handle = env->get_pointer(env, stack, obj_uv_handle);
+  SPVM__Go__UV__Loop__HANDLE_DATA* uv_handle_data = uv_handle->data;
+  uv_handle_data->obj_cb = obj_cb;
   
   int32_t status = uv_idle_start(uv_handle, SPVM__Go__UV__Loop__cb);
   

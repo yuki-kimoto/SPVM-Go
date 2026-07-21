@@ -31,7 +31,7 @@ class Go::UV::Loop : pointer {
   # For Go::UV::Handle
   native method handle_idle_new : Go::UV::Handle::Idle ();
   
-  native method handle_idle_start : void ($uv_handle : Go::UV::Handle::Idle);
+  native method handle_idle_start : void ($uv_handle : Go::UV::Handle::Idle, $cb : Go::UV::Callback::Handle);
   
   native method handle_idle_stop : void ($uv_handle : Go::UV::Handle::Idle);
   
