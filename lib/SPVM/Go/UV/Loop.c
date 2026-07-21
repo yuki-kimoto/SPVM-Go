@@ -374,3 +374,69 @@ int32_t SPVM__Go__UV__Loop__handle_async_new(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   return 0;
 }
+
+int32_t SPVM__Go__UV__Loop__handle_timer_new(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t error_id = 0;
+  
+  SPVM_OBJ* obj_uv_loop = stack[0].oval;
+  
+  uv_loop_t* uv_loop = env->get_pointer(env, stack, obj_uv_loop);
+  uv_timer_t* uv_handle = env->new_memory_block(env, stack, sizeof(uv_timer_t));
+  
+  SPVM__Go__UV__Loop__HANDLE_DATA* handle_data = env->new_memory_block(env, stack, sizeof(SPVM__Go__UV__Loop__HANDLE_DATA));
+  handle_data->env = env;
+  handle_data->stack = stack;
+  
+  uv_handle->data = handle_data;
+  
+  SPVM_OBJ* obj_uv_handle = env->new_pointer_object_by_name(env, stack, "Go::UV::Handle::Timer", uv_handle, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) return error_id;
+  
+  handle_data->obj_uv_handle = obj_uv_handle;
+  
+  int32_t status = uv_timer_init(uv_loop, uv_handle);
+  
+  if (!(status == 0)) {
+    return env->die(env, stack, "uv_timer_init failed. status=%d.", __func__, FILE_NAME, __LINE__, status);
+  }
+  
+  stack[0].oval = obj_uv_handle;
+  
+  return 0;
+}
+
+int32_t SPVM__Go__UV__Loop__handle_timer_start(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  SPVM_OBJ* obj_uv_loop = stack[0].oval;
+  SPVM_OBJ* obj_uv_handle = stack[1].oval;
+  SPVM_OBJ* obj_cb = stack[2].oval;
+  int64_t timeout = stack[3].lval;
+  int64_t repeat = stack[4].lval;
+  
+  uv_timer_t* uv_handle = env->get_pointer(env, stack, obj_uv_handle);
+  
+  int32_t status = uv_timer_start(uv_handle, SPVM__Go__UV__Loop__cb, (uint64_t)timeout, (uint64_t)repeat);
+  
+  if (!(status == 0)) {
+    return env->die(env, stack, "uv_timer_start failed. status=%d.", __func__, FILE_NAME, __LINE__, status);
+  }
+  
+  return 0;
+}
+
+int32_t SPVM__Go__UV__Loop__handle_timer_stop(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  SPVM_OBJ* obj_uv_loop = stack[0].oval;
+  SPVM_OBJ* obj_uv_handle = stack[1].oval;
+  
+  uv_timer_t* uv_handle = env->get_pointer(env, stack, obj_uv_handle);
+  
+  int32_t status = uv_timer_stop(uv_handle);
+  
+  if (!(status == 0)) {
+    return env->die(env, stack, "uv_timer_stop failed. status=%d.", __func__, FILE_NAME, __LINE__, status);
+  }
+  
+  return 0;
+}

@@ -8,6 +8,7 @@ class Go::UV::Loop : pointer {
   use Go::UV::Handle;
   use Go::UV::Handle::Idle;
   use Go::UV::Handle::Async;
+  use Go::UV::Handle::Timer;
   use Go::UV::Callback::LoopAlive;
   use Go::UV::Constant;
   use Go::UV::Callback::Handle;
@@ -41,5 +42,11 @@ class Go::UV::Loop : pointer {
   native method handle_destroy : void ($uv_handle : Go::UV::Handle);
   
   native method handle_async_new : Go::UV::Handle::Async ();
+  
+  native method handle_timer_new : Go::UV::Handle::Timer ();
+  
+  native method handle_timer_start : void ($uv_handle : Go::UV::Handle::Timer, $timeout : long, $repeat : long);
+  
+  native method handle_timer_stop : void ($uv_handle : Go::UV::Handle::Timer);
   
 }
