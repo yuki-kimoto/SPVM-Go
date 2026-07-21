@@ -64,11 +64,11 @@ static void SPVM__Go__UV__Loop__enable_goroutine_cb(uv_handle_t* handle) {
   uv_close((uv_handle_t*)handle, SPVM__Go__UV__Loop__close_cb);
 }
 
-static void SPVM__Go__UV__Loop__enable_goroutine_cb_for_poll(uv_poll_t* handle, int status, int events) {
+static void SPVM__Go__UV__Loop__enable_goroutine_cb_for_timer(uv_timer_t* handle) {
   SPVM__Go__UV__Loop__enable_goroutine_cb((uv_handle_t*)handle);
 }
 
-static void SPVM__Go__UV__Loop__enable_goroutine_cb_for_timer(uv_timer_t* handle) {
+static void SPVM__Go__UV__Loop__enable_goroutine_cb_for_poll(uv_poll_t* handle) {
   SPVM__Go__UV__Loop__enable_goroutine_cb((uv_handle_t*)handle);
 }
 
@@ -114,7 +114,7 @@ int32_t SPVM__Go__UV__Loop__timer(SPVM_ENV* env, SPVM_VALUE* stack) {
 }
 
 
-static void SPVM__Go__UV__Loop__cb(uv_idle_t* handle) {
+static void SPVM__Go__UV__Loop__handle_cb(uv_handle_t* handle) {
   int32_t error_id = 0;
   
   SPVM__Go__UV__Loop__HANDLE_DATA* handle_data = (SPVM__Go__UV__Loop__HANDLE_DATA*)handle->data;
@@ -132,6 +132,19 @@ static void SPVM__Go__UV__Loop__cb(uv_idle_t* handle) {
     spvm_diag("[Unexcepted Error]Callback 'cb' failed.");
     abort();
   }
+}
+
+static void SPVM__Go__UV__Loop__idle_cb(uv_idle_t* handle) {
+  
+  SPVM__Go__UV__Loop__handle_cb((uv_handle_t*)handle);
+}
+
+static void SPVM__Go__UV__Loop__async_cb(uv_async_t* handle) {
+  SPVM__Go__UV__Loop__handle_cb((uv_handle_t*)handle);
+}
+
+static void SPVM__Go__UV__Loop__timer_cb(uv_timer_t* handle) {
+  SPVM__Go__UV__Loop__handle_cb((uv_handle_t*)handle);
 }
 
 int32_t SPVM__Go__UV__Loop__new_idle(SPVM_ENV* env, SPVM_VALUE* stack) {
@@ -181,7 +194,7 @@ int32_t SPVM__Go__UV__Loop__handle_idle_start(SPVM_ENV* env, SPVM_VALUE* stack) 
   env->set_field_object_by_name(env, stack, obj_uv_handle, "cb", obj_cb, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
   
-  int32_t status = uv_idle_start(uv_handle, SPVM__Go__UV__Loop__cb);
+  int32_t status = uv_idle_start(uv_handle, SPVM__Go__UV__Loop__idle_cb);
   
   if (!(status == 0)) {
     return env->die(env, stack, "uv_idle_start failed. status=%d.", __func__, FILE_NAME, __LINE__, status);
@@ -411,7 +424,7 @@ int32_t SPVM__Go__UV__Loop__new_async(SPVM_ENV* env, SPVM_VALUE* stack) {
   env->set_field_object_by_name(env, stack, obj_uv_handle, "cb", obj_cb, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
   
-  int32_t status = uv_async_init(uv_loop, uv_handle, SPVM__Go__UV__Loop__cb);
+  int32_t status = uv_async_init(uv_loop, uv_handle, SPVM__Go__UV__Loop__enable_goroutine_cb_for_async);
   
   if (!(status == 0)) {
     return env->die(env, stack, "uv_async_init failed. status=%d.", __func__, FILE_NAME, __LINE__, status);
@@ -463,7 +476,7 @@ int32_t SPVM__Go__UV__Loop__handle_timer_start(SPVM_ENV* env, SPVM_VALUE* stack)
   
   uv_timer_t* uv_handle = env->get_pointer(env, stack, obj_uv_handle);
   
-  int32_t status = uv_timer_start(uv_handle, SPVM__Go__UV__Loop__cb, (uint64_t)timeout_msec, (uint64_t)interval_msec);
+  int32_t status = uv_timer_start(uv_handle, SPVM__Go__UV__Loop__timer_cb, (uint64_t)timeout_msec, (uint64_t)interval_msec);
   
   if (!(status == 0)) {
     return env->die(env, stack, "uv_timer_start failed. status=%d.", __func__, FILE_NAME, __LINE__, status);
