@@ -90,6 +90,8 @@ int32_t SPVM__Go__UV__Loop__timer(SPVM_ENV* env, SPVM_VALUE* stack) {
   SPVM_OBJ* obj_uv_loop = stack[0].oval;
   SPVM_OBJ* obj_uv_handle = stack[1].oval;
   SPVM_OBJ* obj_cb = stack[2].oval;
+  int64_t timeout_msec = stack[3].lval;
+  int64_t interval_msec = stack[4].lval;
   
   assert(obj_cb);
   
@@ -106,8 +108,7 @@ int32_t SPVM__Go__UV__Loop__timer(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   timer_handle->data = timer_handle_data;
   
-  int64_t timeout_msec = env->get_field_long_by_name(env, stack, obj_uv_handle, "timeout_msec", &error_id, __func__, FILE_NAME, __LINE__);
-  uv_timer_start(timer_handle, SPVM__Go__UV__Loop__enable_goroutine_cb_for_timer, timeout_msec, 0);
+  uv_timer_start(timer_handle, SPVM__Go__UV__Loop__enable_goroutine_cb_for_timer, timeout_msec, interval_msec);
   
   return 0;
 }
@@ -344,6 +345,21 @@ int32_t SPVM__Go__UV__Loop__handle_async_send(SPVM_ENV* env, SPVM_VALUE* stack) 
   return 0;
 }
 
+
+int32_t SPVM__Go__UV__Loop__handle_async_send_v2(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t error_id = 0;
+  
+  SPVM_OBJ* obj_uv_loop = stack[0].oval;
+  SPVM_OBJ* obj_uv_handle = stack[1].oval;
+  
+  uv_async_t* uv_handle = (uv_async_t*)env->get_pointer(env, stack, obj_uv_handle);
+  
+  uv_async_send(uv_handle);
+  
+  return 0;
+}
+
 int32_t SPVM__Go__UV__Loop__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   SPVM_OBJ* obj_uv_loop = stack[0].oval;
@@ -442,12 +458,12 @@ int32_t SPVM__Go__UV__Loop__handle_timer_start(SPVM_ENV* env, SPVM_VALUE* stack)
   SPVM_OBJ* obj_uv_loop = stack[0].oval;
   SPVM_OBJ* obj_uv_handle = stack[1].oval;
   SPVM_OBJ* obj_cb = stack[2].oval;
-  int64_t timeout = stack[3].lval;
-  int64_t repeat = stack[4].lval;
+  int64_t timeout_msec = stack[3].lval;
+  int64_t interval_msec = stack[4].lval;
   
   uv_timer_t* uv_handle = env->get_pointer(env, stack, obj_uv_handle);
   
-  int32_t status = uv_timer_start(uv_handle, SPVM__Go__UV__Loop__cb, (uint64_t)timeout, (uint64_t)repeat);
+  int32_t status = uv_timer_start(uv_handle, SPVM__Go__UV__Loop__cb, (uint64_t)timeout_msec, (uint64_t)interval_msec);
   
   if (!(status == 0)) {
     return env->die(env, stack, "uv_timer_start failed. status=%d.", __func__, FILE_NAME, __LINE__, status);
