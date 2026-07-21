@@ -3,12 +3,15 @@
 
 class Go::UV::Handle::Idle extends Go::UV::Handle {
   
-  # Class Methods
-  static method new : Go::UV::Handle::Idle () {
+  # Instance Methods
+  method start : void ($cb : Go::UV::Callback::Handle) {
     
-    my $self = new Go::UV::Handle::Idle;
+    $self->{loop}->handle_idle_start($self, $cb);
+  }
+  
+  method stop : void () {
     
-    return $self;
+    $self->{loop}->handle_idle_stop($self);
   }
   
 }
