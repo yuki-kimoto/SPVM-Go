@@ -47,20 +47,11 @@ class Go::UV::Handle : pointer {
   
   has address : Address;
   
-  has related_handle_address : Address;
-  
   has cb : rw Go::UV::Callback::Handle;
   
   has loop : ro Go::UV::Loop;
   
-  # Class Methods
-  static method new : Go::UV::Handle () {
-    
-    my $self = new Go::UV::Handle;
-    
-    return $self;
-  }
-  
+  # Instance Methods
   method close : void () {
     $self->loop->handle_close($self);
   }
