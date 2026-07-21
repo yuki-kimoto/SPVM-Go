@@ -189,7 +189,7 @@ class Go::Schedule {
       $goroutine->{handle_type} = Go::UV::Handle->UV_TIMER;
       
       my $uv_loop = $self->{uv_loop};
-      $uv_loop->timer($goroutine);
+      $uv_loop->timer($goroutine, $enable_goroutine_cb);
       
       unless ($deadline) {
         die "The deadline \$deadline in schedule type TYPE_TIMER must be defined.";
