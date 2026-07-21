@@ -11,6 +11,7 @@ class Go::Goroutine extends Go::UV::Handle: pointer {
   use Go::Channel;
   use Go::Time;
   use Resource::Coro;
+  use Go::UV::Handle;
   
   # Fields
   has return_back : Go::Goroutine;
@@ -20,6 +21,8 @@ class Go::Goroutine extends Go::UV::Handle: pointer {
   has finished : byte;
   
   has disabled : byte;
+  
+  has uv_handle : Go::UV::Handle;
   
   # Class Methods
   static method new : Go::Goroutine ($task :  Callback = undef, $return_back : Go::Goroutine = undef) {
