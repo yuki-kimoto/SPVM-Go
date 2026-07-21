@@ -121,7 +121,7 @@ static void SPVM__Go__UV__Loop__cb(uv_idle_t* handle) {
   SPVM_ENV* env = handle_data->env;
   SPVM_VALUE* stack = handle_data->stack;
   SPVM_OBJ* obj_uv_handle = handle_data->obj_uv_handle;
-  SPVM_OBJ* obj_cb = handle_data->obj_cb;
+  SPVM_OBJ* obj_cb = env->get_field_object_by_name(env, stack, obj_uv_handle, "cb", &error_id, __func__, FILE_NAME, __LINE__);
   
   assert(obj_cb);
   stack[0].oval = obj_cb;
@@ -166,6 +166,8 @@ int32_t SPVM__Go__UV__Loop__handle_idle_new(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 int32_t SPVM__Go__UV__Loop__handle_idle_start(SPVM_ENV* env, SPVM_VALUE* stack) {
   
+  int32_t error_id = 0;
+  
   SPVM_OBJ* obj_uv_loop = stack[0].oval;
   SPVM_OBJ* obj_uv_handle = stack[1].oval;
   SPVM_OBJ* obj_cb = stack[2].oval;
@@ -174,7 +176,9 @@ int32_t SPVM__Go__UV__Loop__handle_idle_start(SPVM_ENV* env, SPVM_VALUE* stack) 
   
   uv_idle_t* uv_handle = env->get_pointer(env, stack, obj_uv_handle);
   SPVM__Go__UV__Loop__HANDLE_DATA* uv_handle_data = uv_handle->data;
-  uv_handle_data->obj_cb = obj_cb;
+  
+  env->set_field_object_by_name(env, stack, obj_uv_handle, "cb", obj_cb, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) { return error_id; }
   
   int32_t status = uv_idle_start(uv_handle, SPVM__Go__UV__Loop__cb);
   
