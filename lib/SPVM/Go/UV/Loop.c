@@ -167,7 +167,11 @@ int32_t SPVM__Go__UV__Loop__handle_idle_start(SPVM_ENV* env, SPVM_VALUE* stack) 
   
   uv_idle_t* uv_handle = env->get_pointer(env, stack, obj_uv_handle);
   
-  uv_idle_start(uv_handle, SPVM__Go__UV__Loop__cb);
+  int32_t status = uv_idle_start(uv_handle, SPVM__Go__UV__Loop__cb);
+  
+  if (!(status == 0)) {
+    return env->die(env, stack, "uv_idle_start failed. status=%d.", __func__, FILE_NAME, __LINE__, status);
+  }
   
   return 0;
 }
@@ -181,7 +185,9 @@ int32_t SPVM__Go__UV__Loop__handle_idle_stop(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t status = uv_idle_stop(uv_handle);
   
-  assert(status == 0);
+  if (!(status == 0)) {
+    return env->die(env, stack, "uv_idle_stop failed. status=%d.", __func__, FILE_NAME, __LINE__, status);
+  }
   
   return 0;
 }
