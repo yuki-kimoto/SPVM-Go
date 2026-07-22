@@ -281,6 +281,7 @@ class Go::Schedule {
     };
     
     my $uv_idle = $uv_loop->new_idle;
+    $uv_loop->idle_init($uv_idle);
     $uv_idle->start($process_next_goroutine_cb);
     
     $uv_loop->run(UV_CONST->UV_RUN_DEFAULT);
