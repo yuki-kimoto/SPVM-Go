@@ -45,7 +45,7 @@ class Go::UV::Loop : pointer {
   
   # For Go::UV::Handle
   
-  native method handle_async_send_v2 : void ($uv_handle : Go::UV::Handle);
+  native method handle_async_send : void ($uv_handle : Go::UV::Handle);
   
   native method handle_timer_start : void ($uv_handle : Go::UV::Handle::Timer, $cb : Go::UV::Callback::Handle, $timeout : long, $repeat : long);
   
