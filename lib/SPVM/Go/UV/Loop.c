@@ -150,44 +150,6 @@ static void SPVM__Go__UV__Loop__timer_cb(uv_timer_t* handle) {
   SPVM__Go__UV__Loop__handle_cb((uv_handle_t*)handle);
 }
 
-int32_t SPVM__Go__UV__Loop__handle_close(SPVM_ENV* env, SPVM_VALUE* stack) {
-  
-  int32_t error_id = 0;
-  
-  SPVM_OBJ* obj_uv_loop = stack[0].oval;
-  SPVM_OBJ* obj_uv_handle = stack[1].oval;
-  SPVM_OBJ* obj_cb = stack[2].oval;
-  
-  env->set_field_object_by_name(env, stack, obj_uv_handle, "close_cb", obj_cb, &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) return error_id;
-  
-  uv_handle_t* uv_handle = env->get_pointer(env, stack, obj_uv_handle);
-  
-  uv_close(uv_handle, SPVM__Go__UV__Loop__close_cb_v2);
-  
-  return 0;
-}
-
-int32_t SPVM__Go__UV__Loop__handle_free(SPVM_ENV* env, SPVM_VALUE* stack) {
-  
-  SPVM_OBJ* obj_uv_handle = stack[0].oval;
-  
-  int32_t no_free = env->no_free(env, stack, obj_uv_handle);
-  
-  if (!no_free) {
-    uv_handle_t* uv_handle = env->get_pointer(env, stack, obj_uv_handle);
-    
-    SPVM__Go__UV__Loop__HANDLE_DATA* uv_handle_data = (SPVM__Go__UV__Loop__HANDLE_DATA*)uv_handle->data;
-    
-    env->free_memory_block(env, stack, uv_handle_data);
-    uv_handle->data = NULL;
-    env->free_memory_block(env, stack, uv_handle);
-    env->set_no_free(env, stack, obj_uv_handle, 1);
-  }
-  
-  return 0;
-}
-
 int32_t SPVM__Go__UV__Loop__poll(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t error_id = 0;
@@ -349,47 +311,6 @@ int32_t SPVM__Go__UV__Loop__idle_init(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 }
 
-int32_t SPVM__Go__UV__Loop__handle_idle_start(SPVM_ENV* env, SPVM_VALUE* stack) {
-  
-  int32_t error_id = 0;
-  
-  SPVM_OBJ* obj_uv_loop = stack[0].oval;
-  SPVM_OBJ* obj_uv_idle = stack[1].oval;
-  SPVM_OBJ* obj_cb = stack[2].oval;
-  
-  assert(obj_cb);
-  
-  uv_idle_t* uv_idle = env->get_pointer(env, stack, obj_uv_idle);
-  SPVM__Go__UV__Loop__HANDLE_DATA* uv_idle_data = uv_idle->data;
-  
-  env->set_field_object_by_name(env, stack, obj_uv_idle, "cb", obj_cb, &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) return error_id;
-  
-  int32_t status = uv_idle_start(uv_idle, SPVM__Go__UV__Loop__idle_cb);
-  
-  if (!(status == 0)) {
-    return env->die(env, stack, "uv_idle_start failed. status=%d.", __func__, FILE_NAME, __LINE__, status);
-  }
-  
-  return 0;
-}
-
-int32_t SPVM__Go__UV__Loop__handle_idle_stop(SPVM_ENV* env, SPVM_VALUE* stack) {
-  
-  SPVM_OBJ* obj_uv_loop = stack[0].oval;
-  SPVM_OBJ* obj_uv_idle = stack[1].oval;
-  
-  uv_idle_t* uv_idle = env->get_pointer(env, stack, obj_uv_idle);
-  
-  int32_t status = uv_idle_stop(uv_idle);
-  
-  if (!(status == 0)) {
-    return env->die(env, stack, "uv_idle_stop failed. status=%d.", __func__, FILE_NAME, __LINE__, status);
-  }
-  
-  return 0;
-}
-
 int32_t SPVM__Go__UV__Loop__new_async(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t error_id = 0;
@@ -501,6 +422,47 @@ int32_t SPVM__Go__UV__Loop__timer_init(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 }
 
+int32_t SPVM__Go__UV__Loop__handle_idle_start(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t error_id = 0;
+  
+  SPVM_OBJ* obj_uv_loop = stack[0].oval;
+  SPVM_OBJ* obj_uv_idle = stack[1].oval;
+  SPVM_OBJ* obj_cb = stack[2].oval;
+  
+  assert(obj_cb);
+  
+  uv_idle_t* uv_idle = env->get_pointer(env, stack, obj_uv_idle);
+  SPVM__Go__UV__Loop__HANDLE_DATA* uv_idle_data = uv_idle->data;
+  
+  env->set_field_object_by_name(env, stack, obj_uv_idle, "cb", obj_cb, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) return error_id;
+  
+  int32_t status = uv_idle_start(uv_idle, SPVM__Go__UV__Loop__idle_cb);
+  
+  if (!(status == 0)) {
+    return env->die(env, stack, "uv_idle_start failed. status=%d.", __func__, FILE_NAME, __LINE__, status);
+  }
+  
+  return 0;
+}
+
+int32_t SPVM__Go__UV__Loop__handle_idle_stop(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  SPVM_OBJ* obj_uv_loop = stack[0].oval;
+  SPVM_OBJ* obj_uv_idle = stack[1].oval;
+  
+  uv_idle_t* uv_idle = env->get_pointer(env, stack, obj_uv_idle);
+  
+  int32_t status = uv_idle_stop(uv_idle);
+  
+  if (!(status == 0)) {
+    return env->die(env, stack, "uv_idle_stop failed. status=%d.", __func__, FILE_NAME, __LINE__, status);
+  }
+  
+  return 0;
+}
+
 int32_t SPVM__Go__UV__Loop__handle_timer_start(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t error_id = 0;
@@ -540,3 +502,42 @@ int32_t SPVM__Go__UV__Loop__handle_timer_stop(SPVM_ENV* env, SPVM_VALUE* stack) 
   
   return 0;
 }
+
+int32_t SPVM__Go__UV__Loop__handle_close(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t error_id = 0;
+  
+  SPVM_OBJ* obj_uv_loop = stack[0].oval;
+  SPVM_OBJ* obj_uv_handle = stack[1].oval;
+  SPVM_OBJ* obj_cb = stack[2].oval;
+  
+  env->set_field_object_by_name(env, stack, obj_uv_handle, "close_cb", obj_cb, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) return error_id;
+  
+  uv_handle_t* uv_handle = env->get_pointer(env, stack, obj_uv_handle);
+  
+  uv_close(uv_handle, SPVM__Go__UV__Loop__close_cb_v2);
+  
+  return 0;
+}
+
+int32_t SPVM__Go__UV__Loop__handle_free(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  SPVM_OBJ* obj_uv_handle = stack[0].oval;
+  
+  int32_t no_free = env->no_free(env, stack, obj_uv_handle);
+  
+  if (!no_free) {
+    uv_handle_t* uv_handle = env->get_pointer(env, stack, obj_uv_handle);
+    
+    SPVM__Go__UV__Loop__HANDLE_DATA* uv_handle_data = (SPVM__Go__UV__Loop__HANDLE_DATA*)uv_handle->data;
+    
+    env->free_memory_block(env, stack, uv_handle_data);
+    uv_handle->data = NULL;
+    env->free_memory_block(env, stack, uv_handle);
+    env->set_no_free(env, stack, obj_uv_handle, 1);
+  }
+  
+  return 0;
+}
+
