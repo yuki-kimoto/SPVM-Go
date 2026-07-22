@@ -8,7 +8,13 @@ class Go::UV {
   
   # Class Methods
   static method default_loop : Go::UV::Loop () {
-    return Go::UV::Loop->default_loop;
+    
+    my $uv_loop = Go::UV::Loop->default_loop;
+    
+    $uv_loop->{uv_handles_h} = Hash->new;
+    
+    return $uv_loop;
   }
+  
   
 }
