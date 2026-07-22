@@ -117,35 +117,6 @@ int32_t SPVM__Go__UV__Loop__run(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 }
 
-int32_t SPVM__Go__UV__Loop__timer(SPVM_ENV* env, SPVM_VALUE* stack) {
-  int32_t error_id = 0;
-  SPVM_OBJ* obj_uv_loop = stack[0].oval;
-  SPVM_OBJ* obj_uv_handle = stack[1].oval;
-  SPVM_OBJ* obj_cb = stack[2].oval;
-  int64_t timeout_msec = stack[3].lval;
-  int64_t interval_msec = stack[4].lval;
-  
-  assert(obj_cb);
-  
-  uv_loop_t* uv_loop = env->get_pointer(env, stack, obj_uv_loop);
-  uv_timer_t* timer_handle = env->new_memory_block(env, stack, sizeof(uv_timer_t));
-  uv_timer_init(uv_loop, timer_handle);
-  
-  SPVM__Go__UV__Loop__HANDLE_DATA* timer_handle_data = env->new_memory_block(env, stack, sizeof(SPVM__Go__UV__Loop__HANDLE_DATA));
-  timer_handle_data->env = env;
-  timer_handle_data->stack = stack;
-  timer_handle_data->obj_uv_handle = obj_uv_handle;
-  env->set_field_object_by_name(env, stack, obj_uv_handle, "cb", obj_cb, &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) return error_id;
-  
-  timer_handle->data = timer_handle_data;
-  
-  uv_timer_start(timer_handle, SPVM__Go__UV__Loop__enable_goroutine_cb_for_timer, timeout_msec, interval_msec);
-  
-  return 0;
-}
-
-
 static void SPVM__Go__UV__Loop__handle_cb(uv_handle_t* handle) {
   int32_t error_id = 0;
   
@@ -267,43 +238,6 @@ int32_t SPVM__Go__UV__Loop__poll(SPVM_ENV* env, SPVM_VALUE* stack) {
     
     uv_timer_start(timer_handle, SPVM__Go__UV__Loop__enable_goroutine_cb_for_timer, timeout_msec, 0);
   }
-  
-  return 0;
-}
-
-static void SPVM__Go__UV__Loop__enable_goroutine_cb_for_async(uv_async_t* handle) {
-  
-  SPVM__Go__UV__Loop__enable_goroutine_cb((uv_handle_t*)handle);
-}
-
-int32_t SPVM__Go__UV__Loop__async(SPVM_ENV* env, SPVM_VALUE* stack) {
-  
-  int32_t error_id = 0;
-  
-  SPVM_OBJ* obj_uv_loop = stack[0].oval;
-  SPVM_OBJ* obj_uv_handle = stack[1].oval;
-  SPVM_OBJ* obj_cb = stack[2].oval;
-  
-  assert(obj_cb);
-  
-  uv_loop_t* uv_loop = env->get_pointer(env, stack, obj_uv_loop);
-  uv_async_t* address = env->new_memory_block(env, stack, sizeof(uv_async_t));
-  uv_async_init(uv_loop, address, SPVM__Go__UV__Loop__enable_goroutine_cb_for_async);
-  
-  SPVM__Go__UV__Loop__HANDLE_DATA* handle_data = env->new_memory_block(env, stack, sizeof(SPVM__Go__UV__Loop__HANDLE_DATA));
-  handle_data->env = env;
-  handle_data->stack = stack;
-  handle_data->obj_uv_handle = obj_uv_handle;
-  env->set_field_object_by_name(env, stack, obj_uv_handle, "cb", obj_cb, &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) return error_id;
-  
-  address->data = handle_data;
-  
-  SPVM_OBJ* obj_address = env->new_pointer_object_by_name(env, stack, "Address", address, &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) return error_id;
-  
-  env->set_field_object_by_name(env, stack, obj_uv_handle, "address", obj_address, &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) return error_id;
   
   return 0;
 }
