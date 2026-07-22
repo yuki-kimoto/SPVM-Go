@@ -55,7 +55,7 @@ class Go::UV::Loop : pointer {
   
   private native method handle_idle_stop : void ($uv_handle : Go::UV::Handle::Idle);
   
-  private native static method handle_destroy : void ($uv_handle : Go::UV::Handle);
+  private native static method handle_free : void ($uv_handle : Go::UV::Handle);
   
   private native method handle_close : void ($uv_handle : Go::UV::Handle, $close_cb : Go::UV::Callback::Handle);
   
