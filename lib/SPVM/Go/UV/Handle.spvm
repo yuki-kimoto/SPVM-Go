@@ -48,8 +48,6 @@ class Go::UV::Handle : pointer {
   
   has io_timeout_occurred : byte;
   
-  has address : Address;
-  
   has cb : rw Go::UV::Callback::Handle;
   
   has close_cb : rw Go::UV::Callback::Handle;
