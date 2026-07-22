@@ -204,27 +204,6 @@ int32_t SPVM__Go__UV__Loop__poll(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 }
 
-int32_t SPVM__Go__UV__Loop__handle_async_send(SPVM_ENV* env, SPVM_VALUE* stack) {
-  
-  int32_t error_id = 0;
-  
-  SPVM_OBJ* obj_uv_loop = stack[0].oval;
-  SPVM_OBJ* obj_uv_handle = stack[1].oval;
-  
-  SPVM_OBJ* obj_address = env->get_field_object_by_name(env, stack, obj_uv_handle, "address", &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) return error_id;
-  
-  uv_async_t* address = (uv_async_t*)env->get_pointer(env, stack, obj_address);
-  
-  uv_async_send(address);
-  
-  env->set_field_object_by_name(env, stack, obj_uv_handle, "address", NULL, &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) return error_id;
-  
-  return 0;
-}
-
-
 int32_t SPVM__Go__UV__Loop__handle_async_send_v2(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t error_id = 0;
