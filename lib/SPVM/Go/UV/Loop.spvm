@@ -57,4 +57,34 @@ class Go::UV::Loop : pointer {
   
   private native method handle_close : void ($uv_handle : Go::UV::Handle, $close_cb : Go::UV::Callback::Handle);
   
+  # Utilities
+  private method set_uv_handle : void ($uv_handle  : Go::UV::Handle) {
+    
+    my $uv_handle_address = Fn->to_address($uv_handle);
+    
+    $self->{uv_handles_h}{$uv_handle_address} = $uv_handle;
+    
+    $uv_handle->{loop} = $self;
+    
+    weaken $uv_handle->{loop};
+  }
+  
+  private method exists_uv_handle : int ($uv_handle  : Go::UV::Handle) {
+    
+    my $uv_handle_address = Fn->to_address($uv_handle);
+    
+    return $self->{uv_handles_h}{$uv_handle_address}->(Go::UV::Handle) ? 1 : 0;
+  }
+  
+  private method delete_uv_handle : void ($uv_handle  : Go::UV::Handle) {
+    
+    if ($self->exists_uv_handle($uv_handle)) {
+      my $uv_handle_address = Fn->to_address($uv_handle);
+      
+      $self->{uv_handles_h}->delete($uv_handle_address);
+      
+      $uv_handle->{loop} = undef;
+    }
+  }
+  
 }

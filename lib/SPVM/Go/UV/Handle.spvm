@@ -3,6 +3,8 @@
 
 class Go::UV::Handle : pointer {
   
+  allow Go::UV::Loop;
+  
   use Callback;
   use Go::UV::Loop;
   use Go::UV::Callback::Handle;
