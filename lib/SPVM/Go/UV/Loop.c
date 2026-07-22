@@ -193,7 +193,9 @@ int32_t SPVM__Go__UV__Loop__new_idle(SPVM_ENV* env, SPVM_VALUE* stack) {
     return env->die(env, stack, "uv_idle_init failed. status=%d.", __func__, FILE_NAME, __LINE__, status);
   }
   
-  env->set_field_object_by_name(env, stack, obj_uv_handle, "loop", obj_uv_loop, &error_id, __func__, FILE_NAME, __LINE__);
+  stack[0].oval = obj_uv_loop;
+  stack[1].oval = obj_uv_handle;
+  env->call_instance_method_by_name(env, stack, "set_uv_handle", 2, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) return error_id;
   
   stack[0].oval = obj_uv_handle;
@@ -262,8 +264,7 @@ int32_t SPVM__Go__UV__Loop__handle_close(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 int32_t SPVM__Go__UV__Loop__handle_destroy(SPVM_ENV* env, SPVM_VALUE* stack) {
   
-  SPVM_OBJ* obj_uv_loop = stack[0].oval;
-  SPVM_OBJ* obj_uv_handle = stack[1].oval;
+  SPVM_OBJ* obj_uv_handle = stack[0].oval;
   
   int32_t no_free = env->no_free(env, stack, obj_uv_handle);
   

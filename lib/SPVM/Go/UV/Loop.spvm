@@ -7,6 +7,8 @@ class Go::UV::Loop : pointer {
   allow Go::UV::Handle;
   allow Go::UV::Handle::Idle;
   
+  allow Go::Schedule;
+  
   use Go::UV::Handle;
   use Go::UV::Handle::Idle;
   use Go::UV::Handle::Async;
@@ -16,7 +18,7 @@ class Go::UV::Loop : pointer {
   use Go::UV::Callback::Handle;
   
   # Fields
-  has uv_handles_h : Hash of Go::UV::Handle;
+  has uv_handles_h : ro Hash of Go::UV::Handle;
   
   # Instance Methods
   native method DESTROY : void ();
@@ -53,7 +55,7 @@ class Go::UV::Loop : pointer {
   
   private native method handle_idle_stop : void ($uv_handle : Go::UV::Handle::Idle);
   
-  private native method handle_destroy : void ($uv_handle : Go::UV::Handle);
+  private native static method handle_destroy : void ($uv_handle : Go::UV::Handle);
   
   private native method handle_close : void ($uv_handle : Go::UV::Handle, $close_cb : Go::UV::Callback::Handle);
   
@@ -65,8 +67,6 @@ class Go::UV::Loop : pointer {
     $self->{uv_handles_h}{$uv_handle_address} = $uv_handle;
     
     $uv_handle->{loop} = $self;
-    
-    weaken $uv_handle->{loop};
   }
   
   private method exists_uv_handle : int ($uv_handle  : Go::UV::Handle) {
