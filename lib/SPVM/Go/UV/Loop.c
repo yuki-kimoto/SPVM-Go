@@ -18,6 +18,7 @@ static void SPVM__Go__UV__Loop__close_cb_none(uv_handle_t* handle) {
 }
 
 static void SPVM__Go__UV__Loop__close_cb_v2(uv_handle_t* handle) {
+  
   int32_t error_id = 0;
   
   SPVM__Go__UV__Loop__HANDLE_DATA* handle_data = (SPVM__Go__UV__Loop__HANDLE_DATA*)handle->data;
@@ -34,6 +35,18 @@ static void SPVM__Go__UV__Loop__close_cb_v2(uv_handle_t* handle) {
   if (!(error_id == 0)) {
     spvm_diag("[Unexcepted Error]Callback 'cb' failed.");
     abort();
+  }
+  
+  SPVM_OBJ* obj_uv_loop = env->get_field_object_by_name(env, stack, obj_uv_handle, "loop", &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) {
+    spvm_diag("[Unexpected Error]%s", env->get_exception_chars(env, stack));
+  }
+  
+  stack[0].oval = obj_uv_loop;
+  stack[1].oval = obj_uv_handle;
+  env->call_instance_method_by_name(env, stack, "delete_uv_handle", 2, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) {
+    spvm_diag("[Unexpected Error]%s", env->get_exception_chars(env, stack));
   }
 }
 
