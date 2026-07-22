@@ -239,13 +239,18 @@ int32_t SPVM__Go__UV__Loop__handle_destroy(SPVM_ENV* env, SPVM_VALUE* stack) {
   SPVM_OBJ* obj_uv_loop = stack[0].oval;
   SPVM_OBJ* obj_uv_handle = stack[1].oval;
   
-  uv_handle_t* uv_handle = env->get_pointer(env, stack, obj_uv_handle);
+  int32_t no_free = env->no_free(env, stack, obj_uv_handle);
   
-  SPVM__Go__UV__Loop__HANDLE_DATA* uv_handle_data = (SPVM__Go__UV__Loop__HANDLE_DATA*)uv_handle->data;
-  
-  env->free_memory_block(env, stack, uv_handle_data);
-  uv_handle->data = NULL;
-  env->free_memory_block(env, stack, uv_handle);
+  if (!no_free) {
+    uv_handle_t* uv_handle = env->get_pointer(env, stack, obj_uv_handle);
+    
+    SPVM__Go__UV__Loop__HANDLE_DATA* uv_handle_data = (SPVM__Go__UV__Loop__HANDLE_DATA*)uv_handle->data;
+    
+    env->free_memory_block(env, stack, uv_handle_data);
+    uv_handle->data = NULL;
+    env->free_memory_block(env, stack, uv_handle);
+    env->set_no_free(env, stack, obj_uv_handle, 1);
+  }
   
   return 0;
 }
