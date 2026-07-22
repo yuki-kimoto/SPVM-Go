@@ -204,20 +204,6 @@ int32_t SPVM__Go__UV__Loop__poll(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 }
 
-int32_t SPVM__Go__UV__Loop__handle_async_send(SPVM_ENV* env, SPVM_VALUE* stack) {
-  
-  int32_t error_id = 0;
-  
-  SPVM_OBJ* obj_uv_loop = stack[0].oval;
-  SPVM_OBJ* obj_uv_async = stack[1].oval;
-  
-  uv_async_t* uv_async = (uv_async_t*)env->get_pointer(env, stack, obj_uv_async);
-  
-  uv_async_send(uv_async);
-  
-  return 0;
-}
-
 int32_t SPVM__Go__UV__Loop__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   SPVM_OBJ* obj_uv_loop = stack[0].oval;
@@ -478,6 +464,20 @@ int32_t SPVM__Go__UV__Loop__handle_timer_stop(SPVM_ENV* env, SPVM_VALUE* stack) 
   if (!(status == 0)) {
     return env->die(env, stack, "uv_timer_stop failed. status=%d.", __func__, FILE_NAME, __LINE__, status);
   }
+  
+  return 0;
+}
+
+int32_t SPVM__Go__UV__Loop__handle_async_send(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t error_id = 0;
+  
+  SPVM_OBJ* obj_uv_loop = stack[0].oval;
+  SPVM_OBJ* obj_uv_async = stack[1].oval;
+  
+  uv_async_t* uv_async = (uv_async_t*)env->get_pointer(env, stack, obj_uv_async);
+  
+  uv_async_send(uv_async);
   
   return 0;
 }
