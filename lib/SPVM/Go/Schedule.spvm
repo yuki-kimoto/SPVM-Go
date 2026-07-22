@@ -277,9 +277,7 @@ class Go::Schedule {
       
       unless ($schedule->loop_alive) {
         $uv_idle->stop;
-        my $close_cb = method : void ($uv_handle : Go::UV::Handle) {
-        };
-        $uv_idle->close($close_cb);
+        $uv_idle->close;
       }
     };
     

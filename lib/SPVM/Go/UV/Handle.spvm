@@ -57,7 +57,7 @@ class Go::UV::Handle : pointer {
   has loop : ro Go::UV::Loop;
   
   # Instance Methods
-  method close : void ($close_cb : Go::UV::Callback::Handle) {
+  method close : void ($close_cb : Go::UV::Callback::Handle = undef) {
     $self->loop->handle_close($self, $close_cb);
   }
   
