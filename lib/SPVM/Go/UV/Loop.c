@@ -505,20 +505,20 @@ int32_t SPVM__Go__UV__Loop__new_timer(SPVM_ENV* env, SPVM_VALUE* stack) {
   SPVM_OBJ* obj_uv_loop = stack[0].oval;
   
   uv_loop_t* uv_loop = env->get_pointer(env, stack, obj_uv_loop);
-  uv_timer_t* uv_handle = env->new_memory_block(env, stack, sizeof(uv_timer_t));
+  uv_timer_t* uv_timer = env->new_memory_block(env, stack, sizeof(uv_timer_t));
   
   SPVM__Go__UV__Loop__HANDLE_DATA* handle_data = env->new_memory_block(env, stack, sizeof(SPVM__Go__UV__Loop__HANDLE_DATA));
   handle_data->env = env;
   handle_data->stack = stack;
   
-  uv_handle->data = handle_data;
+  uv_timer->data = handle_data;
   
-  SPVM_OBJ* obj_uv_handle = env->new_pointer_object_by_name(env, stack, "Go::UV::Handle::Timer", uv_handle, &error_id, __func__, FILE_NAME, __LINE__);
+  SPVM_OBJ* obj_uv_timer = env->new_pointer_object_by_name(env, stack, "Go::UV::Handle::Timer", uv_timer, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) return error_id;
   
-  handle_data->obj_uv_handle = obj_uv_handle;
+  handle_data->obj_uv_handle = obj_uv_timer;
   
-  stack[0].oval = obj_uv_handle;
+  stack[0].oval = obj_uv_timer;
   
   return 0;
 }
@@ -528,19 +528,19 @@ int32_t SPVM__Go__UV__Loop__timer_init(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t error_id = 0;
   
   SPVM_OBJ* obj_uv_loop = stack[0].oval;
-  SPVM_OBJ* obj_uv_handle = stack[1].oval;
+  SPVM_OBJ* obj_uv_timer = stack[1].oval;
   
   uv_loop_t* uv_loop = env->get_pointer(env, stack, obj_uv_loop);
-  uv_timer_t* uv_handle = env->get_pointer(env, stack, obj_uv_handle);
+  uv_timer_t* uv_timer = env->get_pointer(env, stack, obj_uv_timer);
   
-  int32_t status = uv_timer_init(uv_loop, uv_handle);
+  int32_t status = uv_timer_init(uv_loop, uv_timer);
   
   if (!(status == 0)) {
     return env->die(env, stack, "uv_timer_init failed. status=%d.", __func__, FILE_NAME, __LINE__, status);
   }
   
   stack[0].oval = obj_uv_loop;
-  stack[1].oval = obj_uv_handle;
+  stack[1].oval = obj_uv_timer;
   env->call_instance_method_by_name(env, stack, "set_uv_handle", 2, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) return error_id;
   
@@ -552,17 +552,17 @@ int32_t SPVM__Go__UV__Loop__handle_timer_start(SPVM_ENV* env, SPVM_VALUE* stack)
   int32_t error_id = 0;
   
   SPVM_OBJ* obj_uv_loop = stack[0].oval;
-  SPVM_OBJ* obj_uv_handle = stack[1].oval;
+  SPVM_OBJ* obj_uv_timer = stack[1].oval;
   SPVM_OBJ* obj_cb = stack[2].oval;
   int64_t timeout_msec = stack[3].lval;
   int64_t interval_msec = stack[4].lval;
   
-  env->set_field_object_by_name(env, stack, obj_uv_handle, "cb", obj_cb, &error_id, __func__, FILE_NAME, __LINE__);
+  env->set_field_object_by_name(env, stack, obj_uv_timer, "cb", obj_cb, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) return error_id;
   
-  uv_timer_t* uv_handle = env->get_pointer(env, stack, obj_uv_handle);
+  uv_timer_t* uv_timer = env->get_pointer(env, stack, obj_uv_timer);
   
-  int32_t status = uv_timer_start(uv_handle, SPVM__Go__UV__Loop__timer_cb, (uint64_t)timeout_msec, (uint64_t)interval_msec);
+  int32_t status = uv_timer_start(uv_timer, SPVM__Go__UV__Loop__timer_cb, (uint64_t)timeout_msec, (uint64_t)interval_msec);
   
   if (!(status == 0)) {
     return env->die(env, stack, "uv_timer_start failed. status=%d.", __func__, FILE_NAME, __LINE__, status);
@@ -574,11 +574,11 @@ int32_t SPVM__Go__UV__Loop__handle_timer_start(SPVM_ENV* env, SPVM_VALUE* stack)
 int32_t SPVM__Go__UV__Loop__handle_timer_stop(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   SPVM_OBJ* obj_uv_loop = stack[0].oval;
-  SPVM_OBJ* obj_uv_handle = stack[1].oval;
+  SPVM_OBJ* obj_uv_timer = stack[1].oval;
   
-  uv_timer_t* uv_handle = env->get_pointer(env, stack, obj_uv_handle);
+  uv_timer_t* uv_timer = env->get_pointer(env, stack, obj_uv_timer);
   
-  int32_t status = uv_timer_stop(uv_handle);
+  int32_t status = uv_timer_stop(uv_timer);
   
   if (!(status == 0)) {
     return env->die(env, stack, "uv_timer_stop failed. status=%d.", __func__, FILE_NAME, __LINE__, status);
