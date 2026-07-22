@@ -1,3 +1,7 @@
+0.035 2026-07-22
+  [Internal Chnages]
+    * Refactor libuv code.
+    
 0.034 2026-07-13
   [Requirement Changes]
     * Require SPVM::Sys 0.574.
