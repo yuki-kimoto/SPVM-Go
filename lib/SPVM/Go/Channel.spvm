@@ -258,7 +258,8 @@ class Go::Channel {
     my $goroutine = $wait->{goroutine};
     
     if ($goroutine) {
-      $self->{schedule}{uv_loop}->handle_async_send($goroutine);
+      my $uv_async = (Go::UV::Handle::Async)$goroutine->{uv_handle};
+      $self->{schedule}{uv_loop}->handle_async_send_v2($uv_async);
     }
   }
   

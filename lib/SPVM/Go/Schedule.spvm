@@ -206,7 +206,9 @@ class Go::Schedule {
     elsif ($schedule_type == &TYPE_CHANNEL_READ ||$schedule_type == &TYPE_CHANNEL_WRITE) {
       $goroutine->{handle_type} = Go::UV::Handle->UV_ASYNC;
       my $uv_loop = $self->{uv_loop};
-      $uv_loop->async($goroutine, $enable_goroutine_cb);
+      my $uv_async = $uv_loop->new_async;
+      $goroutine->{uv_handle} = $uv_async;
+      $uv_loop->async_init($uv_async, $enable_goroutine_cb_v2);
     }
     
     if ($self->{disabled_goroutines_h}->{$goroutine_address}) {
