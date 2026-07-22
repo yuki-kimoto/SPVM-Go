@@ -157,10 +157,7 @@ class Go::Schedule {
     
     my $enable_goroutine_cb_v2 = [$goroutine : Go::Goroutine, $schedule : Go::Schedule = $self] method : void ($uv_handle : Go::UV::Handle) {
       $schedule->enable_goroutine($goroutine);
-      my $close_cb = method : void ($uv_handle : Go::UV::Handle) {
-        $uv_handle->DESTROY;
-      };
-      $uv_handle->close($close_cb);
+      $uv_handle->close;
     };
     
     if ($schedule_type == &TYPE_IO_READ ||$schedule_type == &TYPE_IO_WRITE) {
@@ -193,7 +190,9 @@ class Go::Schedule {
       
       my $timeout_msec = $timeout_duration_nsec / 1000000;
       my $uv_loop = $self->{uv_loop};
-      $uv_loop->timer($goroutine, $enable_goroutine_cb, $timeout_msec, 0);
+      my $uv_timer = $uv_loop->new_timer;
+      $goroutine->{uv_handle} = $uv_timer;
+      $uv_loop->handle_timer_start($uv_timer, $enable_goroutine_cb_v2, $timeout_msec, 0);
       
       unless ($deadline) {
         die "The deadline \$deadline in schedule type TYPE_TIMER must be defined.";
