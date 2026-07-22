@@ -484,13 +484,15 @@ int32_t SPVM__Go__UV__Loop__new_async(SPVM_ENV* env, SPVM_VALUE* stack) {
   env->set_field_object_by_name(env, stack, obj_uv_handle, "cb", obj_cb, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) return error_id;
   
-  int32_t status = uv_async_init(uv_loop, uv_handle, SPVM__Go__UV__Loop__enable_goroutine_cb_for_async);
+  int32_t status = uv_async_init(uv_loop, uv_handle, SPVM__Go__UV__Loop__async_cb);
   
   if (!(status == 0)) {
     return env->die(env, stack, "uv_async_init failed. status=%d.", __func__, FILE_NAME, __LINE__, status);
   }
   
-  env->set_field_object_by_name(env, stack, obj_uv_handle, "loop", obj_uv_loop, &error_id, __func__, FILE_NAME, __LINE__);
+  stack[0].oval = obj_uv_loop;
+  stack[1].oval = obj_uv_handle;
+  env->call_instance_method_by_name(env, stack, "set_uv_handle", 2, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) return error_id;
   
   stack[0].oval = obj_uv_handle;
