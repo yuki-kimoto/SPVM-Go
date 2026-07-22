@@ -3,4 +3,9 @@
 
 class Go::UV::Handle::Async extends Go::UV::Handle {
   
+  # Instance Methods
+  method send : void () {
+    
+    $self->{loop}->handle_async_send($self);
+  }
 }
