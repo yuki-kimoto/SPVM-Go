@@ -124,7 +124,7 @@ int32_t SPVM__Go__UV__Loop__timer(SPVM_ENV* env, SPVM_VALUE* stack) {
   timer_handle_data->stack = stack;
   timer_handle_data->obj_uv_handle = obj_uv_handle;
   env->set_field_object_by_name(env, stack, obj_uv_handle, "cb", obj_cb, &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) { return error_id; }
+  if (error_id) return error_id;
   
   timer_handle->data = timer_handle_data;
   
@@ -194,7 +194,7 @@ int32_t SPVM__Go__UV__Loop__new_idle(SPVM_ENV* env, SPVM_VALUE* stack) {
   }
   
   env->set_field_object_by_name(env, stack, obj_uv_handle, "loop", obj_uv_loop, &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) { return error_id; }
+  if (error_id) return error_id;
   
   stack[0].oval = obj_uv_handle;
   
@@ -215,7 +215,7 @@ int32_t SPVM__Go__UV__Loop__handle_idle_start(SPVM_ENV* env, SPVM_VALUE* stack) 
   SPVM__Go__UV__Loop__HANDLE_DATA* uv_handle_data = uv_handle->data;
   
   env->set_field_object_by_name(env, stack, obj_uv_handle, "cb", obj_cb, &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) { return error_id; }
+  if (error_id) return error_id;
   
   int32_t status = uv_idle_start(uv_handle, SPVM__Go__UV__Loop__idle_cb);
   
@@ -251,7 +251,7 @@ int32_t SPVM__Go__UV__Loop__handle_close(SPVM_ENV* env, SPVM_VALUE* stack) {
   SPVM_OBJ* obj_cb = stack[2].oval;
   
   env->set_field_object_by_name(env, stack, obj_uv_handle, "close_cb", obj_cb, &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) { return error_id; }
+  if (error_id) return error_id;
   
   uv_handle_t* uv_handle = env->get_pointer(env, stack, obj_uv_handle);
   
@@ -308,7 +308,7 @@ int32_t SPVM__Go__UV__Loop__poll(SPVM_ENV* env, SPVM_VALUE* stack) {
   poll_handle_data->stack = stack;
   poll_handle_data->obj_uv_handle = obj_uv_handle;
   env->set_field_object_by_name(env, stack, obj_uv_handle, "cb", obj_cb, &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) { return error_id; }
+  if (error_id) return error_id;
   
   poll_handle->data = poll_handle_data;
   
@@ -359,15 +359,15 @@ int32_t SPVM__Go__UV__Loop__async(SPVM_ENV* env, SPVM_VALUE* stack) {
   handle_data->stack = stack;
   handle_data->obj_uv_handle = obj_uv_handle;
   env->set_field_object_by_name(env, stack, obj_uv_handle, "cb", obj_cb, &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) { return error_id; }
+  if (error_id) return error_id;
   
   address->data = handle_data;
   
   SPVM_OBJ* obj_address = env->new_pointer_object_by_name(env, stack, "Address", address, &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) { return error_id; }
+  if (error_id) return error_id;
   
   env->set_field_object_by_name(env, stack, obj_uv_handle, "address", obj_address, &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) { return error_id; }
+  if (error_id) return error_id;
   
   return 0;
 }
@@ -380,14 +380,14 @@ int32_t SPVM__Go__UV__Loop__handle_async_send(SPVM_ENV* env, SPVM_VALUE* stack) 
   SPVM_OBJ* obj_uv_handle = stack[1].oval;
   
   SPVM_OBJ* obj_address = env->get_field_object_by_name(env, stack, obj_uv_handle, "address", &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) { return error_id; }
+  if (error_id) return error_id;
   
   uv_async_t* address = (uv_async_t*)env->get_pointer(env, stack, obj_address);
   
   uv_async_send(address);
   
   env->set_field_object_by_name(env, stack, obj_uv_handle, "address", NULL, &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) { return error_id; }
+  if (error_id) return error_id;
   
   return 0;
 }
@@ -456,7 +456,7 @@ int32_t SPVM__Go__UV__Loop__new_async(SPVM_ENV* env, SPVM_VALUE* stack) {
   handle_data->obj_uv_handle = obj_uv_handle;
   
   env->set_field_object_by_name(env, stack, obj_uv_handle, "cb", obj_cb, &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) { return error_id; }
+  if (error_id) return error_id;
   
   int32_t status = uv_async_init(uv_loop, uv_handle, SPVM__Go__UV__Loop__enable_goroutine_cb_for_async);
   
@@ -465,7 +465,7 @@ int32_t SPVM__Go__UV__Loop__new_async(SPVM_ENV* env, SPVM_VALUE* stack) {
   }
   
   env->set_field_object_by_name(env, stack, obj_uv_handle, "loop", obj_uv_loop, &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) { return error_id; }
+  if (error_id) return error_id;
   
   stack[0].oval = obj_uv_handle;
   
@@ -499,7 +499,7 @@ int32_t SPVM__Go__UV__Loop__new_timer(SPVM_ENV* env, SPVM_VALUE* stack) {
   }
   
   env->set_field_object_by_name(env, stack, obj_uv_handle, "loop", obj_uv_loop, &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) { return error_id; }
+  if (error_id) return error_id;
   
   stack[0].oval = obj_uv_handle;
   
