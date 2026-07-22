@@ -10,8 +10,6 @@ class Go::UV::Handle : pointer {
   use Go::UV::Callback::Handle;
   
   # Fields
-  has handle_type : int;
-  
   has event_type : int;
   
   has timeout_msec : long;
