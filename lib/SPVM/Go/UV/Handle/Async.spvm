@@ -3,12 +3,4 @@
 
 class Go::UV::Handle::Async extends Go::UV::Handle {
   
-  # Class Methods
-  static method new : Go::UV::Handle::Async () {
-    
-    my $self = new Go::UV::Handle::Async;
-    
-    return $self;
-  }
-  
 }

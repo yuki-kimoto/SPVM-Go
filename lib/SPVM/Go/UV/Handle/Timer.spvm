@@ -3,4 +3,15 @@
 
 class Go::UV::Handle::Timer extends Go::UV::Handle {
   
+  # Instance Methods
+  method start : void ($cb : Go::UV::Callback::Handle, $timeout_msec : long, $interval_msec : long = 0) {
+    
+    $self->{loop}->handle_timer_start($self, $cb, $timeout_msec, $interval_msec);
+  }
+  
+  method stop : void () {
+    
+    $self->{loop}->handle_timer_stop($self);
+  }
+  
 }
