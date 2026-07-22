@@ -56,13 +56,9 @@ class Go::UV::Handle : pointer {
   
   has loop : ro Go::UV::Loop;
   
-  has no_close : ro byte;
-  
   # Instance Methods
   method close : void ($close_cb : Go::UV::Callback::Handle) {
-    unless ($self->no_close) {
-      $self->loop->handle_close($self, $close_cb);
-    }
+    $self->loop->handle_close($self, $close_cb);
   }
   
   method DESTROY : void () {
