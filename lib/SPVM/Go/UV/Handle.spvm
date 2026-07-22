@@ -5,6 +5,7 @@ class Go::UV::Handle : pointer {
   
   use Callback;
   use Go::UV::Loop;
+  use Go::UV::Callback::Handle;
   
   # Enumerations
   enum {
@@ -54,8 +55,8 @@ class Go::UV::Handle : pointer {
   has loop : ro Go::UV::Loop;
   
   # Instance Methods
-  method close : void () {
-    $self->loop->handle_close($self);
+  method close : void ($close_cb : Go::UV::Callback::Handle) {
+    $self->loop->handle_close($self, $close_cb);
   }
   
   method DESTROY : void () {

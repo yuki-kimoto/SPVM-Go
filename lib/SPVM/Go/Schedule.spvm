@@ -157,7 +157,10 @@ class Go::Schedule {
     
     my $enable_goroutine_cb_v2 = [$goroutine : Go::Goroutine, $schedule : Go::Schedule = $self] method : void ($uv_handle : Go::UV::Handle) {
       $schedule->enable_goroutine($goroutine);
-      $uv_handle->close;
+      my $close_cb = method : void ($uv_handle : Go::UV::Handle) {
+        $uv_handle->DESTROY;
+      };
+      $uv_handle->close($close_cb);
     };
     
     if ($schedule_type == &TYPE_IO_READ ||$schedule_type == &TYPE_IO_WRITE) {
@@ -274,7 +277,10 @@ class Go::Schedule {
       
       unless ($schedule->loop_alive) {
         $uv_idle->stop;
-        $uv_idle->close;
+        my $close_cb = method : void ($uv_handle : Go::UV::Handle) {
+          $uv_handle->DESTROY;
+        };
+        $uv_idle->close($close_cb);
       }
     };
     
