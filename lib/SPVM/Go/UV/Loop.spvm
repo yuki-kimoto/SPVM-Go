@@ -40,7 +40,9 @@ class Go::UV::Loop : pointer {
   
   native method timer_init : void ($uv_timer : Go::UV::Handle::Timer);
   
-  native method new_async : Go::UV::Handle::Async ($cb : Go::UV::Callback::Handle);
+  native method new_async : Go::UV::Handle::Async ();
+  
+  native method async_init : void ($uv_async : Go::UV::Handle::Async, $cb : Go::UV::Callback::Handle);
   
   # For Go::UV
   native static method default_loop : Go::UV::Loop ();

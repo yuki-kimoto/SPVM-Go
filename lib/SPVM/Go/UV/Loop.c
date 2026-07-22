@@ -481,6 +481,26 @@ int32_t SPVM__Go__UV__Loop__new_async(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   handle_data->obj_uv_handle = obj_uv_handle;
   
+  stack[0].oval = obj_uv_handle;
+  
+  return 0;
+}
+
+int32_t SPVM__Go__UV__Loop__async_init(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t error_id = 0;
+  
+  SPVM_OBJ* obj_uv_loop = stack[0].oval;
+  SPVM_OBJ* obj_uv_handle = stack[1].oval;
+  SPVM_OBJ* obj_cb = stack[2].oval;
+  
+  if (!obj_cb) {
+    return env->die(env, stack, "$cb must be defined.", __func__, FILE_NAME, __LINE__);
+  }
+  
+  uv_loop_t* uv_loop = env->get_pointer(env, stack, obj_uv_loop);
+  uv_async_t* uv_handle = env->get_pointer(env, stack, obj_uv_handle);
+  
   env->set_field_object_by_name(env, stack, obj_uv_handle, "cb", obj_cb, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) return error_id;
   
