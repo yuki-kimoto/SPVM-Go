@@ -218,6 +218,7 @@ class Go::Schedule {
     $goroutine->{disabled} = 0;
     $goroutine->{cb} = undef;
     $goroutine->{uv_handle} = undef;
+    $goroutine->{related_uv_handle} = undef;
     $self->{disabled_goroutines_h}->delete(Fn->to_address($goroutine));
     $self->{goroutines}->push($goroutine);
   }
