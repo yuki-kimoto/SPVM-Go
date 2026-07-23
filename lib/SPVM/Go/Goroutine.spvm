@@ -24,6 +24,8 @@ class Go::Goroutine extends Go::UV::Handle: pointer {
   
   has uv_handle : Go::UV::Handle;
   
+  has io_timeout_occurred : byte;
+  
   # Class Methods
   static method new : Go::Goroutine ($task :  Callback = undef, $return_back : Go::Goroutine = undef) {
     
