@@ -21,7 +21,7 @@ class Go::UV::Handle : pointer {
   }
   
   method get_type : void () {
-    $self->loop->handle_get_type($self);
+    Go::UV::Loop->handle_get_type($self);
   }
   
   method DESTROY : void () {

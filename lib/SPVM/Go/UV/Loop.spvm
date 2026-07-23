@@ -62,7 +62,7 @@ class Go::UV::Loop : pointer {
   
   private native method handle_close : void ($uv_handle : Go::UV::Handle, $close_cb : Go::UV::Callback::Handle = undef);
   
-  private native method handle_get_type : void ($uv_handle : Go::UV::Handle);
+  private native static method handle_get_type : void ($uv_handle : Go::UV::Handle);
   
   # Utilities
   private method set_uv_handle : void ($uv_handle  : Go::UV::Handle) {
