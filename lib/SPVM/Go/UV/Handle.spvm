@@ -20,6 +20,10 @@ class Go::UV::Handle : pointer {
     $self->loop->handle_close($self, $close_cb);
   }
   
+  method get_type : void () {
+    $self->loop->handle_get_type($self);
+  }
+  
   method DESTROY : void () {
     Go::UV::Loop->handle_free($self);
   }

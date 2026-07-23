@@ -577,3 +577,19 @@ int32_t SPVM__Go__UV__Loop__handle_poll_start(SPVM_ENV* env, SPVM_VALUE* stack) 
   return 0;
 }
 
+int32_t SPVM__Go__UV__Loop__handle_get_type(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t error_id = 0;
+  
+  SPVM_OBJ* obj_uv_loop = stack[0].oval;
+  SPVM_OBJ* obj_uv_handle = stack[1].oval;
+  
+  uv_handle_t* uv_handle = env->get_pointer(env, stack, obj_uv_handle);
+  
+  int32_t uv_handle_type = uv_handle_get_type(uv_handle);
+  
+  stack[0].ival = uv_handle_type;
+  
+  return 0;
+}
+
