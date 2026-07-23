@@ -481,11 +481,10 @@ int32_t SPVM__Go__UV__Loop__handle_timer_start(SPVM_ENV* env, SPVM_VALUE* stack)
   
   int32_t error_id = 0;
   
-  SPVM_OBJ* obj_uv_loop = stack[0].oval;
-  SPVM_OBJ* obj_uv_timer = stack[1].oval;
-  SPVM_OBJ* obj_cb = stack[2].oval;
-  int64_t timeout_msec = stack[3].lval;
-  int64_t interval_msec = stack[4].lval;
+  SPVM_OBJ* obj_uv_timer = stack[0].oval;
+  SPVM_OBJ* obj_cb = stack[1].oval;
+  int64_t timeout_msec = stack[2].lval;
+  int64_t interval_msec = stack[3].lval;
   
   env->set_field_object_by_name(env, stack, obj_uv_timer, "cb", obj_cb, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) return error_id;
