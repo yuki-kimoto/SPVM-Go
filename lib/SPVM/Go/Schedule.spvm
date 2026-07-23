@@ -172,10 +172,10 @@ class Go::Schedule {
         $deadline = Go::Time->now->add(Go::Duration_1l->new($timeout_duration_nsec));
       }
       $goroutine->{timeout_msec} = $timeout_duration_nsec / 1000000;
-      $goroutine->{event_type} = $schedule_type == &TYPE_IO_READ ? UV_CONST->UV_READABLE : UV_CONST->UV_WRITABLE;
+      my $events = $schedule_type == &TYPE_IO_READ ? UV_CONST->UV_READABLE : UV_CONST->UV_WRITABLE;
       
       my $uv_loop = $self->{uv_loop};
-      $uv_loop->poll($goroutine, $enable_goroutine_cb);
+      $uv_loop->poll($goroutine, $events, $enable_goroutine_cb);
       
       if (Go->ENV_DEBUG) {
         Fn->say_stderr(Format->sprintf("[Go Debug]Register goroutine wait for IO (Callback:%p, QueueNum:%d.)", [(object)$goroutine->{task}, $self->{goroutines}->length]));
