@@ -25,7 +25,7 @@ class Go::UV::Loop : pointer {
   native method DESTROY : void ();
   
   # Instance Methods
-  native method poll : void ($uv_handle : Go::UV::Handle, $events : int, $cb : Go::UV::Callback::Handle);
+  native method poll : void ($uv_handle : Go::UV::Handle, $fd : int = -1, $events : int = 0, $cb : Go::UV::Callback::Handle = undef);
   
   native method run : void ($uv_run_mode : int);
   

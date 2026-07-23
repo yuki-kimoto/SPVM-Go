@@ -165,8 +165,6 @@ class Go::Schedule {
         die "The file descriptor \$fd in schedule type TYPE_IO_READ or TYPE_IO_WRITE must be a non-negative value.";
       }
       
-      $goroutine->{fd} = $fd;
-      
       my $deadline = (Go::Time)undef;
       if ($timeout_duration_nsec > 0) {
         $deadline = Go::Time->now->add(Go::Duration_1l->new($timeout_duration_nsec));
@@ -175,7 +173,7 @@ class Go::Schedule {
       my $events = $schedule_type == &TYPE_IO_READ ? UV_CONST->UV_READABLE : UV_CONST->UV_WRITABLE;
       
       my $uv_loop = $self->{uv_loop};
-      $uv_loop->poll($goroutine, $events, $enable_goroutine_cb);
+      $uv_loop->poll($goroutine, $fd, $events, $enable_goroutine_cb);
       
       if (Go->ENV_DEBUG) {
         Fn->say_stderr(Format->sprintf("[Go Debug]Register goroutine wait for IO (Callback:%p, QueueNum:%d.)", [(object)$goroutine->{task}, $self->{goroutines}->length]));
@@ -217,7 +215,6 @@ class Go::Schedule {
   }
   
   private method enable_goroutine : void ($goroutine : Go::Goroutine) {
-    $goroutine->{fd} = -1;
     $goroutine->{disabled} = 0;
     $goroutine->{cb} = undef;
     $goroutine->{uv_handle} = undef;

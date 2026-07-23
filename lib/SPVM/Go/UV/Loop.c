@@ -160,17 +160,14 @@ int32_t SPVM__Go__UV__Loop__poll(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t error_id = 0;
   SPVM_OBJ* obj_uv_loop = stack[0].oval;
   SPVM_OBJ* obj_uv_handle = stack[1].oval;
-  int32_t events = stack[2].oval;
-  SPVM_OBJ* obj_cb = stack[3].oval;
+  int32_t fd = stack[2].oval;
+  int32_t events = stack[3].oval;
+  SPVM_OBJ* obj_cb = stack[4].oval;
   
   assert(obj_cb);
   
   uv_loop_t* uv_loop = env->get_pointer(env, stack, obj_uv_loop);
   uv_poll_t* poll_handle = env->new_memory_block(env, stack, sizeof(uv_poll_t));
-  int32_t fd = env->get_field_int_by_name(env, stack, obj_uv_handle, "fd", &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) {
-    return error_id;
-  }
   uv_poll_init(uv_loop, poll_handle, fd);
   
   SPVM__Go__UV__Loop__HANDLE_DATA* poll_handle_data = env->new_memory_block(env, stack, sizeof(SPVM__Go__UV__Loop__HANDLE_DATA));

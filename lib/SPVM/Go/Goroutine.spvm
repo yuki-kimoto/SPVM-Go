@@ -35,8 +35,6 @@ class Go::Goroutine extends Go::UV::Handle: pointer {
     
     $self->init_goroutine;
     
-    $self->{fd} = -1;
-    
     return $self;
   }
   

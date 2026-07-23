@@ -12,8 +12,6 @@ class Go::UV::Handle : pointer {
   # Fields
   has timeout_msec : long;
   
-  has fd : int;
-  
   has io_timeout_occurred : byte;
   
   has cb : rw Go::UV::Callback::Handle;
