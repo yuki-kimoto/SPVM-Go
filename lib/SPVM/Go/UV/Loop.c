@@ -275,6 +275,10 @@ int32_t SPVM__Go__UV__Loop__idle_init(SPVM_ENV* env, SPVM_VALUE* stack) {
   SPVM_OBJ* obj_uv_loop = stack[0].oval;
   SPVM_OBJ* obj_uv_idle = stack[1].oval;
   
+  if (!obj_uv_idle) {
+    return env->die(env, stack, "$uv_idle must be defined.", __func__, FILE_NAME, __LINE__);
+  }
+  
   uv_loop_t* uv_loop = env->get_pointer(env, stack, obj_uv_loop);
   uv_idle_t* uv_idle = env->get_pointer(env, stack, obj_uv_idle);
   
@@ -329,6 +333,10 @@ int32_t SPVM__Go__UV__Loop__async_init(SPVM_ENV* env, SPVM_VALUE* stack) {
   SPVM_OBJ* obj_uv_loop = stack[0].oval;
   SPVM_OBJ* obj_uv_async = stack[1].oval;
   SPVM_OBJ* obj_cb = stack[2].oval;
+  
+  if (!obj_uv_async) {
+    return env->die(env, stack, "$uv_async must be defined.", __func__, FILE_NAME, __LINE__);
+  }
   
   if (!obj_cb) {
     return env->die(env, stack, "$cb must be defined.", __func__, FILE_NAME, __LINE__);
@@ -386,6 +394,10 @@ int32_t SPVM__Go__UV__Loop__timer_init(SPVM_ENV* env, SPVM_VALUE* stack) {
   SPVM_OBJ* obj_uv_loop = stack[0].oval;
   SPVM_OBJ* obj_uv_timer = stack[1].oval;
   
+  if (!obj_uv_timer) {
+    return env->die(env, stack, "$uv_timer must be defined.", __func__, FILE_NAME, __LINE__);
+  }
+  
   uv_loop_t* uv_loop = env->get_pointer(env, stack, obj_uv_loop);
   uv_timer_t* uv_timer = env->get_pointer(env, stack, obj_uv_timer);
   
@@ -435,6 +447,10 @@ int32_t SPVM__Go__UV__Loop__poll_init(SPVM_ENV* env, SPVM_VALUE* stack) {
   SPVM_OBJ* obj_uv_loop = stack[0].oval;
   SPVM_OBJ* obj_uv_poll = stack[1].oval;
   int32_t fd = stack[2].ival;
+  
+  if (!obj_uv_poll) {
+    return env->die(env, stack, "$uv_poll must be defined.", __func__, FILE_NAME, __LINE__);
+  }
   
   uv_loop_t* uv_loop = env->get_pointer(env, stack, obj_uv_loop);
   uv_poll_t* uv_poll = env->get_pointer(env, stack, obj_uv_poll);
