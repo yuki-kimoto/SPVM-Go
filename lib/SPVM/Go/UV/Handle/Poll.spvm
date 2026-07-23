@@ -1,7 +1,7 @@
 # Copyright (c) 2026 Yuki Kimoto
 # MIT License
 
-class Go::UV::Handle::Poll {
+class Go::UV::Handle::Poll extends Go::UV::Handle {
   
   # Instance Methods
   method start : void ($cb : Go::UV::Callback::Handle, $events : int) {

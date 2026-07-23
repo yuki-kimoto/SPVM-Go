@@ -39,7 +39,7 @@ class Go::UV::Loop : pointer {
   
   native method new_poll : Go::UV::Handle::Poll ();
   
-  native method poll_init : void ($uv_poll : Go::UV::Handle::Poll);
+  native method poll_init : void ($uv_poll : Go::UV::Handle::Poll, $fd : int);
   
   native method new_async : Go::UV::Handle::Async ();
   

@@ -156,14 +156,15 @@ class Go::Schedule {
     };
     
     my $enable_goroutine_cb_v2 = [$goroutine : Go::Goroutine, $schedule : Go::Schedule = $self] method : void ($uv_handle : Go::UV::Handle) {
-      my $related_uv_handle = $goroutine->{related_uv_handle};
-      if ($related_uv_handle) {
-        my $uv_handle_type = $uv_handle->get_type;
-        if ($uv_handle_type == UV_CONST->UV_TIMER) {
+      my $goroutine_uv_handle = $goroutine->{uv_handle};
+      my $goroutine_timout_uv_timer = $goroutine->{timeout_uv_timer};
+      
+      if ($goroutine_timout_uv_timer) {
+        unless ($uv_handle == $goroutine_uv_handle) {
           # IO timeout
           $goroutine->{io_timeout_occurred} = 1;
         }
-        $related_uv_handle->close;
+        $goroutine_uv_handle->close;
       }
       
       $uv_handle->close;
@@ -184,7 +185,18 @@ class Go::Schedule {
       my $events = $schedule_type == &TYPE_IO_READ ? UV_CONST->UV_READABLE : UV_CONST->UV_WRITABLE;
       
       my $uv_loop = $self->{uv_loop};
-      $uv_loop->poll($goroutine, $fd, $events, $enable_goroutine_cb, $timeout_msec);
+      
+      my $uv_poll = $uv_loop->new_poll;
+      $uv_loop->poll_init($uv_poll, $fd);
+      $goroutine->{uv_handle} = $uv_poll;
+      $uv_poll->start($enable_goroutine_cb_v2, $events);
+      
+      if ($timeout_msec > 0) {
+        my $uv_timer = $uv_loop->new_timer;
+        $uv_loop->timer_init($uv_timer);
+        $goroutine->{timeout_uv_timer} = $uv_timer;
+        $uv_timer->start($enable_goroutine_cb_v2, $timeout_msec);
+      }
       
       if (Go->ENV_DEBUG) {
         Fn->say_stderr(Format->sprintf("[Go Debug]Register goroutine wait for IO (Callback:%p, QueueNum:%d.)", [(object)$goroutine->{task}, $self->{goroutines}->length]));
@@ -229,7 +241,7 @@ class Go::Schedule {
     $goroutine->{disabled} = 0;
     $goroutine->{cb} = undef;
     $goroutine->{uv_handle} = undef;
-    $goroutine->{related_uv_handle} = undef;
+    $goroutine->{timeout_uv_timer} = undef;
     $self->{disabled_goroutines_h}->delete(Fn->to_address($goroutine));
     $self->{goroutines}->push($goroutine);
   }
