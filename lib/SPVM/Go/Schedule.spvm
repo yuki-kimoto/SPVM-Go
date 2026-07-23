@@ -156,8 +156,19 @@ class Go::Schedule {
     };
     
     my $enable_goroutine_cb_v2 = [$goroutine : Go::Goroutine, $schedule : Go::Schedule = $self] method : void ($uv_handle : Go::UV::Handle) {
-      $schedule->enable_goroutine($goroutine);
+      my $related_uv_handle = $goroutine->{related_uv_handle};
+      if ($related_uv_handle) {
+        my $uv_handle_type = $uv_handle->get_type;
+        if ($uv_handle_type == UV_CONST->UV_TIMER) {
+          # IO timeout
+          $goroutine->{io_timeout_occurred} = 1;
+        }
+        $related_uv_handle->close;
+      }
+      
       $uv_handle->close;
+      
+      $schedule->enable_goroutine($goroutine);
     };
     
     if ($schedule_type == &TYPE_IO_READ ||$schedule_type == &TYPE_IO_WRITE) {
