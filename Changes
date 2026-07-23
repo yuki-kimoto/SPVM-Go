@@ -1,5 +1,9 @@
+0.036 2026-07-23
+  [Internal Changes]
+    * Refactor libuv code.
+    
 0.035 2026-07-22
-  [Internal Chnages]
+  [Internal Changes]
     * Refactor libuv code.
     
 0.034 2026-07-13
