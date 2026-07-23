@@ -13,6 +13,20 @@ typedef struct {
   uv_handle_t* related_handle;
 } SPVM__Go__UV__Loop__HANDLE_DATA;
 
+int32_t SPVM__Go__UV__Loop__default_loop(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t error_id = 0;
+  
+  uv_loop_t* uv_loop = uv_default_loop();
+  
+  SPVM_OBJ* obj_uv_loop = env->new_pointer_object_by_name(env, stack, "Go::UV::Loop", uv_loop, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) return error_id;
+  
+  stack[0].oval = obj_uv_loop;
+  
+  return 0;
+}
+
 static void SPVM__Go__UV__Loop__close_cb(uv_handle_t* handle) {
   
   int32_t error_id = 0;
@@ -47,19 +61,6 @@ static void SPVM__Go__UV__Loop__close_cb(uv_handle_t* handle) {
     spvm_diag("[Unexpected Error]%s", env->get_exception_chars(env, stack));
     abort();
   }
-}
-
-int32_t SPVM__Go__UV__Loop__run(SPVM_ENV* env, SPVM_VALUE* stack) {
-  
-  SPVM_OBJ* obj_uv_loop = stack[0].oval;
-  int32_t uv_run_mode = stack[1].ival;
-  
-  uv_loop_t* uv_loop = env->get_pointer(env, stack, obj_uv_loop);
-  assert(uv_loop);
-  
-  int32_t status = uv_run(uv_loop, uv_run_mode);
-  
-  return 0;
 }
 
 static void SPVM__Go__UV__Loop__handle_cb(uv_handle_t* handle) {
@@ -100,16 +101,15 @@ static void SPVM__Go__UV__Loop__poll_cb(uv_poll_t* handle, int status, int event
   SPVM__Go__UV__Loop__handle_cb((uv_handle_t*)handle);
 }
 
-int32_t SPVM__Go__UV__Loop__default_loop(SPVM_ENV* env, SPVM_VALUE* stack) {
+int32_t SPVM__Go__UV__Loop__run(SPVM_ENV* env, SPVM_VALUE* stack) {
   
-  int32_t error_id = 0;
+  SPVM_OBJ* obj_uv_loop = stack[0].oval;
+  int32_t uv_run_mode = stack[1].ival;
   
-  uv_loop_t* uv_loop = uv_default_loop();
+  uv_loop_t* uv_loop = env->get_pointer(env, stack, obj_uv_loop);
+  assert(uv_loop);
   
-  SPVM_OBJ* obj_uv_loop = env->new_pointer_object_by_name(env, stack, "Go::UV::Loop", uv_loop, &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) return error_id;
-  
-  stack[0].oval = obj_uv_loop;
+  int32_t status = uv_run(uv_loop, uv_run_mode);
   
   return 0;
 }
