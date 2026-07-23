@@ -460,22 +460,6 @@ int32_t SPVM__Go__UV__Loop__handle_idle_start(SPVM_ENV* env, SPVM_VALUE* stack) 
   return 0;
 }
 
-int32_t SPVM__Go__UV__Loop__handle_idle_stop(SPVM_ENV* env, SPVM_VALUE* stack) {
-  
-  SPVM_OBJ* obj_uv_loop = stack[0].oval;
-  SPVM_OBJ* obj_uv_idle = stack[1].oval;
-  
-  uv_idle_t* uv_idle = env->get_pointer(env, stack, obj_uv_idle);
-  
-  int32_t status = uv_idle_stop(uv_idle);
-  
-  if (!(status == 0)) {
-    return env->die(env, stack, "uv_idle_stop failed. status=%d.", __func__, FILE_NAME, __LINE__, status);
-  }
-  
-  return 0;
-}
-
 int32_t SPVM__Go__UV__Loop__handle_timer_start(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t error_id = 0;
@@ -495,22 +479,6 @@ int32_t SPVM__Go__UV__Loop__handle_timer_start(SPVM_ENV* env, SPVM_VALUE* stack)
   
   if (!(status == 0)) {
     return env->die(env, stack, "uv_timer_start failed. status=%d.", __func__, FILE_NAME, __LINE__, status);
-  }
-  
-  return 0;
-}
-
-int32_t SPVM__Go__UV__Loop__handle_timer_stop(SPVM_ENV* env, SPVM_VALUE* stack) {
-  
-  SPVM_OBJ* obj_uv_loop = stack[0].oval;
-  SPVM_OBJ* obj_uv_timer = stack[1].oval;
-  
-  uv_timer_t* uv_timer = env->get_pointer(env, stack, obj_uv_timer);
-  
-  int32_t status = uv_timer_stop(uv_timer);
-  
-  if (!(status == 0)) {
-    return env->die(env, stack, "uv_timer_stop failed. status=%d.", __func__, FILE_NAME, __LINE__, status);
   }
   
   return 0;
@@ -591,18 +559,3 @@ int32_t SPVM__Go__UV__Loop__handle_poll_start(SPVM_ENV* env, SPVM_VALUE* stack) 
   return 0;
 }
 
-int32_t SPVM__Go__UV__Loop__handle_poll_stop(SPVM_ENV* env, SPVM_VALUE* stack) {
-  
-  SPVM_OBJ* obj_uv_loop = stack[0].oval;
-  SPVM_OBJ* obj_uv_poll = stack[1].oval;
-  
-  uv_poll_t* uv_poll = env->get_pointer(env, stack, obj_uv_poll);
-  
-  int32_t status = uv_poll_stop(uv_poll);
-  
-  if (!(status == 0)) {
-    return env->die(env, stack, "uv_poll_stop failed. status=%d.", __func__, FILE_NAME, __LINE__, status);
-  }
-  
-  return 0;
-}

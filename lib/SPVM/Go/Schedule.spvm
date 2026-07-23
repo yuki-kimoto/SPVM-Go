@@ -273,7 +273,6 @@ class Go::Schedule {
       $schedule->process_next_goroutine;
       
       unless ($schedule->loop_alive) {
-        $uv_idle->stop;
         $uv_idle->close;
       }
     };

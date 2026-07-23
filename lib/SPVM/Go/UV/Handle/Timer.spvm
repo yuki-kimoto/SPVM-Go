@@ -9,9 +9,4 @@ class Go::UV::Handle::Timer extends Go::UV::Handle {
     $self->{loop}->handle_timer_start($self, $cb, $timeout_msec, $interval_msec);
   }
   
-  method stop : void () {
-    
-    $self->{loop}->handle_timer_stop($self);
-  }
-  
 }
