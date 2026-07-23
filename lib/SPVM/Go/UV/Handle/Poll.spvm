@@ -3,4 +3,10 @@
 
 class Go::UV::Handle::Poll {
   
+  # Instance Methods
+  method start : void ($cb : Go::UV::Callback::Handle, $events : int) {
+    
+    Go::UV::Loop->handle_poll_start($self, $cb, $events);
+  }
+  
 }
