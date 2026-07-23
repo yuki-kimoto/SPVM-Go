@@ -6,7 +6,7 @@ class Go::UV::Handle::Idle extends Go::UV::Handle {
   # Instance Methods
   method start : void ($cb : Go::UV::Callback::Handle) {
     
-    $self->{loop}->handle_idle_start($self, $cb);
+    Go::UV::Loop->handle_idle_start($self, $cb);
   }
   
 }

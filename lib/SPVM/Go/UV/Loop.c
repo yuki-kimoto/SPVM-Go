@@ -457,9 +457,8 @@ int32_t SPVM__Go__UV__Loop__handle_idle_start(SPVM_ENV* env, SPVM_VALUE* stack) 
   
   int32_t error_id = 0;
   
-  SPVM_OBJ* obj_uv_loop = stack[0].oval;
-  SPVM_OBJ* obj_uv_idle = stack[1].oval;
-  SPVM_OBJ* obj_cb = stack[2].oval;
+  SPVM_OBJ* obj_uv_idle = stack[0].oval;
+  SPVM_OBJ* obj_cb = stack[1].oval;
   
   assert(obj_cb);
   

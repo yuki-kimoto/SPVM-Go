@@ -56,7 +56,7 @@ class Go::UV::Loop : pointer {
   
   native method handle_poll_start : void ($uv_handle : Go::UV::Handle::Poll, $cb : Go::UV::Callback::Handle, $events : int);
   
-  private native method handle_idle_start : void ($uv_handle : Go::UV::Handle::Idle, $cb : Go::UV::Callback::Handle);
+  private native static method handle_idle_start : void ($uv_handle : Go::UV::Handle::Idle, $cb : Go::UV::Callback::Handle);
   
   private native static method handle_free : void ($uv_handle : Go::UV::Handle);
   
