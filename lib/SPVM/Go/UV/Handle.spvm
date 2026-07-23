@@ -5,13 +5,10 @@ class Go::UV::Handle : pointer {
   
   allow Go::UV::Loop;
   
-  use Callback;
   use Go::UV::Loop;
   use Go::UV::Callback::Handle;
   
   # Fields
-  has timeout_msec : long;
-  
   has cb : rw Go::UV::Callback::Handle;
   
   has close_cb : rw Go::UV::Callback::Handle;

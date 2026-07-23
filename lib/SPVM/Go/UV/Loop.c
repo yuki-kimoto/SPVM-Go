@@ -163,6 +163,7 @@ int32_t SPVM__Go__UV__Loop__poll(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t fd = stack[2].oval;
   int32_t events = stack[3].oval;
   SPVM_OBJ* obj_cb = stack[4].oval;
+  int64_t timeout_msec = stack[5].lval;
   
   assert(obj_cb);
   
@@ -181,7 +182,6 @@ int32_t SPVM__Go__UV__Loop__poll(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   uv_poll_start(poll_handle, events, SPVM__Go__UV__Loop__enable_goroutine_cb_for_poll);
   
-  int64_t timeout_msec = env->get_field_long_by_name(env, stack, obj_uv_handle, "timeout_msec", &error_id, __func__, FILE_NAME, __LINE__);
   if (timeout_msec > 0) {
     uv_timer_t* timer_handle = env->new_memory_block(env, stack, sizeof(uv_timer_t));
     uv_timer_init(uv_loop, timer_handle);
