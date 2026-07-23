@@ -460,7 +460,9 @@ int32_t SPVM__Go__UV__Loop__handle_idle_start(SPVM_ENV* env, SPVM_VALUE* stack) 
   SPVM_OBJ* obj_uv_idle = stack[0].oval;
   SPVM_OBJ* obj_cb = stack[1].oval;
   
-  assert(obj_cb);
+  if (!obj_cb) {
+    return env->die(env, stack, "$cb must be defined.", __func__, FILE_NAME, __LINE__);
+  }
   
   uv_idle_t* uv_idle = env->get_pointer(env, stack, obj_uv_idle);
   SPVM__Go__UV__Loop__HANDLE_DATA* uv_idle_data = uv_idle->data;
@@ -486,6 +488,10 @@ int32_t SPVM__Go__UV__Loop__handle_timer_start(SPVM_ENV* env, SPVM_VALUE* stack)
   int64_t timeout_msec = stack[2].lval;
   int64_t interval_msec = stack[3].lval;
   
+  if (!obj_cb) {
+    return env->die(env, stack, "$cb must be defined.", __func__, FILE_NAME, __LINE__);
+  }
+  
   env->set_field_object_by_name(env, stack, obj_uv_timer, "cb", obj_cb, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) return error_id;
   
@@ -507,6 +513,10 @@ int32_t SPVM__Go__UV__Loop__handle_poll_start(SPVM_ENV* env, SPVM_VALUE* stack) 
   SPVM_OBJ* obj_uv_poll = stack[0].oval;
   SPVM_OBJ* obj_cb = stack[1].oval;
   int32_t events = stack[2].ival;
+  
+  if (!obj_cb) {
+    return env->die(env, stack, "$cb must be defined.", __func__, FILE_NAME, __LINE__);
+  }
   
   env->set_field_object_by_name(env, stack, obj_uv_poll, "cb", obj_cb, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) return error_id;
