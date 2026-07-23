@@ -160,8 +160,8 @@ int32_t SPVM__Go__UV__Loop__poll(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t error_id = 0;
   SPVM_OBJ* obj_uv_loop = stack[0].oval;
   SPVM_OBJ* obj_uv_handle = stack[1].oval;
-  int32_t fd = stack[2].oval;
-  int32_t events = stack[3].oval;
+  int32_t fd = stack[2].ival;
+  int32_t events = stack[3].ival;
   SPVM_OBJ* obj_cb = stack[4].oval;
   int64_t timeout_msec = stack[5].lval;
   
