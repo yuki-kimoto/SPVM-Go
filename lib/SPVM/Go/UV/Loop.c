@@ -418,7 +418,7 @@ int32_t SPVM__Go__UV__Loop__new_poll(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   uv_poll->data = handle_data;
   
-  SPVM_OBJ* obj_uv_poll = env->new_pointer_object_by_name(env, stack, "Go::UV::Handle::Timer", uv_poll, &error_id, __func__, FILE_NAME, __LINE__);
+  SPVM_OBJ* obj_uv_poll = env->new_pointer_object_by_name(env, stack, "Go::UV::Handle::Poll", uv_poll, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) return error_id;
   
   handle_data->obj_uv_handle = obj_uv_poll;
