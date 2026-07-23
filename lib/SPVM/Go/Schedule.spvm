@@ -152,7 +152,7 @@ class Go::Schedule {
     
     my $goroutine_address = Fn->to_address($goroutine);
     
-    my $enable_goroutine_cb_v2 = [$goroutine : Go::Goroutine, $schedule : Go::Schedule = $self] method : void ($uv_handle : Go::UV::Handle) {
+    my $enable_goroutine_cb = [$goroutine : Go::Goroutine, $schedule : Go::Schedule = $self] method : void ($uv_handle : Go::UV::Handle) {
       my $goroutine_uv_handle = $goroutine->{uv_handle};
       my $goroutine_timout_uv_timer = $goroutine->{timeout_uv_timer};
       
@@ -186,13 +186,13 @@ class Go::Schedule {
       my $uv_poll = $uv_loop->new_poll;
       $uv_loop->poll_init($uv_poll, $fd);
       $goroutine->{uv_handle} = $uv_poll;
-      $uv_poll->start($enable_goroutine_cb_v2, $events);
+      $uv_poll->start($enable_goroutine_cb, $events);
       
       if ($timeout_msec > 0) {
         my $uv_timer = $uv_loop->new_timer;
         $uv_loop->timer_init($uv_timer);
         $goroutine->{timeout_uv_timer} = $uv_timer;
-        $uv_timer->start($enable_goroutine_cb_v2, $timeout_msec);
+        $uv_timer->start($enable_goroutine_cb, $timeout_msec);
       }
       
       if (Go->ENV_DEBUG) {
@@ -210,7 +210,7 @@ class Go::Schedule {
       my $uv_timer = $uv_loop->new_timer;
       $uv_loop->timer_init($uv_timer);
       $goroutine->{uv_handle} = $uv_timer;
-      $uv_timer->start($enable_goroutine_cb_v2, $timeout_msec);
+      $uv_timer->start($enable_goroutine_cb, $timeout_msec);
       
       unless ($deadline) {
         die "The deadline \$deadline in schedule type TYPE_TIMER must be defined.";
@@ -224,7 +224,7 @@ class Go::Schedule {
       my $uv_loop = $self->{uv_loop};
       my $uv_async = $uv_loop->new_async;
       $goroutine->{uv_handle} = $uv_async;
-      $uv_loop->async_init($uv_async, $enable_goroutine_cb_v2);
+      $uv_loop->async_init($uv_async, $enable_goroutine_cb);
     }
     
     if ($self->{disabled_goroutines_h}->{$goroutine_address}) {
