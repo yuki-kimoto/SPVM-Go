@@ -22,9 +22,6 @@ class Go::UV::Loop : pointer {
   has uv_handles_h : ro Hash of Go::UV::Handle;
   
   # Instance Methods
-  native method DESTROY : void ();
-  
-  # Instance Methods
   native method run : void ($uv_run_mode : int);
   
   native method new_idle : Go::UV::Handle::Idle ();

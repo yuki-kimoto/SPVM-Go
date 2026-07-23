@@ -49,61 +49,6 @@ static void SPVM__Go__UV__Loop__close_cb_v2(uv_handle_t* handle) {
   }
 }
 
-static void SPVM__Go__UV__Loop__close_cb(uv_handle_t* handle) {
-  SPVM__Go__UV__Loop__HANDLE_DATA* handle_data = (SPVM__Go__UV__Loop__HANDLE_DATA*)handle->data;
-  
-  SPVM_ENV* env = handle_data->env;
-  SPVM_VALUE* stack = handle_data->stack;
-  
-  env->free_memory_block(env, stack, handle_data);
-  handle->data = NULL;
-  env->free_memory_block(env, stack, handle);
-}
-
-static void SPVM__Go__UV__Loop__enable_goroutine_cb(uv_handle_t* handle) {
-  
-  int32_t error_id = 0;
-  
-  SPVM__Go__UV__Loop__HANDLE_DATA* handle_data = (SPVM__Go__UV__Loop__HANDLE_DATA*)handle->data;
-  
-  SPVM_ENV* env = handle_data->env;
-  SPVM_VALUE* stack = handle_data->stack;
-  SPVM_OBJ* obj_uv_handle = handle_data->obj_uv_handle;
-  
-  SPVM_OBJ* obj_cb = env->get_field_object_by_name(env, stack, obj_uv_handle, "cb", &error_id, __func__, FILE_NAME, __LINE__);
-  assert(obj_cb);
-  stack[0].oval = obj_cb;
-  env->call_instance_method_by_name(env, stack, "", 1, &error_id, __func__, FILE_NAME, __LINE__);
-  if (!(error_id == 0)) {
-    spvm_diag("[Unexcepted Error]Callback 'cb' failed.");
-    abort();
-  }
-  
-  uv_handle_t* related_handle = handle_data->related_handle;
-  if (related_handle) {
-    int32_t handle_type = uv_handle_get_type((uv_handle_t*)handle);
-    if (handle_type == UV_TIMER) {
-      // IO timeout
-      env->set_field_int_by_name(env, stack, obj_uv_handle, "io_timeout_occurred", 1, &error_id, __func__, FILE_NAME, __LINE__);
-      if (!(error_id == 0)) {
-        spvm_diag("[Unexcepted Error]Setting 'io_timeout_occurred' field failed.");
-        abort();
-      }
-    }
-    uv_close(related_handle, SPVM__Go__UV__Loop__close_cb);
-  }
-  
-  uv_close((uv_handle_t*)handle, SPVM__Go__UV__Loop__close_cb);
-}
-
-static void SPVM__Go__UV__Loop__enable_goroutine_cb_for_timer(uv_timer_t* handle) {
-  SPVM__Go__UV__Loop__enable_goroutine_cb((uv_handle_t*)handle);
-}
-
-static void SPVM__Go__UV__Loop__enable_goroutine_cb_for_poll(uv_poll_t* handle, int status, int event) {
-  SPVM__Go__UV__Loop__enable_goroutine_cb((uv_handle_t*)handle);
-}
-
 int32_t SPVM__Go__UV__Loop__run(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   SPVM_OBJ* obj_uv_loop = stack[0].oval;
@@ -153,15 +98,6 @@ static void SPVM__Go__UV__Loop__timer_cb(uv_timer_t* handle) {
 static void SPVM__Go__UV__Loop__poll_cb(uv_poll_t* handle, int status, int event) {
   
   SPVM__Go__UV__Loop__handle_cb((uv_handle_t*)handle);
-}
-
-int32_t SPVM__Go__UV__Loop__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
-  
-  SPVM_OBJ* obj_uv_loop = stack[0].oval;
-  
-  // Nothing to do for now
-  
-  return 0;
 }
 
 int32_t SPVM__Go__UV__Loop__default_loop(SPVM_ENV* env, SPVM_VALUE* stack) {
