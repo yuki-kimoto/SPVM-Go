@@ -23,21 +23,25 @@ class Go::UV::Loop : pointer {
   # Instance Methods
   native method run : void ($uv_run_mode : int);
   
-  native method new_idle : Go::UV::Handle::Idle ();
-  
   native method idle_init : void ($uv_idle : Go::UV::Handle::Idle);
-  
-  native method new_timer : Go::UV::Handle::Timer ();
   
   native method timer_init : void ($uv_timer : Go::UV::Handle::Timer);
   
-  native method new_poll : Go::UV::Handle::Poll ();
-  
   native method poll_init : void ($uv_poll : Go::UV::Handle::Poll, $fd : int);
   
-  native method new_async : Go::UV::Handle::Async ();
-  
   native method async_init : void ($uv_async : Go::UV::Handle::Async, $cb : Go::UV::Callback::Handle);
+  
+  # For Go::UV::Handle::Idle
+  native static method new_idle : Go::UV::Handle::Idle ();
+  
+  # For Go::UV::Handle::Timer
+  native static method new_timer : Go::UV::Handle::Timer ();
+  
+  # For Go::UV::Handle::Poll
+  native static method new_poll : Go::UV::Handle::Poll ();
+  
+  # For Go::UV::Handle::Async
+  native static method new_async : Go::UV::Handle::Async ();
   
   # For Go::UV::Handle::Write
   native static method new_write : Go::UV::Handle::Write ();

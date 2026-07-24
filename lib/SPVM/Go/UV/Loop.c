@@ -114,31 +114,6 @@ int32_t SPVM__Go__UV__Loop__run(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 }
 
-int32_t SPVM__Go__UV__Loop__new_idle(SPVM_ENV* env, SPVM_VALUE* stack) {
-  
-  int32_t error_id = 0;
-  
-  SPVM_OBJ* obj_uv_loop = stack[0].oval;
-  
-  uv_loop_t* uv_loop = env->get_pointer(env, stack, obj_uv_loop);
-  uv_idle_t* uv_idle = env->new_memory_block(env, stack, sizeof(uv_idle_t));
-  
-  SPVM__Go__UV__Loop__HANDLE_DATA* handle_data = env->new_memory_block(env, stack, sizeof(SPVM__Go__UV__Loop__HANDLE_DATA));
-  handle_data->env = env;
-  handle_data->stack = stack;
-  
-  uv_idle->data = handle_data;
-  
-  SPVM_OBJ* obj_uv_idle = env->new_pointer_object_by_name(env, stack, "Go::UV::Handle::Idle", uv_idle, &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) return error_id;
-  
-  handle_data->obj_uv_handle = obj_uv_idle;
-  
-  stack[0].oval = obj_uv_idle;
-  
-  return 0;
-}
-
 int32_t SPVM__Go__UV__Loop__idle_init(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t error_id = 0;
@@ -163,36 +138,6 @@ int32_t SPVM__Go__UV__Loop__idle_init(SPVM_ENV* env, SPVM_VALUE* stack) {
   stack[1].oval = obj_uv_idle;
   env->call_instance_method_by_name(env, stack, "set_uv_handle", 2, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) return error_id;
-  
-  return 0;
-}
-
-int32_t SPVM__Go__UV__Loop__new_async(SPVM_ENV* env, SPVM_VALUE* stack) {
-  
-  int32_t error_id = 0;
-  
-  SPVM_OBJ* obj_uv_loop = stack[0].oval;
-  SPVM_OBJ* obj_cb = stack[1].oval;
-  
-  if (!obj_cb) {
-    return env->die(env, stack, "$cb must be defined.", __func__, FILE_NAME, __LINE__);
-  }
-  
-  uv_loop_t* uv_loop = env->get_pointer(env, stack, obj_uv_loop);
-  uv_async_t* uv_async = env->new_memory_block(env, stack, sizeof(uv_async_t));
-  
-  SPVM__Go__UV__Loop__HANDLE_DATA* handle_data = env->new_memory_block(env, stack, sizeof(SPVM__Go__UV__Loop__HANDLE_DATA));
-  handle_data->env = env;
-  handle_data->stack = stack;
-  
-  uv_async->data = handle_data;
-  
-  SPVM_OBJ* obj_uv_async = env->new_pointer_object_by_name(env, stack, "Go::UV::Handle::Async", uv_async, &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) return error_id;
-  
-  handle_data->obj_uv_handle = obj_uv_async;
-  
-  stack[0].oval = obj_uv_async;
   
   return 0;
 }
@@ -233,31 +178,6 @@ int32_t SPVM__Go__UV__Loop__async_init(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 }
 
-int32_t SPVM__Go__UV__Loop__new_timer(SPVM_ENV* env, SPVM_VALUE* stack) {
-  
-  int32_t error_id = 0;
-  
-  SPVM_OBJ* obj_uv_loop = stack[0].oval;
-  
-  uv_loop_t* uv_loop = env->get_pointer(env, stack, obj_uv_loop);
-  uv_timer_t* uv_timer = env->new_memory_block(env, stack, sizeof(uv_timer_t));
-  
-  SPVM__Go__UV__Loop__HANDLE_DATA* handle_data = env->new_memory_block(env, stack, sizeof(SPVM__Go__UV__Loop__HANDLE_DATA));
-  handle_data->env = env;
-  handle_data->stack = stack;
-  
-  uv_timer->data = handle_data;
-  
-  SPVM_OBJ* obj_uv_timer = env->new_pointer_object_by_name(env, stack, "Go::UV::Handle::Timer", uv_timer, &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) return error_id;
-  
-  handle_data->obj_uv_handle = obj_uv_timer;
-  
-  stack[0].oval = obj_uv_timer;
-  
-  return 0;
-}
-
 int32_t SPVM__Go__UV__Loop__timer_init(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t error_id = 0;
@@ -290,9 +210,6 @@ int32_t SPVM__Go__UV__Loop__new_poll(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t error_id = 0;
   
-  SPVM_OBJ* obj_uv_loop = stack[0].oval;
-  
-  uv_loop_t* uv_loop = env->get_pointer(env, stack, obj_uv_loop);
   uv_poll_t* uv_poll = env->new_memory_block(env, stack, sizeof(uv_poll_t));
   
   SPVM__Go__UV__Loop__HANDLE_DATA* handle_data = env->new_memory_block(env, stack, sizeof(SPVM__Go__UV__Loop__HANDLE_DATA));
@@ -480,6 +397,78 @@ int32_t SPVM__Go__UV__Loop__handle_get_type(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t uv_handle_type = uv_handle_get_type(uv_handle);
   
   stack[0].ival = uv_handle_type;
+  
+  return 0;
+}
+
+int32_t SPVM__Go__UV__Loop__new_idle(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t error_id = 0;
+  
+  uv_idle_t* uv_idle = env->new_memory_block(env, stack, sizeof(uv_idle_t));
+  
+  SPVM__Go__UV__Loop__HANDLE_DATA* handle_data = env->new_memory_block(env, stack, sizeof(SPVM__Go__UV__Loop__HANDLE_DATA));
+  handle_data->env = env;
+  handle_data->stack = stack;
+  
+  uv_idle->data = handle_data;
+  
+  SPVM_OBJ* obj_uv_idle = env->new_pointer_object_by_name(env, stack, "Go::UV::Handle::Idle", uv_idle, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) return error_id;
+  
+  handle_data->obj_uv_handle = obj_uv_idle;
+  
+  stack[0].oval = obj_uv_idle;
+  
+  return 0;
+}
+
+int32_t SPVM__Go__UV__Loop__new_async(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t error_id = 0;
+  
+  SPVM_OBJ* obj_cb = stack[1].oval;
+  
+  if (!obj_cb) {
+    return env->die(env, stack, "$cb must be defined.", __func__, FILE_NAME, __LINE__);
+  }
+  
+  uv_async_t* uv_async = env->new_memory_block(env, stack, sizeof(uv_async_t));
+  
+  SPVM__Go__UV__Loop__HANDLE_DATA* handle_data = env->new_memory_block(env, stack, sizeof(SPVM__Go__UV__Loop__HANDLE_DATA));
+  handle_data->env = env;
+  handle_data->stack = stack;
+  
+  uv_async->data = handle_data;
+  
+  SPVM_OBJ* obj_uv_async = env->new_pointer_object_by_name(env, stack, "Go::UV::Handle::Async", uv_async, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) return error_id;
+  
+  handle_data->obj_uv_handle = obj_uv_async;
+  
+  stack[0].oval = obj_uv_async;
+  
+  return 0;
+}
+
+int32_t SPVM__Go__UV__Loop__new_timer(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t error_id = 0;
+  
+  uv_timer_t* uv_timer = env->new_memory_block(env, stack, sizeof(uv_timer_t));
+  
+  SPVM__Go__UV__Loop__HANDLE_DATA* handle_data = env->new_memory_block(env, stack, sizeof(SPVM__Go__UV__Loop__HANDLE_DATA));
+  handle_data->env = env;
+  handle_data->stack = stack;
+  
+  uv_timer->data = handle_data;
+  
+  SPVM_OBJ* obj_uv_timer = env->new_pointer_object_by_name(env, stack, "Go::UV::Handle::Timer", uv_timer, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) return error_id;
+  
+  handle_data->obj_uv_handle = obj_uv_timer;
+  
+  stack[0].oval = obj_uv_timer;
   
   return 0;
 }
