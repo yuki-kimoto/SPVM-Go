@@ -1,10 +1,10 @@
 # Copyright (c) 2026 Yuki Kimoto
 # MIT License
 
-class Go::UV::Callback::Timer {
+class Go::UV::Callback::Timer : interface_t {
   
+  use Go::UV::Handle::Timer;
   
-  static method my_method : void () {
-    
-  }
+  required method : void ($uv_timer : Go::UV::Handle::Timer);
+  
 }

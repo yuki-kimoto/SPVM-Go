@@ -1,10 +1,10 @@
 # Copyright (c) 2026 Yuki Kimoto
 # MIT License
 
-class Go::UV::Callback::Async {
+class Go::UV::Callback::Async : interface_t {
   
+  use Go::UV::Handle::Async;
   
-  static method my_method : void () {
-    
-  }
+  required method : void ($uv_async : Go::UV::Handle::Async);
+  
 }

@@ -17,6 +17,12 @@ class Go::UV::Loop : pointer {
   use Go::UV::Constant;
   use Go::UV::Callback::Handle;
   use Go::UV::Request::Write;
+  use Go::UV::Callback::Idle;
+  use Go::UV::Callback::Timer;
+  use Go::UV::Callback::Async;
+  use Go::UV::Callback::Poll;
+  use Go::UV::Callback::Read;
+  use Go::UV::Callback::Write;
   
   # Fields
   has uv_handles_h : ro Hash of Go::UV::Handle;

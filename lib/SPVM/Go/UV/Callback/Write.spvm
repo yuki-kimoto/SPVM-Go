@@ -1,10 +1,10 @@
 # Copyright (c) 2026 Yuki Kimoto
 # MIT License
 
-class Go::UV::Callback::Write {
+class Go::UV::Callback::Write : interface_t {
   
+  use Go::UV::Request::Write;
   
-  static method my_method : void () {
-    
-  }
+  required method : void ($uv_req : Go::UV::Request::Write, $status : int);
+  
 }

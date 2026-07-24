@@ -1,10 +1,9 @@
 # Copyright (c) 2026 Yuki Kimoto
 # MIT License
 
-class Go::UV::Callback::Read {
+class Go::UV::Callback::Read : interface_t {
   
+  use Go::UV::Handle::Stream;
   
-  static method my_method : void () {
-    
-  }
+  required method : void ($uv_stream : Go::UV::Handle::Stream, $nread : int, $buffer : string);
 }
