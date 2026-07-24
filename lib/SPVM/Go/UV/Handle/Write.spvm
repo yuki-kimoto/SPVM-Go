@@ -6,7 +6,7 @@ class Go::UV::Handle::Write : pointer {
   use Go::UV::Loop;
   
   # Class Mehtods
-  method new : Go::UV::Handle::Write () {
+  static method new : Go::UV::Handle::Write () {
     
     my $self = Go::UV::Loop->new_write;
     
