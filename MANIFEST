@@ -210,6 +210,8 @@ lib/SPVM/Go/UV/Handle/Pipe.pm
 lib/SPVM/Go/UV/Handle/Pipe.spvm
 lib/SPVM/Go/UV/Handle/Poll.pm
 lib/SPVM/Go/UV/Handle/Poll.spvm
+lib/SPVM/Go/UV/Handle/Stream.pm
+lib/SPVM/Go/UV/Handle/Stream.spvm
 lib/SPVM/Go/UV/Handle/Timer.pm
 lib/SPVM/Go/UV/Handle/Timer.spvm
 lib/SPVM/Go/UV/Handle/Write.pm

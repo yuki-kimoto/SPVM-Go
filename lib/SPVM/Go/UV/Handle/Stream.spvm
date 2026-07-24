@@ -1,0 +1,6 @@
+# Copyright (c) 2026 Yuki Kimoto
+# MIT License
+
+class Go::UV::Handle::Stream extends Go::UV::Handle {
+  
+}
