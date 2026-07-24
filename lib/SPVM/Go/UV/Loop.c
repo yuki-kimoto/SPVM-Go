@@ -484,3 +484,29 @@ int32_t SPVM__Go__UV__Loop__handle_get_type(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 }
 
+int32_t SPVM__Go__UV__Loop__new_write(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t error_id = 0;
+  
+  uv_write_t* uv_write = env->new_memory_block(env, stack, sizeof(uv_write_t));
+  
+  SPVM_OBJ* obj_uv_write = env->new_pointer_object_by_name(env, stack, "Go::UV::Handle::Write", uv_write, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) return error_id;
+  
+  stack[0].oval = obj_uv_write;
+  
+  return 0;
+}
+
+int32_t SPVM__Go__UV__Loop__destroy_write(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t error_id = 0;
+  
+  SPVM_OBJ* obj_uv_write = stack[0].oval;
+  
+  uv_write_t* uv_write = env->get_pointer(env, stack, obj_uv_write);
+  
+  env->free_memory_block(env, stack, uv_write);
+  
+  return 0;
+}

@@ -39,6 +39,11 @@ class Go::UV::Loop : pointer {
   
   native method async_init : void ($uv_async : Go::UV::Handle::Async, $cb : Go::UV::Callback::Handle);
   
+  # For Go::UV::Handle::Write
+  native static method new_write : Go::UV::Handle::Write ();
+  
+  native static method destroy_write : void ($uv_write : Go::UV::Handle::Write);
+  
   # For Go::UV
   native static method default_loop : Go::UV::Loop ();
   
