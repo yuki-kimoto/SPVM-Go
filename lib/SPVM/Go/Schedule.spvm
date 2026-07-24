@@ -202,7 +202,10 @@ class Go::Schedule {
         my $uv_timer = Go::UV::Handle::Timer->new;
         $uv_loop->timer_init($uv_timer);
         $goroutine->{timeout_uv_timer} = $uv_timer;
-        $uv_timer->start($enable_goroutine_cb, $timeout_msec);
+        my $timer_cb = [$goroutine : Go::Goroutine, $schedule : Go::Schedule = $self] method : void ($uv_timer : Go::UV::Handle::Timer) {
+          $schedule->awake($goroutine, $uv_timer);
+        };
+        $uv_timer->start($timer_cb, $timeout_msec);
       }
       
       if (Go->ENV_DEBUG) {
