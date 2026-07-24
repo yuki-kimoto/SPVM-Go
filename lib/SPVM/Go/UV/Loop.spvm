@@ -69,15 +69,15 @@ class Go::UV::Loop : pointer {
   
   native static method handle_pipe_open : void ($uv_pipe : Go::UV::Handle::Pipe, $fd : int);
   
-  private native static method handle_read_start : void ($uv_handle : Go::UV::Handle::Stream, $buffer : mutable string, $buffer_length : int, $cb : Go::UV::Callback::Handle);
+  native static method handle_read_start : void ($uv_handle : Go::UV::Handle::Stream, $buffer : mutable string, $buffer_length : int, $cb : Go::UV::Callback::Handle);
   
-  private native static method handle_write : void ($uv_req : Go::UV::Handle::Write, $uv_handle : Go::UV::Handle::Stream, $buffer : mutable string, $buffer_length : int, $cb : Go::UV::Callback::Handle);
+  native static method handle_write : void ($uv_req : Go::UV::Handle::Write, $uv_handle : Go::UV::Handle::Stream, $buffer : string, $buffer_length : int, $cb : Go::UV::Callback::Handle);
   
-  private native static method handle_free : void ($uv_handle : Go::UV::Handle);
+  native static method handle_free : void ($uv_handle : Go::UV::Handle);
   
-  private native static method handle_close : void ($uv_handle : Go::UV::Handle, $close_cb : Go::UV::Callback::Handle = undef);
+  native static method handle_close : void ($uv_handle : Go::UV::Handle, $close_cb : Go::UV::Callback::Handle = undef);
   
-  private native static method handle_get_type : int ($uv_handle : Go::UV::Handle);
+  native static method handle_get_type : int ($uv_handle : Go::UV::Handle);
   
   # Utilities
   private method set_uv_handle : void ($uv_handle  : Go::UV::Handle) {
