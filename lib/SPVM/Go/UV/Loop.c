@@ -562,6 +562,28 @@ int32_t SPVM__Go__UV__Loop__pipe_init(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 }
 
+int32_t SPVM__Go__UV__Loop__handle_pipe_open(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t error_id = 0;
+  
+  SPVM_OBJ* obj_uv_pipe = stack[0].oval;
+  int32_t fd = stack[1].ival;
+  
+  if (!obj_uv_pipe) {
+    return env->die(env, stack, "$uv_pipe must be defined.", __func__, FILE_NAME, __LINE__);
+  }
+  
+  uv_pipe_t* uv_pipe = env->get_pointer(env, stack, obj_uv_pipe);
+  
+  int32_t status = uv_pipe_open(uv_pipe, fd);
+  
+  if (!(status == 0)) {
+    return env->die(env, stack, "uv_pipe_open failed. status=%d.", __func__, FILE_NAME, __LINE__, status);
+  }
+  
+  return 0;
+}
+
 void SPVM__Go__UV__Loop__alloc_cb(uv_handle_t* uv_handle, size_t suggested_size, uv_buf_t* uv_buf) {
   
   int32_t error_id = 0;

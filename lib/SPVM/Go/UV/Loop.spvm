@@ -67,6 +67,8 @@ class Go::UV::Loop : pointer {
   
   private native static method handle_idle_start : void ($uv_handle : Go::UV::Handle::Idle, $cb : Go::UV::Callback::Handle);
   
+  native static method handle_pipe_open : void ($uv_pipe : Go::UV::Handle::Pipe, $fd : int);
+  
   private native static method handle_read_start : void ($uv_handle : Go::UV::Handle::Stream, $buffer : mutable string, $buffer_length : int, $cb : Go::UV::Callback::Handle);
   
   private native static method handle_write : void ($uv_req : Go::UV::Handle::Write, $uv_handle : Go::UV::Handle::Stream, $buffer : mutable string, $buffer_length : int, $cb : Go::UV::Callback::Handle);
