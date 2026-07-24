@@ -197,8 +197,6 @@ lib/SPVM/Go/UV/Callback/Handle.pm
 lib/SPVM/Go/UV/Callback/Handle.spvm
 lib/SPVM/Go/UV/Callback/Idle.pm
 lib/SPVM/Go/UV/Callback/Idle.spvm
-lib/SPVM/Go/UV/Callback/LoopAlive.pm
-lib/SPVM/Go/UV/Callback/LoopAlive.spvm
 lib/SPVM/Go/UV/Callback/Poll.pm
 lib/SPVM/Go/UV/Callback/Poll.spvm
 lib/SPVM/Go/UV/Callback/Read.pm
