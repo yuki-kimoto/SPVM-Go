@@ -25,7 +25,7 @@ class Go::Goroutine extends Go::UV::Handle: pointer {
   
   has uv_handle : Go::UV::Handle;
   
-  has timeout_uv_timer : Go::UV::Handle; # For IO timeout
+  has timeout_uv_timer : Go::UV::Handle::Timer;
   
   has io_timeout_occurred : byte;
   
