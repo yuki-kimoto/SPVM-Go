@@ -231,7 +231,7 @@ class Go::Schedule {
     elsif ($schedule_type == &TYPE_PIPE_READ ||$schedule_type == &TYPE_PIPE_WRITE) {
       
       unless ($goroutine->{uv_write}) {
-        $goroutine->{uv_write} = Go::UV::Handle::Write->new;
+        $goroutine->{uv_write} = Go::UV::Request::Write->new;
       }
       
     }

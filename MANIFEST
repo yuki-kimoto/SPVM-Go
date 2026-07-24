@@ -214,12 +214,14 @@ lib/SPVM/Go/UV/Handle/Stream.pm
 lib/SPVM/Go/UV/Handle/Stream.spvm
 lib/SPVM/Go/UV/Handle/Timer.pm
 lib/SPVM/Go/UV/Handle/Timer.spvm
-lib/SPVM/Go/UV/Handle/Write.pm
-lib/SPVM/Go/UV/Handle/Write.spvm
 lib/SPVM/Go/UV/Loop.c
 lib/SPVM/Go/UV/Loop.config
 lib/SPVM/Go/UV/Loop.pm
 lib/SPVM/Go/UV/Loop.spvm
+lib/SPVM/Go/UV/Request.pm
+lib/SPVM/Go/UV/Request.spvm
+lib/SPVM/Go/UV/Request/Write.pm
+lib/SPVM/Go/UV/Request/Write.spvm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files

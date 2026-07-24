@@ -1,4 +1,4 @@
-package SPVM::Go::UV::Handle::Write;
+package SPVM::Go::UV::Request::Write;
 
 
 
@@ -8,15 +8,15 @@ package SPVM::Go::UV::Handle::Write;
 
 =head1 Name
 
-SPVM::Go::UV::Handle::Write - Short Description
+SPVM::Go::UV::Request::Write - Short Description
 
 =head1 Description
 
-Go::UV::Handle::Write class in L<SPVM> has methods to do someting.
+Go::UV::Request::Write class in L<SPVM> has methods to do someting.
 
 =head1 Usage
 
-  use Go::UV::Handle::Write;
+  use Go::UV::Request::Write;
 
 =head1 Details
 

@@ -1,12 +1,12 @@
 # Copyright (c) 2026 Yuki Kimoto
 # MIT License
 
-class Go::UV::Handle::Write : pointer {
+class Go::UV::Request::Write extends Go::UV::Request {
   
   use Go::UV::Loop;
   
   # Class Mehtods
-  static method new : Go::UV::Handle::Write () {
+  static method new : Go::UV::Request::Write () {
     
     my $self = Go::UV::Loop->new_write;
     

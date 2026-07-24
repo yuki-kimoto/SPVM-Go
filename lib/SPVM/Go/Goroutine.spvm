@@ -12,7 +12,7 @@ class Go::Goroutine : pointer {
   use Go::Time;
   use Resource::Coro;
   use Go::UV::Handle;
-  use Go::UV::Handle::Write;
+  use Go::UV::Request::Write;
   
   # Fields
   has return_back : Go::Goroutine;
@@ -29,7 +29,7 @@ class Go::Goroutine : pointer {
   
   has io_timeout_occurred : byte;
   
-  has uv_write : Go::UV::Handle::Write;
+  has uv_write : Go::UV::Request::Write;
   
   # Class Methods
   static method new : Go::Goroutine ($task :  Callback = undef, $return_back : Go::Goroutine = undef) {
