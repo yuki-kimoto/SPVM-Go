@@ -193,6 +193,8 @@ lib/SPVM/Go/UV.pm
 lib/SPVM/Go/UV.spvm
 lib/SPVM/Go/UV/Callback/Async.pm
 lib/SPVM/Go/UV/Callback/Async.spvm
+lib/SPVM/Go/UV/Callback/Close.pm
+lib/SPVM/Go/UV/Callback/Close.spvm
 lib/SPVM/Go/UV/Callback/Handle.pm
 lib/SPVM/Go/UV/Callback/Handle.spvm
 lib/SPVM/Go/UV/Callback/Idle.pm

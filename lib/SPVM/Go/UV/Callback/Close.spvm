@@ -1,0 +1,10 @@
+# Copyright (c) 2026 Yuki Kimoto
+# MIT License
+
+class Go::UV::Callback::Close : interface_t {
+  
+  use Go::UV::Handle;
+  
+  required method : void ($uv_handle : Go::UV::Handle);
+  
+}
