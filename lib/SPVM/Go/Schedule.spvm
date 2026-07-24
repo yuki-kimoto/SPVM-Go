@@ -223,7 +223,10 @@ class Go::Schedule {
       my $uv_timer = Go::UV::Handle::Timer->new;
       $uv_loop->timer_init($uv_timer);
       $goroutine->{uv_handle} = $uv_timer;
-      $uv_timer->start($enable_goroutine_cb, $timeout_msec);
+      my $timer_cb = [$goroutine : Go::Goroutine, $schedule : Go::Schedule = $self] method : void ($uv_timer : Go::UV::Handle::Timer) {
+        $schedule->awake($goroutine, $uv_timer);
+      };
+      $uv_timer->start($timer_cb, $timeout_msec);
       
       unless ($deadline) {
         die "The deadline \$deadline in schedule type TYPE_TIMER must be defined.";
@@ -237,7 +240,10 @@ class Go::Schedule {
       my $uv_loop = $self->{uv_loop};
       my $uv_async = Go::UV::Handle::Async->new;
       $goroutine->{uv_handle} = $uv_async;
-      $uv_loop->async_init($uv_async, $enable_goroutine_cb);
+      my $async_cb = [$goroutine : Go::Goroutine, $schedule : Go::Schedule = $self] method : void ($uv_timer : Go::UV::Handle::Async) {
+        $schedule->awake($goroutine, $uv_timer);
+      };
+      $uv_loop->async_init($uv_async, $async_cb);
     }
     elsif ($schedule_type == &TYPE_PIPE_READ ||$schedule_type == &TYPE_PIPE_WRITE) {
       
