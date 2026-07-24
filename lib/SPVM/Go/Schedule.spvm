@@ -192,7 +192,11 @@ class Go::Schedule {
       my $uv_poll = Go::UV::Handle::Poll->new;
       $uv_loop->poll_init($uv_poll, $fd);
       $goroutine->{uv_handle} = $uv_poll;
-      $uv_poll->start($enable_goroutine_cb, $events);
+      my $poll_cb = [$goroutine : Go::Goroutine, $schedule : Go::Schedule = $self] method : void ($uv_poll : Go::UV::Handle::Poll) {
+        $schedule->awake($goroutine, $uv_poll);
+      };
+      
+      $uv_poll->start($poll_cb, $events);
       
       if ($timeout_msec > 0) {
         my $uv_timer = Go::UV::Handle::Timer->new;
