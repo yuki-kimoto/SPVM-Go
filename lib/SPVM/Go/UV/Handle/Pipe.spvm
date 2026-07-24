@@ -1,0 +1,14 @@
+# Copyright (c) 2026 Yuki Kimoto
+# MIT License
+
+class Go::UV::Handle::Pipe extends Go::UV::Handle {
+  
+  # Class Mehtods
+  static method new : Go::UV::Handle::Pipe () {
+    
+    my $self = Go::UV::Loop->new_pipe;
+    
+    return $self;
+  }
+  
+}

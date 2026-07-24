@@ -499,3 +499,54 @@ int32_t SPVM__Go__UV__Loop__destroy_write(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   return 0;
 }
+
+int32_t SPVM__Go__UV__Loop__new_pipe(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t error_id = 0;
+  
+  uv_pipe_t* uv_pipe = env->new_memory_block(env, stack, sizeof(uv_pipe_t));
+  
+  SPVM__Go__UV__Loop__HANDLE_DATA* handle_data = env->new_memory_block(env, stack, sizeof(SPVM__Go__UV__Loop__HANDLE_DATA));
+  handle_data->env = env;
+  handle_data->stack = stack;
+  
+  uv_pipe->data = handle_data;
+  
+  SPVM_OBJ* obj_uv_pipe = env->new_pointer_object_by_name(env, stack, "Go::UV::Handle::Pipe", uv_pipe, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) return error_id;
+  
+  handle_data->obj_uv_handle = obj_uv_pipe;
+  
+  stack[0].oval = obj_uv_pipe;
+  
+  return 0;
+}
+
+int32_t SPVM__Go__UV__Loop__pipe_init(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t error_id = 0;
+  
+  SPVM_OBJ* obj_uv_loop = stack[0].oval;
+  SPVM_OBJ* obj_uv_pipe = stack[1].oval;
+  int32_t ipc = stack[2].ival;
+  
+  if (!obj_uv_pipe) {
+    return env->die(env, stack, "$uv_pipe must be defined.", __func__, FILE_NAME, __LINE__);
+  }
+  
+  uv_loop_t* uv_loop = env->get_pointer(env, stack, obj_uv_loop);
+  uv_pipe_t* uv_pipe = env->get_pointer(env, stack, obj_uv_pipe);
+  
+  int32_t status = uv_pipe_init(uv_loop, uv_pipe, ipc);
+  
+  if (!(status == 0)) {
+    return env->die(env, stack, "uv_pipe_init failed. status=%d.", __func__, FILE_NAME, __LINE__, status);
+  }
+  
+  stack[0].oval = obj_uv_loop;
+  stack[1].oval = obj_uv_pipe;
+  env->call_instance_method_by_name(env, stack, "set_uv_handle", 2, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) return error_id;
+  
+  return 0;
+}

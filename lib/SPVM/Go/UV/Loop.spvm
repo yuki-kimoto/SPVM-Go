@@ -12,6 +12,7 @@ class Go::UV::Loop : pointer {
   use Go::UV::Handle::Async;
   use Go::UV::Handle::Timer;
   use Go::UV::Handle::Poll;
+  use Go::UV::Handle::Pipe;
   use Go::UV::Callback::LoopAlive;
   use Go::UV::Constant;
   use Go::UV::Callback::Handle;
@@ -31,6 +32,8 @@ class Go::UV::Loop : pointer {
   
   native method async_init : void ($uv_async : Go::UV::Handle::Async, $cb : Go::UV::Callback::Handle);
   
+  native method pipe_init : void ($uv_pipe : Go::UV::Handle::Pipe, $ipc : int);
+  
   # For Go::UV::Handle::Idle
   native static method new_idle : Go::UV::Handle::Idle ();
   
@@ -45,6 +48,9 @@ class Go::UV::Loop : pointer {
   
   # For Go::UV::Handle::Write
   native static method new_write : Go::UV::Handle::Write ();
+  
+  # For Go::UV::Handle::Pipe
+  native static method new_pipe : Go::UV::Handle::Pipe ();
   
   native static method destroy_write : void ($uv_write : Go::UV::Handle::Write);
   
