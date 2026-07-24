@@ -245,7 +245,6 @@ class Go::Schedule {
   
   private method enable_goroutine : void ($goroutine : Go::Goroutine) {
     $goroutine->{disabled} = 0;
-    $goroutine->{cb} = undef;
     $goroutine->{uv_handle} = undef;
     $goroutine->{timeout_uv_timer} = undef;
     $self->{disabled_goroutines_h}->delete(Fn->to_address($goroutine));
