@@ -84,22 +84,27 @@ static void SPVM__Go__UV__Loop__handle_cb(uv_handle_t* uv_handle) {
   }
 }
 
-static void SPVM__Go__UV__Loop__idle_cb(uv_idle_t* uv_handle) {
+static void SPVM__Go__UV__Loop__idle_cb(uv_idle_t* uv_idle) {
   
-  SPVM__Go__UV__Loop__handle_cb((uv_handle_t*)uv_handle);
+  SPVM__Go__UV__Loop__handle_cb((uv_handle_t*)uv_idle);
 }
 
-static void SPVM__Go__UV__Loop__async_cb(uv_async_t* uv_handle) {
-  SPVM__Go__UV__Loop__handle_cb((uv_handle_t*)uv_handle);
+static void SPVM__Go__UV__Loop__async_cb(uv_async_t* uv_async) {
+  SPVM__Go__UV__Loop__handle_cb((uv_handle_t*)uv_async);
 }
 
-static void SPVM__Go__UV__Loop__timer_cb(uv_timer_t* uv_handle) {
-  SPVM__Go__UV__Loop__handle_cb((uv_handle_t*)uv_handle);
+static void SPVM__Go__UV__Loop__timer_cb(uv_timer_t* uv_timer) {
+  SPVM__Go__UV__Loop__handle_cb((uv_handle_t*)uv_timer);
 }
 
-static void SPVM__Go__UV__Loop__poll_cb(uv_poll_t* uv_handle, int status, int event) {
+static void SPVM__Go__UV__Loop__poll_cb(uv_poll_t* uv_poll, int status, int event) {
   
-  SPVM__Go__UV__Loop__handle_cb((uv_handle_t*)uv_handle);
+  SPVM__Go__UV__Loop__handle_cb((uv_handle_t*)uv_poll);
+}
+
+void SPVM__Go__UV__Loop__read_cb(uv_stream_t* uv_stream, ssize_t nread, const uv_buf_t* buf) {
+  
+  SPVM__Go__UV__Loop__handle_cb((uv_handle_t*)uv_stream);
 }
 
 int32_t SPVM__Go__UV__Loop__run(SPVM_ENV* env, SPVM_VALUE* stack) {
@@ -552,3 +557,72 @@ int32_t SPVM__Go__UV__Loop__pipe_init(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 }
 
+void SPVM__Go__UV__Loop__alloc_cb(uv_handle_t* uv_handle, size_t suggested_size, uv_buf_t* buf) {
+  
+  int32_t error_id = 0;
+  
+  buf->base = NULL;
+  buf->len = 0;
+  
+  SPVM__Go__UV__Loop__HANDLE_DATA* uv_handle_buffer = (SPVM__Go__UV__Loop__HANDLE_DATA*)uv_handle->data;
+  
+  SPVM_ENV* env = uv_handle_buffer->env;
+  SPVM_VALUE* stack = uv_handle_buffer->stack;
+  SPVM_OBJ* obj_uv_handle = uv_handle_buffer->obj_uv_handle;
+  
+  SPVM_OBJ* obj_buffer = env->get_field_object_by_name(env, stack, obj_uv_handle, "buffer", &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) {
+    spvm_diag("[Unexpected Error]%s", env->get_exception_chars(env, stack));
+    abort();
+  }
+  const char* buffer = env->get_chars(env, stack, obj_buffer);
+  
+  int32_t buffer_length = env->get_field_int_by_name(env, stack, obj_uv_handle, "buffer_length", &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) {
+    spvm_diag("[Unexpected Error]%s", env->get_exception_chars(env, stack));
+    abort();
+  }
+  
+  buf->base = (char*)buffer;
+  buf->len = buffer_length;
+}
+
+int32_t SPVM__Go__UV__Loop__handle_read_start(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t error_id = 0;
+  
+  SPVM_OBJ* obj_uv_pipe = stack[0].oval;
+  SPVM_OBJ* obj_buffer = stack[1].oval;
+  int32_t buffer_length = stack[2].oval;
+  SPVM_OBJ* obj_cb = stack[3].oval;
+  
+  if (!obj_buffer) {
+    return env->die(env, stack, "$buffer must be defined.", __func__, FILE_NAME, __LINE__);
+  }
+  
+  if (!obj_cb) {
+    return env->die(env, stack, "$cb must be defined.", __func__, FILE_NAME, __LINE__);
+  }
+  
+  void* buffer_chars = env->get_chars(env, stack, obj_buffer);
+  int32_t buffer_len = env->length(env, stack, obj_buffer);
+  
+  env->set_field_object_by_name(env, stack, obj_uv_pipe, "cb", obj_cb, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) return error_id;
+  
+  env->set_field_object_by_name(env, stack, obj_uv_pipe, "buffer", obj_buffer, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) return error_id;
+  
+  env->set_field_int_by_name(env, stack, obj_uv_pipe, "buffer_length", buffer_length, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) return error_id;
+  
+  uv_pipe_t* uv_pipe = env->get_pointer(env, stack, obj_uv_pipe);
+  
+  int32_t status = uv_read_start((uv_stream_t*)uv_pipe, SPVM__Go__UV__Loop__alloc_cb, SPVM__Go__UV__Loop__read_cb);
+  
+  if (!(status == 0)) {
+    return env->die(env, stack, "uv_read_start failed. status=%d.", __func__, FILE_NAME, __LINE__, status);
+  }
+  
+  return 0;
+}
