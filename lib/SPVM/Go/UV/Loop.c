@@ -10,7 +10,7 @@ typedef struct {
   SPVM_ENV* env;
   SPVM_VALUE* stack;
   SPVM_OBJ* obj_uv_handle;
-  uv_handle_t* related_handle;
+  uv_handle_t* related_uv_handle;
 } SPVM__Go__UV__Loop__HANDLE_DATA;
 
 int32_t SPVM__Go__UV__Loop__default_loop(SPVM_ENV* env, SPVM_VALUE* stack) {
@@ -27,15 +27,15 @@ int32_t SPVM__Go__UV__Loop__default_loop(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 }
 
-static void SPVM__Go__UV__Loop__close_cb(uv_handle_t* handle) {
+static void SPVM__Go__UV__Loop__close_cb(uv_handle_t* uv_handle) {
   
   int32_t error_id = 0;
   
-  SPVM__Go__UV__Loop__HANDLE_DATA* handle_data = (SPVM__Go__UV__Loop__HANDLE_DATA*)handle->data;
+  SPVM__Go__UV__Loop__HANDLE_DATA* uv_handle_data = (SPVM__Go__UV__Loop__HANDLE_DATA*)uv_handle->data;
   
-  SPVM_ENV* env = handle_data->env;
-  SPVM_VALUE* stack = handle_data->stack;
-  SPVM_OBJ* obj_uv_handle = handle_data->obj_uv_handle;
+  SPVM_ENV* env = uv_handle_data->env;
+  SPVM_VALUE* stack = uv_handle_data->stack;
+  SPVM_OBJ* obj_uv_handle = uv_handle_data->obj_uv_handle;
   SPVM_OBJ* obj_cb = env->get_field_object_by_name(env, stack, obj_uv_handle, "close_cb", &error_id, __func__, FILE_NAME, __LINE__);
   
   if (obj_cb) {
@@ -63,14 +63,15 @@ static void SPVM__Go__UV__Loop__close_cb(uv_handle_t* handle) {
   }
 }
 
-static void SPVM__Go__UV__Loop__handle_cb(uv_handle_t* handle) {
+static void SPVM__Go__UV__Loop__handle_cb(uv_handle_t* uv_handle) {
+  
   int32_t error_id = 0;
   
-  SPVM__Go__UV__Loop__HANDLE_DATA* handle_data = (SPVM__Go__UV__Loop__HANDLE_DATA*)handle->data;
+  SPVM__Go__UV__Loop__HANDLE_DATA* uv_handle_data = (SPVM__Go__UV__Loop__HANDLE_DATA*)uv_handle->data;
   
-  SPVM_ENV* env = handle_data->env;
-  SPVM_VALUE* stack = handle_data->stack;
-  SPVM_OBJ* obj_uv_handle = handle_data->obj_uv_handle;
+  SPVM_ENV* env = uv_handle_data->env;
+  SPVM_VALUE* stack = uv_handle_data->stack;
+  SPVM_OBJ* obj_uv_handle = uv_handle_data->obj_uv_handle;
   SPVM_OBJ* obj_cb = env->get_field_object_by_name(env, stack, obj_uv_handle, "cb", &error_id, __func__, FILE_NAME, __LINE__);
   
   assert(obj_cb);
@@ -83,22 +84,22 @@ static void SPVM__Go__UV__Loop__handle_cb(uv_handle_t* handle) {
   }
 }
 
-static void SPVM__Go__UV__Loop__idle_cb(uv_idle_t* handle) {
+static void SPVM__Go__UV__Loop__idle_cb(uv_idle_t* uv_handle) {
   
-  SPVM__Go__UV__Loop__handle_cb((uv_handle_t*)handle);
+  SPVM__Go__UV__Loop__handle_cb((uv_handle_t*)uv_handle);
 }
 
-static void SPVM__Go__UV__Loop__async_cb(uv_async_t* handle) {
-  SPVM__Go__UV__Loop__handle_cb((uv_handle_t*)handle);
+static void SPVM__Go__UV__Loop__async_cb(uv_async_t* uv_handle) {
+  SPVM__Go__UV__Loop__handle_cb((uv_handle_t*)uv_handle);
 }
 
-static void SPVM__Go__UV__Loop__timer_cb(uv_timer_t* handle) {
-  SPVM__Go__UV__Loop__handle_cb((uv_handle_t*)handle);
+static void SPVM__Go__UV__Loop__timer_cb(uv_timer_t* uv_handle) {
+  SPVM__Go__UV__Loop__handle_cb((uv_handle_t*)uv_handle);
 }
 
-static void SPVM__Go__UV__Loop__poll_cb(uv_poll_t* handle, int status, int event) {
+static void SPVM__Go__UV__Loop__poll_cb(uv_poll_t* uv_handle, int status, int event) {
   
-  SPVM__Go__UV__Loop__handle_cb((uv_handle_t*)handle);
+  SPVM__Go__UV__Loop__handle_cb((uv_handle_t*)uv_handle);
 }
 
 int32_t SPVM__Go__UV__Loop__run(SPVM_ENV* env, SPVM_VALUE* stack) {
@@ -212,16 +213,16 @@ int32_t SPVM__Go__UV__Loop__new_poll(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   uv_poll_t* uv_poll = env->new_memory_block(env, stack, sizeof(uv_poll_t));
   
-  SPVM__Go__UV__Loop__HANDLE_DATA* handle_data = env->new_memory_block(env, stack, sizeof(SPVM__Go__UV__Loop__HANDLE_DATA));
-  handle_data->env = env;
-  handle_data->stack = stack;
+  SPVM__Go__UV__Loop__HANDLE_DATA* uv_handle_data = env->new_memory_block(env, stack, sizeof(SPVM__Go__UV__Loop__HANDLE_DATA));
+  uv_handle_data->env = env;
+  uv_handle_data->stack = stack;
   
-  uv_poll->data = handle_data;
+  uv_poll->data = uv_handle_data;
   
   SPVM_OBJ* obj_uv_poll = env->new_pointer_object_by_name(env, stack, "Go::UV::Handle::Poll", uv_poll, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) return error_id;
   
-  handle_data->obj_uv_handle = obj_uv_poll;
+  uv_handle_data->obj_uv_handle = obj_uv_poll;
   
   stack[0].oval = obj_uv_poll;
   
@@ -407,16 +408,16 @@ int32_t SPVM__Go__UV__Loop__new_idle(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   uv_idle_t* uv_idle = env->new_memory_block(env, stack, sizeof(uv_idle_t));
   
-  SPVM__Go__UV__Loop__HANDLE_DATA* handle_data = env->new_memory_block(env, stack, sizeof(SPVM__Go__UV__Loop__HANDLE_DATA));
-  handle_data->env = env;
-  handle_data->stack = stack;
+  SPVM__Go__UV__Loop__HANDLE_DATA* uv_handle_data = env->new_memory_block(env, stack, sizeof(SPVM__Go__UV__Loop__HANDLE_DATA));
+  uv_handle_data->env = env;
+  uv_handle_data->stack = stack;
   
-  uv_idle->data = handle_data;
+  uv_idle->data = uv_handle_data;
   
   SPVM_OBJ* obj_uv_idle = env->new_pointer_object_by_name(env, stack, "Go::UV::Handle::Idle", uv_idle, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) return error_id;
   
-  handle_data->obj_uv_handle = obj_uv_idle;
+  uv_handle_data->obj_uv_handle = obj_uv_idle;
   
   stack[0].oval = obj_uv_idle;
   
@@ -435,16 +436,16 @@ int32_t SPVM__Go__UV__Loop__new_async(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   uv_async_t* uv_async = env->new_memory_block(env, stack, sizeof(uv_async_t));
   
-  SPVM__Go__UV__Loop__HANDLE_DATA* handle_data = env->new_memory_block(env, stack, sizeof(SPVM__Go__UV__Loop__HANDLE_DATA));
-  handle_data->env = env;
-  handle_data->stack = stack;
+  SPVM__Go__UV__Loop__HANDLE_DATA* uv_handle_data = env->new_memory_block(env, stack, sizeof(SPVM__Go__UV__Loop__HANDLE_DATA));
+  uv_handle_data->env = env;
+  uv_handle_data->stack = stack;
   
-  uv_async->data = handle_data;
+  uv_async->data = uv_handle_data;
   
   SPVM_OBJ* obj_uv_async = env->new_pointer_object_by_name(env, stack, "Go::UV::Handle::Async", uv_async, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) return error_id;
   
-  handle_data->obj_uv_handle = obj_uv_async;
+  uv_handle_data->obj_uv_handle = obj_uv_async;
   
   stack[0].oval = obj_uv_async;
   
@@ -457,16 +458,16 @@ int32_t SPVM__Go__UV__Loop__new_timer(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   uv_timer_t* uv_timer = env->new_memory_block(env, stack, sizeof(uv_timer_t));
   
-  SPVM__Go__UV__Loop__HANDLE_DATA* handle_data = env->new_memory_block(env, stack, sizeof(SPVM__Go__UV__Loop__HANDLE_DATA));
-  handle_data->env = env;
-  handle_data->stack = stack;
+  SPVM__Go__UV__Loop__HANDLE_DATA* uv_handle_data = env->new_memory_block(env, stack, sizeof(SPVM__Go__UV__Loop__HANDLE_DATA));
+  uv_handle_data->env = env;
+  uv_handle_data->stack = stack;
   
-  uv_timer->data = handle_data;
+  uv_timer->data = uv_handle_data;
   
   SPVM_OBJ* obj_uv_timer = env->new_pointer_object_by_name(env, stack, "Go::UV::Handle::Timer", uv_timer, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) return error_id;
   
-  handle_data->obj_uv_handle = obj_uv_timer;
+  uv_handle_data->obj_uv_handle = obj_uv_timer;
   
   stack[0].oval = obj_uv_timer;
   
@@ -506,16 +507,16 @@ int32_t SPVM__Go__UV__Loop__new_pipe(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   uv_pipe_t* uv_pipe = env->new_memory_block(env, stack, sizeof(uv_pipe_t));
   
-  SPVM__Go__UV__Loop__HANDLE_DATA* handle_data = env->new_memory_block(env, stack, sizeof(SPVM__Go__UV__Loop__HANDLE_DATA));
-  handle_data->env = env;
-  handle_data->stack = stack;
+  SPVM__Go__UV__Loop__HANDLE_DATA* uv_handle_data = env->new_memory_block(env, stack, sizeof(SPVM__Go__UV__Loop__HANDLE_DATA));
+  uv_handle_data->env = env;
+  uv_handle_data->stack = stack;
   
-  uv_pipe->data = handle_data;
+  uv_pipe->data = uv_handle_data;
   
   SPVM_OBJ* obj_uv_pipe = env->new_pointer_object_by_name(env, stack, "Go::UV::Handle::Pipe", uv_pipe, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) return error_id;
   
-  handle_data->obj_uv_handle = obj_uv_pipe;
+  uv_handle_data->obj_uv_handle = obj_uv_pipe;
   
   stack[0].oval = obj_uv_pipe;
   
@@ -550,3 +551,4 @@ int32_t SPVM__Go__UV__Loop__pipe_init(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   return 0;
 }
+
