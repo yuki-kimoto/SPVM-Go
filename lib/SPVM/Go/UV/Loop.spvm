@@ -13,9 +13,7 @@ class Go::UV::Loop : pointer {
   use Go::UV::Handle::Timer;
   use Go::UV::Handle::Poll;
   use Go::UV::Handle::Pipe;
-  use Go::UV::Callback::LoopAlive;
   use Go::UV::Constant;
-  use Go::UV::Callback::Handle;
   use Go::UV::Request::Write;
   use Go::UV::Callback::Idle;
   use Go::UV::Callback::Timer;
@@ -37,7 +35,7 @@ class Go::UV::Loop : pointer {
   
   native method poll_init : void ($uv_poll : Go::UV::Handle::Poll, $fd : int);
   
-  native method async_init : void ($uv_async : Go::UV::Handle::Async, $cb : Go::UV::Callback::Handle);
+  native method async_init : void ($uv_async : Go::UV::Handle::Async, $cb : Go::UV::Callback::Async);
   
   native method pipe_init : void ($uv_pipe : Go::UV::Handle::Pipe, $ipc : int);
   
@@ -68,21 +66,21 @@ class Go::UV::Loop : pointer {
   
   native static method handle_async_send : void ($uv_handle : Go::UV::Handle);
   
-  native static method handle_timer_start : void ($uv_handle : Go::UV::Handle::Timer, $cb : Go::UV::Callback::Handle, $timeout_msec : long, $interval_msec : long = 0);
+  native static method handle_timer_start : void ($uv_handle : Go::UV::Handle::Timer, $cb : Go::UV::Callback::Timer, $timeout_msec : long, $interval_msec : long = 0);
   
-  native static method handle_poll_start : void ($uv_handle : Go::UV::Handle::Poll, $cb : Go::UV::Callback::Handle, $events : int);
+  native static method handle_poll_start : void ($uv_handle : Go::UV::Handle::Poll, $cb : Go::UV::Callback::Poll, $events : int);
   
-  private native static method handle_idle_start : void ($uv_handle : Go::UV::Handle::Idle, $cb : Go::UV::Callback::Handle);
+  private native static method handle_idle_start : void ($uv_handle : Go::UV::Handle::Idle, $cb : Go::UV::Callback::Idle);
   
   native static method handle_pipe_open : void ($uv_pipe : Go::UV::Handle::Pipe, $fd : int);
   
-  native static method handle_read_start : void ($uv_handle : Go::UV::Handle::Stream, $buffer : mutable string, $buffer_length : int, $cb : Go::UV::Callback::Handle);
+  native static method handle_read_start : void ($uv_handle : Go::UV::Handle::Stream, $buffer : mutable string, $buffer_length : int, $cb : Go::UV::Callback::Read);
   
-  native static method handle_write : void ($uv_req : Go::UV::Request::Write, $uv_handle : Go::UV::Handle::Stream, $buffer : string, $buffer_length : int, $cb : Go::UV::Callback::Handle);
+  native static method handle_write : void ($uv_req : Go::UV::Request::Write, $uv_handle : Go::UV::Handle::Stream, $buffer : string, $buffer_length : int, $cb : Go::UV::Callback::Write);
   
   native static method handle_free : void ($uv_handle : Go::UV::Handle);
   
-  native static method handle_close : void ($uv_handle : Go::UV::Handle, $close_cb : Go::UV::Callback::Handle = undef);
+  native static method handle_close : void ($uv_handle : Go::UV::Handle, $close_cb : Go::UV::Callback::Close = undef);
   
   native static method handle_get_type : int ($uv_handle : Go::UV::Handle);
   
