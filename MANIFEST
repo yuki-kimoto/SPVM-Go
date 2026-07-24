@@ -210,6 +210,8 @@ lib/SPVM/Go/UV/Handle/Poll.pm
 lib/SPVM/Go/UV/Handle/Poll.spvm
 lib/SPVM/Go/UV/Handle/Timer.pm
 lib/SPVM/Go/UV/Handle/Timer.spvm
+lib/SPVM/Go/UV/Handle/Write.pm
+lib/SPVM/Go/UV/Handle/Write.spvm
 lib/SPVM/Go/UV/Loop.c
 lib/SPVM/Go/UV/Loop.config
 lib/SPVM/Go/UV/Loop.pm
