@@ -31,6 +31,8 @@ class Go::Goroutine : pointer {
   
   has io_error_occurred : byte;
   
+  has io_error_message : string;
+  
   has uv_write : Go::UV::Request::Write;
   
   # Class Methods
