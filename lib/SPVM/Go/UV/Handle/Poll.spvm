@@ -5,6 +5,9 @@ class Go::UV::Handle::Poll extends Go::UV::Handle {
   
   use Go::UV::Callback::Poll;
   
+  # Fields
+  has poll_cb : ro Go::UV::Callback::Poll;
+  
   # Class Mehtods
   static method new : Go::UV::Handle::Poll () {
     
