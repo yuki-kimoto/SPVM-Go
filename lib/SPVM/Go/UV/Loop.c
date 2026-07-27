@@ -510,6 +510,21 @@ int32_t SPVM__Go__UV__Loop__handle_close(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 }
 
+int32_t SPVM__Go__UV__Loop__handle_is_closing(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t error_id = 0;
+  
+  SPVM_OBJ* obj_uv_handle = stack[0].oval;
+  
+  uv_handle_t* uv_handle = env->get_pointer(env, stack, obj_uv_handle);
+  
+  int32_t is_closing = uv_is_closing(uv_handle);
+  
+  stack[0].ival = is_closing;
+  
+  return 0;
+}
+
 int32_t SPVM__Go__UV__Loop__handle_free(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   SPVM_OBJ* obj_uv_handle = stack[0].oval;
