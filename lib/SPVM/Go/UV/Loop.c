@@ -158,6 +158,8 @@ static void SPVM__Go__UV__Loop__poll_cb(uv_poll_t* uv_handle, int status, int ev
   
   stack[0].oval = obj_cb;
   stack[1].oval = obj_uv_handle;
+  stack[2].ival = status;
+  stack[3].ival = event;
   env->call_instance_method_by_name(env, stack, "", 2, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) {
     spvm_diag("[An exception is converted to a warning in SPVM__Go__UV__Loop__poll_cb]\n%s", env->get_exception_chars(env, stack));

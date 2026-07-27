@@ -191,7 +191,7 @@ class Go::Schedule {
       my $uv_poll = Go::UV::Handle::Poll->new;
       $uv_loop->poll_init($uv_poll, $fd);
       $goroutine->{uv_handle} = $uv_poll;
-      my $poll_cb = [$goroutine : Go::Goroutine, $schedule : Go::Schedule = $self] method : void ($uv_poll : Go::UV::Handle::Poll) {
+      my $poll_cb = [$goroutine : Go::Goroutine, $schedule : Go::Schedule = $self] method : void ($uv_poll : Go::UV::Handle::Poll, $status : int, $events : int) {
         $schedule->awake($goroutine, $uv_poll);
       };
       
