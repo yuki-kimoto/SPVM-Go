@@ -114,14 +114,14 @@ static void SPVM__Go__UV__Loop__timer_cb(uv_timer_t* uv_handle) {
   SPVM_ENV* env = uv_handle_data->env;
   SPVM_VALUE* stack = uv_handle_data->stack;
   SPVM_OBJ* obj_uv_handle = uv_handle_data->obj_uv_handle;
-  SPVM_OBJ* obj_cb = env->get_field_object_by_name(env, stack, obj_uv_handle, "cb", &error_id, __func__, FILE_NAME, __LINE__);
+  SPVM_OBJ* obj_cb = env->get_field_object_by_name(env, stack, obj_uv_handle, "timer_cb", &error_id, __func__, FILE_NAME, __LINE__);
   
   assert(obj_cb);
   stack[0].oval = obj_cb;
   stack[1].oval = obj_uv_handle;
   env->call_instance_method_by_name(env, stack, "", 2, &error_id, __func__, FILE_NAME, __LINE__);
   if (!(error_id == 0)) {
-    spvm_diag("[Unexcepted Error]Callback 'cb' failed.");
+    spvm_diag("[Unexcepted Error]Callback 'timer_cb' failed.");
     abort();
   }
 }
@@ -384,7 +384,7 @@ int32_t SPVM__Go__UV__Loop__handle_timer_start(SPVM_ENV* env, SPVM_VALUE* stack)
     return env->die(env, stack, "$cb must be defined.", __func__, FILE_NAME, __LINE__);
   }
   
-  env->set_field_object_by_name(env, stack, obj_uv_timer, "cb", obj_cb, &error_id, __func__, FILE_NAME, __LINE__);
+  env->set_field_object_by_name(env, stack, obj_uv_timer, "timer_cb", obj_cb, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) return error_id;
   
   uv_timer_t* uv_timer = env->get_pointer(env, stack, obj_uv_timer);
