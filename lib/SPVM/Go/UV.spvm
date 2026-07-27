@@ -6,14 +6,17 @@ class Go::UV {
   
   use Go::UV::Loop;
   
+  our $DEFAULT_LOOP : Go::UV::Loop;
+  INIT {
+    $DEFAULT_LOOP = Go::UV::Loop->default_loop;
+    
+    $DEFAULT_LOOP->{uv_handles_h} = Hash->new;
+  }
+  
   # Class Methods
   static method default_loop : Go::UV::Loop () {
     
-    my $uv_loop = Go::UV::Loop->default_loop;
-    
-    $uv_loop->{uv_handles_h} = Hash->new;
-    
-    return $uv_loop;
+    return $DEFAULT_LOOP;
   }
   
   static method strerror : string ($status : int) {
