@@ -156,14 +156,14 @@ void SPVM__Go__UV__Loop__read_cb(uv_stream_t* uv_handle, ssize_t nread, const uv
   SPVM_ENV* env = uv_handle_data->env;
   SPVM_VALUE* stack = uv_handle_data->stack;
   SPVM_OBJ* obj_uv_handle = uv_handle_data->obj_uv_handle;
-  SPVM_OBJ* obj_cb = env->get_field_object_by_name(env, stack, obj_uv_handle, "cb", &error_id, __func__, FILE_NAME, __LINE__);
+  SPVM_OBJ* obj_cb = env->get_field_object_by_name(env, stack, obj_uv_handle, "read_cb", &error_id, __func__, FILE_NAME, __LINE__);
   
   assert(obj_cb);
   stack[0].oval = obj_cb;
   stack[1].oval = obj_uv_handle;
   env->call_instance_method_by_name(env, stack, "", 2, &error_id, __func__, FILE_NAME, __LINE__);
   if (!(error_id == 0)) {
-    spvm_diag("[Unexcepted Error]Callback 'cb' failed.");
+    spvm_diag("[Unexcepted Error]Callback 'read_cb' failed.");
     abort();
   }
 }
@@ -177,14 +177,14 @@ void SPVM__Go__UV__Loop__write_cb(uv_write_t* uv_handle, int status) {
   SPVM_ENV* env = uv_handle_data->env;
   SPVM_VALUE* stack = uv_handle_data->stack;
   SPVM_OBJ* obj_uv_handle = uv_handle_data->obj_uv_handle;
-  SPVM_OBJ* obj_cb = env->get_field_object_by_name(env, stack, obj_uv_handle, "cb", &error_id, __func__, FILE_NAME, __LINE__);
+  SPVM_OBJ* obj_cb = env->get_field_object_by_name(env, stack, obj_uv_handle, "write_cb", &error_id, __func__, FILE_NAME, __LINE__);
   
   assert(obj_cb);
   stack[0].oval = obj_cb;
   stack[1].oval = obj_uv_handle;
   env->call_instance_method_by_name(env, stack, "", 2, &error_id, __func__, FILE_NAME, __LINE__);
   if (!(error_id == 0)) {
-    spvm_diag("[Unexcepted Error]Callback 'cb' failed.");
+    spvm_diag("[Unexcepted Error]Callback 'write_cb' failed.");
     abort();
   }
 }
@@ -718,7 +718,7 @@ int32_t SPVM__Go__UV__Loop__handle_read_start(SPVM_ENV* env, SPVM_VALUE* stack) 
     return env->die(env, stack, "$cb must be defined.", __func__, FILE_NAME, __LINE__);
   }
   
-  env->set_field_object_by_name(env, stack, obj_uv_stream, "cb", obj_cb, &error_id, __func__, FILE_NAME, __LINE__);
+  env->set_field_object_by_name(env, stack, obj_uv_stream, "read_cb", obj_cb, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) return error_id;
   
   env->set_field_object_by_name(env, stack, obj_uv_stream, "buffer", obj_buffer, &error_id, __func__, FILE_NAME, __LINE__);
@@ -773,7 +773,7 @@ int32_t SPVM__Go__UV__Loop__handle_write(SPVM_ENV* env, SPVM_VALUE* stack) {
     return env->die(env, stack, "$cb must be defined.", __func__, FILE_NAME, __LINE__);
   }
   
-  env->set_field_object_by_name(env, stack, obj_uv_stream, "cb", obj_cb, &error_id, __func__, FILE_NAME, __LINE__);
+  env->set_field_object_by_name(env, stack, obj_uv_stream, "write_cb", obj_cb, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) return error_id;
   
   env->set_field_object_by_name(env, stack, obj_uv_stream, "buffer", obj_buffer, &error_id, __func__, FILE_NAME, __LINE__);
