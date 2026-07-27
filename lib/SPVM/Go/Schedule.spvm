@@ -141,6 +141,12 @@ class Go::Schedule {
         $current_goroutine->{io_timeout_occurred} = 0;
         die Go::Error::IOTimeout "IO timeout occur";
       }
+      elsif ($current_goroutine->{io_error_occurred}) {
+        $current_goroutine->{io_error_occurred} = 0;
+        my $io_error_message = $current_goroutine->{io_error_message};
+        $current_goroutine->{io_error_message} = undef;
+        die $io_error_message;
+      }
     }
     else {
       unless ($schedule_type == &TYPE_NONE) {
@@ -212,6 +218,11 @@ class Go::Schedule {
       $uv_loop->poll_init($uv_poll, $fd);
       $goroutine->{uv_handle} = $uv_poll;
       my $poll_cb = [$goroutine : Go::Goroutine, $schedule : Go::Schedule = $self] method : void ($uv_poll : Go::UV::Handle::Poll, $status : int, $events : int) {
+        if ($status < 0) {
+          $goroutine->{io_error_occurred} = 1;
+          my $io_error_message = Go::UV->strerror($status);
+          $goroutine->{io_error_message} = $io_error_message;
+        }
         $schedule->awake($goroutine, $uv_poll);
       };
       
