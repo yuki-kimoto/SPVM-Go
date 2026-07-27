@@ -158,14 +158,10 @@ class Go::Schedule {
         # IO timeout
         $goroutine->{io_timeout_occurred} = 1;
       }
-      unless ($goroutine_uv_handle->is_closing) {
-        $goroutine_uv_handle->close;
-      }
+      $goroutine_uv_handle->close;
     }
     
-    unless ($uv_handle->is_closing) {
-      $uv_handle->close;
-    }
+    $uv_handle->close;
     
     $self->enable_goroutine($goroutine);
   }
@@ -322,9 +318,7 @@ class Go::Schedule {
       $schedule->process_next_goroutine;
       
       unless ($schedule->loop_alive) {
-        unless ($uv_idle->is_closing) {
-          $uv_idle->close;
-        }
+        $uv_idle->close;
       }
     };
     

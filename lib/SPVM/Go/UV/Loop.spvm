@@ -84,8 +84,6 @@ class Go::UV::Loop : pointer {
   
   native static method handle_close : void ($uv_handle : Go::UV::Handle, $close_cb : Go::UV::Callback::Close = undef);
   
-  native static method handle_is_closing : int ($uv_handle : Go::UV::Handle);
-  
   native static method handle_get_type : int ($uv_handle : Go::UV::Handle);
   
   # Utilities
