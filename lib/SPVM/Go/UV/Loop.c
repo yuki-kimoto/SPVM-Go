@@ -37,30 +37,35 @@ static void SPVM__Go__UV__Loop__close_cb(uv_handle_t* uv_handle) {
   SPVM_VALUE* stack = uv_handle_data->stack;
   SPVM_OBJ* obj_uv_handle = uv_handle_data->obj_uv_handle;
   SPVM_OBJ* obj_cb = env->get_field_object_by_name(env, stack, obj_uv_handle, "close_cb", &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) {
+    spvm_diag("[Error]Getting 'close_cb' field failed. An exception is thrown, but it is converted a warning in SPVM__Go__UV__Loop__close_cb.");
+    return;
+  }
   
   if (obj_cb) {
     stack[0].oval = obj_cb;
     stack[1].oval = obj_uv_handle;
     env->call_instance_method_by_name(env, stack, "", 2, &error_id, __func__, FILE_NAME, __LINE__);
     if (error_id) {
-      spvm_diag("[Unexpected Error]%s", env->get_exception_chars(env, stack));
-      abort();
+      spvm_diag("[Error]Calling 'close_cb' failed. An exception is thrown, but it is converted a warning in SPVM__Go__UV__Loop__close_cb.");
+      return;
     }
   }
   
   SPVM_OBJ* obj_uv_loop = env->get_field_object_by_name(env, stack, obj_uv_handle, "loop", &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) {
-    spvm_diag("[Unexpected Error]%s", env->get_exception_chars(env, stack));
-    abort();
+    spvm_diag("[Error]Getting 'loop' field failed. An exception is thrown, but it is converted a warning in SPVM__Go__UV__Loop__close_cb.");
+    return;
   }
   
   stack[0].oval = obj_uv_loop;
   stack[1].oval = obj_uv_handle;
   env->call_instance_method_by_name(env, stack, "delete_uv_handle", 2, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) {
-    spvm_diag("[Unexpected Error]%s", env->get_exception_chars(env, stack));
-    abort();
+    spvm_diag("[Error]Calling 'delete_uv_handle' failed. An exception is thrown, but it is converted a warning in SPVM__Go__UV__Loop__close_cb.");
+    return;
   }
+  
 }
 
 static void SPVM__Go__UV__Loop__idle_cb(uv_idle_t* uv_handle) {
