@@ -29,6 +29,8 @@ class Go::Goroutine : pointer {
   
   has io_timeout_occurred : byte;
   
+  has io_error_occurred : byte;
+  
   has uv_write : Go::UV::Request::Write;
   
   # Class Methods
