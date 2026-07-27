@@ -268,6 +268,11 @@ class Go::Schedule {
       
       if ($schedule_type == &TYPE_PIPE_READ) {
         my $read_cb = [$goroutine : Go::Goroutine, $schedule : Go::Schedule = $self, $ret_length_ref : int[]] method : void ($uv_stream : Go::UV::Handle::Stream, $nread : int, $buffer : string) {
+          if ($nread < 0) {
+            $goroutine->{io_error_occurred} = 1;
+            my $io_error_message = Go::UV->strerror($nread);
+            $goroutine->{io_error_message} = $io_error_message;
+          }
           $ret_length_ref->[0] = $nread;
           $schedule->awake($goroutine, $uv_stream);
         };
@@ -276,6 +281,11 @@ class Go::Schedule {
       }
       else {
         my $write_cb = [$goroutine : Go::Goroutine, $schedule : Go::Schedule = $self, $ret_length_ref : int[], $buffer_length : int, $uv_pipe : Go::UV::Handle::Pipe] method : void ($uv_req : Go::UV::Request::Write, $status : int) {
+          if ($status < 0) {
+            $goroutine->{io_error_occurred} = 1;
+            my $io_error_message = Go::UV->strerror($status);
+            $goroutine->{io_error_message} = $io_error_message;
+          }
           $ret_length_ref->[0] = $buffer_length;
           $schedule->awake($goroutine, $uv_pipe);
         };
