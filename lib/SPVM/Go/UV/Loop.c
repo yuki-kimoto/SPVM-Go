@@ -157,14 +157,26 @@ void SPVM__Go__UV__Loop__read_cb(uv_stream_t* uv_handle, ssize_t nread, const uv
   SPVM_VALUE* stack = uv_handle_data->stack;
   SPVM_OBJ* obj_uv_handle = uv_handle_data->obj_uv_handle;
   SPVM_OBJ* obj_cb = env->get_field_object_by_name(env, stack, obj_uv_handle, "read_cb", &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) {
+    spvm_diag("[Error]Getting 'read_cb' field failed. An exception is thrown, but it is converted a warning in SPVM__Go__UV__Loop__read_cb.");
+    return;
+  }
+  
+  SPVM_OBJ* obj_read_buffer = env->get_field_object_by_name(env, stack, obj_uv_handle, "read_buffer", &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) {
+    spvm_diag("[Error]Getting 'read_buffer' field failed. An exception is thrown, but it is converted a warning in SPVM__Go__UV__Loop__read_cb.");
+    return;
+  }
   
   assert(obj_cb);
   stack[0].oval = obj_cb;
   stack[1].oval = obj_uv_handle;
-  env->call_instance_method_by_name(env, stack, "", 2, &error_id, __func__, FILE_NAME, __LINE__);
+  stack[2].ival = nread;
+  stack[3].oval = obj_read_buffer;
+  env->call_instance_method_by_name(env, stack, "", 4, &error_id, __func__, FILE_NAME, __LINE__);
   if (!(error_id == 0)) {
-    spvm_diag("[Unexcepted Error]Callback 'read_cb' failed.");
-    abort();
+    spvm_diag("[Error]Calling 'read_cb' failed. An exception is thrown, but it is converted a warning in SPVM__Go__UV__Loop__read_cb.");
+    return;
   }
 }
 
