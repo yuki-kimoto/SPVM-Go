@@ -736,9 +736,6 @@ int32_t SPVM__Go__UV__Loop__handle_read_start(SPVM_ENV* env, SPVM_VALUE* stack) 
   env->set_field_object_by_name(env, stack, obj_uv_stream, "read_buffer", obj_buffer, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) return error_id;
   
-  env->set_field_int_by_name(env, stack, obj_uv_stream, "read_buffer_length", buffer_length, &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) return error_id;
-  
   uv_stream_t* uv_stream = env->get_pointer(env, stack, obj_uv_stream);
   
   int32_t status = uv_read_start(uv_stream, SPVM__Go__UV__Loop__alloc_cb, SPVM__Go__UV__Loop__read_cb);
