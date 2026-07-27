@@ -6,10 +6,9 @@ class Go::UV::Handle : pointer {
   allow Go::UV::Loop;
   
   use Go::UV::Loop;
-  use Go::UV::Callback::Handle;
   
   # Fields
-  has close_cb : rw Go::UV::Callback::Handle;
+  has close_cb : rw Go::UV::Callback::Close;
   
   has loop : ro Go::UV::Loop;
   
@@ -18,7 +17,7 @@ class Go::UV::Handle : pointer {
   has buffer_length : int;
   
   # Instance Methods
-  method close : void ($close_cb : Go::UV::Callback::Handle = undef) {
+  method close : void ($close_cb : Go::UV::Callback::Close = undef) {
     Go::UV::Loop->handle_close($self, $close_cb);
   }
   
