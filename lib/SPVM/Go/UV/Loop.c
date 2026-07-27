@@ -63,7 +63,7 @@ static void SPVM__Go__UV__Loop__close_cb(uv_handle_t* uv_handle) {
   }
 }
 
-static void SPVM__Go__UV__Loop__handle_cb(uv_handle_t* uv_handle) {
+static void SPVM__Go__UV__Loop__idle_cb(uv_idle_t* uv_handle) {
   
   int32_t error_id = 0;
   
@@ -84,32 +84,109 @@ static void SPVM__Go__UV__Loop__handle_cb(uv_handle_t* uv_handle) {
   }
 }
 
-static void SPVM__Go__UV__Loop__idle_cb(uv_idle_t* uv_idle) {
+static void SPVM__Go__UV__Loop__async_cb(uv_async_t* uv_handle) {
   
-  SPVM__Go__UV__Loop__handle_cb((uv_handle_t*)uv_idle);
-}
-
-static void SPVM__Go__UV__Loop__async_cb(uv_async_t* uv_async) {
-  SPVM__Go__UV__Loop__handle_cb((uv_handle_t*)uv_async);
-}
-
-static void SPVM__Go__UV__Loop__timer_cb(uv_timer_t* uv_timer) {
-  SPVM__Go__UV__Loop__handle_cb((uv_handle_t*)uv_timer);
-}
-
-static void SPVM__Go__UV__Loop__poll_cb(uv_poll_t* uv_poll, int status, int event) {
+  int32_t error_id = 0;
   
-  SPVM__Go__UV__Loop__handle_cb((uv_handle_t*)uv_poll);
+  SPVM__Go__UV__Loop__HANDLE_DATA* uv_handle_data = (SPVM__Go__UV__Loop__HANDLE_DATA*)uv_handle->data;
+  
+  SPVM_ENV* env = uv_handle_data->env;
+  SPVM_VALUE* stack = uv_handle_data->stack;
+  SPVM_OBJ* obj_uv_handle = uv_handle_data->obj_uv_handle;
+  SPVM_OBJ* obj_cb = env->get_field_object_by_name(env, stack, obj_uv_handle, "cb", &error_id, __func__, FILE_NAME, __LINE__);
+  
+  assert(obj_cb);
+  stack[0].oval = obj_cb;
+  stack[1].oval = obj_uv_handle;
+  env->call_instance_method_by_name(env, stack, "", 2, &error_id, __func__, FILE_NAME, __LINE__);
+  if (!(error_id == 0)) {
+    spvm_diag("[Unexcepted Error]Callback 'cb' failed.");
+    abort();
+  }
 }
 
-void SPVM__Go__UV__Loop__read_cb(uv_stream_t* uv_stream, ssize_t nread, const uv_buf_t* buf) {
+static void SPVM__Go__UV__Loop__timer_cb(uv_timer_t* uv_handle) {
   
-  SPVM__Go__UV__Loop__handle_cb((uv_handle_t*)uv_stream);
+  int32_t error_id = 0;
+  
+  SPVM__Go__UV__Loop__HANDLE_DATA* uv_handle_data = (SPVM__Go__UV__Loop__HANDLE_DATA*)uv_handle->data;
+  
+  SPVM_ENV* env = uv_handle_data->env;
+  SPVM_VALUE* stack = uv_handle_data->stack;
+  SPVM_OBJ* obj_uv_handle = uv_handle_data->obj_uv_handle;
+  SPVM_OBJ* obj_cb = env->get_field_object_by_name(env, stack, obj_uv_handle, "cb", &error_id, __func__, FILE_NAME, __LINE__);
+  
+  assert(obj_cb);
+  stack[0].oval = obj_cb;
+  stack[1].oval = obj_uv_handle;
+  env->call_instance_method_by_name(env, stack, "", 2, &error_id, __func__, FILE_NAME, __LINE__);
+  if (!(error_id == 0)) {
+    spvm_diag("[Unexcepted Error]Callback 'cb' failed.");
+    abort();
+  }
 }
 
-void SPVM__Go__UV__Loop__write_cb(uv_write_t* uv_req, int status) {
+static void SPVM__Go__UV__Loop__poll_cb(uv_poll_t* uv_handle, int status, int event) {
   
-  SPVM__Go__UV__Loop__handle_cb((uv_handle_t*)uv_req);
+  int32_t error_id = 0;
+  
+  SPVM__Go__UV__Loop__HANDLE_DATA* uv_handle_data = (SPVM__Go__UV__Loop__HANDLE_DATA*)uv_handle->data;
+  
+  SPVM_ENV* env = uv_handle_data->env;
+  SPVM_VALUE* stack = uv_handle_data->stack;
+  SPVM_OBJ* obj_uv_handle = uv_handle_data->obj_uv_handle;
+  SPVM_OBJ* obj_cb = env->get_field_object_by_name(env, stack, obj_uv_handle, "cb", &error_id, __func__, FILE_NAME, __LINE__);
+  
+  assert(obj_cb);
+  stack[0].oval = obj_cb;
+  stack[1].oval = obj_uv_handle;
+  env->call_instance_method_by_name(env, stack, "", 2, &error_id, __func__, FILE_NAME, __LINE__);
+  if (!(error_id == 0)) {
+    spvm_diag("[Unexcepted Error]Callback 'cb' failed.");
+    abort();
+  }
+}
+
+void SPVM__Go__UV__Loop__read_cb(uv_stream_t* uv_handle, ssize_t nread, const uv_buf_t* buf) {
+  
+  int32_t error_id = 0;
+  
+  SPVM__Go__UV__Loop__HANDLE_DATA* uv_handle_data = (SPVM__Go__UV__Loop__HANDLE_DATA*)uv_handle->data;
+  
+  SPVM_ENV* env = uv_handle_data->env;
+  SPVM_VALUE* stack = uv_handle_data->stack;
+  SPVM_OBJ* obj_uv_handle = uv_handle_data->obj_uv_handle;
+  SPVM_OBJ* obj_cb = env->get_field_object_by_name(env, stack, obj_uv_handle, "cb", &error_id, __func__, FILE_NAME, __LINE__);
+  
+  assert(obj_cb);
+  stack[0].oval = obj_cb;
+  stack[1].oval = obj_uv_handle;
+  env->call_instance_method_by_name(env, stack, "", 2, &error_id, __func__, FILE_NAME, __LINE__);
+  if (!(error_id == 0)) {
+    spvm_diag("[Unexcepted Error]Callback 'cb' failed.");
+    abort();
+  }
+}
+
+void SPVM__Go__UV__Loop__write_cb(uv_write_t* uv_handle, int status) {
+  
+  int32_t error_id = 0;
+  
+  SPVM__Go__UV__Loop__HANDLE_DATA* uv_handle_data = (SPVM__Go__UV__Loop__HANDLE_DATA*)uv_handle->data;
+  
+  SPVM_ENV* env = uv_handle_data->env;
+  SPVM_VALUE* stack = uv_handle_data->stack;
+  SPVM_OBJ* obj_uv_handle = uv_handle_data->obj_uv_handle;
+  SPVM_OBJ* obj_cb = env->get_field_object_by_name(env, stack, obj_uv_handle, "cb", &error_id, __func__, FILE_NAME, __LINE__);
+  
+  assert(obj_cb);
+  stack[0].oval = obj_cb;
+  stack[1].oval = obj_uv_handle;
+  env->call_instance_method_by_name(env, stack, "", 2, &error_id, __func__, FILE_NAME, __LINE__);
+  if (!(error_id == 0)) {
+    spvm_diag("[Unexcepted Error]Callback 'cb' failed.");
+    abort();
+  }
 }
 
 int32_t SPVM__Go__UV__Loop__run(SPVM_ENV* env, SPVM_VALUE* stack) {
