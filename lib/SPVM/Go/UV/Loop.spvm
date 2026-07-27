@@ -62,6 +62,8 @@ class Go::UV::Loop : pointer {
   # For Go::UV
   native static method default_loop : Go::UV::Loop ();
   
+  native static method strerror : string ($status : int);
+  
   # For Go::UV::Handle
   
   native static method handle_async_send : void ($uv_handle : Go::UV::Handle);
