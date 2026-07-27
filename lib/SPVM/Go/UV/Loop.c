@@ -38,8 +38,8 @@ static void SPVM__Go__UV__Loop__close_cb(uv_handle_t* uv_handle) {
   SPVM_OBJ* obj_uv_handle = uv_handle_data->obj_uv_handle;
   SPVM_OBJ* obj_cb = env->get_field_object_by_name(env, stack, obj_uv_handle, "close_cb", &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) {
-    spvm_diag("[Error]Getting 'close_cb' field failed. An exception is thrown, but it is converted a warning in SPVM__Go__UV__Loop__close_cb.");
-    return;
+    spvm_diag("[Unexpected Error]Getting 'close_cb' field failed. An exception is thrown.");
+    abort();
   }
   
   if (obj_cb) {
@@ -47,25 +47,24 @@ static void SPVM__Go__UV__Loop__close_cb(uv_handle_t* uv_handle) {
     stack[1].oval = obj_uv_handle;
     env->call_instance_method_by_name(env, stack, "", 2, &error_id, __func__, FILE_NAME, __LINE__);
     if (error_id) {
-      spvm_diag("[Error]Calling 'close_cb' failed. An exception is thrown, but it is converted a warning in SPVM__Go__UV__Loop__close_cb.");
+      spvm_diag("[An exception is converted to a warning in SPVM__Go__UV__Loop__close_cb]\n%s", env->get_exception_chars(env, stack));
       return;
     }
   }
   
   SPVM_OBJ* obj_uv_loop = env->get_field_object_by_name(env, stack, obj_uv_handle, "loop", &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) {
-    spvm_diag("[Error]Getting 'loop' field failed. An exception is thrown, but it is converted a warning in SPVM__Go__UV__Loop__close_cb.");
-    return;
+    spvm_diag("[Unexpected Error]Getting 'loop' field failed. An exception is thrown.");
+    abort();
   }
   
   stack[0].oval = obj_uv_loop;
   stack[1].oval = obj_uv_handle;
   env->call_instance_method_by_name(env, stack, "delete_uv_handle", 2, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) {
-    spvm_diag("[Error]Calling 'delete_uv_handle' failed. An exception is thrown, but it is converted a warning in SPVM__Go__UV__Loop__close_cb.");
-    return;
+    spvm_diag("[Unexpected Error]Calling 'delete_uv_handle' failed.");
+    abort();
   }
-  
 }
 
 static void SPVM__Go__UV__Loop__idle_cb(uv_idle_t* uv_handle) {
