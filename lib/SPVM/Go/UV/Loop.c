@@ -73,15 +73,19 @@ static void SPVM__Go__UV__Loop__idle_cb(uv_idle_t* uv_handle) {
   SPVM_VALUE* stack = uv_handle_data->stack;
   SPVM_OBJ* obj_uv_handle = uv_handle_data->obj_uv_handle;
   SPVM_OBJ* obj_cb = env->get_field_object_by_name(env, stack, obj_uv_handle, "idle_cb", &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) {
+    spvm_diag("[Error]Getting 'idle_cb' field failed. An exception is thrown, but it is converted a warning in SPVM__Go__UV__Loop__idle_cb.");
+    return;
+  }
   
-  assert(obj_cb);
   stack[0].oval = obj_cb;
   stack[1].oval = obj_uv_handle;
   env->call_instance_method_by_name(env, stack, "", 2, &error_id, __func__, FILE_NAME, __LINE__);
-  if (!(error_id == 0)) {
-    spvm_diag("[Unexcepted Error]Callback 'idle_cb' failed.");
-    abort();
+  if (error_id) {
+    spvm_diag("[Error]Calling 'idle_cb' field failed. An exception is thrown, but it is converted a warning in SPVM__Go__UV__Loop__idle_cb.");
+    return;
   }
+  
 }
 
 static void SPVM__Go__UV__Loop__async_cb(uv_async_t* uv_handle) {
@@ -94,15 +98,19 @@ static void SPVM__Go__UV__Loop__async_cb(uv_async_t* uv_handle) {
   SPVM_VALUE* stack = uv_handle_data->stack;
   SPVM_OBJ* obj_uv_handle = uv_handle_data->obj_uv_handle;
   SPVM_OBJ* obj_cb = env->get_field_object_by_name(env, stack, obj_uv_handle, "async_cb", &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) {
+    spvm_diag("[Error]Getting 'async_cb' field failed. An exception is thrown, but it is converted a warning in SPVM__Go__UV__Loop__async_cb.");
+    return;
+  }
   
-  assert(obj_cb);
   stack[0].oval = obj_cb;
   stack[1].oval = obj_uv_handle;
   env->call_instance_method_by_name(env, stack, "", 2, &error_id, __func__, FILE_NAME, __LINE__);
-  if (!(error_id == 0)) {
-    spvm_diag("[Unexcepted Error]Callback 'async_cb' failed.");
-    abort();
+  if (error_id) {
+    spvm_diag("[Error]Calling 'async_cb' field failed. An exception is thrown, but it is converted a warning in SPVM__Go__UV__Loop__async_cb.");
+    return;
   }
+  
 }
 
 static void SPVM__Go__UV__Loop__timer_cb(uv_timer_t* uv_handle) {
@@ -115,15 +123,19 @@ static void SPVM__Go__UV__Loop__timer_cb(uv_timer_t* uv_handle) {
   SPVM_VALUE* stack = uv_handle_data->stack;
   SPVM_OBJ* obj_uv_handle = uv_handle_data->obj_uv_handle;
   SPVM_OBJ* obj_cb = env->get_field_object_by_name(env, stack, obj_uv_handle, "timer_cb", &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) {
+    spvm_diag("[Error]Getting 'async_cb' field failed. An exception is thrown, but it is converted a warning in SPVM__Go__UV__Loop__timer_cb.");
+    return;
+  }
   
-  assert(obj_cb);
   stack[0].oval = obj_cb;
   stack[1].oval = obj_uv_handle;
   env->call_instance_method_by_name(env, stack, "", 2, &error_id, __func__, FILE_NAME, __LINE__);
-  if (!(error_id == 0)) {
-    spvm_diag("[Unexcepted Error]Callback 'timer_cb' failed.");
-    abort();
+  if (error_id) {
+    spvm_diag("[Error]Calling 'timer_cb' field failed. An exception is thrown, but it is converted a warning in SPVM__Go__UV__Loop__timer_cb.");
+    return;
   }
+  
 }
 
 static void SPVM__Go__UV__Loop__poll_cb(uv_poll_t* uv_handle, int status, int event) {
@@ -136,15 +148,19 @@ static void SPVM__Go__UV__Loop__poll_cb(uv_poll_t* uv_handle, int status, int ev
   SPVM_VALUE* stack = uv_handle_data->stack;
   SPVM_OBJ* obj_uv_handle = uv_handle_data->obj_uv_handle;
   SPVM_OBJ* obj_cb = env->get_field_object_by_name(env, stack, obj_uv_handle, "poll_cb", &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) {
+    spvm_diag("[Error]Getting 'poll_cb' field failed. An exception is thrown, but it is converted a warning in SPVM__Go__UV__Loop__poll_cb.");
+    return;
+  }
   
-  assert(obj_cb);
   stack[0].oval = obj_cb;
   stack[1].oval = obj_uv_handle;
   env->call_instance_method_by_name(env, stack, "", 2, &error_id, __func__, FILE_NAME, __LINE__);
-  if (!(error_id == 0)) {
-    spvm_diag("[Unexcepted Error]Callback 'poll_cb' failed.");
-    abort();
+  if (error_id) {
+    spvm_diag("[Error]Calling 'poll_cb' field failed. An exception is thrown, but it is converted a warning in SPVM__Go__UV__Loop__poll_cb.");
+    return;
   }
+  
 }
 
 void SPVM__Go__UV__Loop__read_cb(uv_stream_t* uv_handle, ssize_t nread, const uv_buf_t* buf) {
