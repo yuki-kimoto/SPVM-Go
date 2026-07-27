@@ -196,7 +196,7 @@ void SPVM__Go__UV__Loop__read_cb(uv_stream_t* uv_handle, ssize_t nread, const uv
   stack[3].oval = obj_read_buffer;
   env->call_instance_method_by_name(env, stack, "", 4, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) {
-    spvm_diag("[An exception is converted to a warning in SPVM__Go__UV__Loop__poll_cb]\n%s", env->get_exception_chars(env, stack));
+    spvm_diag("[An exception is converted to a warning in SPVM__Go__UV__Loop__read_cb]\n%s", env->get_exception_chars(env, stack));
     return;
   }
   
@@ -212,16 +212,21 @@ void SPVM__Go__UV__Loop__write_cb(uv_write_t* uv_handle, int status) {
   SPVM_VALUE* stack = uv_handle_data->stack;
   SPVM_OBJ* obj_uv_handle = uv_handle_data->object;
   SPVM_OBJ* obj_cb = env->get_field_object_by_name(env, stack, obj_uv_handle, "write_cb", &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) {
+    spvm_diag("[Unexpected Error]Getting 'write_cb' field failed.");
+    abort();
+  }
   
   assert(obj_cb);
   stack[0].oval = obj_cb;
   stack[1].oval = obj_uv_handle;
   stack[2].ival = status;
   env->call_instance_method_by_name(env, stack, "", 2, &error_id, __func__, FILE_NAME, __LINE__);
-  if (!(error_id == 0)) {
-    spvm_diag("[Unexcepted Error]Callback 'write_cb' failed.");
-    abort();
+  if (error_id) {
+    spvm_diag("[An exception is converted to a warning in SPVM__Go__UV__Loop__write_cb]\n%s", env->get_exception_chars(env, stack));
+    return;
   }
+  
 }
 
 int32_t SPVM__Go__UV__Loop__run(SPVM_ENV* env, SPVM_VALUE* stack) {
