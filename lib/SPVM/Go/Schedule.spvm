@@ -121,10 +121,6 @@ class Go::Schedule {
         $current_goroutine->{io_timeout_occurred} = 0;
         die Go::Error::IOTimeout "IO timeout occur";
       }
-      elsif ($current_goroutine->{io_error_occurred}) {
-        $current_goroutine->{io_error_occurred} = 0;
-        die $current_goroutine->{io_error_message};
-      }
     }
     else {
       unless ($schedule_type == &TYPE_NONE) {
@@ -162,10 +158,14 @@ class Go::Schedule {
         # IO timeout
         $goroutine->{io_timeout_occurred} = 1;
       }
-      $goroutine_uv_handle->close;
+      unless ($goroutine_uv_handle->is_closing) {
+        $goroutine_uv_handle->close;
+      }
     }
     
-    $uv_handle->close;
+    unless ($uv_handle->is_closing) {
+      $uv_handle->close;
+    }
     
     $self->enable_goroutine($goroutine);
   }
@@ -196,12 +196,6 @@ class Go::Schedule {
       $uv_loop->poll_init($uv_poll, $fd);
       $goroutine->{uv_handle} = $uv_poll;
       my $poll_cb = [$goroutine : Go::Goroutine, $schedule : Go::Schedule = $self] method : void ($uv_poll : Go::UV::Handle::Poll, $status : int, $events : int) {
-        
-        if ($status < 0) {
-          $goroutine->{io_error_occurred} = 1;
-          $goroutine->{io_error_message} = Go::UV->strerror($status);
-        }
-        
         $schedule->awake($goroutine, $uv_poll);
       };
       
@@ -328,7 +322,9 @@ class Go::Schedule {
       $schedule->process_next_goroutine;
       
       unless ($schedule->loop_alive) {
-        $uv_idle->close;
+        unless ($uv_idle->is_closing) {
+          $uv_idle->close;
+        }
       }
     };
     
