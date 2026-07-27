@@ -12,10 +12,6 @@ class Go::UV::Handle : pointer {
   
   has loop : ro Go::UV::Loop;
   
-  has buffer : mutable string;
-  
-  has buffer_length : int;
-  
   # Instance Methods
   method close : void ($close_cb : Go::UV::Callback::Close = undef) {
     Go::UV::Loop->handle_close($self, $close_cb);

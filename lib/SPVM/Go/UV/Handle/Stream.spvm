@@ -13,6 +13,14 @@ class Go::UV::Handle::Stream extends Go::UV::Handle {
   
   has write_cb : ro Go::UV::Callback::Write;
   
+  has read_buffer : mutable string;
+  
+  has read_buffer_length : int;
+  
+  has write_buffer : mutable string;
+  
+  has write_buffer_length : int;
+  
   # Instance Methods
   method read_start : void ($buffer : mutable string, $buffer_length : int, $cb : Go::UV::Callback::Read) {
     
