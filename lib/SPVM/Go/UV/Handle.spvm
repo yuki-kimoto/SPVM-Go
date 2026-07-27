@@ -9,8 +9,6 @@ class Go::UV::Handle : pointer {
   use Go::UV::Callback::Handle;
   
   # Fields
-  has cb : rw Go::UV::Callback::Handle;
-  
   has close_cb : rw Go::UV::Callback::Handle;
   
   has loop : ro Go::UV::Loop;
