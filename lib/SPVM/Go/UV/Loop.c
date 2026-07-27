@@ -215,6 +215,7 @@ void SPVM__Go__UV__Loop__write_cb(uv_write_t* uv_handle, int status) {
   assert(obj_cb);
   stack[0].oval = obj_cb;
   stack[1].oval = obj_uv_handle;
+  stack[2].ival = status;
   env->call_instance_method_by_name(env, stack, "", 2, &error_id, __func__, FILE_NAME, __LINE__);
   if (!(error_id == 0)) {
     spvm_diag("[Unexcepted Error]Callback 'write_cb' failed.");
