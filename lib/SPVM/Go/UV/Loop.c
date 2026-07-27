@@ -10,7 +10,6 @@ typedef struct {
   SPVM_ENV* env;
   SPVM_VALUE* stack;
   SPVM_OBJ* obj_uv_handle;
-  uv_handle_t* related_uv_handle;
 } SPVM__Go__UV__Loop__HANDLE_DATA;
 
 int32_t SPVM__Go__UV__Loop__default_loop(SPVM_ENV* env, SPVM_VALUE* stack) {
