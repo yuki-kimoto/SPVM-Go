@@ -3,6 +3,9 @@
 
 class Go::UV::Handle::Async extends Go::UV::Handle {
   
+  # Fields
+  has async_cb : ro Go::UV::Callback::Async;
+  
   # Class Mehtods
   static method new : Go::UV::Handle::Async () {
     
