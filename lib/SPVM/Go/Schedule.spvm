@@ -264,17 +264,12 @@ class Go::Schedule {
         $uv_pipe->read_start((mutable string)$buffer, $buffer_length, $read_cb);
       }
       else {
-
-=pod
-
-        my $write_cb = [$goroutine : Go::Goroutine, $schedule : Go::Schedule = $self, $ret_length_ref : int[], $buffer_length : int] method : void ($uv_req : Go::UV::Request::Write, $status : int) {
+        my $write_cb = [$goroutine : Go::Goroutine, $schedule : Go::Schedule = $self, $ret_length_ref : int[], $buffer_length : int, $uv_pipe : Go::UV::Handle::Pipe] method : void ($uv_req : Go::UV::Request::Write, $status : int) {
           $ret_length_ref->[0] = $buffer_length;
-          $schedule->awake($goroutine, $uv_req);
+          $schedule->awake($goroutine, $uv_pipe);
         };
         
-        $uv_pipe->write($goroutine->{uv_write}, $buffer, $buffer_length, $cb);
-
-=cut
+        $uv_pipe->write($goroutine->{uv_write}, $buffer, $buffer_length, $write_cb);
       }
       
       if ($timeout_msec > 0) {
