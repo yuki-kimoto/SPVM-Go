@@ -77,6 +77,26 @@ class Go::Schedule {
     $self->schedule($schedule_type, $timeout_duration_nsec, $fd);
   }
   
+  private method schedule_pipe_read : int ($fd : int, $string : mutable string, $length : int = -1, $offset : int = 0, $timeout_duration_nsec : long = 0) {
+    
+    my $schedule_type = &TYPE_PIPE_READ;
+    
+    my $read_length_ref = [0];
+    $self->schedule($schedule_type, $timeout_duration_nsec, $fd, undef, $string, $length, $offset, $read_length_ref);
+    
+    return $read_length_ref->[0];
+  }
+  
+  private method schedule_pipe_write : int ($fd : int, $string : string, $length : int = -1, $offset : int = 0, $timeout_duration_nsec : long = 0) {
+    
+    my $schedule_type = &TYPE_PIPE_WRITE;
+    
+    my $write_length_ref = [0];
+    $self->schedule($schedule_type, $timeout_duration_nsec, $fd, undef, $string, $length, $offset, $write_length_ref);
+    
+    return $write_length_ref->[0];
+  }
+  
   private method schedule_timer : int ($timeout_duration_nsec : long) {
     
     my $schedule_type = &TYPE_TIMER;
@@ -98,7 +118,7 @@ class Go::Schedule {
     $self->schedule($schedule_type, 0, -1, $write_wait);
   }
   
-  private method schedule : int ($schedule_type : int = 0, $timeout_duration_nsec : long = 0, $fd : int = -1, $wait : Go::Channel::Wait = undef) {
+  private method schedule : int ($schedule_type : int = 0, $timeout_duration_nsec : long = 0, $fd : int = -1, $wait : Go::Channel::Wait = undef, $buffer : string = undef, $buffer_length : int = -1, $buffer_offset : int = 0, $ret_length_ref : int[] = undef) {
     
     my $called_from_main_thread = Thread::ID->eq(Thread::ThisThread->get_id, $self->{thread_id});
     
@@ -110,7 +130,7 @@ class Go::Schedule {
     
     if ($current_goroutine) {
       unless ($schedule_type == &TYPE_NONE) {
-        $self->disable_goroutine($current_goroutine, $schedule_type, $timeout_duration_nsec, $fd, $wait);
+        $self->disable_goroutine($current_goroutine, $schedule_type, $timeout_duration_nsec, $fd, $wait, $buffer, $buffer_length, $buffer_offset, $ret_length_ref);
       }
       
       my $return_back_goroutine = $self->{return_back_goroutine};
@@ -166,7 +186,7 @@ class Go::Schedule {
     $self->enable_goroutine($goroutine);
   }
   
-  private method disable_goroutine : void ($goroutine : Go::Goroutine, $schedule_type : int = 0, $timeout_duration_nsec : long = 0, $fd : int = -1, $wait : Go::Channel::Wait = undef) {
+  private method disable_goroutine : void ($goroutine : Go::Goroutine, $schedule_type : int = 0, $timeout_duration_nsec : long = 0, $fd : int = -1, $wait : Go::Channel::Wait = undef, $buffer : string = undef, $buffer_length : int = -1, $buffer_offset : int = 0, $ret_length_ref: int[] = undef) {
     
     my $goroutine_address = Fn->to_address($goroutine);
     
@@ -211,6 +231,66 @@ class Go::Schedule {
         Fn->say_stderr(Format->sprintf("[Go Debug]Register goroutine wait for IO (Callback:%p, QueueNum:%d.)", [(object)$goroutine->{task}, $self->{goroutines}->length]));
       }
     }
+    elsif ($schedule_type == &TYPE_PIPE_READ ||$schedule_type == &TYPE_PIPE_WRITE) {
+      
+      unless ($goroutine->{uv_write}) {
+        $goroutine->{uv_write} = Go::UV::Request::Write->new;
+      }
+      
+      unless ($fd >= 0) {
+        die "The file descriptor \$fd in schedule type TYPE_PIPE_READ or TYPE_PIPE_WRITE must be a non-negative value.";
+      }
+      
+      my $deadline = (Go::Time)undef;
+      if ($timeout_duration_nsec > 0) {
+        $deadline = Go::Time->now->add(Go::Duration_1l->new($timeout_duration_nsec));
+      }
+      my $timeout_msec = $timeout_duration_nsec / 1000000;
+      
+      my $uv_loop = $self->{uv_loop};
+      
+      my $uv_pipe = Go::UV::Handle::Pipe->new;
+      my $ipc = 0;
+      $uv_loop->pipe_init($uv_pipe, $ipc);
+      $uv_pipe->open($fd);
+      $goroutine->{uv_handle} = $uv_pipe;
+      
+      if ($schedule_type == &TYPE_PIPE_READ) {
+        my $read_cb = [$goroutine : Go::Goroutine, $schedule : Go::Schedule = $self, $ret_length_ref : int[]] method : void ($uv_stream : Go::UV::Handle::Stream, $nread : int, $buffer : string) {
+          $ret_length_ref->[0] = $nread;
+          $schedule->awake($goroutine, $uv_stream);
+        };
+        
+        $uv_pipe->read_start((mutable string)$buffer, $buffer_length, $read_cb);
+      }
+      else {
+
+=pod
+
+        my $write_cb = [$goroutine : Go::Goroutine, $schedule : Go::Schedule = $self, $ret_length_ref : int[], $buffer_length : int] method : void ($uv_req : Go::UV::Request::Write, $status : int) {
+          $ret_length_ref->[0] = $buffer_length;
+          $schedule->awake($goroutine, $uv_req);
+        };
+        
+        $uv_pipe->write($goroutine->{uv_write}, $buffer, $buffer_length, $cb);
+
+=cut
+      }
+      
+      if ($timeout_msec > 0) {
+        my $uv_timer = Go::UV::Handle::Timer->new;
+        $uv_loop->timer_init($uv_timer);
+        $goroutine->{timeout_uv_timer} = $uv_timer;
+        my $timer_cb = [$goroutine : Go::Goroutine, $schedule : Go::Schedule = $self] method : void ($uv_timer : Go::UV::Handle::Timer) {
+          $schedule->awake($goroutine, $uv_timer);
+        };
+        $uv_timer->start($timer_cb, $timeout_msec);
+      }
+      
+      if (Go->ENV_DEBUG) {
+        Fn->say_stderr(Format->sprintf("[Go Debug]Register goroutine wait for pipe (Callback:%p, QueueNum:%d.)", [(object)$goroutine->{task}, $self->{goroutines}->length]));
+      }
+    }
     elsif ($schedule_type == &TYPE_TIMER) {
       my $deadline = (Go::Time)undef;
       if ($timeout_duration_nsec > 0) {
@@ -243,13 +323,6 @@ class Go::Schedule {
         $schedule->awake($goroutine, $uv_timer);
       };
       $uv_loop->async_init($uv_async, $async_cb);
-    }
-    elsif ($schedule_type == &TYPE_PIPE_READ ||$schedule_type == &TYPE_PIPE_WRITE) {
-      
-      unless ($goroutine->{uv_write}) {
-        $goroutine->{uv_write} = Go::UV::Request::Write->new;
-      }
-      
     }
     
     if ($self->{disabled_goroutines_h}->{$goroutine_address}) {
