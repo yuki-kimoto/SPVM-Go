@@ -57,7 +57,7 @@ class Go::Schedule {
     
     $self->{disabled_goroutines_h} = Hash->new;
     
-    $self->{uv_loop} = Go::UV->default_loop;
+    $self->{uv_loop} = Go::UV::Loop->new;
     
     return $self;
   }
