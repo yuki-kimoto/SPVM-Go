@@ -23,6 +23,13 @@ class Go::UV::Loop : pointer {
   use Go::UV::Callback::Write;
   use Go::UV::Callback::Close;
   
+  # Class Variables
+  our $DEFAULT_LOOP : Go::UV::Loop;
+  
+  INIT {
+    &default_loop;
+  }
+  
   # Fields
   has uv_handles_h : ro Hash of Go::UV::Handle;
   

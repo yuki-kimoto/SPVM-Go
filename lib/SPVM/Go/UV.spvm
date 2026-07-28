@@ -6,16 +6,10 @@ class Go::UV {
   
   use Go::UV::Loop;
   
-  our $DEFAULT_LOOP : Go::UV::Loop;
-  INIT {
-    $DEFAULT_LOOP = Go::UV::Loop->default_loop;
-    $DEFAULT_LOOP->init;
-  }
-  
   # Class Methods
   static method default_loop : Go::UV::Loop () {
     
-    return $DEFAULT_LOOP;
+    return Go::UV::Loop->default_loop;
   }
   
   static method strerror : string ($status : int) {
