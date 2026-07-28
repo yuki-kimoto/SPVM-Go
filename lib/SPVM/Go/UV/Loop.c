@@ -885,6 +885,10 @@ int32_t SPVM__Go__UV__Loop__new(SPVM_ENV* env, SPVM_VALUE* stack) {
   if (error_id) return error_id;
   
   stack[0].oval = obj_uv_loop;
+  env->call_instance_method_by_name(env, stack, "init", 1, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) return error_id;
+  
+  stack[0].oval = obj_uv_loop;
   
   return 0;
 }
