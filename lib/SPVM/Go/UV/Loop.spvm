@@ -30,6 +30,10 @@ class Go::UV::Loop : pointer {
   native static method new : Go::UV::Loop ();
   
   # Instance Methods
+  protected method init : void () {
+    $self->{uv_handles_h} = Hash->new;
+  }
+  
   native method run : void ($uv_run_mode : int);
   
   native method idle_init : void ($uv_idle : Go::UV::Handle::Idle);

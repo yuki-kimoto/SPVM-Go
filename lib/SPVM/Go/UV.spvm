@@ -9,8 +9,7 @@ class Go::UV {
   our $DEFAULT_LOOP : Go::UV::Loop;
   INIT {
     $DEFAULT_LOOP = Go::UV::Loop->default_loop;
-    
-    $DEFAULT_LOOP->{uv_handles_h} = Hash->new;
+    $DEFAULT_LOOP->init;
   }
   
   # Class Methods
