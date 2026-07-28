@@ -21,6 +21,8 @@ int32_t SPVM__Go__UV__Loop__default_loop(SPVM_ENV* env, SPVM_VALUE* stack) {
   SPVM_OBJ* obj_uv_loop = env->new_pointer_object_by_name(env, stack, "Go::UV::Loop", uv_loop, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) return error_id;
   
+  env->set_no_free(env, stack, obj_uv_loop, 1);
+  
   stack[0].oval = obj_uv_loop;
   
   return 0;
@@ -851,6 +853,49 @@ int32_t SPVM__Go__UV__Loop__handle_write(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   if (!(status == 0)) {
     return env->die(env, stack, "uv_write failed. status=%d.", __func__, FILE_NAME, __LINE__, status);
+  }
+  
+  return 0;
+}
+
+int32_t SPVM__Go__UV__Loop__new(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t error_id = 0;
+  
+  uv_loop_t* uv_loop = env->new_memory_block(env, stack, sizeof(uv_loop_t));
+  
+  int32_t status = uv_loop_init(uv_loop);
+  
+  if (!(status == 0)) {
+    return env->die(env, stack, "uv_loop_init failed. status=%d.", __func__, FILE_NAME, __LINE__, status);
+  }
+  
+  SPVM_OBJ* obj_uv_loop = env->new_pointer_object_by_name(env, stack, "Go::UV::Loop", uv_loop, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) return error_id;
+  
+  stack[0].oval = obj_uv_loop;
+  
+  return 0;
+}
+
+int32_t SPVM__Go__UV__Loop__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t error_id = 0;
+  
+  SPVM_OBJ* obj_uv_loop = stack[0].oval;
+  
+  uv_loop_t* uv_loop = env->get_pointer(env, stack, obj_uv_loop);
+  
+  int32_t status = uv_loop_close(uv_loop);
+  
+  if (!(status == 0)) {
+    return env->die(env, stack, "uv_loop_close failed. status=%d.", __func__, FILE_NAME, __LINE__, status);
+  }
+  
+  int32_t no_free = env->no_free(env, stack, obj_uv_loop);
+  if (!no_free) {
+    env->free_memory_block(env, stack, uv_loop);
+    env->set_no_free(env, stack, obj_uv_loop, 1);
   }
   
   return 0;
