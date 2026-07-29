@@ -10,6 +10,7 @@ typedef struct {
   SPVM_ENV* env;
   SPVM_VALUE* stack;
   SPVM_OBJ* obj_uv_handle;
+  SPVM_OBJ* obj_uv_req;
 } SPVM__Go__UV__Loop__DATA;
 
 int32_t SPVM__Go__UV__Loop__default_loop(SPVM_ENV* env, SPVM_VALUE* stack) {
@@ -229,6 +230,18 @@ void SPVM__Go__UV__Loop__read_cb(uv_stream_t* uv_handle, ssize_t nread, const uv
     return;
   }
   
+  env->set_field_object_by_name(env, stack, obj_uv_handle, "read_buffer", NULL, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) {
+    spvm_diag("[Unexpected Error]Setting 'read_buffer' field failed.");
+    abort();
+  }
+  
+  env->set_field_object_by_name(env, stack, obj_uv_handle, "read_cb", NULL, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) {
+    spvm_diag("[Unexpected Error]Setting 'read_cb' field failed.");
+    abort();
+  }
+  
 }
 
 void SPVM__Go__UV__Loop__write_cb(uv_write_t* uv_handle, int status) {
@@ -240,6 +253,7 @@ void SPVM__Go__UV__Loop__write_cb(uv_write_t* uv_handle, int status) {
   SPVM_ENV* env = uv_data->env;
   SPVM_VALUE* stack = uv_data->stack;
   SPVM_OBJ* obj_uv_handle = uv_data->obj_uv_handle;
+  SPVM_OBJ* obj_uv_req_write = uv_data->obj_uv_req;
   SPVM_OBJ* obj_cb = env->get_field_object_by_name(env, stack, obj_uv_handle, "write_cb", &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) {
     spvm_diag("[Unexpected Error]Getting 'write_cb' field failed.");
@@ -248,12 +262,24 @@ void SPVM__Go__UV__Loop__write_cb(uv_write_t* uv_handle, int status) {
   
   assert(obj_cb);
   stack[0].oval = obj_cb;
-  stack[1].oval = obj_uv_handle;
+  stack[1].oval = obj_uv_req_write;
   stack[2].ival = status;
-  env->call_instance_method_by_name(env, stack, "", 2, &error_id, __func__, FILE_NAME, __LINE__);
+  env->call_instance_method_by_name(env, stack, "", 3, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) {
     spvm_diag("[An exception is converted to a warning in SPVM__Go__UV__Loop__write_cb]\n%s", env->get_exception_chars(env, stack));
     return;
+  }
+  
+  env->set_field_object_by_name(env, stack, obj_uv_handle, "write_buffer", NULL, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) {
+    spvm_diag("[Unexpected Error]Setting 'write_buffer' field failed.");
+    abort();
+  }
+  
+  env->set_field_object_by_name(env, stack, obj_uv_handle, "write_cb", NULL, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) {
+    spvm_diag("[Unexpected Error]Setting 'write_cb' field failed.");
+    abort();
   }
   
 }
@@ -641,13 +667,14 @@ int32_t SPVM__Go__UV__Loop__new_write(SPVM_ENV* env, SPVM_VALUE* stack) {
   SPVM__Go__UV__Loop__DATA* uv_data = env->new_memory_block(env, stack, sizeof(SPVM__Go__UV__Loop__DATA));
   uv_data->env = env;
   uv_data->stack = stack;
-  
   uv_req_write->data = uv_data;
   
-  SPVM_OBJ* obj_uv_write = env->new_pointer_object_by_name(env, stack, "Go::UV::Request::Write", uv_write, &error_id, __func__, FILE_NAME, __LINE__);
+  SPVM_OBJ* obj_uv_req_write = env->new_pointer_object_by_name(env, stack, "Go::UV::Request::Write", uv_req_write, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) return error_id;
   
-  stack[0].oval = obj_uv_write;
+  uv_data->obj_uv_req = obj_uv_req_write;
+  
+  stack[0].oval = obj_uv_req_write;
   
   return 0;
 }
@@ -889,7 +916,9 @@ int32_t SPVM__Go__UV__Loop__handle_write(SPVM_ENV* env, SPVM_VALUE* stack) {
   uv_buf.len = buffer_length;
   
   SPVM__Go__UV__Loop__DATA* uv_data = (SPVM__Go__UV__Loop__DATA*)uv_req_write->data;
+  
   uv_data->obj_uv_handle = obj_uv_stream;
+  
   int32_t status = uv_write(uv_req_write, uv_stream, &uv_buf, 1, SPVM__Go__UV__Loop__write_cb);
   
   if (!(status == 0)) {

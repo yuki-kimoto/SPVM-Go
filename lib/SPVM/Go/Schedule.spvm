@@ -218,7 +218,7 @@ class Go::Schedule {
         $uv_pipe->read_start((mutable string)$buffer, $buffer_length, $read_cb, $buffer_offset);
       }
       else {
-        my $write_cb = [$goroutine : Go::Goroutine, $schedule : Go::Schedule = $self, $schedule_info : Go::Schedule::Info, $buffer_length : int, $uv_pipe : Go::UV::Handle::Pipe] method : void ($uv_req : Go::UV::Request::Write, $status : int) {
+        my $write_cb = [$goroutine : Go::Goroutine, $schedule : Go::Schedule = $self, $schedule_info : Go::Schedule::Info, $buffer_length : int, $uv_pipe : Go::UV::Handle::Pipe] method : void ($uv_req_write : Go::UV::Request::Write, $status : int) {
           if ($status < 0) {
             $goroutine->{io_error_occurred} = 1;
             my $io_error_message = Go::UV->strerror($status);
