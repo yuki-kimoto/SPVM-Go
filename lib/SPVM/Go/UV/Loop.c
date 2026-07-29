@@ -815,6 +815,7 @@ int32_t SPVM__Go__UV__Loop__handle_write(SPVM_ENV* env, SPVM_VALUE* stack) {
   SPVM_OBJ* obj_buffer = stack[2].oval;
   int32_t buffer_length = stack[3].ival;
   SPVM_OBJ* obj_cb = stack[4].oval;
+  int32_t buffer_offset = stack[5].ival;
   
   if (!obj_uv_req) {
     return env->die(env, stack, "$uv_req must be defined.", __func__, FILE_NAME, __LINE__);
@@ -833,8 +834,8 @@ int32_t SPVM__Go__UV__Loop__handle_write(SPVM_ENV* env, SPVM_VALUE* stack) {
     return env->die(env, stack, "$buffer_length must be a positive number.", __func__, FILE_NAME, __LINE__);
   }
   
-  if (!(buffer_length <= max_buffer_length)) {
-    return env->die(env, stack, "$buffer_length must be less than or equal to the length of $buffer.", __func__, FILE_NAME, __LINE__);
+  if (!(buffer_offset + buffer_length <= max_buffer_length)) {
+    return env->die(env, stack, "$buffer_offset + $buffer_length must be less than or equal to the length of $buffer.", __func__, FILE_NAME, __LINE__);
   }
   
   if (!obj_cb) {
@@ -857,7 +858,7 @@ int32_t SPVM__Go__UV__Loop__handle_write(SPVM_ENV* env, SPVM_VALUE* stack) {
   uv_write_t* uv_req = env->get_pointer(env, stack, obj_uv_req);
   
   uv_buf_t uv_buf = {0};
-  uv_buf.base = (char*)buffer;
+  uv_buf.base = (char*)buffer + buffer_offset;
   uv_buf.len = buffer_length;
   
   int32_t status = uv_write(uv_req, uv_stream, &uv_buf, 1, SPVM__Go__UV__Loop__write_cb);
