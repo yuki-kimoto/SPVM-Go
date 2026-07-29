@@ -2,16 +2,12 @@ use Test::More;
 
 use strict;
 use warnings;
-use FindBin;
-use lib "$FindBin::Bin/lib";
-BEGIN { $ENV{SPVM_BUILD_DIR} = "$FindBin::Bin/.spvm_build"; }
+use lib 't/lib';
 
-use SPVM 'Fn';
 use SPVM 'TestCase::Go';
 
 use SPVM 'Go';
 use SPVM::Go;
-use SPVM 'Fn';
 
 use Time::HiRes;
 
@@ -48,11 +44,11 @@ ok(SPVM::TestCase::Go->multi_top_goroutines);
 
 # Version
 {
-  my $version_string = SPVM::Fn->get_version_string("Go");
+  my $version_string = $api->get_version_string("Go");
   is($SPVM::Go::VERSION, $version_string);
 }
 
-SPVM::Fn->destroy_runtime_permanent_vars;
+$api->destroy_runtime_permanent_vars;
 
 my $end_memory_blocks_count = $api->get_memory_blocks_count;
 is($end_memory_blocks_count, $start_memory_blocks_count);
