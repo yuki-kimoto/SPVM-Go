@@ -137,12 +137,6 @@ class Go::Schedule {
     my $buffer_length = exists $schedule_info->{buffer_length} ? $schedule_info->{buffer_length} : -1;
     my $buffer_offset = $schedule_info->{buffer_offset};
     
-    my $goroutine_address = Fn->to_address($goroutine);
-    
-    my $enable_goroutine_cb = [$goroutine : Go::Goroutine, $schedule : Go::Schedule = $self] method : void ($uv_handle : Go::UV::Handle) {
-      $schedule->awake($goroutine, $uv_handle);
-    };
-    
     if ($schedule_type == Go::Schedule::Info->TYPE_IO_READ ||$schedule_type == Go::Schedule::Info->TYPE_IO_WRITE) {
       unless ($fd >= 0) {
         die "The file descriptor \$fd in schedule type TYPE_IO_READ or TYPE_IO_WRITE must be a non-negative value.";
@@ -284,6 +278,7 @@ class Go::Schedule {
       $uv_loop->async_init($uv_async, $async_cb);
     }
     
+    my $goroutine_address = Fn->to_address($goroutine);
     if ($self->{disabled_goroutines_h}->{$goroutine_address}) {
       die "[Unexpected Error]Disabled goroutine already exists.";
     }
