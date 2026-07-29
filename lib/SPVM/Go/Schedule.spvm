@@ -64,13 +64,6 @@ class Go::Schedule {
   }
   
   # Instance Methods
-  private method schedule_io_write : void ($fd : int, $timeout_duration_nsec : long = 0) {
-    
-    my $schedule_type = &TYPE_IO_WRITE;
-    
-    $self->schedule($schedule_type, $timeout_duration_nsec, $fd);
-  }
-  
   private method schedule_pipe_read : int ($fd : int, $string : mutable string, $length : int = -1, $offset : int = 0, $timeout_duration_nsec : long = 0) {
     
     my $schedule_type = &TYPE_PIPE_READ;
