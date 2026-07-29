@@ -215,7 +215,7 @@ class Go::Schedule {
           $schedule->awake($goroutine, $uv_stream);
         };
         
-        $uv_pipe->read_start((mutable string)$buffer, $buffer_length, $read_cb);
+        $uv_pipe->read_start((mutable string)$buffer, $buffer_length, $read_cb, $buffer_offset);
       }
       else {
         my $write_cb = [$goroutine : Go::Goroutine, $schedule : Go::Schedule = $self, $schedule_info : Go::Schedule::Info, $buffer_length : int, $uv_pipe : Go::UV::Handle::Pipe] method : void ($uv_req : Go::UV::Request::Write, $status : int) {
@@ -228,7 +228,7 @@ class Go::Schedule {
           $schedule->awake($goroutine, $uv_pipe);
         };
         
-        $uv_pipe->write($goroutine->{uv_write}, $buffer, $buffer_length, $write_cb);
+        $uv_pipe->write($goroutine->{uv_write}, $buffer, $buffer_length, $write_cb, $buffer_offset);
       }
       
       if ($timeout_msec > 0) {

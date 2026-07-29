@@ -90,9 +90,9 @@ class Go::UV::Loop : pointer {
   
   native static method handle_pipe_open : void ($uv_pipe : Go::UV::Handle::Pipe, $fd : int);
   
-  native static method handle_read_start : void ($uv_handle : Go::UV::Handle::Stream, $buffer : mutable string, $buffer_length : int, $cb : Go::UV::Callback::Read);
+  native static method handle_read_start : void ($uv_handle : Go::UV::Handle::Stream, $buffer : mutable string, $buffer_length : int, $cb : Go::UV::Callback::Read, $buffer_offset : int = 0);
   
-  native static method handle_write : void ($uv_req : Go::UV::Request::Write, $uv_handle : Go::UV::Handle::Stream, $buffer : string, $buffer_length : int, $cb : Go::UV::Callback::Write);
+  native static method handle_write : void ($uv_req : Go::UV::Request::Write, $uv_handle : Go::UV::Handle::Stream, $buffer : string, $buffer_length : int, $cb : Go::UV::Callback::Write, $buffer_offset : int = 0);
   
   native static method handle_free : void ($uv_handle : Go::UV::Handle);
   

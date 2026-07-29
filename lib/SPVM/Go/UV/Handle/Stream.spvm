@@ -18,14 +18,14 @@ class Go::UV::Handle::Stream extends Go::UV::Handle {
   has write_buffer : string;
   
   # Instance Methods
-  method read_start : void ($buffer : mutable string, $buffer_length : int, $cb : Go::UV::Callback::Read) {
+  method read_start : void ($buffer : mutable string, $buffer_length : int, $cb : Go::UV::Callback::Read, $buffer_offset : int = 0) {
     
-    Go::UV::Loop->handle_read_start($self, $buffer, $buffer_length, $cb);
+    Go::UV::Loop->handle_read_start($self, $buffer, $buffer_length, $cb, $buffer_offset);
   }
   
-  method write : void ($uv_req : Go::UV::Request::Write, $buffer : string, $buffer_length : int, $cb : Go::UV::Callback::Write) {
+  method write : void ($uv_req : Go::UV::Request::Write, $buffer : string, $buffer_length : int, $cb : Go::UV::Callback::Write, $buffer_offset : int = 0) {
     
-    Go::UV::Loop->handle_write($uv_req, $self, $buffer, $buffer_length, $cb);
+    Go::UV::Loop->handle_write($uv_req, $self, $buffer, $buffer_length, $cb, $buffer_offset);
   }
   
 }
