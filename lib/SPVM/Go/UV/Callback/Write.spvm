@@ -5,6 +5,6 @@ class Go::UV::Callback::Write : interface_t {
   
   use Go::UV::Request::Write;
   
-  required method : void ($uv_req : Go::UV::Request::Write, $status : int);
+  required method : void ($uv_req_write : Go::UV::Request::Write, $status : int);
   
 }
