@@ -840,15 +840,15 @@ int32_t SPVM__Go__UV__Loop__handle_write(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t error_id = 0;
   
-  SPVM_OBJ* obj_uv_req = stack[0].oval;
+  SPVM_OBJ* obj_uv_req_write = stack[0].oval;
   SPVM_OBJ* obj_uv_stream = stack[1].oval;
   SPVM_OBJ* obj_buffer = stack[2].oval;
   int32_t buffer_length = stack[3].ival;
   SPVM_OBJ* obj_cb = stack[4].oval;
   int32_t buffer_offset = stack[5].ival;
   
-  if (!obj_uv_req) {
-    return env->die(env, stack, "$uv_req must be defined.", __func__, FILE_NAME, __LINE__);
+  if (!obj_uv_req_write) {
+    return env->die(env, stack, "$uv_req_write must be defined.", __func__, FILE_NAME, __LINE__);
   }
   
   if (!obj_uv_stream) {
@@ -882,13 +882,15 @@ int32_t SPVM__Go__UV__Loop__handle_write(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   const char* buffer = env->get_chars(env, stack, obj_buffer);
   
-  uv_write_t* uv_req = env->get_pointer(env, stack, obj_uv_req);
+  uv_write_t* uv_req_write = env->get_pointer(env, stack, obj_uv_req_write);
   
   uv_buf_t uv_buf = {0};
   uv_buf.base = (char*)buffer + buffer_offset;
   uv_buf.len = buffer_length;
   
-  int32_t status = uv_write(uv_req, uv_stream, &uv_buf, 1, SPVM__Go__UV__Loop__write_cb);
+  SPVM__Go__UV__Loop__DATA* uv_data = (SPVM__Go__UV__Loop__DATA*)uv_req_write->data;
+  uv_data->uv_handle = obj_uv_stream;
+  int32_t status = uv_write(uv_req_write, uv_stream, &uv_buf, 1, SPVM__Go__UV__Loop__write_cb);
   
   if (!(status == 0)) {
     return env->die(env, stack, "uv_write failed. status=%d.", __func__, FILE_NAME, __LINE__, status);
