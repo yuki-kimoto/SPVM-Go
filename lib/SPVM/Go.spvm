@@ -125,7 +125,12 @@ class Go {
     
     my $schedule = $GO->{schedule};
     
-    return $schedule->schedule_pipe_write($fd, $string, $length, $offset, $timeout_duration->{nsec});
+    my $schedule_type = Go::Schedule::Info->TYPE_PIPE_WRITE;
+    
+    my $write_length_ref = [0];
+    $schedule->schedule($schedule_type, $timeout_duration->{nsec}, $fd, undef, $string, $length, $offset, $write_length_ref);
+    
+    return $write_length_ref->[0];
   }
   
   static method gosched_pipe_write_sec : int ($fd : int, $string : string, $length : int = -1, $offset : int = 0, $timeout_sec : double = 0) {
