@@ -922,7 +922,7 @@ int32_t SPVM__Go__UV__Loop__handle_write(SPVM_ENV* env, SPVM_VALUE* stack) {
   uv_buf.base = (char*)buffer + buffer_offset;
   uv_buf.len = buffer_length;
   
-  SPVM__Go__UV__Loop__HANDLE_DATA* uv_data = (SPVM__Go__UV__Loop__HANDLE_DATA*)uv_req_write->data;
+  SPVM__Go__UV__Loop__REQ_DATA* uv_data = (SPVM__Go__UV__Loop__HANDLE_DATA*)uv_req_write->data;
   
   uv_data->obj_uv_handle = obj_uv_stream;
   
