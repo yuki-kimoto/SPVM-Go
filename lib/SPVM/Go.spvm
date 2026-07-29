@@ -55,7 +55,7 @@ class Go {
     
     my $schedule_info = new Go::Schedule::Info;
     
-    $schedule->schedule_with_info($schedule_info);
+    $schedule->schedule($schedule_info);
   }
   
   static method sleep : void ($duration : Go::Duration_1l = undef) {
@@ -66,7 +66,7 @@ class Go {
     $schedule_info->{type} = Go::Schedule::Info->TYPE_TIMER;
     $schedule_info->{timeout_duration_nsec} = $duration->{nsec};
     
-    $schedule->schedule_with_info($schedule_info);
+    $schedule->schedule($schedule_info);
   }
   
   static method sleep_sec : void ($sec : double = 0) {
@@ -85,7 +85,7 @@ class Go {
     $schedule_info->{fd} = $fd;
     $schedule_info->{timeout_duration_nsec} = $timeout_duration->{nsec};
     
-    $schedule->schedule_with_info($schedule_info);
+    $schedule->schedule($schedule_info);
   }
   
   static method gosched_io_read_sec : void ($fd : int, $timeout_sec : double = 0) {
@@ -104,7 +104,7 @@ class Go {
     $schedule_info->{fd} = $fd;
     $schedule_info->{timeout_duration_nsec} = $timeout_duration->{nsec};
     
-    $schedule->schedule_with_info($schedule_info);
+    $schedule->schedule($schedule_info);
   }
   
   static method gosched_io_write_sec : void ($fd : int, $timeout_sec : double = 0) {
@@ -126,7 +126,7 @@ class Go {
     $schedule_info->{buffer_length} = $length;
     $schedule_info->{buffer_offset} = $offset;
     
-    $schedule->schedule_with_info($schedule_info);
+    $schedule->schedule($schedule_info);
     
     my $read_length = $schedule_info->{ret_length};
     
@@ -152,7 +152,7 @@ class Go {
     $schedule_info->{buffer_length} = $length;
     $schedule_info->{buffer_offset} = $offset;
     
-    $schedule->schedule_with_info($schedule_info);
+    $schedule->schedule($schedule_info);
     
     my $write_length = $schedule_info->{ret_length};
     
