@@ -259,7 +259,6 @@ void SPVM__Go__UV__Loop__write_cb(uv_write_t* uv_handle, int status) {
   
   SPVM_ENV* env = uv_data->env;
   SPVM_VALUE* stack = uv_data->stack;
-  SPVM_OBJ* obj_uv_handle = uv_data->obj_uv_handle;
   SPVM_OBJ* obj_uv_req_write = uv_data->obj_uv_req;
   SPVM_OBJ* obj_cb = env->get_field_object_by_name(env, stack, obj_uv_req_write, "write_cb", &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) {
@@ -275,18 +274,6 @@ void SPVM__Go__UV__Loop__write_cb(uv_write_t* uv_handle, int status) {
   if (error_id) {
     spvm_diag("[An exception is converted to a warning in SPVM__Go__UV__Loop__write_cb]\n%s", env->get_exception_chars(env, stack));
     return;
-  }
-  
-  env->set_field_object_by_name(env, stack, obj_uv_handle, "write_buffer", NULL, &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) {
-    spvm_diag("[Unexpected Error]Setting 'write_buffer' field failed.");
-    abort();
-  }
-  
-  env->set_field_object_by_name(env, stack, obj_uv_handle, "write_cb", NULL, &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) {
-    spvm_diag("[Unexpected Error]Setting 'write_cb' field failed.");
-    abort();
   }
   
   env->set_field_object_by_name(env, stack, obj_uv_req_write, "write_buffer", NULL, &error_id, __func__, FILE_NAME, __LINE__);
@@ -918,12 +905,6 @@ int32_t SPVM__Go__UV__Loop__handle_write(SPVM_ENV* env, SPVM_VALUE* stack) {
     return env->die(env, stack, "$cb must be defined.", __func__, FILE_NAME, __LINE__);
   }
   
-  env->set_field_object_by_name(env, stack, obj_uv_stream, "write_cb", obj_cb, &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) return error_id;
-  
-  env->set_field_object_by_name(env, stack, obj_uv_stream, "write_buffer", obj_buffer, &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) return error_id;
-  
   env->set_field_object_by_name(env, stack, obj_uv_req_write, "write_cb", obj_cb, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) return error_id;
   
@@ -941,8 +922,6 @@ int32_t SPVM__Go__UV__Loop__handle_write(SPVM_ENV* env, SPVM_VALUE* stack) {
   uv_buf.len = buffer_length;
   
   SPVM__Go__UV__Loop__REQ_DATA* uv_data = (SPVM__Go__UV__Loop__HANDLE_DATA*)uv_req_write->data;
-  
-  uv_data->obj_uv_handle = obj_uv_stream;
   
   int32_t status = uv_write(uv_req_write, uv_stream, &uv_buf, 1, SPVM__Go__UV__Loop__write_cb);
   

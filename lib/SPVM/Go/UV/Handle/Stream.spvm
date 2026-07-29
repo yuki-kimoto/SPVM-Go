@@ -17,10 +17,6 @@ class Go::UV::Handle::Stream extends Go::UV::Handle {
   
   has read_buffer_offset : int;
   
-  has write_cb : ro Go::UV::Callback::Write;
-  
-  has write_buffer : string;
-  
   # Instance Methods
   method read_start : void ($buffer : mutable string, $buffer_length : int, $cb : Go::UV::Callback::Read, $buffer_offset : int = 0) {
     
