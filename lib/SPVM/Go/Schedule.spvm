@@ -73,9 +73,7 @@ class Go::Schedule {
     
     if ($current_goroutine) {
       unless ($schedule_type == Go::Schedule::Info->TYPE_NONE) {
-        my $ret_length_ref : int[] = [0];
-        $self->disable_goroutine($current_goroutine, $schedule_type, $timeout_duration_nsec, $fd, $wait, $buffer, $buffer_length, $buffer_offset, $ret_length_ref);
-        $schedule_info->{ret_length} = $ret_length_ref->[0];
+        $self->disable_goroutine($current_goroutine, $schedule_info);
       }
       
       my $return_back_goroutine = $self->{return_back_goroutine};
@@ -137,7 +135,15 @@ class Go::Schedule {
     $self->enable_goroutine($goroutine);
   }
   
-  private method disable_goroutine : void ($goroutine : Go::Goroutine, $schedule_type : int = 0, $timeout_duration_nsec : long = 0, $fd : int = -1, $wait : Go::Channel::Wait = undef, $buffer : string = undef, $buffer_length : int = -1, $buffer_offset : int = 0, $ret_length_ref: int[] = undef) {
+  private method disable_goroutine : void ($goroutine : Go::Goroutine, $schedule_info : Go::Schedule::Info) {
+    
+    my $schedule_type = $schedule_info->{type};
+    my $timeout_duration_nsec = $schedule_info->{timeout_duration_nsec};
+    my $fd = $schedule_info->{fd};
+    my $wait = $schedule_info->{wait};
+    my $buffer = $schedule_info->{buffer};
+    my $buffer_length = exists $schedule_info->{buffer_length} ? $schedule_info->{buffer_length} : -1;
+    my $buffer_offset = $schedule_info->{buffer_offset};
     
     my $goroutine_address = Fn->to_address($goroutine);
     
@@ -212,26 +218,26 @@ class Go::Schedule {
       $goroutine->{uv_handle} = $uv_pipe;
       
       if ($schedule_type == Go::Schedule::Info->TYPE_PIPE_READ) {
-        my $read_cb = [$goroutine : Go::Goroutine, $schedule : Go::Schedule = $self, $ret_length_ref : int[]] method : void ($uv_stream : Go::UV::Handle::Stream, $nread : int, $buffer : string) {
+        my $read_cb = [$goroutine : Go::Goroutine, $schedule : Go::Schedule = $self, $schedule_info : Go::Schedule::Info] method : void ($uv_stream : Go::UV::Handle::Stream, $nread : int, $buffer : string) {
           if ($nread < 0) {
             $goroutine->{io_error_occurred} = 1;
             my $io_error_message = Go::UV->strerror($nread);
             $goroutine->{io_error_message} = $io_error_message;
           }
-          $ret_length_ref->[0] = $nread;
+          $schedule_info->{ret_length} = $nread;
           $schedule->awake($goroutine, $uv_stream);
         };
         
         $uv_pipe->read_start((mutable string)$buffer, $buffer_length, $read_cb);
       }
       else {
-        my $write_cb = [$goroutine : Go::Goroutine, $schedule : Go::Schedule = $self, $ret_length_ref : int[], $buffer_length : int, $uv_pipe : Go::UV::Handle::Pipe] method : void ($uv_req : Go::UV::Request::Write, $status : int) {
+        my $write_cb = [$goroutine : Go::Goroutine, $schedule : Go::Schedule = $self, $schedule_info : Go::Schedule::Info, $buffer_length : int, $uv_pipe : Go::UV::Handle::Pipe] method : void ($uv_req : Go::UV::Request::Write, $status : int) {
           if ($status < 0) {
             $goroutine->{io_error_occurred} = 1;
             my $io_error_message = Go::UV->strerror($status);
             $goroutine->{io_error_message} = $io_error_message;
           }
-          $ret_length_ref->[0] = $buffer_length;
+          $schedule_info->{ret_length} = $buffer_length;
           $schedule->awake($goroutine, $uv_pipe);
         };
         
