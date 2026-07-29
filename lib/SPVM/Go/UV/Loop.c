@@ -636,7 +636,13 @@ int32_t SPVM__Go__UV__Loop__new_write(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t error_id = 0;
   
-  uv_write_t* uv_write = env->new_memory_block(env, stack, sizeof(uv_write_t));
+  uv_write_t* uv_req_write = env->new_memory_block(env, stack, sizeof(uv_write_t));
+  
+  SPVM__Go__UV__Loop__DATA* uv_data = env->new_memory_block(env, stack, sizeof(SPVM__Go__UV__Loop__DATA));
+  uv_data->env = env;
+  uv_data->stack = stack;
+  
+  uv_req_write->data = uv_data;
   
   SPVM_OBJ* obj_uv_write = env->new_pointer_object_by_name(env, stack, "Go::UV::Request::Write", uv_write, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) return error_id;
@@ -650,11 +656,22 @@ int32_t SPVM__Go__UV__Loop__destroy_write(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t error_id = 0;
   
-  SPVM_OBJ* obj_uv_write = stack[0].oval;
+  SPVM_OBJ* obj_uv_req_write = stack[0].oval;
   
-  uv_write_t* uv_write = env->get_pointer(env, stack, obj_uv_write);
+  uv_write_t* uv_req_write = env->get_pointer(env, stack, obj_uv_req_write);
   
-  env->free_memory_block(env, stack, uv_write);
+  int32_t no_free = env->no_free(env, stack, obj_uv_req_write);
+  
+  if (!no_free) {
+    uv_write_t* uv_req_write = env->get_pointer(env, stack, obj_uv_req_write);
+    
+    SPVM__Go__UV__Loop__DATA* uv_data = (SPVM__Go__UV__Loop__DATA*)uv_req_write->data;
+    
+    env->free_memory_block(env, stack, uv_data);
+    uv_req_write->data = NULL;
+    env->free_memory_block(env, stack, uv_req_write);
+    env->set_no_free(env, stack, obj_uv_req_write, 1);
+  }
   
   return 0;
 }
