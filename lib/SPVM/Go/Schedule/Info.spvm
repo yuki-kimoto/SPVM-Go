@@ -3,6 +3,8 @@
 
 class Go::Schedule::Info {
   
+  allow Go;
+  
   use Go::Channel::Wait;
   
   private enum {
