@@ -1,3 +1,8 @@
+0.037 2026-07-29
+  [Internal Changes]
+    * Refactor libuv code.
+    * Support pipe read/write internally.
+    
 0.036 2026-07-23
   [Internal Changes]
     * Refactor libuv code.
