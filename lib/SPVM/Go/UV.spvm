@@ -7,11 +7,6 @@ class Go::UV {
   use Go::UV::Loop;
   
   # Class Methods
-  static method default_loop : Go::UV::Loop () {
-    
-    return Go::UV::Loop->default_loop;
-  }
-  
   static method strerror : string ($status : int) {
     
     my $uv_strerro = Go::UV::Loop->strerror($status);
