@@ -1,0 +1,28 @@
+class TestCase::Go::Pipe {
+  use Go;
+  use Sys;
+  use Sys::Socket::Constant as SOCKET_C;
+  use Sys::IO::Constant as IO_C;
+  use Sys::OS;
+  
+  static method basic : int () {
+    
+    
+    if (Sys::OS->is_windows) {
+      diag "[Test Skip]Currently pipe is not supported in Windows.";
+    }
+    else {
+      my $read_fh = -1;
+      my $write_fh = -1;
+      
+      Sys->socketpair(\$read_fh, \$write_fh, SOCKET_C->AF_UNIX, SOCKET_C->SOCK_STREAM, 0);
+      
+      Sys->fcntl($read_fh, IO_C->F_SETFL, IO_C->O_NONBLOCK);
+      Sys->fcntl($write_fh, IO_C->F_SETFL, IO_C->O_NONBLOCK);
+      
+    }
+    
+    return 1;
+  }
+  
+}
