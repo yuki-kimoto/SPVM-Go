@@ -4,6 +4,7 @@
 class Go::Schedule::Info {
   
   allow Go;
+  allow Go::Channel;
   
   use Go::Channel::Wait;
   

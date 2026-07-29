@@ -139,7 +139,9 @@ class Go::Channel {
           }
         }
         
-        $schedule->schedule_channel_read($read_wait);
+        my $schedule_type = Go::Schedule::Info->TYPE_CHANNEL_READ;
+        
+        $schedule->schedule($schedule_type, 0, -1, $read_wait);
       }
     }
     

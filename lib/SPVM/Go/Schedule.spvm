@@ -64,13 +64,6 @@ class Go::Schedule {
   }
   
   # Instance Methods
-  private method schedule_channel_read : void ($read_wait : Go::Channel::Wait) {
-    
-    my $schedule_type = &TYPE_CHANNEL_READ;
-    
-    $self->schedule($schedule_type, 0, -1, $read_wait);
-  }
-  
   private method schedule_channel_write : void ($write_wait : Go::Channel::Wait) {
     
     my $schedule_type = &TYPE_CHANNEL_WRITE;
