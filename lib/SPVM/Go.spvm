@@ -114,12 +114,19 @@ class Go {
     
     my $schedule = $GO->{schedule};
     
-    my $schedule_type = Go::Schedule::Info->TYPE_PIPE_READ;
+    my $schedule_info = new Go::Schedule::Info;
+    $schedule_info->{type} = Go::Schedule::Info->TYPE_PIPE_READ;
+    $schedule_info->{fd} = $fd;
+    $schedule_info->{timeout_duration_nsec} = $timeout_duration->{nsec};
+    $schedule_info->{buffer} = $string;
+    $schedule_info->{buffer_length} = $length;
+    $schedule_info->{buffer_offset} = $offset;
     
-    my $read_length_ref = [0];
-    $schedule->schedule($schedule_type, $timeout_duration->{nsec}, $fd, undef, $string, $length, $offset, $read_length_ref);
+    $schedule->schedule_with_info($schedule_info);
     
-    return $read_length_ref->[0];
+    my $read_length = $schedule_info->{ret_length};
+    
+    return $read_length;
   }
   
   static method gosched_pipe_read_sec : int ($fd : int, $string : mutable string, $length : int = -1, $offset : int = 0, $timeout_sec : double = 0) {
