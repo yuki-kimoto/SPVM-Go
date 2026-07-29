@@ -261,7 +261,7 @@ void SPVM__Go__UV__Loop__write_cb(uv_write_t* uv_handle, int status) {
   SPVM_VALUE* stack = uv_data->stack;
   SPVM_OBJ* obj_uv_handle = uv_data->obj_uv_handle;
   SPVM_OBJ* obj_uv_req_write = uv_data->obj_uv_req;
-  SPVM_OBJ* obj_cb = env->get_field_object_by_name(env, stack, obj_uv_handle, "write_cb", &error_id, __func__, FILE_NAME, __LINE__);
+  SPVM_OBJ* obj_cb = env->get_field_object_by_name(env, stack, obj_uv_req_write, "write_cb", &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) {
     spvm_diag("[Unexpected Error]Getting 'write_cb' field failed.");
     abort();
@@ -284,6 +284,18 @@ void SPVM__Go__UV__Loop__write_cb(uv_write_t* uv_handle, int status) {
   }
   
   env->set_field_object_by_name(env, stack, obj_uv_handle, "write_cb", NULL, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) {
+    spvm_diag("[Unexpected Error]Setting 'write_cb' field failed.");
+    abort();
+  }
+  
+  env->set_field_object_by_name(env, stack, obj_uv_req_write, "write_buffer", NULL, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) {
+    spvm_diag("[Unexpected Error]Setting 'write_buffer' field failed.");
+    abort();
+  }
+  
+  env->set_field_object_by_name(env, stack, obj_uv_req_write, "write_cb", NULL, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) {
     spvm_diag("[Unexpected Error]Setting 'write_cb' field failed.");
     abort();
@@ -910,6 +922,12 @@ int32_t SPVM__Go__UV__Loop__handle_write(SPVM_ENV* env, SPVM_VALUE* stack) {
   if (error_id) return error_id;
   
   env->set_field_object_by_name(env, stack, obj_uv_stream, "write_buffer", obj_buffer, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) return error_id;
+  
+  env->set_field_object_by_name(env, stack, obj_uv_req_write, "write_cb", obj_cb, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) return error_id;
+  
+  env->set_field_object_by_name(env, stack, obj_uv_req_write, "write_buffer", obj_buffer, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) return error_id;
   
   uv_stream_t* uv_stream = env->get_pointer(env, stack, obj_uv_stream);

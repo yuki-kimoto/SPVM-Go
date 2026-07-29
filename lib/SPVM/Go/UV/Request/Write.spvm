@@ -4,6 +4,13 @@
 class Go::UV::Request::Write extends Go::UV::Request {
   
   use Go::UV::Loop;
+  use Go::UV::Request::Write;
+  use Go::UV::Callback::Write;
+  
+  # Fields
+  has write_cb : ro Go::UV::Callback::Write;
+  
+  has write_buffer : string;
   
   # Class Mehtods
   static method new : Go::UV::Request::Write () {
