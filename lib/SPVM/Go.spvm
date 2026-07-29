@@ -76,9 +76,12 @@ class Go {
     
     my $schedule = $GO->{schedule};
     
-    my $schedule_type = Go::Schedule::Info->TYPE_IO_READ;
+    my $schedule_info = new Go::Schedule::Info;
+    $schedule_info->{type} = Go::Schedule::Info->TYPE_IO_READ;
+    $schedule_info->{fd} = $fd;
+    $schedule_info->{timeout_duration_nsec} = $timeout_duration->{nsec};
     
-    $schedule->schedule($schedule_type, $timeout_duration->{nsec}, $fd);
+    $schedule->schedule_with_info($schedule_info);
   }
   
   static method gosched_io_read_sec : void ($fd : int, $timeout_sec : double = 0) {
