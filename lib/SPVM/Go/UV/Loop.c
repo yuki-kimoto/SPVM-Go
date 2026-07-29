@@ -848,9 +848,6 @@ int32_t SPVM__Go__UV__Loop__handle_write(SPVM_ENV* env, SPVM_VALUE* stack) {
   env->set_field_object_by_name(env, stack, obj_uv_stream, "write_buffer", obj_buffer, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) return error_id;
   
-  env->set_field_int_by_name(env, stack, obj_uv_stream, "write_buffer_length", buffer_length, &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) return error_id;
-  
   uv_stream_t* uv_stream = env->get_pointer(env, stack, obj_uv_stream);
   
   const char* buffer = env->get_chars(env, stack, obj_buffer);
