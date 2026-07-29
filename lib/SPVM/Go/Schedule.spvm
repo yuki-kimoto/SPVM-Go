@@ -14,6 +14,7 @@ class Go::Schedule {
   use Go::UV;
   use Go::UV::Loop;
   use Go::UV::Constant as UV_CONST;
+  use Go::Schedule::Info;
   
   use Format;
   use List;

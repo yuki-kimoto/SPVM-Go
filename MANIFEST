@@ -40,6 +40,8 @@ lib/SPVM/Go/OS/Signal.pm
 lib/SPVM/Go/OS/Signal.spvm
 lib/SPVM/Go/Schedule.pm
 lib/SPVM/Go/Schedule.spvm
+lib/SPVM/Go/Schedule/Info.pm
+lib/SPVM/Go/Schedule/Info.spvm
 lib/SPVM/Go/Select.pm
 lib/SPVM/Go/Select.spvm
 lib/SPVM/Go/Select/Case.pm

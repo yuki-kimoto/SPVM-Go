@@ -1,0 +1,42 @@
+# Copyright (c) 2026 Yuki Kimoto
+# MIT License
+
+class Go::Schedule::Info {
+  
+  use Go::Channel::Wait;
+  
+  private enum {
+    TYPE_NONE,
+    TYPE_IO_READ,
+    TYPE_IO_WRITE,
+    TYPE_TIMER,
+    TYPE_CHANNEL_READ,
+    TYPE_CHANNEL_WRITE,
+    TYPE_PIPE_READ,
+    TYPE_PIPE_WRITE,
+  }
+  
+  # Fields
+  has type : int;
+  
+  has timeout_duration_nsec : long;
+  
+  has wait : Go::Channel::Wait;
+  
+  has buffer : string;
+  
+  has buffer_length : int;
+  
+  has buffer_offset : int;
+  
+  has ret_length : int;
+  
+  # Class Methods
+  static method new : Go::Schedule::Info () {
+    
+    my $self = new Go::Schedule::Info;
+    
+    return $self;
+  }
+  
+}
