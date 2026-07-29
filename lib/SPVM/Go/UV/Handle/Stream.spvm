@@ -15,6 +15,10 @@ class Go::UV::Handle::Stream extends Go::UV::Handle {
   
   has read_buffer : mutable string;
   
+  has read_buffer_length : int;
+  
+  has read_buffer_offset : int;
+  
   has write_buffer : string;
   
   # Instance Methods

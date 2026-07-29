@@ -742,20 +742,26 @@ void SPVM__Go__UV__Loop__alloc_cb(uv_handle_t* uv_handle, size_t suggested_size,
   SPVM_VALUE* stack = uv_handle_buffer->stack;
   SPVM_OBJ* obj_uv_handle = uv_handle_buffer->object;
   
-  SPVM_OBJ* obj_buffer = env->get_field_object_by_name(env, stack, obj_uv_handle, "buffer", &error_id, __func__, FILE_NAME, __LINE__);
+  SPVM_OBJ* obj_buffer = env->get_field_object_by_name(env, stack, obj_uv_handle, "read_buffer", &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) {
     spvm_diag("[Unexpected Error]%s", env->get_exception_chars(env, stack));
     abort();
   }
   const char* buffer = env->get_chars(env, stack, obj_buffer);
   
-  int32_t buffer_length = env->get_field_int_by_name(env, stack, obj_uv_handle, "buffer_length", &error_id, __func__, FILE_NAME, __LINE__);
+  int32_t buffer_length = env->get_field_int_by_name(env, stack, obj_uv_handle, "read_buffer_length", &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) {
     spvm_diag("[Unexpected Error]%s", env->get_exception_chars(env, stack));
     abort();
   }
   
-  uv_buf->base = (char*)buffer;
+  int32_t buffer_offset = env->get_field_object_by_name(env, stack,obj_uv_handle, "read_buffer_offset", &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) {
+    spvm_diag("[Unexpected Error]%s", env->get_exception_chars(env, stack));
+    abort();
+  }
+  
+  uv_buf->base = (char*)buffer + buffer_offset;
   uv_buf->len = buffer_length;
 }
 
@@ -767,6 +773,7 @@ int32_t SPVM__Go__UV__Loop__handle_read_start(SPVM_ENV* env, SPVM_VALUE* stack) 
   SPVM_OBJ* obj_buffer = stack[1].oval;
   int32_t buffer_length = stack[2].ival;
   SPVM_OBJ* obj_cb = stack[3].oval;
+  int32_t buffer_offset = stack[4].ival;
   
   if (!obj_uv_stream) {
     return env->die(env, stack, "$uv_stream must be defined.", __func__, FILE_NAME, __LINE__);
@@ -781,8 +788,8 @@ int32_t SPVM__Go__UV__Loop__handle_read_start(SPVM_ENV* env, SPVM_VALUE* stack) 
     return env->die(env, stack, "$buffer_length must be a positive number.", __func__, FILE_NAME, __LINE__);
   }
   
-  if (!(buffer_length <= max_buffer_length)) {
-    return env->die(env, stack, "$buffer_length must be less than or equal to the length of $buffer.", __func__, FILE_NAME, __LINE__);
+  if (!(buffer_offset + buffer_length <= max_buffer_length)) {
+    return env->die(env, stack, "$buffer_offset + $buffer_length must be less than or equal to the length of $buffer.", __func__, FILE_NAME, __LINE__);
   }
   
   if (!obj_cb) {
@@ -793,6 +800,12 @@ int32_t SPVM__Go__UV__Loop__handle_read_start(SPVM_ENV* env, SPVM_VALUE* stack) 
   if (error_id) return error_id;
   
   env->set_field_object_by_name(env, stack, obj_uv_stream, "read_buffer", obj_buffer, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) return error_id;
+  
+  env->set_field_object_by_name(env, stack, obj_uv_stream, "read_buffer_length", buffer_length, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) return error_id;
+  
+  env->set_field_object_by_name(env, stack, obj_uv_stream, "read_buffer_offset", buffer_offset, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) return error_id;
   
   uv_stream_t* uv_stream = env->get_pointer(env, stack, obj_uv_stream);
