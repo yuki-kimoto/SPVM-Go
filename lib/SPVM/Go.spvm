@@ -60,7 +60,9 @@ class Go {
     
     my $schedule = $GO->{schedule};
     
-    $schedule->schedule_timer($duration->{nsec});
+    my $schedule_type = Go::Schedule::Info->TYPE_TIMER;
+    
+    $schedule->schedule($schedule_type, $duration->{nsec});
   }
   
   static method sleep_sec : void ($sec : double = 0) {
