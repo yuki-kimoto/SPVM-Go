@@ -217,9 +217,11 @@ class Go::Channel {
             return;
           }
           
-          my $schedule_type = Go::Schedule::Info->TYPE_CHANNEL_WRITE;
+          my $schedule_info = new Go::Schedule::Info;
+          $schedule_info->{type} = Go::Schedule::Info->TYPE_CHANNEL_WRITE;
+          $schedule_info->{wait} = $write_wait;
           
-          $schedule->schedule($schedule_type, 0, -1, $write_wait);
+          $schedule->schedule_with_info($schedule_info);
         }
       }
     }
