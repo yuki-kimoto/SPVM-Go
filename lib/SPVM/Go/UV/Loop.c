@@ -9,7 +9,7 @@ static const char* FILE_NAME = "Go/UV/Loop.c";
 typedef struct {
   SPVM_ENV* env;
   SPVM_VALUE* stack;
-  SPVM_OBJ* uv_handle;
+  SPVM_OBJ* obj_uv_handle;
 } SPVM__Go__UV__Loop__DATA;
 
 int32_t SPVM__Go__UV__Loop__default_loop(SPVM_ENV* env, SPVM_VALUE* stack) {
@@ -63,7 +63,7 @@ static void SPVM__Go__UV__Loop__close_cb(uv_handle_t* uv_handle) {
   
   SPVM_ENV* env = uv_data->env;
   SPVM_VALUE* stack = uv_data->stack;
-  SPVM_OBJ* obj_uv_handle = uv_data->uv_handle;
+  SPVM_OBJ* obj_uv_handle = uv_data->obj_uv_handle;
   SPVM_OBJ* obj_cb = env->get_field_object_by_name(env, stack, obj_uv_handle, "close_cb", &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) {
     spvm_diag("[Unexpected Error]Getting 'close_cb' field failed.");
@@ -103,7 +103,7 @@ static void SPVM__Go__UV__Loop__idle_cb(uv_idle_t* uv_handle) {
   
   SPVM_ENV* env = uv_data->env;
   SPVM_VALUE* stack = uv_data->stack;
-  SPVM_OBJ* obj_uv_handle = uv_data->uv_handle;
+  SPVM_OBJ* obj_uv_handle = uv_data->obj_uv_handle;
   SPVM_OBJ* obj_cb = env->get_field_object_by_name(env, stack, obj_uv_handle, "idle_cb", &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) {
     spvm_diag("[Unexpected Error]Getting 'idle_cb' field failed.");
@@ -128,7 +128,7 @@ static void SPVM__Go__UV__Loop__async_cb(uv_async_t* uv_handle) {
   
   SPVM_ENV* env = uv_data->env;
   SPVM_VALUE* stack = uv_data->stack;
-  SPVM_OBJ* obj_uv_handle = uv_data->uv_handle;
+  SPVM_OBJ* obj_uv_handle = uv_data->obj_uv_handle;
   SPVM_OBJ* obj_cb = env->get_field_object_by_name(env, stack, obj_uv_handle, "async_cb", &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) {
     spvm_diag("[Unexpected Error]Getting 'async_cb' field failed.");
@@ -153,7 +153,7 @@ static void SPVM__Go__UV__Loop__timer_cb(uv_timer_t* uv_handle) {
   
   SPVM_ENV* env = uv_data->env;
   SPVM_VALUE* stack = uv_data->stack;
-  SPVM_OBJ* obj_uv_handle = uv_data->uv_handle;
+  SPVM_OBJ* obj_uv_handle = uv_data->obj_uv_handle;
   SPVM_OBJ* obj_cb = env->get_field_object_by_name(env, stack, obj_uv_handle, "timer_cb", &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) {
     spvm_diag("[Unexpected Error]Getting 'timer_cb' field failed.");
@@ -178,7 +178,7 @@ static void SPVM__Go__UV__Loop__poll_cb(uv_poll_t* uv_handle, int status, int ev
   
   SPVM_ENV* env = uv_data->env;
   SPVM_VALUE* stack = uv_data->stack;
-  SPVM_OBJ* obj_uv_handle = uv_data->uv_handle;
+  SPVM_OBJ* obj_uv_handle = uv_data->obj_uv_handle;
   SPVM_OBJ* obj_cb = env->get_field_object_by_name(env, stack, obj_uv_handle, "poll_cb", &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) {
     spvm_diag("[Unexpected Error]Getting 'poll_cb' field failed.");
@@ -205,7 +205,7 @@ void SPVM__Go__UV__Loop__read_cb(uv_stream_t* uv_handle, ssize_t nread, const uv
   
   SPVM_ENV* env = uv_data->env;
   SPVM_VALUE* stack = uv_data->stack;
-  SPVM_OBJ* obj_uv_handle = uv_data->uv_handle;
+  SPVM_OBJ* obj_uv_handle = uv_data->obj_uv_handle;
   SPVM_OBJ* obj_cb = env->get_field_object_by_name(env, stack, obj_uv_handle, "read_cb", &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) {
     spvm_diag("[Unexpected Error]Getting 'read_cb' field failed.");
@@ -239,7 +239,7 @@ void SPVM__Go__UV__Loop__write_cb(uv_write_t* uv_handle, int status) {
   
   SPVM_ENV* env = uv_data->env;
   SPVM_VALUE* stack = uv_data->stack;
-  SPVM_OBJ* obj_uv_handle = uv_data->uv_handle;
+  SPVM_OBJ* obj_uv_handle = uv_data->obj_uv_handle;
   SPVM_OBJ* obj_cb = env->get_field_object_by_name(env, stack, obj_uv_handle, "write_cb", &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) {
     spvm_diag("[Unexpected Error]Getting 'write_cb' field failed.");
@@ -378,7 +378,7 @@ int32_t SPVM__Go__UV__Loop__new_poll(SPVM_ENV* env, SPVM_VALUE* stack) {
   SPVM_OBJ* obj_uv_poll = env->new_pointer_object_by_name(env, stack, "Go::UV::Handle::Poll", uv_poll, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) return error_id;
   
-  uv_data->uv_handle = obj_uv_poll;
+  uv_data->obj_uv_handle = obj_uv_poll;
   
   stack[0].oval = obj_uv_poll;
   
@@ -575,7 +575,7 @@ int32_t SPVM__Go__UV__Loop__new_idle(SPVM_ENV* env, SPVM_VALUE* stack) {
   SPVM_OBJ* obj_uv_idle = env->new_pointer_object_by_name(env, stack, "Go::UV::Handle::Idle", uv_idle, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) return error_id;
   
-  uv_data->uv_handle = obj_uv_idle;
+  uv_data->obj_uv_handle = obj_uv_idle;
   
   stack[0].oval = obj_uv_idle;
   
@@ -603,7 +603,7 @@ int32_t SPVM__Go__UV__Loop__new_async(SPVM_ENV* env, SPVM_VALUE* stack) {
   SPVM_OBJ* obj_uv_async = env->new_pointer_object_by_name(env, stack, "Go::UV::Handle::Async", uv_async, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) return error_id;
   
-  uv_data->uv_handle = obj_uv_async;
+  uv_data->obj_uv_handle = obj_uv_async;
   
   stack[0].oval = obj_uv_async;
   
@@ -625,7 +625,7 @@ int32_t SPVM__Go__UV__Loop__new_timer(SPVM_ENV* env, SPVM_VALUE* stack) {
   SPVM_OBJ* obj_uv_timer = env->new_pointer_object_by_name(env, stack, "Go::UV::Handle::Timer", uv_timer, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) return error_id;
   
-  uv_data->uv_handle = obj_uv_timer;
+  uv_data->obj_uv_handle = obj_uv_timer;
   
   stack[0].oval = obj_uv_timer;
   
@@ -691,7 +691,7 @@ int32_t SPVM__Go__UV__Loop__new_pipe(SPVM_ENV* env, SPVM_VALUE* stack) {
   SPVM_OBJ* obj_uv_pipe = env->new_pointer_object_by_name(env, stack, "Go::UV::Handle::Pipe", uv_pipe, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) return error_id;
   
-  uv_data->uv_handle = obj_uv_pipe;
+  uv_data->obj_uv_handle = obj_uv_pipe;
   
   stack[0].oval = obj_uv_pipe;
   
@@ -757,7 +757,7 @@ void SPVM__Go__UV__Loop__alloc_cb(uv_handle_t* uv_handle, size_t suggested_size,
   
   SPVM_ENV* env = uv_handle_buffer->env;
   SPVM_VALUE* stack = uv_handle_buffer->stack;
-  SPVM_OBJ* obj_uv_handle = uv_handle_buffer->uv_handle;
+  SPVM_OBJ* obj_uv_handle = uv_handle_buffer->obj_uv_handle;
   
   SPVM_OBJ* obj_buffer = env->get_field_object_by_name(env, stack, obj_uv_handle, "read_buffer", &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) {
@@ -889,7 +889,7 @@ int32_t SPVM__Go__UV__Loop__handle_write(SPVM_ENV* env, SPVM_VALUE* stack) {
   uv_buf.len = buffer_length;
   
   SPVM__Go__UV__Loop__DATA* uv_data = (SPVM__Go__UV__Loop__DATA*)uv_req_write->data;
-  uv_data->uv_handle = obj_uv_stream;
+  uv_data->obj_uv_handle = obj_uv_stream;
   int32_t status = uv_write(uv_req_write, uv_stream, &uv_buf, 1, SPVM__Go__UV__Loop__write_cb);
   
   if (!(status == 0)) {
