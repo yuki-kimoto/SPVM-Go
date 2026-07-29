@@ -53,9 +53,7 @@ class Go {
     
     my $schedule = $GO->{schedule};
     
-    my $schedule_info = new Go::Schedule::Info;
-    
-    $schedule->schedule($schedule_info);
+    $schedule->schedule;
   }
   
   static method sleep : void ($duration : Go::Duration_1l = undef) {
