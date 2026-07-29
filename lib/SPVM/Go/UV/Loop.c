@@ -11,7 +11,14 @@ typedef struct {
   SPVM_VALUE* stack;
   SPVM_OBJ* obj_uv_handle;
   SPVM_OBJ* obj_uv_req;
-} SPVM__Go__UV__Loop__DATA;
+} SPVM__Go__UV__Loop__HANDLE_DATA;
+
+typedef struct {
+  SPVM_ENV* env;
+  SPVM_VALUE* stack;
+  SPVM_OBJ* obj_uv_handle;
+  SPVM_OBJ* obj_uv_req;
+} SPVM__Go__UV__Loop__REQ_DATA;
 
 int32_t SPVM__Go__UV__Loop__default_loop(SPVM_ENV* env, SPVM_VALUE* stack) {
   
@@ -60,7 +67,7 @@ static void SPVM__Go__UV__Loop__close_cb(uv_handle_t* uv_handle) {
   
   int32_t error_id = 0;
   
-  SPVM__Go__UV__Loop__DATA* uv_data = (SPVM__Go__UV__Loop__DATA*)uv_handle->data;
+  SPVM__Go__UV__Loop__HANDLE_DATA* uv_data = (SPVM__Go__UV__Loop__HANDLE_DATA*)uv_handle->data;
   
   SPVM_ENV* env = uv_data->env;
   SPVM_VALUE* stack = uv_data->stack;
@@ -100,7 +107,7 @@ static void SPVM__Go__UV__Loop__idle_cb(uv_idle_t* uv_handle) {
   
   int32_t error_id = 0;
   
-  SPVM__Go__UV__Loop__DATA* uv_data = (SPVM__Go__UV__Loop__DATA*)uv_handle->data;
+  SPVM__Go__UV__Loop__HANDLE_DATA* uv_data = (SPVM__Go__UV__Loop__HANDLE_DATA*)uv_handle->data;
   
   SPVM_ENV* env = uv_data->env;
   SPVM_VALUE* stack = uv_data->stack;
@@ -125,7 +132,7 @@ static void SPVM__Go__UV__Loop__async_cb(uv_async_t* uv_handle) {
   
   int32_t error_id = 0;
   
-  SPVM__Go__UV__Loop__DATA* uv_data = (SPVM__Go__UV__Loop__DATA*)uv_handle->data;
+  SPVM__Go__UV__Loop__HANDLE_DATA* uv_data = (SPVM__Go__UV__Loop__HANDLE_DATA*)uv_handle->data;
   
   SPVM_ENV* env = uv_data->env;
   SPVM_VALUE* stack = uv_data->stack;
@@ -150,7 +157,7 @@ static void SPVM__Go__UV__Loop__timer_cb(uv_timer_t* uv_handle) {
   
   int32_t error_id = 0;
   
-  SPVM__Go__UV__Loop__DATA* uv_data = (SPVM__Go__UV__Loop__DATA*)uv_handle->data;
+  SPVM__Go__UV__Loop__HANDLE_DATA* uv_data = (SPVM__Go__UV__Loop__HANDLE_DATA*)uv_handle->data;
   
   SPVM_ENV* env = uv_data->env;
   SPVM_VALUE* stack = uv_data->stack;
@@ -175,7 +182,7 @@ static void SPVM__Go__UV__Loop__poll_cb(uv_poll_t* uv_handle, int status, int ev
   
   int32_t error_id = 0;
   
-  SPVM__Go__UV__Loop__DATA* uv_data = (SPVM__Go__UV__Loop__DATA*)uv_handle->data;
+  SPVM__Go__UV__Loop__HANDLE_DATA* uv_data = (SPVM__Go__UV__Loop__HANDLE_DATA*)uv_handle->data;
   
   SPVM_ENV* env = uv_data->env;
   SPVM_VALUE* stack = uv_data->stack;
@@ -202,7 +209,7 @@ void SPVM__Go__UV__Loop__read_cb(uv_stream_t* uv_handle, ssize_t nread, const uv
   
   int32_t error_id = 0;
   
-  SPVM__Go__UV__Loop__DATA* uv_data = (SPVM__Go__UV__Loop__DATA*)uv_handle->data;
+  SPVM__Go__UV__Loop__HANDLE_DATA* uv_data = (SPVM__Go__UV__Loop__HANDLE_DATA*)uv_handle->data;
   
   SPVM_ENV* env = uv_data->env;
   SPVM_VALUE* stack = uv_data->stack;
@@ -248,7 +255,7 @@ void SPVM__Go__UV__Loop__write_cb(uv_write_t* uv_handle, int status) {
   
   int32_t error_id = 0;
   
-  SPVM__Go__UV__Loop__DATA* uv_data = (SPVM__Go__UV__Loop__DATA*)uv_handle->data;
+  SPVM__Go__UV__Loop__HANDLE_DATA* uv_data = (SPVM__Go__UV__Loop__HANDLE_DATA*)uv_handle->data;
   
   SPVM_ENV* env = uv_data->env;
   SPVM_VALUE* stack = uv_data->stack;
@@ -395,7 +402,7 @@ int32_t SPVM__Go__UV__Loop__new_poll(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   uv_poll_t* uv_poll = env->new_memory_block(env, stack, sizeof(uv_poll_t));
   
-  SPVM__Go__UV__Loop__DATA* uv_data = env->new_memory_block(env, stack, sizeof(SPVM__Go__UV__Loop__DATA));
+  SPVM__Go__UV__Loop__HANDLE_DATA* uv_data = env->new_memory_block(env, stack, sizeof(SPVM__Go__UV__Loop__HANDLE_DATA));
   uv_data->env = env;
   uv_data->stack = stack;
   
@@ -452,7 +459,7 @@ int32_t SPVM__Go__UV__Loop__handle_idle_start(SPVM_ENV* env, SPVM_VALUE* stack) 
   }
   
   uv_idle_t* uv_idle = env->get_pointer(env, stack, obj_uv_idle);
-  SPVM__Go__UV__Loop__DATA* uv_idle_data = uv_idle->data;
+  SPVM__Go__UV__Loop__HANDLE_DATA* uv_idle_data = uv_idle->data;
   
   env->set_field_object_by_name(env, stack, obj_uv_idle, "idle_cb", obj_cb, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) return error_id;
@@ -560,7 +567,7 @@ int32_t SPVM__Go__UV__Loop__handle_free(SPVM_ENV* env, SPVM_VALUE* stack) {
   if (!no_free) {
     uv_handle_t* uv_handle = env->get_pointer(env, stack, obj_uv_handle);
     
-    SPVM__Go__UV__Loop__DATA* uv_data = (SPVM__Go__UV__Loop__DATA*)uv_handle->data;
+    SPVM__Go__UV__Loop__HANDLE_DATA* uv_data = (SPVM__Go__UV__Loop__HANDLE_DATA*)uv_handle->data;
     
     env->free_memory_block(env, stack, uv_data);
     uv_handle->data = NULL;
@@ -592,7 +599,7 @@ int32_t SPVM__Go__UV__Loop__new_idle(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   uv_idle_t* uv_idle = env->new_memory_block(env, stack, sizeof(uv_idle_t));
   
-  SPVM__Go__UV__Loop__DATA* uv_data = env->new_memory_block(env, stack, sizeof(SPVM__Go__UV__Loop__DATA));
+  SPVM__Go__UV__Loop__HANDLE_DATA* uv_data = env->new_memory_block(env, stack, sizeof(SPVM__Go__UV__Loop__HANDLE_DATA));
   uv_data->env = env;
   uv_data->stack = stack;
   
@@ -620,7 +627,7 @@ int32_t SPVM__Go__UV__Loop__new_async(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   uv_async_t* uv_async = env->new_memory_block(env, stack, sizeof(uv_async_t));
   
-  SPVM__Go__UV__Loop__DATA* uv_data = env->new_memory_block(env, stack, sizeof(SPVM__Go__UV__Loop__DATA));
+  SPVM__Go__UV__Loop__HANDLE_DATA* uv_data = env->new_memory_block(env, stack, sizeof(SPVM__Go__UV__Loop__HANDLE_DATA));
   uv_data->env = env;
   uv_data->stack = stack;
   
@@ -642,7 +649,7 @@ int32_t SPVM__Go__UV__Loop__new_timer(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   uv_timer_t* uv_timer = env->new_memory_block(env, stack, sizeof(uv_timer_t));
   
-  SPVM__Go__UV__Loop__DATA* uv_data = env->new_memory_block(env, stack, sizeof(SPVM__Go__UV__Loop__DATA));
+  SPVM__Go__UV__Loop__HANDLE_DATA* uv_data = env->new_memory_block(env, stack, sizeof(SPVM__Go__UV__Loop__HANDLE_DATA));
   uv_data->env = env;
   uv_data->stack = stack;
   
@@ -664,7 +671,7 @@ int32_t SPVM__Go__UV__Loop__new_write(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   uv_write_t* uv_req_write = env->new_memory_block(env, stack, sizeof(uv_write_t));
   
-  SPVM__Go__UV__Loop__DATA* uv_data = env->new_memory_block(env, stack, sizeof(SPVM__Go__UV__Loop__DATA));
+  SPVM__Go__UV__Loop__REQ_DATA* uv_data = env->new_memory_block(env, stack, sizeof(SPVM__Go__UV__Loop__HANDLE_DATA));
   uv_data->env = env;
   uv_data->stack = stack;
   uv_req_write->data = uv_data;
@@ -692,7 +699,7 @@ int32_t SPVM__Go__UV__Loop__destroy_write(SPVM_ENV* env, SPVM_VALUE* stack) {
   if (!no_free) {
     uv_write_t* uv_req_write = env->get_pointer(env, stack, obj_uv_req_write);
     
-    SPVM__Go__UV__Loop__DATA* uv_data = (SPVM__Go__UV__Loop__DATA*)uv_req_write->data;
+    SPVM__Go__UV__Loop__REQ_DATA* uv_data = (SPVM__Go__UV__Loop__HANDLE_DATA*)uv_req_write->data;
     
     env->free_memory_block(env, stack, uv_data);
     uv_req_write->data = NULL;
@@ -709,7 +716,7 @@ int32_t SPVM__Go__UV__Loop__new_pipe(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   uv_pipe_t* uv_pipe = env->new_memory_block(env, stack, sizeof(uv_pipe_t));
   
-  SPVM__Go__UV__Loop__DATA* uv_data = env->new_memory_block(env, stack, sizeof(SPVM__Go__UV__Loop__DATA));
+  SPVM__Go__UV__Loop__HANDLE_DATA* uv_data = env->new_memory_block(env, stack, sizeof(SPVM__Go__UV__Loop__HANDLE_DATA));
   uv_data->env = env;
   uv_data->stack = stack;
   
@@ -780,7 +787,7 @@ void SPVM__Go__UV__Loop__alloc_cb(uv_handle_t* uv_handle, size_t suggested_size,
   
   int32_t error_id = 0;
   
-  SPVM__Go__UV__Loop__DATA* uv_handle_buffer = (SPVM__Go__UV__Loop__DATA*)uv_handle->data;
+  SPVM__Go__UV__Loop__HANDLE_DATA* uv_handle_buffer = (SPVM__Go__UV__Loop__HANDLE_DATA*)uv_handle->data;
   
   SPVM_ENV* env = uv_handle_buffer->env;
   SPVM_VALUE* stack = uv_handle_buffer->stack;
@@ -915,7 +922,7 @@ int32_t SPVM__Go__UV__Loop__handle_write(SPVM_ENV* env, SPVM_VALUE* stack) {
   uv_buf.base = (char*)buffer + buffer_offset;
   uv_buf.len = buffer_length;
   
-  SPVM__Go__UV__Loop__DATA* uv_data = (SPVM__Go__UV__Loop__DATA*)uv_req_write->data;
+  SPVM__Go__UV__Loop__HANDLE_DATA* uv_data = (SPVM__Go__UV__Loop__HANDLE_DATA*)uv_req_write->data;
   
   uv_data->obj_uv_handle = obj_uv_stream;
   
