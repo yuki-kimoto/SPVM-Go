@@ -53,6 +53,22 @@ class Go::Schedule {
   }
   
   # Instance Methods
+  private method schedule_with_info : int ($schedule_info : Go::Schedule::Info) {
+    
+    my $schedule_type = $schedule_info->{type};
+    my $timeout_duration_nsec = $schedule_info->{timeout_duration_nsec};
+    my $fd = $schedule_info->{fd};
+    my $wait = $schedule_info->{wait};
+    my $buffer = $schedule_info->{buffer};
+    my $buffer_length = exists $schedule_info->{buffer_length} ? $schedule_info->{buffer_length} : -1;
+    my $buffer_offset = $schedule_info->{buffer_offset};
+    my $ret_length = $schedule_info->{ret_length};
+    
+    my $ret_length_ref : int[] = [0];
+    $self->schedule($schedule_type, $timeout_duration_nsec, $fd, $wait, $buffer, $buffer_length, $buffer_offset, $ret_length_ref);
+    $schedule_info->{ret_length} = $ret_length_ref->[0];
+  }
+  
   private method schedule : int ($schedule_type : int = 0, $timeout_duration_nsec : long = 0, $fd : int = -1, $wait : Go::Channel::Wait = undef, $buffer : string = undef, $buffer_length : int = -1, $buffer_offset : int = 0, $ret_length_ref : int[] = undef) {
     
     my $called_from_main_thread = Thread::ID->eq(Thread::ThisThread->get_id, $self->{thread_id});

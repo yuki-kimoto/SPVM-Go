@@ -23,6 +23,8 @@ class Go::Schedule::Info {
   # Fields
   has type : int;
   
+  has fd : int;
+  
   has timeout_duration_nsec : long;
   
   has wait : Go::Channel::Wait;
