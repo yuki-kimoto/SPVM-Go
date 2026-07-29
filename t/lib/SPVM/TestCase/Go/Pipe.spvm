@@ -20,14 +20,19 @@ class TestCase::Go::Pipe {
         Sys->fcntl($read_fh, IO_C->F_SETFL, IO_C->O_NONBLOCK);
         Sys->fcntl($write_fh, IO_C->F_SETFL, IO_C->O_NONBLOCK);
         
-        Go->go([$write_fh : int]method : void () {
+        my $write_length_ref = [-1];
+        Go->go([$write_fh : int, $write_length_ref : int[]] method : void () {
           my $write_buffer = "abc";
-          Go->gosched_pipe_write($write_fh, $write_buffer, length $write_buffer);
+          $write_length_ref->[0] = Go->gosched_pipe_write($write_fh, $write_buffer, length $write_buffer);
         });
         Go->gosched;
         
         my $read_buffer = new_string_len 3;
         my $read_length = Go->gosched_pipe_read($read_fh, $read_buffer, length $read_buffer);
+        
+        unless ($write_length_ref->[0] == 3) {
+          return 0;
+        }
         
         unless ($read_buffer eq "abc") {
           return 0;
