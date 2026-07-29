@@ -5,6 +5,7 @@ class Go::Schedule::Info {
   
   allow Go;
   allow Go::Channel;
+  allow Go::Schedule;
   
   use Go::Channel::Wait;
   

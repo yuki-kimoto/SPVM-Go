@@ -22,17 +22,6 @@ class Go::Schedule {
   use Thread::ID;
   use Thread::ThisThread;
   
-  private enum {
-    TYPE_NONE,
-    TYPE_IO_READ,
-    TYPE_IO_WRITE,
-    TYPE_TIMER,
-    TYPE_CHANNEL_READ,
-    TYPE_CHANNEL_WRITE,
-    TYPE_PIPE_READ,
-    TYPE_PIPE_WRITE,
-  }
-  
   has goroutines : List of Go::Goroutine;
   
   has current_goroutine : Go::Goroutine;
@@ -75,7 +64,7 @@ class Go::Schedule {
     my $current_goroutine = $self->{current_goroutine};
     
     if ($current_goroutine) {
-      unless ($schedule_type == &TYPE_NONE) {
+      unless ($schedule_type == Go::Schedule::Info->TYPE_NONE) {
         $self->disable_goroutine($current_goroutine, $schedule_type, $timeout_duration_nsec, $fd, $wait, $buffer, $buffer_length, $buffer_offset, $ret_length_ref);
       }
       
@@ -95,7 +84,7 @@ class Go::Schedule {
       }
     }
     else {
-      unless ($schedule_type == &TYPE_NONE) {
+      unless ($schedule_type == Go::Schedule::Info->TYPE_NONE) {
         $self->add_task([$self : Go::Schedule, $schedule_type : int, $timeout_duration_nsec : long, $fd : int] method : void () {
           $self->schedule($schedule_type, $timeout_duration_nsec, $fd);
         });
@@ -146,7 +135,7 @@ class Go::Schedule {
       $schedule->awake($goroutine, $uv_handle);
     };
     
-    if ($schedule_type == &TYPE_IO_READ ||$schedule_type == &TYPE_IO_WRITE) {
+    if ($schedule_type == Go::Schedule::Info->TYPE_IO_READ ||$schedule_type == Go::Schedule::Info->TYPE_IO_WRITE) {
       unless ($fd >= 0) {
         die "The file descriptor \$fd in schedule type TYPE_IO_READ or TYPE_IO_WRITE must be a non-negative value.";
       }
@@ -156,7 +145,7 @@ class Go::Schedule {
         $deadline = Go::Time->now->add(Go::Duration_1l->new($timeout_duration_nsec));
       }
       my $timeout_msec = $timeout_duration_nsec / 1000000;
-      my $events = $schedule_type == &TYPE_IO_READ ? UV_CONST->UV_READABLE : UV_CONST->UV_WRITABLE;
+      my $events = $schedule_type == Go::Schedule::Info->TYPE_IO_READ ? UV_CONST->UV_READABLE : UV_CONST->UV_WRITABLE;
       
       my $uv_loop = $self->{uv_loop};
       
@@ -188,7 +177,7 @@ class Go::Schedule {
         Fn->say_stderr(Format->sprintf("[Go Debug]Register goroutine wait for IO (Callback:%p, QueueNum:%d.)", [(object)$goroutine->{task}, $self->{goroutines}->length]));
       }
     }
-    elsif ($schedule_type == &TYPE_PIPE_READ ||$schedule_type == &TYPE_PIPE_WRITE) {
+    elsif ($schedule_type == Go::Schedule::Info->TYPE_PIPE_READ ||$schedule_type == Go::Schedule::Info->TYPE_PIPE_WRITE) {
       
       unless ($goroutine->{uv_write}) {
         $goroutine->{uv_write} = Go::UV::Request::Write->new;
@@ -212,7 +201,7 @@ class Go::Schedule {
       $uv_pipe->open($fd);
       $goroutine->{uv_handle} = $uv_pipe;
       
-      if ($schedule_type == &TYPE_PIPE_READ) {
+      if ($schedule_type == Go::Schedule::Info->TYPE_PIPE_READ) {
         my $read_cb = [$goroutine : Go::Goroutine, $schedule : Go::Schedule = $self, $ret_length_ref : int[]] method : void ($uv_stream : Go::UV::Handle::Stream, $nread : int, $buffer : string) {
           if ($nread < 0) {
             $goroutine->{io_error_occurred} = 1;
@@ -253,7 +242,7 @@ class Go::Schedule {
         Fn->say_stderr(Format->sprintf("[Go Debug]Register goroutine wait for pipe (Callback:%p, QueueNum:%d.)", [(object)$goroutine->{task}, $self->{goroutines}->length]));
       }
     }
-    elsif ($schedule_type == &TYPE_TIMER) {
+    elsif ($schedule_type == Go::Schedule::Info->TYPE_TIMER) {
       my $deadline = (Go::Time)undef;
       if ($timeout_duration_nsec > 0) {
         $deadline = Go::Time->now->add(Go::Duration_1l->new($timeout_duration_nsec));
@@ -277,7 +266,7 @@ class Go::Schedule {
         Fn->say_stderr(Format->sprintf("[Go Debug]Register goroutine wait for timer (Callback:%p, QueueNum:%d.)", [(object)$goroutine->{task}, $self->{goroutines}->length]));
       }
     }
-    elsif ($schedule_type == &TYPE_CHANNEL_READ ||$schedule_type == &TYPE_CHANNEL_WRITE) {
+    elsif ($schedule_type == Go::Schedule::Info->TYPE_CHANNEL_READ ||$schedule_type == Go::Schedule::Info->TYPE_CHANNEL_WRITE) {
       my $uv_loop = $self->{uv_loop};
       my $uv_async = Go::UV::Handle::Async->new;
       $goroutine->{uv_handle} = $uv_async;
