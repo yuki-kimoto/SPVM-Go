@@ -8,64 +8,60 @@ package SPVM::Go::UV::Handle::Stream;
 
 =head1 Name
 
-SPVM::Go::UV::Handle::Stream - Short Description
+SPVM::Go::UV::Handle::Stream - Stream Handle for libuv
 
 =head1 Description
 
-Go::UV::Handle::Stream class in L<SPVM> has methods to do someting.
+C<Go::UV::Handle::Stream> in L<SPVM> represents the stream handle for L<libuv|https://libuv.org/>, corresponding to the C<uv_stream_t> structure.
+
+=head1 Super Class
+
+L<Go::UV::Handle|SPVM::Go::UV::Handle>
 
 =head1 Usage
 
   use Go::UV::Handle::Stream;
 
-=head1 Details
-
-
-
-=head1 Super Class
-
-
-
-=head1 Interfaces
-
-
-
-=head1 Enumerations
-
-
-
 =head1 Fields
 
+=head2 read_cb
 
+C<has read_cb : rw L<Go::UV::Callback::Read|SPVM::Go::UV::Callback::Read>;>
 
-=head1 Class Methods
+The callback called when data has been read from the stream.
 
+=head2 read_buffer
 
+C<has read_buffer : rw mutable string;>
+
+The buffer associated with the read operation.
+
+=head2 read_buffer_length
+
+C<has read_buffer_length : rw int;>
+
+The length of the read buffer.
+
+=head2 read_buffer_offset
+
+C<has read_buffer_offset : rw int;>
+
+The offset of the read buffer.
 
 =head1 Instance Methods
 
+=head2 read_start
 
+C<method read_start : void ($buffer : mutable string, $buffer_length : int, $cb : L<Go::UV::Callback::Read|SPVM::Go::UV::Callback::Read>, $buffer_offset : int = 0);>
 
-=head1 Well Known Child Classes
+Starts reading data into C<$buffer> with length C<$buffer_length> and offset C<$buffer_offset> from the stream. 
 
+The callback C<$cb> is stored in L</"read_cb"> field. The buffer C<$buffer> is stored in L</"read_buffer"> field. The length C<$buffer_length> is stored in L</"read_buffer_length"> field. The offset C<$buffer_offset> is stored in L</"read_buffer_offset"> field.
 
-
-=head1 See Also
-
-
-
-
-=head1 Repository
-
-
-
-=head1 Author
-
-Yuki Kimoto C<kimoto.yuki@gmail.com>
+The callback C<$cb> is invoked when data has been read from the stream.
 
 =head1 Copyright & License
 
 Copyright (c) 2026 Yuki Kimoto
 
 MIT License
-
