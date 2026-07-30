@@ -12,13 +12,17 @@ SPVM::Go::UV::Request::Write - Write Request for libuv
 
 =head1 Description
 
-C<Go::UV::Request::Write> in L<SPVM> represents the write request for L<libuv|https://libuv.org/>, corresponding to the C<uv_write_t> structure. It inherits from L<Go::UV::Request|SPVM::Go::UV::Request>.
+C<Go::UV::Request::Write> in L<SPVM> represents the write request for L<libuv|https://libuv.org/>, corresponding to the C<uv_write_t> structure. 
 
 =head1 Usage
 
   use Go::UV::Request::Write;
   
   my $req_write = Go::UV::Request::Write->new;
+
+=head1 Super Class
+
+L<Go::UV::Request|SPVM::Go::UV::Request>.
 
 =head1 Fields
 

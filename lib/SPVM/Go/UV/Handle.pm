@@ -8,64 +8,48 @@ package SPVM::Go::UV::Handle;
 
 =head1 Name
 
-SPVM::Go::UV::Handle - Short Description
+SPVM::Go::UV::Handle - Base Handle for libuv
 
 =head1 Description
 
-Go::UV::Handle class in L<SPVM> has methods to do someting.
+C<Go::UV::Handle> in L<SPVM> represents the base handle for L<libuv|https://libuv.org/>, corresponding to the C<uv_handle_t> structure.
 
 =head1 Usage
 
   use Go::UV::Handle;
 
-=head1 Details
-
-
-
-=head1 Super Class
-
-
-
-=head1 Interfaces
-
-
-
-=head1 Enumerations
-
-
-
 =head1 Fields
 
+=head2 close_cb
 
+C<has close_cb : rw L<Go::UV::Callback::Close|SPVM::Go::UV::Callback::Close>;>
 
-=head1 Class Methods
+The callback called when the handle has been closed.
 
+=head2 loop
 
+C<has loop : ro L<Go::UV::Loop|SPVM::Go::UV::Loop>;>
+
+The event loop associated with the handle.
 
 =head1 Instance Methods
 
+=head2 close
 
+C<method close : void ($close_cb : L<Go::UV::Callback::Close|SPVM::Go::UV::Callback::Close> = undef);>
 
-=head1 Well Known Child Classes
+Request the handle to be closed. The callback $close_cb is invoked when the handle has been closed. 
 
+The callback $close_cb is stored in L</"close_cb"> field.
 
+=head2 get_type
 
-=head1 See Also
+C<method get_type : int ();>
 
-
-
-
-=head1 Repository
-
-
-
-=head1 Author
-
-Yuki Kimoto C<kimoto.yuki@gmail.com>
+Returns the handle type.
 
 =head1 Copyright & License
 
 Copyright (c) 2026 Yuki Kimoto
 
 MIT License
-
