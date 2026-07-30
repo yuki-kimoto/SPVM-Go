@@ -39,7 +39,9 @@ C<static method new : L<Go::UV::Loop|SPVM::Go::UV::Loop> ();>
 
 Creates a new L<libuv loop|https://docs.libuv.org/en/v1.x/loop.html#c.uv_loop_init>.
 
-=head1 Instance Methods
+Exceptions:
+
+If C<uv_loop_init> fails, an exception is thrown.=head1 Instance Methods
 
 =head2 run
 
@@ -55,11 +57,21 @@ C<method idle_init : void ($uv_idle : L<Go::UV::Handle::Idle|SPVM::Go::UV::Handl
 
 Initializes an idle handle $uv_idle associated with the event loop. See L<uv_idle_init|https://docs.libuv.org/en/v1.x/idle.html#c.uv_idle_init>.
 
+Exceptions:
+
+$uv_idle must be defined. Otherwise an exception is thrown.
+
 =head2 timer_init
 
 C<method timer_init : void ($uv_timer : L<Go::UV::Handle::Timer|SPVM::Go::UV::Handle::Timer>);>
 
 Initializes a timer handle $uv_timer associated with the event loop. See L<uv_timer_init|https://docs.libuv.org/en/v1.x/timer.html#c.uv_timer_init>.
+
+Exceptions:
+
+$uv_timer must be defined. Otherwise an exception is thrown.
+
+If C<uv_timer_init> fails, an exception is thrown.
 
 =head2 poll_init
 
@@ -67,11 +79,31 @@ C<method poll_init : void ($uv_poll : L<Go::UV::Handle::Poll|SPVM::Go::UV::Handl
 
 Initializes a poll handle $uv_poll for the given file descriptor $fd associated with the event loop. See L<uv_poll_init|https://docs.libuv.org/en/v1.x/poll.html#c.uv_poll_init>.
 
+Exceptions:
+
+$uv_poll must be defined. Otherwise an exception is thrown.
+
+If C<uv_poll_init> fails, an exception is thrown.
+
+Exceptions:
+
+$uv_async must be defined. Otherwise an exception is thrown.
+
+$cb must be defined. Otherwise an exception is thrown.
+
+If C<uv_async_init> fails, an exception is thrown.
+
 =head2 async_init
 
 C<method async_init : void ($uv_async : L<Go::UV::Handle::Async|SPVM::Go::UV::Handle::Async>, $cb : L<Go::UV::Callback::Async|SPVM::Go::UV::Callback::Async>);>
 
 Initializes an async handle $uv_async associated with the event loop with a callback $cb. L<Go::UV::Handle::Async#async_cb|SPVM::Go::UV::Handle::Async/"async_cb"> field is set to $cb. See L<uv_async_init|https://docs.libuv.org/en/v1.x/async.html#c.uv_async_init>.
+
+Exceptions:
+
+$uv_pipe must be defined. Otherwise an exception is thrown.
+
+If C<uv_pipe_init> fails, an exception is thrown.
 
 =head2 pipe_init
 
@@ -84,3 +116,7 @@ Initializes a pipe handle $uv_pipe associated with the event loop with $ipc. See
 C<method DESTROY : void ();>
 
 Destroys the event loop and releases its resources. See L<uv_loop_close|https://docs.libuv.org/en/v1.x/loop.html#c.uv_loop_close>.
+
+Exceptions:
+
+If C<uv_loop_close> fails, an exception is thrown.
