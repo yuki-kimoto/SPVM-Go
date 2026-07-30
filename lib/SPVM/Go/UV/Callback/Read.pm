@@ -8,64 +8,28 @@ package SPVM::Go::UV::Callback::Read;
 
 =head1 Name
 
-SPVM::Go::UV::Callback::Read - Short Description
+SPVM::Go::UV::Callback::Read - Callback for Read Operation
 
 =head1 Description
 
-Go::UV::Callback::Read class in L<SPVM> has methods to do someting.
+C<Go::UV::Callback::Read> in L<SPVM> is the interface for the callback passed to L<uv_read_start|https://docs.libuv.org/en/v1.x/stream.html#c.uv_read_start>.
 
 =head1 Usage
 
   use Go::UV::Callback::Read;
 
-=head1 Details
+=head1 Interface Methods
 
+=head2 Anonymous method
 
+C<required method : void ($uv_stream : L<Go::UV::Handle::Stream|SPVM::Go::UV::Handle::Stream>, $nread : int, $buffer : string);>
 
-=head1 Super Class
+The callback method called when data has been received from the stream.
 
-
-
-=head1 Interfaces
-
-
-
-=head1 Enumerations
-
-
-
-=head1 Fields
-
-
-
-=head1 Class Methods
-
-
-
-=head1 Instance Methods
-
-
-
-=head1 Well Known Child Classes
-
-
-
-=head1 See Also
-
-
-
-
-=head1 Repository
-
-
-
-=head1 Author
-
-Yuki Kimoto C<kimoto.yuki@gmail.com>
+See L<Go::UV::Handle::Stream#read_start|SPVM::Go::UV::Handle::Stream/"read_start"> method for usage.
 
 =head1 Copyright & License
 
 Copyright (c) 2026 Yuki Kimoto
 
 MIT License
-
