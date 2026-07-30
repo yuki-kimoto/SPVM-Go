@@ -52,6 +52,8 @@ The callback C<$cb> is stored in L</"poll_cb"> field.
 
 The callback C<$cb> is invoked when the specified events occur.
 
+This method calls the L<uv_poll_start|https://docs.libuv.org/en/v1.x/poll.html#c.uv_poll_start> function.
+
 =head1 Copyright & License
 
 Copyright (c) 2026 Yuki Kimoto

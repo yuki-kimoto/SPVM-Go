@@ -40,6 +40,8 @@ C<method open : void ($fd : int);>
 
 Associates an existing file descriptor C<$fd> with the pipe handle.
 
+This method calls the L<uv_pipe_open|https://docs.libuv.org/en/v1.x/pipe.html#c.uv_pipe_open> function.
+
 =head1 Copyright & License
 
 Copyright (c) 2026 Yuki Kimoto

@@ -52,6 +52,8 @@ The callback C<$cb> is stored in L</"timer_cb"> field.
 
 The callback C<$cb> is invoked when the timer timeout expires.
 
+This method calls the L<uv_timer_start|https://docs.libuv.org/en/v1.x/timer.html#c.uv_timer_start> function internally.
+
 =head1 Copyright & License
 
 Copyright (c) 2026 Yuki Kimoto

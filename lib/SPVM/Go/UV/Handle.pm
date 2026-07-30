@@ -42,11 +42,15 @@ Request the handle to be closed. The callback $close_cb is invoked when the hand
 
 The callback $close_cb is stored in L</"close_cb"> field.
 
+This method calls the L<uv_close|https://docs.libuv.org/en/v1.x/handle.html#c.uv_close> function.
+
 =head2 get_type
 
 C<method get_type : int ();>
 
 Returns the handle type.
+
+This method calls the L<uv_handle_get_type|https://docs.libuv.org/en/v1.x/handle.html#c.uv_handle_get_type> function.
 
 =head1 Copyright & License
 

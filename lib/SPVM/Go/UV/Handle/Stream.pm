@@ -60,6 +60,8 @@ The callback C<$cb> is stored in L</"read_cb"> field. The buffer C<$buffer> is s
 
 The callback C<$cb> is invoked when data has been read from the stream.
 
+This method calls the L<uv_read_start|https://docs.libuv.org/en/v1.x/stream.html#c.uv_read_start> function internally.
+
 =head1 Copyright & License
 
 Copyright (c) 2026 Yuki Kimoto
