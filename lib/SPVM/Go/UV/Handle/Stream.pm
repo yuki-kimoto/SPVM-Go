@@ -62,6 +62,18 @@ The callback C<$cb> is invoked when data has been read from the stream.
 
 This method calls the L<uv_read_start|https://docs.libuv.org/en/v1.x/stream.html#c.uv_read_start> function internally.
 
+Exceptions:
+
+If $buffer is not defined, an exception is thrown.
+
+If $buffer_length is not a positive number, an exception is thrown.
+
+If $buffer_offset + $buffer_length is greater than the length of C<$buffer>, an exception is thrown.
+
+If $cb is not defined, an exception is thrown.
+
+If uv_read_start> fails, an exception is thrown.
+
 =head1 Copyright & License
 
 Copyright (c) 2026 Yuki Kimoto

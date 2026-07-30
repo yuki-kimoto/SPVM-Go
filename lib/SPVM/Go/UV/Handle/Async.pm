@@ -50,6 +50,10 @@ Awakens the async handle.
 
 This method calls the L<uv_async_send|https://docs.libuv.org/en/v1.x/async.html#c.uv_async_send> function.
 
+Exceptions:
+
+If uv_async_send fails, an exception is thrown.
+
 =head1 Copyright & License
 
 Copyright (c) 2026 Yuki Kimoto

@@ -54,6 +54,12 @@ The callback C<$cb> is invoked when the specified events occur.
 
 This method calls the L<uv_poll_start|https://docs.libuv.org/en/v1.x/poll.html#c.uv_poll_start> function.
 
+Exceptions:
+
+If $cb is not defined, an exception is thrown.
+
+If uv_poll_start fails, an exception is thrown.
+
 =head1 Copyright & License
 
 Copyright (c) 2026 Yuki Kimoto

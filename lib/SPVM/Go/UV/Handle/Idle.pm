@@ -54,6 +54,12 @@ The callback C<$cb> is invoked when the idle handle is active.
 
 This method calls the L<uv_idle_start|https://docs.libuv.org/en/v1.x/idle.html#c.uv_idle_start> function.
 
+Exceptions:
+
+If $cb is not defined, an exception is thrown.
+
+If uv_idle_start fails, an exception is thrown.
+
 =head1 Copyright & License
 
 Copyright (c) 2026 Yuki Kimoto

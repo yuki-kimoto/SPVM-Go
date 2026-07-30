@@ -58,6 +58,20 @@ The callback $cb is stored in L</"write_cb"> field. The buffer $buffer is stored
 
 The callback $cb is invoked when the write operation completes.
 
+Exceptions:
+
+If $uv_stream is not defined, an exception is thrown.
+
+If $buffer is not defined, an exception is thrown.
+
+If $buffer_length is not a positive number, an exception is thrown.
+
+If $buffer_offset + $buffer_length is greater than the length of $buffer, an exception is thrown.
+
+If $cb is not defined, an exception is thrown.
+
+If uv_write fails, an exception is thrown.
+
 =head1 Copyright & License
 
 Copyright (c) 2026 Yuki Kimoto

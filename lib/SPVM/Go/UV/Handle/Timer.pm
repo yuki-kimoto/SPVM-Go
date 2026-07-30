@@ -54,6 +54,12 @@ The callback C<$cb> is invoked when the timer timeout expires.
 
 This method calls the L<uv_timer_start|https://docs.libuv.org/en/v1.x/timer.html#c.uv_timer_start> function internally.
 
+Exceptions:
+
+If $cb is not defined, an exception is thrown.
+
+If uv_timer_start fails, an exception is thrown.
+
 =head1 Copyright & License
 
 Copyright (c) 2026 Yuki Kimoto
