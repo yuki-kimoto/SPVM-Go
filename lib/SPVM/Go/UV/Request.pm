@@ -8,64 +8,26 @@ package SPVM::Go::UV::Request;
 
 =head1 Name
 
-SPVM::Go::UV::Request - Short Description
+SPVM::Go::UV::Request - Base Request for libuv
 
 =head1 Description
 
-Go::UV::Request class in L<SPVM> has methods to do someting.
+C<Go::UV::Request> in L<SPVM> represents the base request for L<libuv|https://libuv.org/>, corresponding to the C<uv_req_t> structure.
 
 =head1 Usage
 
   use Go::UV::Request;
 
-=head1 Details
-
-
-
-=head1 Super Class
-
-
-
-=head1 Interfaces
-
-
-
-=head1 Enumerations
-
-
-
-=head1 Fields
-
-
-
-=head1 Class Methods
-
-
-
-=head1 Instance Methods
-
-
-
 =head1 Well Known Child Classes
 
+=over 2
 
+=item * L<Go::UV::Request::Write|SPVM::Go::UV::Request::Write>
 
-=head1 See Also
-
-
-
-
-=head1 Repository
-
-
-
-=head1 Author
-
-Yuki Kimoto C<kimoto.yuki@gmail.com>
+=back
 
 =head1 Copyright & License
 
 Copyright (c) 2026 Yuki Kimoto
 
 MIT License
-
