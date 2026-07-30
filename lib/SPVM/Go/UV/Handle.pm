@@ -52,6 +52,24 @@ Returns the handle type.
 
 This method calls the L<uv_handle_get_type|https://docs.libuv.org/en/v1.x/handle.html#c.uv_handle_get_type> function.
 
+=head1 Well Known Child Classes
+
+=over 2
+
+=item * L<Go::UV::Handle::Async|SPVM::Go::UV::Handle::Async>
+
+=item * L<Go::UV::Handle::Idle|SPVM::Go::UV::Handle::Idle>
+
+=item * L<Go::UV::Handle::Pipe|SPVM::Go::UV::Handle::Pipe>
+
+=item * L<Go::UV::Handle::Poll|SPVM::Go::UV::Handle::Poll>
+
+=item * L<Go::UV::Handle::Stream|SPVM::Go::UV::Handle::Stream>
+
+=item * L<Go::UV::Handle::Timer|SPVM::Go::UV::Handle::Timer>
+
+=back
+
 =head1 Copyright & License
 
 Copyright (c) 2026 Yuki Kimoto
