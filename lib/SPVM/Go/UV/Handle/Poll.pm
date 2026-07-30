@@ -8,64 +8,52 @@ package SPVM::Go::UV::Handle::Poll;
 
 =head1 Name
 
-SPVM::Go::UV::Handle::Poll - Short Description
+SPVM::Go::UV::Handle::Poll - Poll Handle for libuv
 
 =head1 Description
 
-Go::UV::Handle::Poll class in L<SPVM> has methods to do someting.
+C<Go::UV::Handle::Poll> in L<SPVM> represents the poll handle for L<libuv|https://libuv.org/>, corresponding to the C<uv_poll_t> structure.
+
+=head1 Super Class
+
+L<Go::UV::Handle|SPVM::Go::UV::Handle>
 
 =head1 Usage
 
   use Go::UV::Handle::Poll;
-
-=head1 Details
-
-
-
-=head1 Super Class
-
-
-
-=head1 Interfaces
-
-
-
-=head1 Enumerations
-
-
+  
+  my $poll = Go::UV::Handle::Poll->new;
 
 =head1 Fields
 
+=head2 poll_cb
 
+C<has poll_cb : rw L<Go::UV::Callback::Poll|SPVM::Go::UV::Callback::Poll>;>
+
+The callback called when file descriptor events occur.
 
 =head1 Class Methods
 
+=head2 new
 
+C<static method new : L<Go::UV::Handle::Poll|SPVM::Go::UV::Handle::Poll> ();>
+
+Creates a new L<Go::UV::Handle::Poll|SPVM::Go::UV::Handle::Poll> object, and returns it.
 
 =head1 Instance Methods
 
+=head2 start
 
+C<method start : void ($cb : L<Go::UV::Callback::Poll|SPVM::Go::UV::Callback::Poll>, $events : int);>
 
-=head1 Well Known Child Classes
+Starts polling the file descriptor for events specified by C<$events> with the callback C<$cb>. 
 
+The callback C<$cb> is stored in L</"poll_cb"> field.
 
-
-=head1 See Also
-
-
-
-
-=head1 Repository
-
-
-
-=head1 Author
-
-Yuki Kimoto C<kimoto.yuki@gmail.com>
+The callback C<$cb> is invoked when the specified events occur.
 
 =head1 Copyright & License
 
 Copyright (c) 2026 Yuki Kimoto
 
 MIT License
-
