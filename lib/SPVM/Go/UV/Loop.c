@@ -331,6 +331,8 @@ int32_t SPVM__Go__UV__Loop__run(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t status = uv_run(uv_loop, uv_run_mode);
   
+  stack[0].ival = status;
+  
   return 0;
 }
 

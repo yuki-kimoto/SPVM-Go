@@ -58,6 +58,8 @@ Socket IO:
 
 =head1 Class Methods
 
+=head2 strerror
+
 C<static method strerror : string ($status : int);>
 
 Gets human-readable description for an error code by calling L<uv_strerror_r|https://docs.libuv.org/en/v1.x/errors.html#c.uv_strerror_r>, and returns it as a string.

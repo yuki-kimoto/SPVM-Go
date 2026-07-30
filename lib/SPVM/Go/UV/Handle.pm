@@ -1,4 +1,4 @@
-package SPVM::Go::UV::Event;
+package SPVM::Go::UV::Handle;
 
 
 
@@ -8,15 +8,15 @@ package SPVM::Go::UV::Event;
 
 =head1 Name
 
-SPVM::Go::UV::Event - Short Description
+SPVM::Go::UV::Handle - Short Description
 
 =head1 Description
 
-Go::UV::Event class in L<SPVM> has methods to do someting.
+Go::UV::Handle class in L<SPVM> has methods to do someting.
 
 =head1 Usage
 
-  use Go::UV::Event;
+  use Go::UV::Handle;
 
 =head1 Details
 
