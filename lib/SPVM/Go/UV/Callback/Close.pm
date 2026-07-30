@@ -8,64 +8,28 @@ package SPVM::Go::UV::Callback::Close;
 
 =head1 Name
 
-SPVM::Go::UV::Callback::Close - Short Description
+SPVM::Go::UV::Callback::Close - Callback for Close Handle
 
 =head1 Description
 
-Go::UV::Callback::Close class in L<SPVM> has methods to do someting.
+C<Go::UV::Callback::Close> in L<SPVM> is the interface for the callback passed to L<uv_close|https://docs.libuv.org/en/v1.x/handle.html#c.uv_close>.
 
 =head1 Usage
 
   use Go::UV::Callback::Close;
 
-=head1 Details
+=head1 Interface Methods
 
+=head2 Anonymous method
 
+C<required method : void ($uv_handle : L<Go::UV::Handle|SPVM::Go::UV::Handle>);>
 
-=head1 Super Class
+The callback method called when the handle has been closed.
 
-
-
-=head1 Interfaces
-
-
-
-=head1 Enumerations
-
-
-
-=head1 Fields
-
-
-
-=head1 Class Methods
-
-
-
-=head1 Instance Methods
-
-
-
-=head1 Well Known Child Classes
-
-
-
-=head1 See Also
-
-
-
-
-=head1 Repository
-
-
-
-=head1 Author
-
-Yuki Kimoto C<kimoto.yuki@gmail.com>
+See L<Go::UV::Handle#close|SPVM::Go::UV::Handle/"close"> method for usage.
 
 =head1 Copyright & License
 
 Copyright (c) 2026 Yuki Kimoto
 
 MIT License
-
