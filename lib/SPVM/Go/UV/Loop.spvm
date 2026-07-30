@@ -7,6 +7,7 @@ class Go::UV::Loop : pointer {
   allow Go::UV::Handle;
   allow Go::UV::Handle::Idle;
   
+  use Go::UV;
   use Go::UV::Handle;
   use Go::UV::Handle::Idle;
   use Go::UV::Handle::Async;
