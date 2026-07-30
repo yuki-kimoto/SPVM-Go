@@ -13,7 +13,7 @@ class Go::Schedule {
   use Go::Time;
   use Go::UV;
   use Go::UV::Loop;
-  use Go::UV::Constant as UV_CONST;
+  use Go::UV::Constant as UV_C;
   use Go::Schedule::Info;
   
   use Format;
@@ -143,7 +143,7 @@ class Go::Schedule {
         $deadline = Go::Time->now->add(Go::Duration_1l->new($timeout_duration_nsec));
       }
       my $timeout_msec = $timeout_duration_nsec / 1000000;
-      my $events = $schedule_type == Go::Schedule::Info->TYPE_IO_READ ? UV_CONST->UV_READABLE : UV_CONST->UV_WRITABLE;
+      my $events = $schedule_type == Go::Schedule::Info->TYPE_IO_READ ? UV_C->UV_READABLE : UV_C->UV_WRITABLE;
       
       my $uv_loop = $self->{uv_loop};
       
@@ -357,7 +357,7 @@ class Go::Schedule {
     $uv_loop->idle_init($uv_idle);
     $uv_idle->start($process_next_goroutine_cb);
     
-    $uv_loop->run(UV_CONST->UV_RUN_DEFAULT);
+    $uv_loop->run(UV_C->UV_RUN_DEFAULT);
   }
   
   private method loop_alive : int () {
