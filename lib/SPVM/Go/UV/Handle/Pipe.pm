@@ -8,64 +8,40 @@ package SPVM::Go::UV::Handle::Pipe;
 
 =head1 Name
 
-SPVM::Go::UV::Handle::Pipe - Short Description
+SPVM::Go::UV::Handle::Pipe - Pipe Handle for libuv
 
 =head1 Description
 
-Go::UV::Handle::Pipe class in L<SPVM> has methods to do someting.
+C<Go::UV::Handle::Pipe> in L<SPVM> represents the pipe handle for L<libuv|https://libuv.org/>, corresponding to the C<uv_pipe_t> structure.
+
+=head1 Super Class
+
+L<Go::UV::Handle::Stream|SPVM::Go::UV::Handle::Stream>
 
 =head1 Usage
 
   use Go::UV::Handle::Pipe;
-
-=head1 Details
-
-
-
-=head1 Super Class
-
-
-
-=head1 Interfaces
-
-
-
-=head1 Enumerations
-
-
-
-=head1 Fields
-
-
+  
+  my $pipe = Go::UV::Handle::Pipe->new;
 
 =head1 Class Methods
 
+=head2 new
 
+C<static method new : L<Go::UV::Handle::Pipe|SPVM::Go::UV::Handle::Pipe> ();>
+
+Creates a new L<Go::UV::Handle::Pipe|SPVM::Go::UV::Handle::Pipe> object, and returns it.
 
 =head1 Instance Methods
 
+=head2 open
 
+C<method open : void ($fd : int);>
 
-=head1 Well Known Child Classes
-
-
-
-=head1 See Also
-
-
-
-
-=head1 Repository
-
-
-
-=head1 Author
-
-Yuki Kimoto C<kimoto.yuki@gmail.com>
+Associates an existing file descriptor C<$fd> with the pipe handle.
 
 =head1 Copyright & License
 
 Copyright (c) 2026 Yuki Kimoto
 
 MIT License
-
