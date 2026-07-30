@@ -125,6 +125,13 @@ static void SPVM__Go__UV__Loop__close_cb(uv_handle_t* uv_handle) {
     spvm_diag("[Unexpected Error]Calling 'delete_uv_handle' failed.");
     abort();
   }
+  
+  env->set_field_object_by_name(env, stack, obj_uv_handle, "close_cb", NULL, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) {
+    spvm_diag("[Unexpected Error]Setting 'close_cb' field failed.");
+    abort();
+  }
+
 }
 
 static void SPVM__Go__UV__Loop__idle_cb(uv_idle_t* uv_handle) {
