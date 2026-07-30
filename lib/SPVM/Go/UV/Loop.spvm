@@ -3,7 +3,6 @@
 
 class Go::UV::Loop : pointer {
   
-  allow Go::UV;
   allow Go::UV::Handle;
   allow Go::UV::Handle::Idle;
   
@@ -36,6 +35,8 @@ class Go::UV::Loop : pointer {
   
   # Class Mehtods
   native static method new : Go::UV::Loop ();
+  
+  native private static method default_loop : Go::UV::Loop ();
   
   # Instance Methods
   protected method init : void () {
@@ -84,9 +85,7 @@ class Go::UV::Loop : pointer {
   native method DESTROY : void ();
   
   # For Go::UV
-  native private static method default_loop : Go::UV::Loop ();
-  
-  native static method strerror : string ($status : int);
+  native static method _strerror : string ($status : int);
   
   # For Go::UV::Handle
   

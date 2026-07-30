@@ -69,7 +69,7 @@ int32_t SPVM__Go__UV__Loop__new(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 }
 
-int32_t SPVM__Go__UV__Loop__strerror(SPVM_ENV* env, SPVM_VALUE* stack) {
+int32_t SPVM__Go__UV__Loop___strerror(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t error_id = 0;
   

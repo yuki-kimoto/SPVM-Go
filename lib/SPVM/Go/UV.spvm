@@ -9,7 +9,7 @@ class Go::UV {
   # Class Methods
   static method strerror : string ($status : int) {
     
-    my $uv_strerro = Go::UV::Loop->strerror($status);
+    my $uv_strerro = Go::UV::Loop->_strerror($status);
     
     return $uv_strerro;
   }
