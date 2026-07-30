@@ -11,7 +11,7 @@ class Go::UV::Handle::Idle extends Go::UV::Handle {
   # Class Mehtods
   static method new : Go::UV::Handle::Idle () {
     
-    my $self = Go::UV::Loop->new_idle;
+    my $self = Go::UV::Loop->_new_idle;
     
     return $self;
   }
@@ -19,7 +19,7 @@ class Go::UV::Handle::Idle extends Go::UV::Handle {
   # Instance Methods
   method start : void ($cb : Go::UV::Callback::Idle) {
     
-    Go::UV::Loop->handle_idle_start($self, $cb);
+    Go::UV::Loop->_handle_idle_start($self, $cb);
   }
   
 }

@@ -14,14 +14,14 @@ class Go::UV::Handle : pointer {
   
   # Instance Methods
   method close : void ($close_cb : Go::UV::Callback::Close = undef) {
-    Go::UV::Loop->handle_close($self, $close_cb);
+    Go::UV::Loop->_handle_close($self, $close_cb);
   }
   
   method get_type : int () {
-    return Go::UV::Loop->handle_get_type($self);
+    return Go::UV::Loop->_handle_get_type($self);
   }
   
   method DESTROY : void () {
-    Go::UV::Loop->handle_destroy($self);
+    Go::UV::Loop->_handle_destroy($self);
   }
 }

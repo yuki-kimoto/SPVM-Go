@@ -11,7 +11,7 @@ class Go::UV::Handle::Poll extends Go::UV::Handle {
   # Class Mehtods
   static method new : Go::UV::Handle::Poll () {
     
-    my $self = Go::UV::Loop->new_poll;
+    my $self = Go::UV::Loop->_new_poll;
     
     return $self;
   }
@@ -19,7 +19,7 @@ class Go::UV::Handle::Poll extends Go::UV::Handle {
   # Instance Methods
   method start : void ($cb : Go::UV::Callback::Poll, $events : int) {
     
-    Go::UV::Loop->handle_poll_start($self, $cb, $events);
+    Go::UV::Loop->_handle_poll_start($self, $cb, $events);
   }
   
 }
