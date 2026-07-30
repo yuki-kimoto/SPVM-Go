@@ -9,13 +9,13 @@ class Go::UV::Handle::Stream extends Go::UV::Handle {
   use Go::UV::Callback::Read;
   
   # Fields
-  has read_cb : ro Go::UV::Callback::Read;
+  has read_cb : rw Go::UV::Callback::Read;
   
-  has read_buffer : mutable string;
+  has read_buffer : rw mutable string;
   
-  has read_buffer_length : int;
+  has read_buffer_length : rw int;
   
-  has read_buffer_offset : int;
+  has read_buffer_offset : rw int;
   
   # Instance Methods
   method read_start : void ($buffer : mutable string, $buffer_length : int, $cb : Go::UV::Callback::Read, $buffer_offset : int = 0) {
