@@ -8,64 +8,28 @@ package SPVM::Go::UV::Callback::Poll;
 
 =head1 Name
 
-SPVM::Go::UV::Callback::Poll - Short Description
+SPVM::Go::UV::Callback::Poll - Callback for Poll Handle
 
 =head1 Description
 
-Go::UV::Callback::Poll class in L<SPVM> has methods to do someting.
+C<Go::UV::Callback::Poll> in L<SPVM> is the interface for the callback passed to L<uv_poll_start|https://docs.libuv.org/en/v1.x/poll.html#c.uv_poll_start>.
 
 =head1 Usage
 
   use Go::UV::Callback::Poll;
 
-=head1 Details
+=head1 Interface Methods
 
+=head2 Anonymous method
 
+C<required method : void ($uv_poll : L<Go::UV::Handle::Poll|SPVM::Go::UV::Handle::Poll>, $status : int, $events : int);>
 
-=head1 Super Class
+The callback method called when the poll handle detects events or an error occurs.
 
-
-
-=head1 Interfaces
-
-
-
-=head1 Enumerations
-
-
-
-=head1 Fields
-
-
-
-=head1 Class Methods
-
-
-
-=head1 Instance Methods
-
-
-
-=head1 Well Known Child Classes
-
-
-
-=head1 See Also
-
-
-
-
-=head1 Repository
-
-
-
-=head1 Author
-
-Yuki Kimoto C<kimoto.yuki@gmail.com>
+See L<Go::UV::Handle::Poll#start|SPVM::Go::UV::Handle::Poll/"start"> method for usage.
 
 =head1 Copyright & License
 
 Copyright (c) 2026 Yuki Kimoto
 
 MIT License
-
