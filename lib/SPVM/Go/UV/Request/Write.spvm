@@ -23,7 +23,7 @@ class Go::UV::Request::Write extends Go::UV::Request {
   # Instance Methods
   method write : void ($uv_stream : Go::UV::Handle::Stream, $buffer : string, $buffer_length : int, $cb : Go::UV::Callback::Write, $buffer_offset : int = 0) {
     
-    Go::UV::Loop->handle_write($self, $uv_stream, $buffer, $buffer_length, $cb, $buffer_offset);
+    Go::UV::Loop->req_write($self, $uv_stream, $buffer, $buffer_length, $cb, $buffer_offset);
   }
   
   method DESTROY : void () {
