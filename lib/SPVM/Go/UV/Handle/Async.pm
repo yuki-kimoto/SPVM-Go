@@ -8,64 +8,48 @@ package SPVM::Go::UV::Handle::Async;
 
 =head1 Name
 
-SPVM::Go::UV::Handle::Async - Short Description
+SPVM::Go::UV::Handle::Async - Async Handle for libuv
 
 =head1 Description
 
-Go::UV::Handle::Async class in L<SPVM> has methods to do someting.
+C<Go::UV::Handle::Async> in L<SPVM> represents the async handle for L<libuv|https://libuv.org/>, corresponding to the C<uv_async_t> structure.
+
+=head1 Super Class
+
+L<Go::UV::Handle|SPVM::Go::UV::Handle>
 
 =head1 Usage
 
   use Go::UV::Handle::Async;
-
-=head1 Details
-
-
-
-=head1 Super Class
-
-
-
-=head1 Interfaces
-
-
-
-=head1 Enumerations
-
-
+  
+  my $async = Go::UV::Handle::Async->new;
 
 =head1 Fields
 
+=head2 async_cb
 
+C<has async_cb : rw L<Go::UV::Callback::Async|SPVM::Go::UV::Callback::Async>;>
+
+The callback called when the async handle has been awakened.
 
 =head1 Class Methods
 
+=head2 new
 
+C<static method new : L<Go::UV::Handle::Async|SPVM::Go::UV::Handle::Async> ();>
+
+Creates a new L<Go::UV::Handle::Async|SPVM::Go::UV::Handle::Async> object, and returns it.
 
 =head1 Instance Methods
 
+=head2 send
 
+C<method send : void ();>
 
-=head1 Well Known Child Classes
-
-
-
-=head1 See Also
-
-
-
-
-=head1 Repository
-
-
-
-=head1 Author
-
-Yuki Kimoto C<kimoto.yuki@gmail.com>
+Awakens the async handle.
 
 =head1 Copyright & License
 
 Copyright (c) 2026 Yuki Kimoto
 
 MIT License
-
