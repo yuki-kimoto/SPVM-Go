@@ -23,9 +23,4 @@ class Go::UV::Handle::Stream extends Go::UV::Handle {
     Go::UV::Loop->handle_read_start($self, $buffer, $buffer_length, $cb, $buffer_offset);
   }
   
-  method write : void ($uv_req : Go::UV::Request::Write, $buffer : string, $buffer_length : int, $cb : Go::UV::Callback::Write, $buffer_offset : int = 0) {
-    
-    Go::UV::Loop->handle_write($uv_req, $self, $buffer, $buffer_length, $cb, $buffer_offset);
-  }
-  
 }

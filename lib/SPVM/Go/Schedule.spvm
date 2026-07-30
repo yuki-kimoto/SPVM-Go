@@ -228,7 +228,7 @@ class Go::Schedule {
           $schedule->awake($goroutine, $uv_pipe);
         };
         
-        $uv_pipe->write($goroutine->{uv_write}, $buffer, $buffer_length, $write_cb, $buffer_offset);
+        $goroutine->{uv_write}->write($uv_pipe, , $buffer, $buffer_length, $write_cb, $buffer_offset);
       }
       
       if ($timeout_msec > 0) {
