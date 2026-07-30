@@ -10,7 +10,6 @@ typedef struct {
   SPVM_ENV* env;
   SPVM_VALUE* stack;
   SPVM_OBJ* obj_uv_handle;
-  SPVM_OBJ* obj_uv_req;
 } SPVM__Go__UV__Loop__HANDLE_DATA;
 
 typedef struct {
@@ -300,7 +299,7 @@ void SPVM__Go__UV__Loop__write_cb(uv_write_t* uv_handle, int status) {
   
   int32_t error_id = 0;
   
-  SPVM__Go__UV__Loop__HANDLE_DATA* uv_data = (SPVM__Go__UV__Loop__HANDLE_DATA*)uv_handle->data;
+  SPVM__Go__UV__Loop__REQ_DATA* uv_data = (SPVM__Go__UV__Loop__REQ_DATA*)uv_handle->data;
   
   SPVM_ENV* env = uv_data->env;
   SPVM_VALUE* stack = uv_data->stack;
@@ -805,7 +804,7 @@ int32_t SPVM__Go__UV__Loop__req_write(SPVM_ENV* env, SPVM_VALUE* stack) {
   uv_buf.base = (char*)buffer + buffer_offset;
   uv_buf.len = buffer_length;
   
-  SPVM__Go__UV__Loop__REQ_DATA* uv_data = (SPVM__Go__UV__Loop__HANDLE_DATA*)uv_req_write->data;
+  SPVM__Go__UV__Loop__REQ_DATA* uv_data = (SPVM__Go__UV__Loop__REQ_DATA*)uv_req_write->data;
   
   int32_t status = uv_write(uv_req_write, uv_stream, &uv_buf, 1, SPVM__Go__UV__Loop__write_cb);
   
@@ -916,7 +915,7 @@ int32_t SPVM__Go__UV__Loop__new_write(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   uv_write_t* uv_req_write = env->new_memory_block(env, stack, sizeof(uv_write_t));
   
-  SPVM__Go__UV__Loop__REQ_DATA* uv_data = env->new_memory_block(env, stack, sizeof(SPVM__Go__UV__Loop__HANDLE_DATA));
+  SPVM__Go__UV__Loop__REQ_DATA* uv_data = env->new_memory_block(env, stack, sizeof(SPVM__Go__UV__Loop__REQ_DATA));
   uv_data->env = env;
   uv_data->stack = stack;
   uv_req_write->data = uv_data;
@@ -944,7 +943,7 @@ int32_t SPVM__Go__UV__Loop__destroy_write(SPVM_ENV* env, SPVM_VALUE* stack) {
   if (!no_free) {
     uv_write_t* uv_req_write = env->get_pointer(env, stack, obj_uv_req_write);
     
-    SPVM__Go__UV__Loop__REQ_DATA* uv_data = (SPVM__Go__UV__Loop__HANDLE_DATA*)uv_req_write->data;
+    SPVM__Go__UV__Loop__REQ_DATA* uv_data = (SPVM__Go__UV__Loop__REQ_DATA*)uv_req_write->data;
     
     env->free_memory_block(env, stack, uv_data);
     uv_req_write->data = NULL;
