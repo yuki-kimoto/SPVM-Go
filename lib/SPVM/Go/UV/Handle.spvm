@@ -22,6 +22,6 @@ class Go::UV::Handle : pointer {
   }
   
   method DESTROY : void () {
-    Go::UV::Loop->handle_free($self);
+    Go::UV::Loop->handle_destroy($self);
   }
 }

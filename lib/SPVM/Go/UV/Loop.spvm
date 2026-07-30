@@ -94,7 +94,7 @@ class Go::UV::Loop : pointer {
   
   native static method handle_write : void ($uv_req_write : Go::UV::Request::Write, $uv_handle : Go::UV::Handle::Stream, $buffer : string, $buffer_length : int, $cb : Go::UV::Callback::Write, $buffer_offset : int = 0);
   
-  native static method handle_free : void ($uv_handle : Go::UV::Handle);
+  native static method handle_destroy : void ($uv_handle : Go::UV::Handle);
   
   native static method handle_close : void ($uv_handle : Go::UV::Handle, $close_cb : Go::UV::Callback::Close = undef);
   
