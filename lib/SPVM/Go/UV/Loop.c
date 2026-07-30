@@ -321,18 +321,6 @@ void SPVM__Go__UV__Loop__write_cb(uv_write_t* uv_handle, int status) {
     return;
   }
   
-  env->set_field_object_by_name(env, stack, obj_uv_req_write, "write_buffer", NULL, &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) {
-    spvm_diag("[Unexpected Error]Setting 'write_buffer' field failed.");
-    abort();
-  }
-  
-  env->set_field_object_by_name(env, stack, obj_uv_req_write, "write_cb", NULL, &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) {
-    spvm_diag("[Unexpected Error]Setting 'write_cb' field failed.");
-    abort();
-  }
-  
 }
 
 int32_t SPVM__Go__UV__Loop__run(SPVM_ENV* env, SPVM_VALUE* stack) {

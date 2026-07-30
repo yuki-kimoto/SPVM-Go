@@ -226,6 +226,7 @@ class Go::Schedule {
           }
           $schedule_info->{ret_length} = $buffer_length;
           $schedule->awake($goroutine, $uv_pipe);
+          $uv_req_write->set_write_cb(undef);
         };
         
         $goroutine->{uv_write}->write($uv_pipe, , $buffer, $buffer_length, $write_cb, $buffer_offset);
