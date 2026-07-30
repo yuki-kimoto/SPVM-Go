@@ -6,7 +6,7 @@ class Go::UV::Handle::Idle extends Go::UV::Handle {
   use Go::UV::Callback::Idle;
   
   # Fields
-  has idle_cb : ro Go::UV::Callback::Idle;
+  has idle_cb : rw Go::UV::Callback::Idle;
   
   # Class Mehtods
   static method new : Go::UV::Handle::Idle () {

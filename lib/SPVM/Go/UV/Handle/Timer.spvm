@@ -6,7 +6,7 @@ class Go::UV::Handle::Timer extends Go::UV::Handle {
   use Go::UV::Callback::Timer;
   
   # Fields
-  has timer_cb : ro Go::UV::Callback::Timer;
+  has timer_cb : rw Go::UV::Callback::Timer;
   
   # Class Mehtods
   static method new : Go::UV::Handle::Timer () {
