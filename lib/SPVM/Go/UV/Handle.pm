@@ -34,15 +34,19 @@ The event loop associated with the handle.
 
 =head1 Instance Methods
 
-=head2 close
+=head2 close_safe
 
-C<method close : void ($close_cb : L<Go::UV::Callback::Close|SPVM::Go::UV::Callback::Close> = undef);>
+C<method close_safe : void ($close_cb : L<Go::UV::Callback::Close|SPVM::Go::UV::Callback::Close> = undef);>
 
-Request the handle to be closed. The callback $close_cb is invoked when the handle has been closed. 
+Request the handle to be closed safely. If the handle is not already closed, it checks whether it is closing using the L<uv_is_closing|https://docs.libuv.org/en/v1.x/handle.html#c.uv_is_closing> function, and if not, calls the L<uv_close|https://docs.libuv.org/en/v1.x/handle.html#c.uv_close> function.
+
+The callback $close_cb is invoked when the handle has been closed. 
 
 The callback $close_cb is stored in L</"close_cb"> field.
 
-This method calls the L<uv_close|https://docs.libuv.org/en/v1.x/handle.html#c.uv_close> function.
+Exceptions:
+
+If uv_close fails, an exception is thrown.
 
 =head2 get_type
 

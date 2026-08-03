@@ -13,8 +13,8 @@ class Go::UV::Handle : pointer {
   has loop : ro Go::UV::Loop;
   
   # Instance Methods
-  method close : void ($close_cb : Go::UV::Callback::Close = undef) {
-    Go::UV::Loop->_handle_close($self, $close_cb);
+  method close_safe : void ($close_cb : Go::UV::Callback::Close = undef) {
+    Go::UV::Loop->_handle_close_safe($self, $close_cb);
   }
   
   method get_type : int () {

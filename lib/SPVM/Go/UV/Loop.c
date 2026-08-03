@@ -677,7 +677,7 @@ int32_t SPVM__Go__UV__Loop___handle_async_send(SPVM_ENV* env, SPVM_VALUE* stack)
   return 0;
 }
 
-int32_t SPVM__Go__UV__Loop___handle_close(SPVM_ENV* env, SPVM_VALUE* stack) {
+int32_t SPVM__Go__UV__Loop___handle_close_safe(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t error_id = 0;
   
