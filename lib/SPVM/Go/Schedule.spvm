@@ -344,12 +344,6 @@ class Go::Schedule {
   
   private method run : void () {
     
-    my $schedule_goroutine = Go::Goroutine->new;
-    
-    $self->{schedule_goroutine} = $schedule_goroutine;
-    
-    my $uv_loop = $self->{uv_loop};
-    
     my $process_next_goroutine_cb = [$schedule : Go::Schedule = $self] method : void ($uv_idle : Go::UV::Handle::Idle) {
       $schedule->process_next_goroutine;
       
@@ -358,6 +352,11 @@ class Go::Schedule {
       }
     };
     
+    my $schedule_goroutine = Go::Goroutine->new;
+    
+    $self->{schedule_goroutine} = $schedule_goroutine;
+    
+    my $uv_loop = $self->{uv_loop};
     my $uv_idle = Go::UV::Handle::Idle->new;
     $uv_loop->idle_init($uv_idle);
     $uv_idle->start($process_next_goroutine_cb);

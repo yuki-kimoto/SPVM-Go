@@ -106,6 +106,8 @@ int32_t SPVM__Go__Goroutine__transfer(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   SPVM_OBJ* obj_goroutine_from = stack[0].oval;
   
+  SPVM_OBJ* obj_goroutine_to = stack[1].oval;
+  
   if (!obj_goroutine_from) {
     return env->die(env, stack, "$from must be defined.", __func__, FILE_NAME, __LINE__);
   }
@@ -113,8 +115,6 @@ int32_t SPVM__Go__Goroutine__transfer(SPVM_ENV* env, SPVM_VALUE* stack) {
   void** goroutine_from_pointer_items = env->get_pointer(env, stack, obj_goroutine_from);
   
   coro_context* goroutine_context_from = goroutine_from_pointer_items[0];
-  
-  SPVM_OBJ* obj_goroutine_to = stack[1].oval;
   
   if (!obj_goroutine_to) {
     return env->die(env, stack, "$to must be defined.", __func__, FILE_NAME, __LINE__);
@@ -173,16 +173,18 @@ int32_t SPVM__Go__Goroutine__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
 int32_t SPVM__Go__Goroutine___pipepair(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t* read_fd_ref = stack[0].iref;
+  
+  int32_t* write_fd_ref = stack[1].iref;
+  
+  int32_t non_blocking = stack[2].ival;
+  
   if (!read_fd_ref) {
     return env->die(env, stack, "$read_fd_ref must be defined.", __func__, FILE_NAME, __LINE__);
   }
   
-  int32_t* write_fd_ref = stack[1].iref;
   if (!write_fd_ref) {
     return env->die(env, stack, "$write_fd_ref must be defined.", __func__, FILE_NAME, __LINE__);
   }
-  
-  int32_t non_blocking = stack[2].ival;
   
 #ifdef _WIN32
   // Generate secure GUID for named pipe
