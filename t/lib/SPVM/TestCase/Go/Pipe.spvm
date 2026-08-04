@@ -16,9 +16,6 @@ class TestCase::Go::Pipe {
       
       Go::Goroutine->_pipepair(\$read_fh, \$write_fh, $non_blocking);
       
-      Sys->fcntl($read_fh, IO_C->F_SETFL, IO_C->O_NONBLOCK);
-      Sys->fcntl($write_fh, IO_C->F_SETFL, IO_C->O_NONBLOCK);
-      
       {
         my $write_length_ref = [-1];
         Go->go([$write_fh : int, $write_length_ref : int[]] method : void () {
@@ -216,9 +213,6 @@ class TestCase::Go::Pipe {
       my $non_blocking = 1;
       
       Go::Goroutine->_pipepair(\$read_fh, \$write_fh, $non_blocking);
-      
-      Sys->fcntl($read_fh, IO_C->F_SETFL, IO_C->O_NONBLOCK);
-      Sys->fcntl($write_fh, IO_C->F_SETFL, IO_C->O_NONBLOCK);
       
       {
         my $read_buffer = new_string_len 3;
