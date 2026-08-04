@@ -46,20 +46,20 @@ static void goroutine_handler (void* data) {
     fprintf(env->api->runtime->get_spvm_stderr(env->runtime), "\n");
   }
   
-  SPVM_OBJ* obj_return_back = env->get_field_object_by_name(env, stack, obj_self, "return_back", &error_id, __func__, FILE_NAME, __LINE__);
+  SPVM_OBJ* obj_schedule_goroutine = env->get_field_object_by_name(env, stack, obj_self, "schedule_goroutine", &error_id, __func__, FILE_NAME, __LINE__);
   assert(error_id == 0);
   
   coro_context* goroutine_context = pointer_items[0];
   
-  void** goroutine_context_return_back_pointer_items = env->get_pointer(env, stack, obj_return_back);
+  void** goroutine_context_schedule_goroutine_pointer_items = env->get_pointer(env, stack, obj_schedule_goroutine);
   
-  coro_context* goroutine_context_return_back = goroutine_context_return_back_pointer_items[0];
+  coro_context* goroutine_context_schedule_goroutine = goroutine_context_schedule_goroutine_pointer_items[0];
   assert(error_id == 0);
   
   env->set_field_byte_by_name(env, stack, obj_self, "finished", 1, &error_id, __func__, FILE_NAME, __LINE__);
   assert(error_id == 0);
   
-  coro_transfer(goroutine_context, goroutine_context_return_back);
+  coro_transfer(goroutine_context, goroutine_context_schedule_goroutine);
   
   assert(0);
 }

@@ -29,7 +29,7 @@ class Go::Schedule {
   
   has disabled_goroutines_h : Hash of Go::Goroutine;
   
-  has return_back_goroutine : Go::Goroutine;
+  has schedule_goroutine : Go::Goroutine;
   
   has thread_id : Thread::ID;
   
@@ -69,9 +69,9 @@ class Go::Schedule {
         $self->disable_goroutine($current_goroutine, $schedule_info);
       }
       
-      my $return_back_goroutine = $self->{return_back_goroutine};
+      my $schedule_goroutine = $self->{schedule_goroutine};
       
-      Go::Goroutine->transfer($current_goroutine, $return_back_goroutine);
+      Go::Goroutine->transfer($current_goroutine, $schedule_goroutine);
       
       if ($current_goroutine->{io_timeout_occurred}) {
         $current_goroutine->{io_timeout_occurred} = 0;
@@ -93,7 +93,7 @@ class Go::Schedule {
       
       $self->run;
       
-      $self->{return_back_goroutine} = undef;
+      $self->{schedule_goroutine} = undef;
       
       $self->{current_goroutine} = undef;
     }
@@ -331,22 +331,22 @@ class Go::Schedule {
         
         $goroutines->push($goroutine);
         
-        my $return_back_goroutine = $self->{return_back_goroutine};
+        my $schedule_goroutine = $self->{schedule_goroutine};
         
-        $goroutine->{return_back} = $return_back_goroutine;
+        $goroutine->{schedule_goroutine} = $schedule_goroutine;
         
         $self->{current_goroutine} = $goroutine;
         
-        Go::Goroutine->transfer($return_back_goroutine, $goroutine);
+        Go::Goroutine->transfer($schedule_goroutine, $goroutine);
       }
     }
   }
   
   private method run : void () {
     
-    my $return_back_goroutine = Go::Goroutine->new;
+    my $schedule_goroutine = Go::Goroutine->new;
     
-    $self->{return_back_goroutine} = $return_back_goroutine;
+    $self->{schedule_goroutine} = $schedule_goroutine;
     
     my $uv_loop = $self->{uv_loop};
     

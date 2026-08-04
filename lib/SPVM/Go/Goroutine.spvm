@@ -15,7 +15,7 @@ class Go::Goroutine : pointer {
   use Go::UV::Request::Write;
   
   # Fields
-  has return_back : Go::Goroutine;
+  has schedule_goroutine : Go::Goroutine;
   
   has task : Callback;
   
@@ -36,13 +36,13 @@ class Go::Goroutine : pointer {
   has uv_write : Go::UV::Request::Write;
   
   # Class Methods
-  static method new : Go::Goroutine ($task :  Callback = undef, $return_back : Go::Goroutine = undef) {
+  static method new : Go::Goroutine ($task :  Callback = undef, $schedule_goroutine : Go::Goroutine = undef) {
     
     my $self = new Go::Goroutine;
     
     $self->{task} = $task;
     
-    $self->{return_back} = $return_back;
+    $self->{schedule_goroutine} = $schedule_goroutine;
     
     $self->init_goroutine;
     
