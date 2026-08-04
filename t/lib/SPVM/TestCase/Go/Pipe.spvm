@@ -77,7 +77,7 @@ class TestCase::Go::Pipe {
           
           {
             my $write_buffer_length = 0;
-            $write_length_ref->[0] = Go->gosched_pipe_write($write_fh, $write_buffer, 0);
+            Go->gosched_pipe_write($write_fh, $write_buffer, 0);
           }
           
           {
