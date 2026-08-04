@@ -21,6 +21,7 @@ class Go::Schedule {
   use QList;
   use Thread::ID;
   use Thread::ThisThread;
+  use Sys::IO;
   
   has goroutines : List of Go::Goroutine;
   
@@ -201,7 +202,8 @@ class Go::Schedule {
       my $uv_pipe = Go::UV::Handle::Pipe->new;
       my $ipc = 0;
       $uv_loop->pipe_init($uv_pipe, $ipc);
-      $uv_pipe->open($fd);
+      my $fd_dup = Sys::IO->dup($fd);
+      $uv_pipe->open($fd_dup);
       $goroutine->{uv_handle} = $uv_pipe;
       
       if ($schedule_type == Go::Schedule::Info->TYPE_PIPE_READ) {
