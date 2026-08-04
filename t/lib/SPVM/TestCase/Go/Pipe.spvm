@@ -205,4 +205,30 @@ class TestCase::Go::Pipe {
     return 1;
   }
   
+  static method timeout : int () {
+    
+    {
+      my $read_fh = -1;
+      my $write_fh = -1;
+      
+      Sys->socketpair(\$read_fh, \$write_fh, SOCKET_C->AF_UNIX, SOCKET_C->SOCK_STREAM, 0);
+      
+      Sys->fcntl($read_fh, IO_C->F_SETFL, IO_C->O_NONBLOCK);
+      Sys->fcntl($write_fh, IO_C->F_SETFL, IO_C->O_NONBLOCK);
+      
+      {
+        my $read_buffer = new_string_len 3;
+        my $read_buffer_length = length $read_buffer;
+        my $read_buffer_offset = 0;
+        my $timeout_sec = 0.5;
+        
+        Go->gosched_pipe_read_sec($read_fh, $read_buffer, $read_buffer_length, $read_buffer_offset, $timeout_sec);
+        
+      }
+      
+    }
+    
+    return 1;
+  }
+  
 }

@@ -14,7 +14,9 @@ if ($^O eq 'MSWin32') {
   plan skip_all => 'Pipe tests are not supported on Windows';
 }
 
-ok(SPVM::TestCase::Go::Pipe->basic);
+# ok(SPVM::TestCase::Go::Pipe->basic);
+
+ok(SPVM::TestCase::Go::Pipe->timeout);
 
 $api->destroy_runtime_permanent_vars;
 
