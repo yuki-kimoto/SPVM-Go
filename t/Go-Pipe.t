@@ -10,10 +10,6 @@ my $api = SPVM::api();
 
 my $start_memory_blocks_count = $api->get_memory_blocks_count;
 
-if ($^O eq 'MSWin32') {
-  plan skip_all => 'Pipe tests are not supported on Windows';
-}
-
 ok(SPVM::TestCase::Go::Pipe->basic);
 
 ok(SPVM::TestCase::Go::Pipe->timeout);
