@@ -161,6 +161,45 @@ class TestCase::Go::Pipe {
         }
       }
       
+      # read multi-times
+      {
+        my $write_length_ref = [-1];
+        Go->go([$write_fh : int, $write_length_ref : int[]] method : void () {
+          my $write_buffer = "abc";
+          $write_length_ref->[0] = Go->gosched_pipe_write($write_fh, $write_buffer);
+        });
+        Go->gosched;
+        
+        {
+          my $read_buffer = new_string_len 3;
+          my $read_buffer_length = 2;
+          my $read_length = Go->gosched_pipe_read($read_fh, $read_buffer, $read_buffer_length);
+          
+          unless ($read_buffer eq "ab\0") {
+            return 0;
+          }
+          
+          unless ($read_length == 2) {
+            return 0;
+          }
+        }
+        
+        {
+          my $read_buffer = new_string_len 3;
+          my $read_buffer_length = 1;
+          my $read_length = Go->gosched_pipe_read($read_fh, $read_buffer, $read_buffer_length);
+          
+          unless ($read_buffer eq "c\0\0") {
+            return 0;
+          }
+          
+          unless ($read_length == 1) {
+            return 0;
+          }
+        }
+        
+      }
+      
     }
     
     return 1;

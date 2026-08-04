@@ -629,8 +629,8 @@ int32_t SPVM__Go__UV__Loop___handle_read_start(SPVM_ENV* env, SPVM_VALUE* stack)
   }
   int32_t max_buffer_length = env->length(env, stack, obj_buffer);
   
-  if (!(buffer_length > 0)) {
-    return env->die(env, stack, "$buffer_length must be a positive number.", __func__, FILE_NAME, __LINE__);
+  if (!(buffer_length >= 0)) {
+    return env->die(env, stack, "$buffer_length must be a non-negative number.", __func__, FILE_NAME, __LINE__);
   }
   
   if (!(buffer_offset + buffer_length <= max_buffer_length)) {
