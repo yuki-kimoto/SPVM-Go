@@ -180,7 +180,10 @@ class Go::Schedule {
       my $timeout_duration_nsec = $schedule_info->{timeout_duration_nsec};
       my $fd = $schedule_info->{fd};
       my $buffer = $schedule_info->{buffer};
-      my $buffer_length = exists $schedule_info->{buffer_length} ? $schedule_info->{buffer_length} : -1;
+      my $buffer_length = $schedule_info->{buffer_length};
+      if ($buffer_length < 0) {
+        $buffer_length = length $buffer;
+      }
       my $buffer_offset = $schedule_info->{buffer_offset};
       
       unless ($goroutine->{uv_write}) {

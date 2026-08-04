@@ -42,6 +42,31 @@ class TestCase::Go::Pipe {
         }
       }
       
+      # Optional argument default
+      {
+        my $write_length_ref = [-1];
+        Go->go([$write_fh : int, $write_length_ref : int[]] method : void () {
+          my $write_buffer = "abc";
+          $write_length_ref->[0] = Go->gosched_pipe_write($write_fh, $write_buffer);
+        });
+        Go->gosched;
+        
+        my $read_buffer = new_string_len 3;
+        my $read_length = Go->gosched_pipe_read($read_fh, $read_buffer);
+        
+        unless ($write_length_ref->[0] == 3) {
+          return 0;
+        }
+        
+        unless ($read_buffer eq "abc") {
+          return 0;
+        }
+        
+        unless ($read_length == 3) {
+          return 0;
+        }
+      }
+      
       # legnth
       {
         my $write_length_ref = [-1];
