@@ -8,9 +8,9 @@
 
 static const char* FILE_NAME = "Go/Goroutine.c";
 
-static void goroutine_handler (void* obj_self_tmp) {
+static void goroutine_handler (void* data) {
   
-  SPVM_OBJ* obj_self = obj_self_tmp;
+  SPVM_OBJ* obj_self = (SPVM_OBJ*)data;
   
   int32_t error_id = 0;
   
