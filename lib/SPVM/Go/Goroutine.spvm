@@ -56,4 +56,7 @@ class Go::Goroutine : pointer {
   
   native method DESTROY : void ();
   
+  # For Sys#pipepair
+  native static method _pipepair : void ($read_fd_ref : int*, $write_fd_ref : int*, $non_bloking : int = 0);
+  
 }
