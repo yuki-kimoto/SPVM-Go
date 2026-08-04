@@ -215,6 +215,16 @@ class TestCase::Go::Pipe {
       Go::Goroutine->_pipepair(\$read_fh, \$write_fh, $non_blocking);
       
       {
+        my $write_length_ref = [-1];
+        Go->go([$write_fh : int, $write_length_ref : int[]] method : void () {
+          my $write_buffer = "abc";
+          my $write_buffer_length = 0;
+          my $write_buffer_offset = 0;
+          my $timeout_sec = 0;
+          $write_length_ref->[0] = Go->gosched_pipe_write_sec($write_fh, $write_buffer, $write_buffer_length, $write_buffer_offset, $timeout_sec);
+        });
+        Go->gosched;
+        
         my $read_buffer = new_string_len 3;
         my $read_buffer_length = length $read_buffer;
         my $read_buffer_offset = 0;
