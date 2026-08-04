@@ -5,13 +5,16 @@ class TestCase::Go::Pipe {
   use Sys::IO::Constant as IO_C;
   use Sys::OS;
   
+  use Go::Goroutine;
+  
   static method basic : int () {
     
     {
       my $read_fh = -1;
       my $write_fh = -1;
+      my $non_blocking = 1;
       
-      Sys->socketpair(\$read_fh, \$write_fh, SOCKET_C->AF_UNIX, SOCKET_C->SOCK_STREAM, 0);
+      Go::Goroutine->_pipepair(\$read_fh, \$write_fh, $non_blocking);
       
       Sys->fcntl($read_fh, IO_C->F_SETFL, IO_C->O_NONBLOCK);
       Sys->fcntl($write_fh, IO_C->F_SETFL, IO_C->O_NONBLOCK);
@@ -210,8 +213,9 @@ class TestCase::Go::Pipe {
     {
       my $read_fh = -1;
       my $write_fh = -1;
+      my $non_blocking = 1;
       
-      Sys->socketpair(\$read_fh, \$write_fh, SOCKET_C->AF_UNIX, SOCKET_C->SOCK_STREAM, 0);
+      Go::Goroutine->_pipepair(\$read_fh, \$write_fh, $non_blocking);
       
       Sys->fcntl($read_fh, IO_C->F_SETFL, IO_C->O_NONBLOCK);
       Sys->fcntl($write_fh, IO_C->F_SETFL, IO_C->O_NONBLOCK);
