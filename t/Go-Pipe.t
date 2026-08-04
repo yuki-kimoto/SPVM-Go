@@ -10,6 +10,10 @@ my $api = SPVM::api();
 
 my $start_memory_blocks_count = $api->get_memory_blocks_count;
 
+if ($^O eq 'MSWin32') {
+  plan skip_all => 'Pipe tests are not supported on Windows';
+}
+
 ok(SPVM::TestCase::Go::Pipe->basic);
 
 $api->destroy_runtime_permanent_vars;
