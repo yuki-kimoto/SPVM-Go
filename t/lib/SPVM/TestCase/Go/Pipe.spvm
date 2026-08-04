@@ -42,6 +42,7 @@ class TestCase::Go::Pipe {
         }
       }
       
+      # legnth
       {
         my $write_length_ref = [-1];
         Go->go([$write_fh : int, $write_length_ref : int[]] method : void () {
@@ -60,6 +61,35 @@ class TestCase::Go::Pipe {
         }
         
         unless ($read_buffer eq "ab\0") {
+          return 0;
+        }
+        
+        unless ($read_length == 2) {
+          return 0;
+        }
+      }
+      
+      # offset
+      {
+        my $write_length_ref = [-1];
+        Go->go([$write_fh : int, $write_length_ref : int[]] method : void () {
+          my $write_buffer = "abc";
+          my $write_buffer_length = 2;
+          my $write_buffer_offset = 1;
+          $write_length_ref->[0] = Go->gosched_pipe_write($write_fh, $write_buffer, $write_buffer_length, $write_buffer_offset);
+        });
+        Go->gosched;
+        
+        my $read_buffer = new_string_len 3;
+        my $read_buffer_length = 2;
+        my $read_buffer_offset = 1;
+        my $read_length = Go->gosched_pipe_read($read_fh, $read_buffer, $read_buffer_length, $read_buffer_offset);
+        
+        unless ($write_length_ref->[0] == 2) {
+          return 0;
+        }
+        
+        unless ($read_buffer eq "\0bc") {
           return 0;
         }
         
