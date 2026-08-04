@@ -71,7 +71,7 @@ int32_t SPVM__Go__Goroutine__init_goroutine(SPVM_ENV* env, SPVM_VALUE* stack) {
   SPVM_OBJ* obj_self = stack[0].oval;
   
   SPVM_OBJ* obj_task = env->get_field_object_by_name(env, stack, obj_self, "task", &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) { return error_id; }
+  if (error_id) return error_id;
   
   coro_context* goroutine_context = env->new_memory_block(env, stack, sizeof(coro_context));
   struct coro_stack* goroutine_stack = NULL;
