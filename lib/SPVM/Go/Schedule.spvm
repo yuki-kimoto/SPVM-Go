@@ -73,18 +73,12 @@ class Go::Schedule {
       
       Go::Goroutine->transfer($current_goroutine, $schedule_goroutine);
       
-      if ($current_goroutine->{error_id} == basic_type_id Go::Error::IOTimeout) {
+      if ($current_goroutine->{error_id}) {
         my $error_id = $current_goroutine->{error_id};
         $current_goroutine->{error_id} = 0;
         my $exception = $current_goroutine->{exception};
         $current_goroutine->{exception} = undef;
         die $error_id, $exception;
-      }
-      elsif ($current_goroutine->{io_error_occurred}) {
-        $current_goroutine->{io_error_occurred} = 0;
-        my $io_error_message = $current_goroutine->{io_error_message};
-        $current_goroutine->{io_error_message} = undef;
-        die $io_error_message;
       }
     }
     else {
@@ -157,9 +151,9 @@ class Go::Schedule {
       $goroutine->{uv_handle} = $uv_poll;
       my $poll_cb = [$goroutine : Go::Goroutine, $schedule : Go::Schedule = $self] method : void ($uv_poll : Go::UV::Handle::Poll, $status : int, $events : int) {
         if ($status < 0) {
-          $goroutine->{io_error_occurred} = 1;
-          my $io_error_message = Go::UV->strerror($status);
-          $goroutine->{io_error_message} = $io_error_message;
+          $goroutine->{error_id} = basic_type_id Error;
+          my $exception = Go::UV->strerror($status);
+          $goroutine->{exception} = $exception;
         }
         $schedule->awake($goroutine, $uv_poll);
       };
@@ -216,9 +210,9 @@ class Go::Schedule {
       if ($schedule_type == Go::Schedule::Info->TYPE_PIPE_READ) {
         my $read_cb = [$goroutine : Go::Goroutine, $schedule : Go::Schedule = $self, $schedule_info : Go::Schedule::Info] method : void ($uv_stream : Go::UV::Handle::Stream, $nread : int, $buffer : string) {
           if ($nread < 0) {
-            $goroutine->{io_error_occurred} = 1;
-            my $io_error_message = Go::UV->strerror($nread);
-            $goroutine->{io_error_message} = $io_error_message;
+            $goroutine->{error_id} = basic_type_id Error;
+            my $exception = Go::UV->strerror($nread);
+            $goroutine->{exception} = $exception;
           }
           $schedule_info->{ret_length} = $nread;
           $schedule->awake($goroutine, $uv_stream);
@@ -229,9 +223,9 @@ class Go::Schedule {
       else {
         my $write_cb = [$goroutine : Go::Goroutine, $schedule : Go::Schedule = $self, $schedule_info : Go::Schedule::Info, $buffer_length : int, $uv_pipe : Go::UV::Handle::Pipe] method : void ($uv_req_write : Go::UV::Request::Write, $status : int) {
           if ($status < 0) {
-            $goroutine->{io_error_occurred} = 1;
-            my $io_error_message = Go::UV->strerror($status);
-            $goroutine->{io_error_message} = $io_error_message;
+            $goroutine->{error_id} = basic_type_id Error;
+            my $exception = Go::UV->strerror($status);
+            $goroutine->{exception} = $exception;
           }
           $schedule_info->{ret_length} = $buffer_length;
           $schedule->awake($goroutine, $uv_pipe);
