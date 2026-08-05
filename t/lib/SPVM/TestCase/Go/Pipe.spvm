@@ -230,7 +230,11 @@ class TestCase::Go::Pipe {
         my $read_buffer_offset = 0;
         my $timeout_sec = 0.5;
         
-        Go->gosched_pipe_read_sec($read_fh, $read_buffer, $read_buffer_length, $read_buffer_offset, $timeout_sec);
+        eval { Go->gosched_pipe_read_sec($read_fh, $read_buffer, $read_buffer_length, $read_buffer_offset, $timeout_sec); }
+        
+        unless ($@ isa Go::Error::IOTimeout) {
+          return 0;
+        }
         
       }
       

@@ -72,12 +72,6 @@ class Go::Schedule {
       my $schedule_goroutine = $self->{schedule_goroutine};
       
       Go::Goroutine->transfer($current_goroutine, $schedule_goroutine);
-      
-      if ($schedule_info->{error_id}) {
-        my $error_id = $schedule_info->{error_id};
-        my $exception = $schedule_info->{exception};
-        die $error_id, $exception;
-      }
     }
     else {
       unless ($schedule_info->{type} == Go::Schedule::Info->TYPE_NONE) {
@@ -91,6 +85,12 @@ class Go::Schedule {
       $self->{schedule_goroutine} = undef;
       
       $self->{current_goroutine} = undef;
+    }
+    
+    if ($schedule_info->{error_id}) {
+      my $error_id = $schedule_info->{error_id};
+      my $exception = $schedule_info->{exception};
+      die $error_id, $exception;
     }
   }
   
