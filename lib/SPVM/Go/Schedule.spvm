@@ -75,7 +75,11 @@ class Go::Schedule {
       
       if ($current_goroutine->{io_timeout_occurred}) {
         $current_goroutine->{io_timeout_occurred} = 0;
-        die Go::Error::IOTimeout "IO timeout occur";
+        my $error_id = $current_goroutine->{error_id};
+        $current_goroutine->{error_id} = 0;
+        my $exception = $current_goroutine->{exception};
+        $current_goroutine->{exception} = undef;
+        die $error_id, $exception;
       }
       elsif ($current_goroutine->{io_error_occurred}) {
         $current_goroutine->{io_error_occurred} = 0;
@@ -119,6 +123,8 @@ class Go::Schedule {
       unless ($uv_handle == $goroutine_uv_handle) {
         # IO timeout
         $goroutine->{io_timeout_occurred} = 1;
+        $goroutine->{error_id} = basic_type_id Go::Error::IOTimeout;
+        $goroutine->{exception} = "IO timeout occur";
       }
       $goroutine_uv_handle->close_safe;
     }
