@@ -9,7 +9,7 @@
 typedef struct {
   SPVM_ENV* env;
   SPVM_VALUE* stack;
-  coro_context* st_coro_contenxt;
+  coro_context* st_coro_context;
   struct coro_stack* st_coro_stack;
 } SPVM__Go__Goroutine__CORO_DATA;
 
@@ -21,11 +21,11 @@ static void SPVM__Go__Goroutine__coro_start_cb (void* data) {
   
   int32_t error_id = 0;
   
-  void** pointer_items = (void**)SPVM_NATIVE_GET_POINTER(obj_self);
+  SPVM__Go__Goroutine__CORO_DATA* coro_data = SPVM_NATIVE_GET_POINTER(obj_self);
   
-  SPVM_ENV* env = pointer_items[2];
+  SPVM_ENV* env = coro_data->env;
   
-  SPVM_VALUE* stack = pointer_items[3];
+  SPVM_VALUE* stack = coro_data->stack;
   
   SPVM_OBJ* obj_task = env->get_field_object_by_name(env, stack, obj_self, "task", &error_id, __func__, FILE_NAME, __LINE__);
   assert(error_id == 0);
@@ -56,11 +56,11 @@ static void SPVM__Go__Goroutine__coro_start_cb (void* data) {
   SPVM_OBJ* obj_schedule_goroutine = env->get_field_object_by_name(env, stack, obj_self, "schedule_goroutine", &error_id, __func__, FILE_NAME, __LINE__);
   assert(error_id == 0);
   
-  coro_context* st_coro_context = pointer_items[0];
+  coro_context* st_coro_context = coro_data->st_coro_context;
   
-  void** st_coro_context_schedule_goroutine_pointer_items = env->get_pointer(env, stack, obj_schedule_goroutine);
+  SPVM__Go__Goroutine__CORO_DATA* st_coro_context_schedule_goroutine_coro_data = env->get_pointer(env, stack, obj_schedule_goroutine);
   
-  coro_context* st_coro_context_schedule_goroutine = st_coro_context_schedule_goroutine_pointer_items[0];
+  coro_context* st_coro_context_schedule_goroutine = st_coro_context_schedule_goroutine_coro_data->st_coro_context;
   assert(error_id == 0);
   
   env->set_field_byte_by_name(env, stack, obj_self, "finished", 1, &error_id, __func__, FILE_NAME, __LINE__);
@@ -95,16 +95,14 @@ int32_t SPVM__Go__Goroutine__init_goroutine(SPVM_ENV* env, SPVM_VALUE* stack) {
     coro_create(st_coro_context, NULL, NULL, NULL, 0);
   }
   
-  void** pointer_items = env->new_memory_block(env, stack, sizeof(void*) * 4);
+  SPVM__Go__Goroutine__CORO_DATA* coro_data = env->new_memory_block(env, stack, sizeof(SPVM__Go__Goroutine__CORO_DATA));
   
-  SPVM_VALUE* stack_for_coro = env->new_stack(env);
+  coro_data->st_coro_context = st_coro_context;
+  coro_data->st_coro_stack = st_coro_stack;
+  coro_data->env = env;
+  coro_data->stack = env->new_stack(env);
   
-  pointer_items[0] = st_coro_context;
-  pointer_items[1] = st_coro_stack;
-  pointer_items[2] = env;
-  pointer_items[3] = stack_for_coro;
-  
-  env->set_pointer(env, stack, obj_self, pointer_items);
+  env->set_pointer(env, stack, obj_self, coro_data);
   
   return 0;
 }
@@ -119,17 +117,17 @@ int32_t SPVM__Go__Goroutine__transfer(SPVM_ENV* env, SPVM_VALUE* stack) {
     return env->die(env, stack, "$from must be defined.", __func__, FILE_NAME, __LINE__);
   }
   
-  void** goroutine_from_pointer_items = env->get_pointer(env, stack, obj_goroutine_from);
+  SPVM__Go__Goroutine__CORO_DATA* coro_data = env->get_pointer(env, stack, obj_goroutine_from);
   
-  coro_context* st_coro_context_from = goroutine_from_pointer_items[0];
+  coro_context* st_coro_context_from = coro_data->st_coro_context;
   
   if (!obj_goroutine_to) {
     return env->die(env, stack, "$to must be defined.", __func__, FILE_NAME, __LINE__);
   }
   
-  void** goroutine_to_pointer_items = env->get_pointer(env, stack, obj_goroutine_to);
+  SPVM__Go__Goroutine__CORO_DATA* goroutine_to_coro_data = env->get_pointer(env, stack, obj_goroutine_to);
   
-  coro_context* st_coro_context_to = goroutine_to_pointer_items[0];
+  coro_context* st_coro_context_to = goroutine_to_coro_data->st_coro_context;
   
   coro_transfer(st_coro_context_from, st_coro_context_to);
   
@@ -140,15 +138,13 @@ int32_t SPVM__Go__Goroutine__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   SPVM_OBJ* obj_self = stack[0].oval;
   
-  void** pointer_items = env->get_pointer(env, stack, obj_self);
+  SPVM__Go__Goroutine__CORO_DATA* coro_data = env->get_pointer(env, stack, obj_self);
   
-  coro_context* st_coro_context = pointer_items[0];
+  coro_context* st_coro_context = coro_data->st_coro_context;
   
-  struct coro_stack* st_coro_stack = pointer_items[1];
+  struct coro_stack* st_coro_stack = coro_data->st_coro_stack;
   
-  SPVM_VALUE* stack_for_coro = pointer_items[3];
-  
-  env->free_stack(env, stack_for_coro);
+  env->free_stack(env, coro_data->stack);
   
   if (st_coro_stack) {
     coro_destroy(st_coro_context);
@@ -160,7 +156,7 @@ int32_t SPVM__Go__Goroutine__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   env->free_memory_block(env, stack, st_coro_context);
   
-  env->free_memory_block(env, stack, pointer_items);
+  env->free_memory_block(env, stack, coro_data);
   
   return 0;
 }
