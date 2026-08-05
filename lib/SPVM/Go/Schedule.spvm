@@ -149,7 +149,7 @@ class Go::Schedule {
       my $uv_poll = Go::UV::Handle::Poll->new;
       $uv_loop->poll_init($uv_poll, $fd);
       $goroutine->{uv_handle} = $uv_poll;
-      my $poll_cb = [$goroutine : Go::Goroutine, $schedule : Go::Schedule = $self] method : void ($uv_poll : Go::UV::Handle::Poll, $status : int, $events : int) {
+      my $poll_cb = [$goroutine : Go::Goroutine, $schedule : Go::Schedule = $self, $schedule_info : Go::Schedule::Info] method : void ($uv_poll : Go::UV::Handle::Poll, $status : int, $events : int) {
         if ($status < 0) {
           $goroutine->{error_id} = basic_type_id Error;
           my $exception = Go::UV->strerror($status);
