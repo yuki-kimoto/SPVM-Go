@@ -38,6 +38,10 @@ class Go::Schedule::Info {
   
   has ret_length : int;
   
+  has error_id : int;
+  
+  has exception : string;
+  
   # Class Methods
   static method new : Go::Schedule::Info () {
     

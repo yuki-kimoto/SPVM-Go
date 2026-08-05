@@ -33,6 +33,10 @@ class Go::Goroutine : pointer {
   
   has io_error_message : string;
   
+  has error_id : int;
+  
+  has exception : string;
+  
   has uv_write : Go::UV::Request::Write;
   
   # Class Methods
