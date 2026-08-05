@@ -27,8 +27,6 @@ class Go::Goroutine : pointer {
   
   has timeout_uv_timer : Go::UV::Handle::Timer;
   
-  has io_timeout_occurred : byte;
-  
   has io_error_occurred : byte;
   
   has io_error_message : string;
