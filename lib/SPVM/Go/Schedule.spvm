@@ -113,13 +113,8 @@ class Go::Schedule {
     if ($goroutine_timout_uv_timer) {
       unless ($uv_handle == $goroutine_uv_handle) {
         # IO timeout
-        $goroutine->{error_id} = basic_type_id Go::Error::IOTimeout;
-        $goroutine->{exception} = "IO timeout occur";
-        
-        if ($schedule_info) {
-          $schedule_info->{error_id} = basic_type_id Go::Error::IOTimeout;
-          $schedule_info->{exception} = "IO timeout occur";
-        }
+        $schedule_info->{error_id} = basic_type_id Go::Error::IOTimeout;
+        $schedule_info->{exception} = "IO timeout occur";
       }
       $goroutine_uv_handle->close_safe;
     }
@@ -154,9 +149,6 @@ class Go::Schedule {
       $goroutine->{uv_handle} = $uv_poll;
       my $poll_cb = [$goroutine : Go::Goroutine, $schedule : Go::Schedule = $self, $schedule_info : Go::Schedule::Info] method : void ($uv_poll : Go::UV::Handle::Poll, $status : int, $events : int) {
         if ($status < 0) {
-          $goroutine->{error_id} = basic_type_id Error;
-          $goroutine->{exception} = Go::UV->strerror($status);
-          
           $schedule_info->{error_id} = basic_type_id Error;
           $schedule_info->{exception} = Go::UV->strerror($status);
         }
@@ -215,9 +207,6 @@ class Go::Schedule {
       if ($schedule_type == Go::Schedule::Info->TYPE_PIPE_READ) {
         my $read_cb = [$goroutine : Go::Goroutine, $schedule : Go::Schedule = $self, $schedule_info : Go::Schedule::Info] method : void ($uv_stream : Go::UV::Handle::Stream, $nread : int, $buffer : string) {
           if ($nread < 0) {
-            $goroutine->{error_id} = basic_type_id Error;
-            $goroutine->{exception} = Go::UV->strerror($nread);
-            
             $schedule_info->{error_id} = basic_type_id Error;
             $schedule_info->{exception} = Go::UV->strerror($nread);
           }
@@ -230,9 +219,6 @@ class Go::Schedule {
       else {
         my $write_cb = [$goroutine : Go::Goroutine, $schedule : Go::Schedule = $self, $schedule_info : Go::Schedule::Info, $buffer_length : int, $uv_pipe : Go::UV::Handle::Pipe] method : void ($uv_req_write : Go::UV::Request::Write, $status : int) {
           if ($status < 0) {
-            $goroutine->{error_id} = basic_type_id Error;
-            $goroutine->{exception} = Go::UV->strerror($status);
-            
             $schedule_info->{error_id} = basic_type_id Error;
             $schedule_info->{exception} = Go::UV->strerror($status);
           }

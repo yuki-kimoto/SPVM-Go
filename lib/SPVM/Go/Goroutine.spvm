@@ -27,10 +27,6 @@ class Go::Goroutine : pointer {
   
   has timeout_uv_timer : Go::UV::Handle::Timer;
   
-  has error_id : int;
-  
-  has exception : string;
-  
   has uv_write : Go::UV::Request::Write;
   
   # Class Methods
