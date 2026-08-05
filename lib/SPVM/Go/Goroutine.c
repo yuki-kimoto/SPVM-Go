@@ -6,6 +6,13 @@
 #include "spvm_native.h"
 #include "coro.h"
 
+typedef struct {
+  SPVM_ENV* env;
+  SPVM_VALUE* stack;
+  coro_context* st_coro_contenxt;
+  struct coro_stack* st_coro_stack;
+} SPVM__Go__Goroutine__CORO_DATA;
+
 static const char* FILE_NAME = "Go/Goroutine.c";
 
 static void SPVM__Go__Goroutine__coro_start_cb (void* data) {
