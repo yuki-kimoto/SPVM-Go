@@ -8,7 +8,7 @@
 
 static const char* FILE_NAME = "Go/Goroutine.c";
 
-static void goroutine_handler (void* data) {
+static void SPVM__Go__Goroutine__coro_start_cb (void* data) {
   
   SPVM_OBJ* obj_self = (SPVM_OBJ*)data;
   
@@ -82,7 +82,7 @@ int32_t SPVM__Go__Goroutine__init_goroutine(SPVM_ENV* env, SPVM_VALUE* stack) {
       return env->die(env, stack, "coro_stack_alloc failed.", __func__, FILE_NAME, __LINE__);
     }
     
-    coro_create(st_coro_context, goroutine_handler, obj_self, st_coro_stack->sptr,  st_coro_stack->ssze);
+    coro_create(st_coro_context, SPVM__Go__Goroutine__coro_start_cb, obj_self, st_coro_stack->sptr,  st_coro_stack->ssze);
   }
   else {
     coro_create(st_coro_context, NULL, NULL, NULL, 0);
