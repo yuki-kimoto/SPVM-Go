@@ -1,3 +1,8 @@
+0.040 2026-08-05
+  [Internal Changes]
+    * Refactor libcoro, libuv and Go::Schedule code.
+  [Exception Improvement]
+    * Improve gosched exception handling.
 0.039 2026-08-04
   [Internal Changes]
     * Refactor libuv code.
