@@ -90,12 +90,12 @@ int32_t SPVM__Go__Goroutine__init_goroutine(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void** pointer_items = env->new_memory_block(env, stack, sizeof(void*) * 4);
   
-  SPVM_VALUE* goroutine_spvm_stack = env->new_stack(env);
+  SPVM_VALUE* stack_for_coro = env->new_stack(env);
   
   pointer_items[0] = st_coro_context;
   pointer_items[1] = st_coro_stack;
   pointer_items[2] = env;
-  pointer_items[3] = goroutine_spvm_stack;
+  pointer_items[3] = stack_for_coro;
   
   env->set_pointer(env, stack, obj_self, pointer_items);
   
@@ -139,9 +139,9 @@ int32_t SPVM__Go__Goroutine__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   struct coro_stack* st_coro_stack = pointer_items[1];
   
-  SPVM_VALUE* goroutine_spvm_stack = pointer_items[3];
+  SPVM_VALUE* stack_for_coro = pointer_items[3];
   
-  env->free_stack(env, goroutine_spvm_stack);
+  env->free_stack(env, stack_for_coro);
   
   if (st_coro_stack) {
     coro_destroy(st_coro_context);
