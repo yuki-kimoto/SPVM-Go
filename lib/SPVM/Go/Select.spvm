@@ -254,7 +254,9 @@ class Go::Select {
         else {
           my $schedule = $self->{schedule};
           
-          $schedule->schedule;
+          my $schedule_info = new Go::Schedule::Info;
+          
+          $schedule->schedule($schedule_info);
         }
       }
     }

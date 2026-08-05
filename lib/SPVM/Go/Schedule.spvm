@@ -54,7 +54,7 @@ class Go::Schedule {
   }
   
   # Instance Methods
-  private method schedule : int ($schedule_info : Go::Schedule::Info = undef) {
+  private method schedule : int ($schedule_info : Go::Schedule::Info) {
     
     my $called_from_main_thread = Thread::ID->eq(Thread::ThisThread->get_id, $self->{thread_id});
     
@@ -65,7 +65,7 @@ class Go::Schedule {
     my $current_goroutine = $self->{current_goroutine};
     
     if ($current_goroutine) {
-      if ($schedule_info) {
+      unless ($schedule_info->{type} == Go::Schedule::Info->TYPE_NONE) {
         $self->disable_goroutine($current_goroutine, $schedule_info);
       }
       
@@ -82,7 +82,7 @@ class Go::Schedule {
       }
     }
     else {
-      if ($schedule_info) {
+      unless ($schedule_info->{type} == Go::Schedule::Info->TYPE_NONE) {
         $self->add_task([$self : Go::Schedule, $schedule_info : Go::Schedule::Info] method : void () {
           $self->schedule($schedule_info);
         });
