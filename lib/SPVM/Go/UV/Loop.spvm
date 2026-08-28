@@ -120,9 +120,4 @@ class Go::UV::Loop : pointer {
   
   native static method _req_write : void ($uv_req_write : Go::UV::Request::Write, $uv_handle : Go::UV::Handle::Stream, $buffer : string, $buffer_length : int, $cb : Go::UV::Callback::Write, $buffer_offset : int = 0);
   
-  # For Go::UV::Request::Write
-  native static method _new_write : Go::UV::Request::Write ();
-  
-  native static method _destroy_write : void ($uv_write : Go::UV::Request::Write);
-  
 }

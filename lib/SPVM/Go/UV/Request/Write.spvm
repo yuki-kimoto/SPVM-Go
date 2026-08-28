@@ -13,12 +13,7 @@ class Go::UV::Request::Write extends Go::UV::Request {
   has write_buffer : rw string;
   
   # Class Mehtods
-  static method new : Go::UV::Request::Write () {
-    
-    my $self = Go::UV::Loop->_new_write;
-    
-    return $self;
-  }
+  native static method new : Go::UV::Request::Write ();
   
   # Instance Methods
   method write : void ($uv_stream : Go::UV::Handle::Stream, $buffer : string, $buffer_length : int, $cb : Go::UV::Callback::Write, $buffer_offset : int = 0) {
@@ -26,9 +21,5 @@ class Go::UV::Request::Write extends Go::UV::Request {
     Go::UV::Loop->_req_write($self, $uv_stream, $buffer, $buffer_length, $cb, $buffer_offset);
   }
   
-  method DESTROY : void () {
-    
-    Go::UV::Loop->_destroy_write($self);
-  }
-  
+  native method DESTROY : void ();
 }
