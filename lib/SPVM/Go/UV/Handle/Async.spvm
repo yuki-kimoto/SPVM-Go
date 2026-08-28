@@ -7,16 +7,8 @@ class Go::UV::Handle::Async extends Go::UV::Handle {
   has async_cb : rw Go::UV::Callback::Async;
   
   # Class Mehtods
-  static method new : Go::UV::Handle::Async () {
-    
-    my $self = Go::UV::Loop->_new_async;
-    
-    return $self;
-  }
+  native static method new : Go::UV::Handle::Async ();
   
   # Instance Methods
-  method send : void () {
-    
-    Go::UV::Loop->_handle_async_send($self);
-  }
+  native method send : void ();
 }

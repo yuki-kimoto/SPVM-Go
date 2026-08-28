@@ -593,19 +593,6 @@ int32_t SPVM__Go__UV__Loop___handle_read_start(SPVM_ENV* env, SPVM_VALUE* stack)
   return 0;
 }
 
-int32_t SPVM__Go__UV__Loop___handle_async_send(SPVM_ENV* env, SPVM_VALUE* stack) {
-  
-  int32_t error_id = 0;
-  
-  SPVM_OBJ* obj_uv_async = stack[0].oval;
-  
-  uv_async_t* uv_async = (uv_async_t*)env->get_pointer(env, stack, obj_uv_async);
-  
-  uv_async_send(uv_async);
-  
-  return 0;
-}
-
 int32_t SPVM__Go__UV__Loop___handle_close_safe(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t error_id = 0;
@@ -678,34 +665,6 @@ int32_t SPVM__Go__UV__Loop___new_idle(SPVM_ENV* env, SPVM_VALUE* stack) {
   uv_handle_data->obj_uv_handle = obj_uv_idle;
   
   stack[0].oval = obj_uv_idle;
-  
-  return 0;
-}
-
-int32_t SPVM__Go__UV__Loop___new_async(SPVM_ENV* env, SPVM_VALUE* stack) {
-  
-  int32_t error_id = 0;
-  
-  SPVM_OBJ* obj_cb = stack[1].oval;
-  
-  if (!obj_cb) {
-    return env->die(env, stack, "$cb must be defined.", __func__, FILE_NAME, __LINE__);
-  }
-  
-  uv_async_t* uv_async = env->new_memory_block(env, stack, sizeof(uv_async_t));
-  
-  SPVM__Go__UV__Loop__HANDLE_DATA* uv_handle_data = env->new_memory_block(env, stack, sizeof(SPVM__Go__UV__Loop__HANDLE_DATA));
-  uv_handle_data->env = env;
-  uv_handle_data->stack = stack;
-  
-  uv_async->data = uv_handle_data;
-  
-  SPVM_OBJ* obj_uv_async = env->new_pointer_object_by_name(env, stack, "Go::UV::Handle::Async", uv_async, &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) return error_id;
-  
-  uv_handle_data->obj_uv_handle = obj_uv_async;
-  
-  stack[0].oval = obj_uv_async;
   
   return 0;
 }

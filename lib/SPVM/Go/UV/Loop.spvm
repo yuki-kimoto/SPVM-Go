@@ -83,8 +83,6 @@ class Go::UV::Loop : pointer {
   
   # For Go::UV::Handle
   
-  native static method _handle_async_send : void ($uv_handle : Go::UV::Handle);
-  
   native static method _handle_timer_start : void ($uv_handle : Go::UV::Handle::Timer, $cb : Go::UV::Callback::Timer, $timeout_msec : long, $interval_msec : long = 0);
   
   native static method _handle_poll_start : void ($uv_handle : Go::UV::Handle::Poll, $cb : Go::UV::Callback::Poll, $events : int);
@@ -107,7 +105,4 @@ class Go::UV::Loop : pointer {
   
   # For Go::UV::Handle::Poll
   native static method _new_poll : Go::UV::Handle::Poll ();
-  
-  # For Go::UV::Handle::Async
-  native static method _new_async : Go::UV::Handle::Async ();
 }
