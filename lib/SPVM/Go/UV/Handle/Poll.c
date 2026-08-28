@@ -7,6 +7,8 @@
 
 static const char* FILE_NAME = "Go/UV/Handle/Poll.c";
 
+void boot_Go__UV__Handle__Poll() {}
+
 int32_t SPVM__Go__UV__Handle__Poll__foo(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   return 0;

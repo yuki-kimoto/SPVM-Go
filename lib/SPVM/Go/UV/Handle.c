@@ -7,9 +7,5 @@
 
 static const char* FILE_NAME = "Go/UV/Handle.c";
 
-int32_t SPVM__Go__UV__Handle__foo(SPVM_ENV* env, SPVM_VALUE* stack) {
-  
-  return 0;
-}
-
+void boot_Go__UV__Handle() {}
 
