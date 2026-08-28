@@ -52,8 +52,8 @@ lib/SPVM/Go/Sync/WaitGroup.pm
 lib/SPVM/Go/Sync/WaitGroup.spvm
 lib/SPVM/Go/Time.pm
 lib/SPVM/Go/Time.spvm
+lib/SPVM/Go/UV.build
 lib/SPVM/Go/UV.c
-lib/SPVM/Go/UV.config
 lib/SPVM/Go/UV.native/include/.gitkeep
 lib/SPVM/Go/UV.native/include/heap-inl.h
 lib/SPVM/Go/UV.native/include/idna.h
@@ -208,8 +208,8 @@ lib/SPVM/Go/UV/Callback/Timer.spvm
 lib/SPVM/Go/UV/Callback/Write.pm
 lib/SPVM/Go/UV/Callback/Write.spvm
 lib/SPVM/Go/UV/ConfigBuilder.pm
+lib/SPVM/Go/UV/Constant.build
 lib/SPVM/Go/UV/Constant.c
-lib/SPVM/Go/UV/Constant.config
 lib/SPVM/Go/UV/Constant.pm
 lib/SPVM/Go/UV/Constant.spvm
 lib/SPVM/Go/UV/Handle.pm
@@ -226,8 +226,8 @@ lib/SPVM/Go/UV/Handle/Stream.pm
 lib/SPVM/Go/UV/Handle/Stream.spvm
 lib/SPVM/Go/UV/Handle/Timer.pm
 lib/SPVM/Go/UV/Handle/Timer.spvm
+lib/SPVM/Go/UV/Loop.build
 lib/SPVM/Go/UV/Loop.c
-lib/SPVM/Go/UV/Loop.config
 lib/SPVM/Go/UV/Loop.pm
 lib/SPVM/Go/UV/Loop.spvm
 lib/SPVM/Go/UV/Request.pm
