@@ -4,17 +4,9 @@
 class Go::UV::Handle::Pipe extends Go::UV::Handle::Stream {
   
   # Class Mehtods
-  static method new : Go::UV::Handle::Pipe () {
-    
-    my $self = Go::UV::Loop->_new_pipe;
-    
-    return $self;
-  }
+  native static method new : Go::UV::Handle::Pipe ();
   
   # Instance Methods
-  method open : void ($fd : int) {
-    
-    Go::UV::Loop->_handle_pipe_open($self, $fd);
-  }
+  native method open : void ($fd : int);
   
 }
