@@ -3,14 +3,9 @@
 
 #include "spvm_native.h"
 #include "uv.h"
+#include "spvm_go_uv.h"
 
 static const char* FILE_NAME = "Go/UV/Request/Write.c";
-
-typedef struct {
-  SPVM_ENV* env;
-  SPVM_VALUE* stack;
-  SPVM_OBJ* obj_uv_req;
-} SPVM__Go__UV__Request__REQ_DATA;
 
 void SPVM__Go__UV__Request__Write__write_cb(uv_write_t* uv_handle, int status) {
   

@@ -3,12 +3,7 @@
 
 #include "spvm_native.h"
 #include "uv.h"
-
-typedef struct {
-  SPVM_ENV* env;
-  SPVM_VALUE* stack;
-  SPVM_OBJ* obj_uv_req;
-} SPVM__Go__UV__Request__REQ_DATA;
+#include "spvm_go_uv.h"
 
 static const char* FILE_NAME = "Go/UV/Request.c";
 

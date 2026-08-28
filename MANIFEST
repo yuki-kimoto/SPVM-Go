@@ -58,6 +58,7 @@ lib/SPVM/Go/UV.native/include/.gitkeep
 lib/SPVM/Go/UV.native/include/heap-inl.h
 lib/SPVM/Go/UV.native/include/idna.h
 lib/SPVM/Go/UV.native/include/queue.h
+lib/SPVM/Go/UV.native/include/spvm_go_uv.h
 lib/SPVM/Go/UV.native/include/strscpy.h
 lib/SPVM/Go/UV.native/include/strtok.h
 lib/SPVM/Go/UV.native/include/unix/darwin-stub.h
