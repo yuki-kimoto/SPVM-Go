@@ -11,4 +11,6 @@ $config->source_files([]);
 
 $config->use_resource('Go::UV');
 
+$config->link_to('Go::UV');
+
 $config;
