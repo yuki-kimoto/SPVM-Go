@@ -32,8 +32,8 @@ lib/SPVM/Go/Duration_1l.pm
 lib/SPVM/Go/Duration_1l.spvm
 lib/SPVM/Go/Error/IOTimeout.pm
 lib/SPVM/Go/Error/IOTimeout.spvm
+lib/SPVM/Go/Goroutine.build
 lib/SPVM/Go/Goroutine.c
-lib/SPVM/Go/Goroutine.config
 lib/SPVM/Go/Goroutine.pm
 lib/SPVM/Go/Goroutine.spvm
 lib/SPVM/Go/OS/Signal.pm
@@ -235,8 +235,6 @@ lib/SPVM/Go/UV/Handle/Poll.pm
 lib/SPVM/Go/UV/Handle/Poll.spvm
 lib/SPVM/Go/UV/Handle/Stream.build
 lib/SPVM/Go/UV/Handle/Stream.c
-lib/SPVM/Go/UV/Handle/Stream.native/include/.gitkeep
-lib/SPVM/Go/UV/Handle/Stream.native/src/.gitkeep
 lib/SPVM/Go/UV/Handle/Stream.pm
 lib/SPVM/Go/UV/Handle/Stream.spvm
 lib/SPVM/Go/UV/Handle/Timer.build
