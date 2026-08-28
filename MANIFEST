@@ -233,6 +233,10 @@ lib/SPVM/Go/UV/Handle/Poll.build
 lib/SPVM/Go/UV/Handle/Poll.c
 lib/SPVM/Go/UV/Handle/Poll.pm
 lib/SPVM/Go/UV/Handle/Poll.spvm
+lib/SPVM/Go/UV/Handle/Stream.build
+lib/SPVM/Go/UV/Handle/Stream.c
+lib/SPVM/Go/UV/Handle/Stream.native/include/.gitkeep
+lib/SPVM/Go/UV/Handle/Stream.native/src/.gitkeep
 lib/SPVM/Go/UV/Handle/Stream.pm
 lib/SPVM/Go/UV/Handle/Stream.spvm
 lib/SPVM/Go/UV/Handle/Timer.build

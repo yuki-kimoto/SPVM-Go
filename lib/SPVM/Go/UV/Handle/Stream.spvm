@@ -3,7 +3,6 @@
 
 class Go::UV::Handle::Stream extends Go::UV::Handle {
   
-  use Go::UV::Loop;
   use Go::UV::Callback::Write;
   use Go::UV::Request::Write;
   use Go::UV::Callback::Read;
@@ -18,9 +17,6 @@ class Go::UV::Handle::Stream extends Go::UV::Handle {
   has read_buffer_offset : rw int;
   
   # Instance Methods
-  method read_start : void ($buffer : mutable string, $buffer_length : int, $cb : Go::UV::Callback::Read, $buffer_offset : int = 0) {
-    
-    Go::UV::Loop->_handle_read_start($self, $buffer, $buffer_length, $cb, $buffer_offset);
-  }
+  native method read_start : void ($buffer : mutable string, $buffer_length : int, $cb : Go::UV::Callback::Read, $buffer_offset : int = 0);
   
 }

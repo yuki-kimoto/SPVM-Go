@@ -5,6 +5,7 @@ class Go::UV::Handle : pointer {
   
   allow Go::UV::Loop;
   
+  use Go::UV::Callback::Close;
   use Go::UV::Loop;
   
   # Fields
@@ -13,15 +14,9 @@ class Go::UV::Handle : pointer {
   has loop : ro Go::UV::Loop;
   
   # Instance Methods
-  method close_safe : void ($close_cb : Go::UV::Callback::Close = undef) {
-    Go::UV::Loop->_handle_close_safe($self, $close_cb);
-  }
+  native method close_safe : void ($close_cb : Go::UV::Callback::Close = undef);
   
-  method get_type : int () {
-    return Go::UV::Loop->_handle_get_type($self);
-  }
+  native method get_type : int ();
   
-  method DESTROY : void () {
-    Go::UV::Loop->_handle_destroy($self);
-  }
+  native method DESTROY : void ();
 }

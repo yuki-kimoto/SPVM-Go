@@ -141,6 +141,7 @@ package MY {
         'Go::UV::Handle::Poll',
         'Go::UV::Handle::Async',
         'Go::UV::Handle::Pipe',
+        'Go::UV::Handle::Stream',
         'Go::UV::Request',
         'Go::UV::Request::Write',
       ];

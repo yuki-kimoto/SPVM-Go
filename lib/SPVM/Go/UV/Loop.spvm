@@ -81,13 +81,4 @@ class Go::UV::Loop : pointer {
   
   native method DESTROY : void ();
   
-  # For Go::UV::Handle
-  
-  native static method _handle_read_start : void ($uv_handle : Go::UV::Handle::Stream, $buffer : mutable string, $buffer_length : int, $cb : Go::UV::Callback::Read, $buffer_offset : int = 0);
-  
-  native static method _handle_destroy : void ($uv_handle : Go::UV::Handle);
-  
-  native static method _handle_close_safe : void ($uv_handle : Go::UV::Handle, $close_cb : Go::UV::Callback::Close = undef);
-  
-  native static method _handle_get_type : int ($uv_handle : Go::UV::Handle);
 }
