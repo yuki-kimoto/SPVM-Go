@@ -1,6 +1,6 @@
 package SPVM::Go;
 
-our $VERSION = "0.040";
+our $VERSION = "0.041";
 
 1;
 
@@ -10,7 +10,7 @@ SPVM::Go - Goroutines of The Go Programming Language
 
 =head1 Description
 
-Go class in L<SPVM> provide the features of goroutines and channels in Go language.
+Go class in L<SPVM> provide goroutines and channels in Go language.
 
 =head1 Usage
 
