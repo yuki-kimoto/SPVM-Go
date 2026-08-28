@@ -85,8 +85,6 @@ class Go::UV::Loop : pointer {
   
   native static method _handle_timer_start : void ($uv_handle : Go::UV::Handle::Timer, $cb : Go::UV::Callback::Timer, $timeout_msec : long, $interval_msec : long = 0);
   
-  native static method _handle_idle_start : void ($uv_handle : Go::UV::Handle::Idle, $cb : Go::UV::Callback::Idle);
-  
   native static method _handle_read_start : void ($uv_handle : Go::UV::Handle::Stream, $buffer : mutable string, $buffer_length : int, $cb : Go::UV::Callback::Read, $buffer_offset : int = 0);
   
   native static method _handle_destroy : void ($uv_handle : Go::UV::Handle);
@@ -94,9 +92,6 @@ class Go::UV::Loop : pointer {
   native static method _handle_close_safe : void ($uv_handle : Go::UV::Handle, $close_cb : Go::UV::Callback::Close = undef);
   
   native static method _handle_get_type : int ($uv_handle : Go::UV::Handle);
-  
-  # For Go::UV::Handle::Idle
-  native static method _new_idle : Go::UV::Handle::Idle ();
   
   # For Go::UV::Handle::Timer
   native static method _new_timer : Go::UV::Handle::Timer ();
