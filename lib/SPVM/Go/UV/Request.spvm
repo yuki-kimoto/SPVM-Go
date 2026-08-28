@@ -3,4 +3,6 @@
 
 class Go::UV::Request {
   
+  # Instance Methods
+  native method DESTROY : void ();
 }
