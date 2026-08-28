@@ -4,14 +4,7 @@
 class Go::UV {
   version_from Go;
   
-  use Go::UV::Loop;
-  
   # Class Methods
-  static method strerror : string ($status : int) {
-    
-    my $uv_strerro = Go::UV::Loop->_strerror($status);
-    
-    return $uv_strerro;
-  }
+  native static method strerror : string ($status : int);
   
 }

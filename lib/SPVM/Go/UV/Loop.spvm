@@ -81,9 +81,6 @@ class Go::UV::Loop : pointer {
   
   native method DESTROY : void ();
   
-  # For Go::UV
-  native static method _strerror : string ($status : int);
-  
   # For Go::UV::Handle
   
   native static method _handle_async_send : void ($uv_handle : Go::UV::Handle);
