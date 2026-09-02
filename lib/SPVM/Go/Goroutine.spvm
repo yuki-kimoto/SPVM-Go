@@ -29,6 +29,8 @@ class Go::Goroutine : pointer {
   
   has uv_write : Go::UV::Request::Write;
   
+  has caller_info : CallerInfo;
+  
   # Class Methods
   static method new : Go::Goroutine ($task :  Callback = undef, $schedule_goroutine : Go::Goroutine = undef) {
     
@@ -37,6 +39,9 @@ class Go::Goroutine : pointer {
     $self->{task} = $task;
     
     $self->{schedule_goroutine} = $schedule_goroutine;
+    
+    my $caller_info = caller;
+    $self->{caller_info} = $caller_info;
     
     $self->init_goroutine;
     

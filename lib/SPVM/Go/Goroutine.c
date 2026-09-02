@@ -11,6 +11,9 @@ typedef struct {
   SPVM_VALUE* stack;
   coro_context* st_coro_context;
   struct coro_stack* st_coro_stack;
+  const char* caller_func_name;
+  const char* caller_file;
+  int32_t caller_line;
 } SPVM__Go__Goroutine__CORO_DATA;
 
 static const char* FILE_NAME = "Go/Goroutine.c";
@@ -27,13 +30,17 @@ static void SPVM__Go__Goroutine__coro_start_cb (void* data) {
   
   SPVM_VALUE* stack = coro_data->stack;
   
+  const char* caller_func_name = coro_data->caller_func_name;
+  const char* caller_file = coro_data->caller_file;
+  int32_t caller_line = coro_data->caller_line;
+  
   SPVM_OBJ* obj_task = env->get_field_object_by_name(env, stack, obj_self, "task", &error_id, __func__, FILE_NAME, __LINE__);
   assert(error_id == 0);
   
   void* method = env->get_instance_method(env, stack, obj_task, "");
   
   stack[0].oval = obj_task;
-  error_id = env->call_method(env, stack, method, 1, __func__, FILE_NAME, __LINE__);
+  error_id = env->call_method(env, stack, method, 1, caller_func_name, caller_file, caller_line);
   
   if (error_id) {
     // Reconstruct the full exception message including stack trace.
@@ -101,6 +108,23 @@ int32_t SPVM__Go__Goroutine__init_goroutine(SPVM_ENV* env, SPVM_VALUE* stack) {
   coro_data->st_coro_stack = st_coro_stack;
   coro_data->env = env;
   coro_data->stack = env->new_stack(env);
+  
+  SPVM_OBJ* obj_caller_info = env->get_field_object_by_name(env, stack, obj_self, "caller_info", &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) return error_id;
+  
+  SPVM_OBJ* obj_caller_method_abs_name = env->get_field_object_by_name(env, stack, obj_caller_info, "method_abs_name", &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) return error_id;
+  const char* caller_method_abs_name = env->get_chars(env, stack, obj_caller_method_abs_name);
+  coro_data->caller_func_name = caller_method_abs_name;
+  
+  SPVM_OBJ* obj_caller_file = env->get_field_object_by_name(env, stack, obj_caller_info, "file", &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) return error_id;
+  const char* caller_file = env->get_chars(env, stack, obj_caller_file);
+  coro_data->caller_file = caller_file;
+  
+  int32_t caller_line = env->get_field_int_by_name(env, stack, obj_caller_info, "line", &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) return error_id;
+  coro_data->caller_line = caller_line;
   
   env->set_pointer(env, stack, obj_self, coro_data);
   
