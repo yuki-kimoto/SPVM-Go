@@ -32,7 +32,7 @@ class Go::Goroutine : pointer {
   has caller_info : CallerInfo;
   
   # Class Methods
-  static method new : Go::Goroutine ($task :  Callback = undef, $schedule_goroutine : Go::Goroutine = undef) {
+  static method new : Go::Goroutine ($task :  Callback = undef, $schedule_goroutine : Go::Goroutine = undef, $caller_info : CallerInfo = undef) {
     
     my $self = new Go::Goroutine;
     
@@ -40,8 +40,7 @@ class Go::Goroutine : pointer {
     
     $self->{schedule_goroutine} = $schedule_goroutine;
     
-    my $caller_info = caller;
-    $self->{caller_info} = $caller_info;
+    $self->{caller_info} = $caller_info // caller;
     
     $self->init_goroutine;
     

@@ -54,7 +54,7 @@ class Go::Schedule {
   }
   
   # Instance Methods
-  private method schedule : int ($schedule_info : Go::Schedule::Info) {
+  private method schedule : int ($schedule_info : Go::Schedule::Info, $caller_info : CallerInfo = undef) {
     
     my $called_from_main_thread = Thread::ID->eq(Thread::ThisThread->get_id, $self->{thread_id});
     
@@ -75,9 +75,9 @@ class Go::Schedule {
     }
     else {
       unless ($schedule_info->{type} == Go::Schedule::Info->TYPE_NONE) {
-        $self->add_task([$self : Go::Schedule, $schedule_info : Go::Schedule::Info] method : void () {
-          $self->schedule($schedule_info);
-        });
+        $self->add_task([$self : Go::Schedule, $schedule_info : Go::Schedule::Info, $caller_info : CallerInfo] method : void () {
+          $self->schedule($schedule_info, $caller_info);
+        }, $caller_info);
       }
       
       $self->run;
@@ -94,9 +94,9 @@ class Go::Schedule {
     }
   }
   
-  private method add_task : void ($task : Callback) {
+  private method add_task : void ($task : Callback, $caller_info : CallerInfo) {
     
-    my $goroutine = Go::Goroutine->new($task);
+    my $goroutine = Go::Goroutine->new($task, undef, $caller_info);
     
     $self->{goroutines}->push($goroutine);
     

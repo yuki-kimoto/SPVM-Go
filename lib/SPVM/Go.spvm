@@ -28,7 +28,9 @@ class Go {
     
     my $schedule = $GO->{schedule};
     
-    $schedule->add_task($task);
+    my $caller_info = caller;
+    
+    $schedule->add_task($task, $caller_info);
   }
   
   static method make : Go::Channel ($capacity : int = 0) {
@@ -55,7 +57,8 @@ class Go {
     
     my $schedule_info = new Go::Schedule::Info;
     
-    $schedule->schedule($schedule_info);
+    my $caller_info = caller;
+    $schedule->schedule($schedule_info, $caller_info);
   }
   
   static method sleep : void ($duration : Go::Duration_1l = undef) {
@@ -66,7 +69,8 @@ class Go {
     $schedule_info->{type} = Go::Schedule::Info->TYPE_TIMER;
     $schedule_info->{timeout_duration_nsec} = $duration->{nsec};
     
-    $schedule->schedule($schedule_info);
+    my $caller_info = caller;
+    $schedule->schedule($schedule_info, $caller_info);
   }
   
   static method sleep_sec : void ($sec : double = 0) {
@@ -78,6 +82,20 @@ class Go {
   
   static method gosched_io_read : void ($fd : int, $timeout_duration : Go::Duration_1l = undef) {
     
+    my $caller_info = caller;
+    &gosched_io_read_with_caller_info($fd, $timeout_duration, $caller_info);
+  }
+  
+  static method gosched_io_read_sec : void ($fd : int, $timeout_sec : double = 0) {
+    
+    my $timeout_duration = Go::Duration_1l->new_from_sec($timeout_sec);
+    
+    my $caller_info = caller;
+    &gosched_io_read_with_caller_info($fd, $timeout_duration, $caller_info);
+  }
+  
+  private static method gosched_io_read_with_caller_info : void ($fd : int, $timeout_duration : Go::Duration_1l = undef, $caller_info : CallerInfo = undef) {
+    
     my $schedule = $GO->{schedule};
     
     my $schedule_info = new Go::Schedule::Info;
@@ -85,17 +103,24 @@ class Go {
     $schedule_info->{fd} = $fd;
     $schedule_info->{timeout_duration_nsec} = $timeout_duration->{nsec};
     
-    $schedule->schedule($schedule_info);
-  }
-  
-  static method gosched_io_read_sec : void ($fd : int, $timeout_sec : double = 0) {
-    
-    my $timeout_duration = Go::Duration_1l->new_from_sec($timeout_sec);
-    
-    &gosched_io_read($fd, $timeout_duration);
+    $schedule->schedule($schedule_info, $caller_info);
   }
   
   static method gosched_io_write : void ($fd : int, $timeout_duration : Go::Duration_1l = undef) {
+    
+    my $caller_info = caller;
+    &gosched_io_write_with_caller_info($fd, $timeout_duration, $caller_info);
+  }
+  
+  static method gosched_io_write_sec : void ($fd : int, $timeout_sec : double = 0) {
+    
+    my $timeout_duration = Go::Duration_1l->new_from_sec($timeout_sec);
+    
+    my $caller_info = caller;
+    &gosched_io_write_with_caller_info($fd, $timeout_duration, $caller_info);
+  }
+  
+  static method gosched_io_write_with_caller_info : void ($fd : int, $timeout_duration : Go::Duration_1l = undef, $caller_info : CallerInfo = undef) {
     
     my $schedule = $GO->{schedule};
     
@@ -104,17 +129,24 @@ class Go {
     $schedule_info->{fd} = $fd;
     $schedule_info->{timeout_duration_nsec} = $timeout_duration->{nsec};
     
-    $schedule->schedule($schedule_info);
-  }
-  
-  static method gosched_io_write_sec : void ($fd : int, $timeout_sec : double = 0) {
-    
-    my $timeout_duration = Go::Duration_1l->new_from_sec($timeout_sec);
-    
-    &gosched_io_write($fd, $timeout_duration);
+    $schedule->schedule($schedule_info, $caller_info);
   }
   
   static method gosched_pipe_read : int ($fd : int, $string : mutable string, $length : int = -1, $offset : int = 0, $timeout_duration : Go::Duration_1l = undef) {
+    
+    my $caller_info = caller;
+    return &gosched_pipe_read_with_caller_info($fd, $string, $length, $offset, $timeout_duration, $caller_info);
+  }
+  
+  static method gosched_pipe_read_sec : int ($fd : int, $string : mutable string, $length : int = -1, $offset : int = 0, $timeout_sec : double = 0) {
+    
+    my $timeout_duration = Go::Duration_1l->new_from_sec($timeout_sec);
+    
+    my $caller_info = caller;
+    return &gosched_pipe_read_with_caller_info($fd, $string, $length, $offset, $timeout_duration, $caller_info);
+  }
+  
+  private static method gosched_pipe_read_with_caller_info : int ($fd : int, $string : mutable string, $length : int = -1, $offset : int = 0, $timeout_duration : Go::Duration_1l = undef, $caller_info : CallerInfo = undef) {
     
     my $schedule = $GO->{schedule};
     
@@ -126,21 +158,28 @@ class Go {
     $schedule_info->{buffer_length} = $length;
     $schedule_info->{buffer_offset} = $offset;
     
-    $schedule->schedule($schedule_info);
+    $schedule->schedule($schedule_info, $caller_info);
     
     my $read_length = $schedule_info->{ret_length};
     
     return $read_length;
   }
   
-  static method gosched_pipe_read_sec : int ($fd : int, $string : mutable string, $length : int = -1, $offset : int = 0, $timeout_sec : double = 0) {
+  static method gosched_pipe_write : int ($fd : int, $string : string, $length : int = -1, $offset : int = 0, $timeout_duration : Go::Duration_1l = undef) {
+    
+    my $caller_info = caller;
+    return &gosched_pipe_write_with_caller_info($fd, $string, $length, $offset, $timeout_duration, $caller_info);
+  }
+  
+  static method gosched_pipe_write_sec : int ($fd : int, $string : string, $length : int = -1, $offset : int = 0, $timeout_sec : double = 0) {
     
     my $timeout_duration = Go::Duration_1l->new_from_sec($timeout_sec);
     
-    return &gosched_pipe_read($fd, $string, $length, $offset, $timeout_duration);
+    my $caller_info = caller;
+    return &gosched_pipe_write_with_caller_info($fd, $string, $length, $offset, $timeout_duration, $caller_info);
   }
   
-  static method gosched_pipe_write : int ($fd : int, $string : string, $length : int = -1, $offset : int = 0, $timeout_duration : Go::Duration_1l = undef) {
+  private static method gosched_pipe_write_with_caller_info : int ($fd : int, $string : string, $length : int = -1, $offset : int = 0, $timeout_duration : Go::Duration_1l = undef, $caller_info : CallerInfo = undef) {
     
     my $schedule = $GO->{schedule};
     
@@ -152,18 +191,11 @@ class Go {
     $schedule_info->{buffer_length} = $length;
     $schedule_info->{buffer_offset} = $offset;
     
-    $schedule->schedule($schedule_info);
+    $schedule->schedule($schedule_info, $caller_info);
     
     my $write_length = $schedule_info->{ret_length};
     
     return $write_length;
-  }
-  
-  static method gosched_pipe_write_sec : int ($fd : int, $string : string, $length : int = -1, $offset : int = 0, $timeout_sec : double = 0) {
-    
-    my $timeout_duration = Go::Duration_1l->new_from_sec($timeout_sec);
-    
-    return &gosched_pipe_write($fd, $string, $length, $offset, $timeout_duration);
   }
   
   private method DESTROY : void () {

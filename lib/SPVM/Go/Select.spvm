@@ -256,7 +256,8 @@ class Go::Select {
           
           my $schedule_info = new Go::Schedule::Info;
           
-          $schedule->schedule($schedule_info);
+          my $caller_info = caller;
+          $schedule->schedule($schedule_info, $caller_info);
         }
       }
     }

@@ -143,7 +143,8 @@ class Go::Channel {
         $schedule_info->{type} = Go::Schedule::Info->TYPE_CHANNEL_READ;
         $schedule_info->{wait} = $read_wait;
         
-        $schedule->schedule($schedule_info);
+        my $caller_info = caller;
+        $schedule->schedule($schedule_info, $caller_info);
       }
     }
     
@@ -223,7 +224,8 @@ class Go::Channel {
           $schedule_info->{type} = Go::Schedule::Info->TYPE_CHANNEL_WRITE;
           $schedule_info->{wait} = $write_wait;
           
-          $schedule->schedule($schedule_info);
+          my $caller_info = caller;
+          $schedule->schedule($schedule_info, $caller_info);
         }
       }
     }
