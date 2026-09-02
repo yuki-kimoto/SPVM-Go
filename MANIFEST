@@ -43,6 +43,7 @@ lib/SPVM/Go/Resource/UV.native/include/.gitkeep
 lib/SPVM/Go/Resource/UV.native/include/heap-inl.h
 lib/SPVM/Go/Resource/UV.native/include/idna.h
 lib/SPVM/Go/Resource/UV.native/include/queue.h
+lib/SPVM/Go/Resource/UV.native/include/spvm_go_uv.h
 lib/SPVM/Go/Resource/UV.native/include/strscpy.h
 lib/SPVM/Go/Resource/UV.native/include/strtok.h
 lib/SPVM/Go/Resource/UV.native/include/unix/darwin-stub.h
@@ -194,9 +195,6 @@ lib/SPVM/Go/Time.pm
 lib/SPVM/Go/Time.spvm
 lib/SPVM/Go/UV.build
 lib/SPVM/Go/UV.c
-lib/SPVM/Go/UV.native/include/.gitkeep
-lib/SPVM/Go/UV.native/include/spvm_go_uv.h
-lib/SPVM/Go/UV.native/src/.gitkeep
 lib/SPVM/Go/UV.pm
 lib/SPVM/Go/UV.spvm
 lib/SPVM/Go/UV/Callback/Async.pm
