@@ -4,6 +4,7 @@
 class Go::UV::Handle::Poll extends Go::UV::Handle {
   
   use Go::UV::Callback::Poll;
+  use Go::Resource::UV;
   
   # Fields
   has poll_cb : rw Go::UV::Callback::Poll;

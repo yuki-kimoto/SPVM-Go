@@ -3,6 +3,8 @@
 
 class Go::UV::Handle::Pipe extends Go::UV::Handle::Stream {
   
+  use Go::Resource::UV;
+  
   # Class Mehtods
   native static method new : Go::UV::Handle::Pipe ();
   

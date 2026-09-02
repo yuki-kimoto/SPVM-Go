@@ -1,0 +1,8 @@
+# Copyright (c) 2026 Yuki Kimoto
+# MIT License
+
+my $config = SPVM::Builder::Config->new_c99;
+
+$config->is_resource(1);
+
+$config;

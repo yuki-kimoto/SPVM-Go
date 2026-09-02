@@ -9,6 +9,8 @@ my $config = $uv_config_builder->build_config;
 
 $config->source_files([]);
 
+$config->use_resource('Go::Resource::UV');
+
 $config->use_resource('Go::UV');
 
 $config->link_to('Go::UV');

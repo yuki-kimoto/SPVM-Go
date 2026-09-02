@@ -5,6 +5,8 @@ class Go::UV::Request::Write extends Go::UV::Request {
   
   use Go::UV::Request::Write;
   use Go::UV::Callback::Write;
+  use Go::Resource::UV;
+  
   
   # Fields
   has write_cb : rw Go::UV::Callback::Write;

@@ -3,6 +3,8 @@
 
 class Go::UV::Handle::Async extends Go::UV::Handle {
   
+  use Go::Resource::UV;
+  
   # Fields
   has async_cb : rw Go::UV::Callback::Async;
   

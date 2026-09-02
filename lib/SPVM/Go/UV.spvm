@@ -4,6 +4,8 @@
 class Go::UV {
   version_from Go;
   
+  use Go::Resource::UV;
+  
   # Class Methods
   native static method strerror : string ($status : int);
   

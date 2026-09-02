@@ -4,6 +4,7 @@
 class Go::UV::Handle::Idle extends Go::UV::Handle {
   
   use Go::UV::Callback::Idle;
+  use Go::Resource::UV;
   
   # Fields
   has idle_cb : rw Go::UV::Callback::Idle;

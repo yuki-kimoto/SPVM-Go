@@ -8,6 +8,8 @@ class Go::UV::Handle : pointer {
   use Go::UV::Callback::Close;
   use Go::UV::Loop;
   
+  use Go::Resource::UV;
+  
   # Fields
   has close_cb : rw Go::UV::Callback::Close;
   
