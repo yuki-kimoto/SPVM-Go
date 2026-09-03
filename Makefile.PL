@@ -118,6 +118,7 @@ WriteMakefile(
     'SPVM::Time::Local' => '0.117',
     'SPVM::Time::Local' => '0.117',
     'SPVM::Resource::Coro' => '0.001',
+    'SPVM::Resource::UV' => '0.001',
   },
 );
 
