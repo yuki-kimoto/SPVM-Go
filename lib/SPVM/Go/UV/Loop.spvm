@@ -20,6 +20,7 @@ class Go::UV::Loop : pointer {
   use Go::UV::Callback::Write;
   use Go::UV::Callback::Close;
   
+  use Resource::UV;
   use Go::Resource::UV;
   
   # Class Variables

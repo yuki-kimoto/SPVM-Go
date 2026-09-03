@@ -11,11 +11,13 @@ sub build_config {
   
   my $config = SPVM::Builder::Config->new_c99;
   
-  $config->use_resource('Go::Resource::UV');
+  $config->use_resource('Resource::UV');
   
-  my $resource_uv =  $config->get_resource('Go::Resource::UV');
+  my $resource_uv =  $config->get_resource('Resource::UV');
   $config->add_define(@{$resource_uv->config->defines});
   $config->add_lib(@{$resource_uv->config->libs});
+  
+  $config->use_resource('Go::Resource::UV');
   
   $config->link_to('Go::UV');
   

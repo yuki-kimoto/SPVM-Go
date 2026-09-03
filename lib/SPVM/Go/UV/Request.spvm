@@ -3,6 +3,7 @@
 
 class Go::UV::Request {
   
+  use Resource::UV;
   use Go::Resource::UV;
   
   # Instance Methods

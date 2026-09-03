@@ -6,6 +6,7 @@ class Go::UV::Handle::Stream extends Go::UV::Handle {
   use Go::UV::Callback::Write;
   use Go::UV::Request::Write;
   use Go::UV::Callback::Read;
+  use Resource::UV;
   use Go::Resource::UV;
   
   # Fields

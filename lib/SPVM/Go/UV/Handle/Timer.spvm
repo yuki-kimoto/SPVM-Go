@@ -4,7 +4,9 @@
 class Go::UV::Handle::Timer extends Go::UV::Handle {
   
   use Go::UV::Callback::Timer;
+  use Resource::UV;
   use Go::Resource::UV;
+  
   
   # Fields
   has timer_cb : rw Go::UV::Callback::Timer;

@@ -3,8 +3,5 @@
 
 class Go::Resource::UV {
   
-  
-  static method my_method : void () {
-    
-  }
+  version_from Go;
 }

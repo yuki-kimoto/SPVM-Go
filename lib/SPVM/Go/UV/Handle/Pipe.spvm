@@ -3,6 +3,7 @@
 
 class Go::UV::Handle::Pipe extends Go::UV::Handle::Stream {
   
+  use Resource::UV;
   use Go::Resource::UV;
   
   # Class Mehtods

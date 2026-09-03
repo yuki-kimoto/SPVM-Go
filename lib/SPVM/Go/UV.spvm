@@ -4,6 +4,7 @@
 class Go::UV {
   version_from Go;
   
+  use Resource::UV;
   use Go::Resource::UV;
   
   # Class Methods

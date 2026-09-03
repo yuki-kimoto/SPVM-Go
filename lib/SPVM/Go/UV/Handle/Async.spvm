@@ -3,6 +3,7 @@
 
 class Go::UV::Handle::Async extends Go::UV::Handle {
   
+  use Resource::UV;
   use Go::Resource::UV;
   
   # Fields

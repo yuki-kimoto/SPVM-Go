@@ -8,6 +8,7 @@ class Go::UV::Handle : pointer {
   use Go::UV::Callback::Close;
   use Go::UV::Loop;
   
+  use Resource::UV;
   use Go::Resource::UV;
   
   # Fields

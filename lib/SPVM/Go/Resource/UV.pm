@@ -8,11 +8,11 @@ package SPVM::Go::Resource::UV;
 
 =head1 Name
 
-SPVM::Go::Resource::UV - Short Description
+SPVM::Go::Resource::UV - Data Structure for Go::UV class and libuv
 
 =head1 Description
 
-Go::Resource::UV class in L<SPVM> is a L<resource|SPVM::Document::Resource> class for something.
+Go::Resource::UV class in L<SPVM> is a L<resource|SPVM::Document::Resource> class for data structure for Go::UV class and libuv.
 
 =head1 Usage
 
@@ -27,9 +27,7 @@ MyClass.build:
 MyClass.c:
 
   #include "spvm_native.h"
-  #include "foo.h"
-  
-  
+  #include "spvm_go_uv.h"
   
   int32_t SPVM__MyClass__test(SPVM_ENV* env, SPVM_VALUE* stack) {
     
@@ -37,81 +35,9 @@ MyClass.c:
     
     return 0;
   }
-  
-  
-  
-=head1 Details
-
-
-
-=head1 Original Product
-
-
-
-=head1 Original Product Version
-
-
-
-=head1 Language
-
-
-
-=head1 Language Standard
-
-
-
-=head1 Required Libraries
-
-
-
-=head1 Required Linker Flags
-
-
-
-=head1 Required Resources
-
-
-
-=head1 Header Files
-
-
-
-=head1 Source Files
-
-
-
-=head1 Compiler Flags
-
-
-
-=head1 How to Create Resource
-
-
-
-=head2 Donwload
-
-
-
-=head2 Extracting Source Files
-
-
-
-=head2 Extracting Header Files
-
-
-
-
-=head1 Repository
-
-
-
-=head1 Author
-
-Yuki Kimoto C<kimoto.yuki@gmail.com>
 
 =head1 Copyright & License
 
 Copyright (c) 2026 Yuki Kimoto
 
 MIT License
-
