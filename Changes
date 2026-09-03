@@ -1,6 +1,11 @@
-0.043 2026-09-02
+0.044 2026-09-03
   [Release Summary]
-    * 
+    * The libuv source files previously included in SPVM::Go::Resource::UV have been moved to SPVM::Resource::UV, and it now uses that.
+  [Internal Changes]
+    * Use Resource::UV instead of Go::Resource::UV. Remove libuv source files from Go::Resource::UV and remain only spvm_go_uv.h.
+    * Require SPVM::Resource::UV 0.001.
+    
+0.043 2026-09-02
   [Internal Changes]
     * Change config extension from .config to .build.
 0.042 2026-08-28
