@@ -133,18 +133,6 @@ package MY {
       
       $options->{native_classes} = [
         'Go::Goroutine',
-        'Go::UV',
-        'Go::UV::Constant',
-        'Go::UV::Loop',
-        'Go::UV::Handle',
-        'Go::UV::Handle::Idle',
-        'Go::UV::Handle::Timer',
-        'Go::UV::Handle::Poll',
-        'Go::UV::Handle::Async',
-        'Go::UV::Handle::Pipe',
-        'Go::UV::Handle::Stream',
-        'Go::UV::Request',
-        'Go::UV::Request::Write',
       ];
       
       $options->{precompile_classes} = [
