@@ -117,8 +117,8 @@ WriteMakefile(
     'SPVM::Regex' => '0.260',
     'SPVM::Time::Local' => '0.117',
     'SPVM::Time::Local' => '0.117',
-    'SPVM::Resource::Coro' => '0.001',
-    'SPVM::Resource::UV' => '0.001',
+    'SPVM::Resource::Coro' => '0.002',
+    'SPVM::UV' => '0.002',
   },
 );
 
