@@ -1,7 +1,0 @@
-# Copyright (c) 2026 Yuki Kimoto
-# MIT License
-
-class Go::Resource::UV {
-  
-  version_from Go;
-}

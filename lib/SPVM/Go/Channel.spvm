@@ -11,6 +11,7 @@ class Go::Channel {
   use Go::Channel::Wait;
   use Fn;
   use QList;
+  use UV::Handle::Async;
   
   # Fields
   has capacity : int;
@@ -268,7 +269,7 @@ class Go::Channel {
     my $goroutine = $wait->{goroutine};
     
     if ($goroutine) {
-      my $uv_async = (Go::UV::Handle::Async)$goroutine->{uv_handle};
+      my $uv_async = (UV::Handle::Async)$goroutine->{uv_handle};
       $uv_async->send;
     }
   }

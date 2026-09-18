@@ -5,14 +5,13 @@ class Go::Goroutine : pointer {
   version_from Go;
   allow Go::Schedule;
   allow Go::Channel;
-  allow Go::UV;
   
   use Callback;
   use Go::Channel;
   use Go::Time;
   use Resource::Coro;
-  use Go::UV::Handle;
-  use Go::UV::Request::Write;
+  use UV::Handle;
+  use UV::Request::Write;
   
   # Fields
   has schedule_goroutine : Go::Goroutine;
@@ -23,11 +22,11 @@ class Go::Goroutine : pointer {
   
   has disabled : byte;
   
-  has uv_handle : Go::UV::Handle;
+  has uv_handle : UV::Handle;
   
-  has timeout_uv_timer : Go::UV::Handle::Timer;
+  has timeout_uv_timer : UV::Handle::Timer;
   
-  has uv_write : Go::UV::Request::Write;
+  has uv_write : UV::Request::Write;
   
   has caller_info : CallerInfo;
   
