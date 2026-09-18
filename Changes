@@ -1,3 +1,13 @@
+0.045 2026-09-18
+
+  [Requirement Changes]
+    * Remove SPVM::Resource::UV requirement.
+    * Require SPVM::Resource::Coro 0.002. 
+    * Require SPVM::UV 0.002.
+  
+  [Internal Changes]
+    * Remove Go::UV classes. And use UV class.
+    
 0.044 2026-09-03
   [Release Summary]
     * The libuv source files previously included in SPVM::Go::Resource::UV have been moved to SPVM::Resource::UV, and it now uses that.
