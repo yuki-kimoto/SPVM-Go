@@ -2,7 +2,7 @@
 # MIT License
 
 class Go {
-  version "0.044";
+  version "0.045";
   
   use Go::Channel;
   use Go::Schedule;
