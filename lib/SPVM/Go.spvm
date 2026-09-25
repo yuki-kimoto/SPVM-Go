@@ -132,6 +132,23 @@ class Go {
     $schedule->schedule($schedule_info, $caller_info);
   }
   
+  static method gosched_io_cancel : void ($fd : int) {
+    
+    my $caller_info = caller;
+    &gosched_io_cancel_with_caller_info($fd, $caller_info);
+  }
+  
+  static method gosched_io_cancel_with_caller_info : void ($fd : int, $caller_info : CallerInfo = undef) {
+    
+    my $schedule = $GO->{schedule};
+    
+    my $schedule_info = new Go::Schedule::Info;
+    $schedule_info->{type} = Go::Schedule::Info->TYPE_IO_CANCEL;
+    $schedule_info->{fd} = $fd;
+    
+    $schedule->schedule($schedule_info, $caller_info);
+  }
+  
   static method gosched_pipe_read : int ($fd : int, $string : mutable string, $length : int = -1, $offset : int = 0, $timeout_duration : Go::Duration_1l = undef) {
     
     my $caller_info = caller;

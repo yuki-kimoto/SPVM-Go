@@ -150,6 +150,14 @@ C<static method gosched_io_write_sec : void ($fd : int, $timeout_sec : double = 
 
 Same as L<"/gosched_io_write">, but the timeout is the seconds $timeout_sec.
 
+=head2 gosched_io_cancel
+
+C<static method gosched_io_cancel : void ($fd : int);>
+
+Cancels suspending the current goroutine for IO writing given the file descriptor $fd
+
+The control is transferred to the scheduler.
+
 =head2 sleep
 
 C<static method sleep : void ($duration : Go::Duration_1l = undef)>
