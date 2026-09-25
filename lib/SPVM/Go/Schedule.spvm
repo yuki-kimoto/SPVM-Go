@@ -200,6 +200,8 @@ class Go::Schedule {
       
       $self->{uv_poll_goroutines_h}->delete("$fd");
       $self->enable_goroutine($uv_poll_goroutine);
+      
+      return;
     }
     elsif ($schedule_type == Go::Schedule::Info->TYPE_PIPE_READ ||$schedule_type == Go::Schedule::Info->TYPE_PIPE_WRITE) {
       my $timeout_duration_nsec = $schedule_info->{timeout_duration_nsec};

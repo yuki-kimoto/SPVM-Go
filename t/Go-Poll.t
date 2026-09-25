@@ -12,6 +12,8 @@ my $api = SPVM::api();
 
 my $start_memory_blocks_count = $api->get_memory_blocks_count;
 
+ok(SPVM::TestCase::Go::Poll->gosched_io_cancel);
+
 {
   my $server = TestUtil::ServerRunner->new(
     code => sub {
