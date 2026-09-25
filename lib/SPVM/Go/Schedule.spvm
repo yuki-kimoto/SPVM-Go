@@ -34,7 +34,7 @@ class Go::Schedule {
   
   has uv_loop : UV::Loop;
   
-  has uv_poll_handles_h : Hash of UV::Handle::Poll;
+  has uv_poll_goroutines_h : Hash of Go::Goroutine;
   
   # Class Methods
   private static method new : Go::Schedule () {
@@ -51,7 +51,7 @@ class Go::Schedule {
     
     $self->{uv_loop} = UV::Loop->new;
     
-    $self->{uv_poll_handles_h} = Hash->new;
+    $self->{uv_poll_goroutines_h} = Hash->new;
     
     return $self;
   }
@@ -156,19 +156,19 @@ class Go::Schedule {
           $schedule_info->{exception} = UV->strerror($status);
         }
         
-        $schedule->{uv_poll_handles_h}->delete("$fd");
+        $schedule->{uv_poll_goroutines_h}->delete("$fd");
         $schedule->awake($goroutine, $uv_poll, $schedule_info);
       };
       
       $uv_poll->start($poll_cb, $events);
-      $self->{uv_poll_handles_h}{"$fd"} = $uv_poll;
+      $self->{uv_poll_goroutines_h}{"$fd"} = $goroutine;
       
       if ($timeout_msec > 0) {
         my $uv_timer = UV::Handle::Timer->new;
         $uv_loop->timer_init($uv_timer);
         $goroutine->{timeout_uv_timer} = $uv_timer;
         my $timer_cb = [$goroutine : Go::Goroutine, $schedule : Go::Schedule = $self, $schedule_info : Go::Schedule::Info, $fd : int] method : void ($uv_timer : UV::Handle::Timer) {
-          $schedule->{uv_poll_handles_h}->delete("$fd");
+          $schedule->{uv_poll_goroutines_h}->delete("$fd");
           $schedule->awake($goroutine, $uv_timer, $schedule_info);
         };
         $uv_timer->start($timer_cb, $timeout_msec);
@@ -185,16 +185,21 @@ class Go::Schedule {
         die "The file descriptor \$fd in schedule type TYPE_IO_CANCEL must be a non-negative value.";
       }
       
-      my $uv_poll = $self->{uv_poll_handles_h}{"$fd"};
+      my $uv_poll_goroutine = $self->{uv_poll_goroutines_h}{"$fd"};
       
-      unless ($uv_poll) {
-        die "The poll file descriptor $fd is not found.";
+      unless ($uv_poll_goroutine) {
+        die "The poll goroutine specified by file descriptor $fd is not found.";
       }
       
-      $uv_poll->close_safe;
+      if ($uv_poll_goroutine->{uv_handle}) {
+        $uv_poll_goroutine->{uv_handle}->close_safe;
+      }
+      if ($uv_poll_goroutine->{timeout_uv_timer}) {
+        $uv_poll_goroutine->{timeout_uv_timer}->close_safe;
+      }
       
-      $self->{uv_poll_handles_h}->delete("$fd");
-      $self->awake($goroutine, $uv_poll, $schedule_info);
+      $self->{uv_poll_goroutines_h}->delete("$fd");
+      $self->enable_goroutine($uv_poll_goroutine);
     }
     elsif ($schedule_type == Go::Schedule::Info->TYPE_PIPE_READ ||$schedule_type == Go::Schedule::Info->TYPE_PIPE_WRITE) {
       my $timeout_duration_nsec = $schedule_info->{timeout_duration_nsec};
