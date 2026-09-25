@@ -1,3 +1,8 @@
+0.046 2026-09-25
+  
+  [New Features]
+    * Add osched_io_cancel method to Go class.
+
 0.045 2026-09-18
 
   [Requirement Changes]
