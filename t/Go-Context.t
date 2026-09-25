@@ -4,8 +4,6 @@ use strict;
 use warnings;
 use lib 't/lib';
 
-use TestUtil::ServerRunner;
-
 use SPVM 'TestCase::Go::Context';
 
 my $api = SPVM::api();
