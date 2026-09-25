@@ -187,19 +187,17 @@ class Go::Schedule {
       
       my $uv_poll_goroutine = $self->{uv_poll_goroutines_h}{"$fd"};
       
-      unless ($uv_poll_goroutine) {
-        die "The poll goroutine specified by file descriptor $fd is not found.";
+      if ($uv_poll_goroutine) {
+        if ($uv_poll_goroutine->{uv_handle}) {
+          $uv_poll_goroutine->{uv_handle}->close_safe;
+        }
+        if ($uv_poll_goroutine->{timeout_uv_timer}) {
+          $uv_poll_goroutine->{timeout_uv_timer}->close_safe;
+        }
+        
+        $self->{uv_poll_goroutines_h}->delete("$fd");
+        $self->enable_goroutine($uv_poll_goroutine);
       }
-      
-      if ($uv_poll_goroutine->{uv_handle}) {
-        $uv_poll_goroutine->{uv_handle}->close_safe;
-      }
-      if ($uv_poll_goroutine->{timeout_uv_timer}) {
-        $uv_poll_goroutine->{timeout_uv_timer}->close_safe;
-      }
-      
-      $self->{uv_poll_goroutines_h}->delete("$fd");
-      $self->enable_goroutine($uv_poll_goroutine);
       
       return;
     }

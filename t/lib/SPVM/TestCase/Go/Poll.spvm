@@ -331,6 +331,9 @@ class TestCase::Go::Poll {
     
     Go->gosched_io_read_sec($socket_fd1, 100);
     
+    # Check doing nothing
+    Go->gosched_io_cancel($socket_fd1);
+    
     return 1;
   }
 
