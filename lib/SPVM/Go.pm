@@ -154,7 +154,15 @@ Same as L<"/gosched_io_write">, but the timeout is the seconds $timeout_sec.
 
 C<static method gosched_io_cancel : void ($fd : int);>
 
-Cancels suspending the current goroutine for IO writing given the file descriptor $fd
+Cancels suspending the current goroutine for IO read/write given the file descriptor $fd
+
+The control is transferred to the scheduler.
+
+=head2 gosched_pipe_cancel
+
+C<static method gosched_pipe_cancel : void ($fd : int);>
+
+Cancels suspending the current goroutine for pipe read/write given the file descriptor $fd
 
 The control is transferred to the scheduler.
 

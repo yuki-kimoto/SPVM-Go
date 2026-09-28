@@ -8,60 +8,11 @@ package SPVM::Go::Schedule::Info;
 
 =head1 Name
 
-SPVM::Go::Schedule::Info - Short Description
+SPVM::Go::Schedule::Info - Schedule information
 
 =head1 Description
 
-Go::Schedule::Info class in L<SPVM> has methods to do someting.
-
-=head1 Usage
-
-  use Go::Schedule::Info;
-
-=head1 Details
-
-
-
-=head1 Super Class
-
-
-
-=head1 Interfaces
-
-
-
-=head1 Enumerations
-
-
-
-=head1 Fields
-
-
-
-=head1 Class Methods
-
-
-
-=head1 Instance Methods
-
-
-
-=head1 Well Known Child Classes
-
-
-
-=head1 See Also
-
-
-
-
-=head1 Repository
-
-
-
-=head1 Author
-
-Yuki Kimoto C<kimoto.yuki@gmail.com>
+Go::Schedule::Info class in L<SPVM> represents schedule information.
 
 =head1 Copyright & License
 

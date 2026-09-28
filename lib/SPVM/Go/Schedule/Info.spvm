@@ -20,6 +20,7 @@ class Go::Schedule::Info {
     TYPE_PIPE_READ,
     TYPE_PIPE_WRITE,
     TYPE_IO_CANCEL,
+    TYPE_PIPE_CANCEL,
   }
   
   # Fields
