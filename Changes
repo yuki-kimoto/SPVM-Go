@@ -1,7 +1,12 @@
-0.046 2026-09-25
-  
+0.047 2026-09-28
   [New Features]
-    * Add osched_io_cancel method to Go class.
+    * Add gosched_pipe_cancel method to Go class.
+  [Test Improvement]
+    * Remove dependency to Perl echo server.
+    
+0.046 2026-09-25
+  [New Features]
+    * Add gosched_io_cancel method to Go class.
 
 0.045 2026-09-18
 
