@@ -79,4 +79,3 @@ t/lib/SPVM/TestCase/Go/Poll.spvm
 t/lib/SPVM/TestCase/Go/Select.spvm
 t/lib/SPVM/TestCase/Go/Sync/WaitGroup.spvm
 t/lib/SPVM/TestCase/Go/Time.spvm
-t/lib/TestUtil/ServerRunner.pm
