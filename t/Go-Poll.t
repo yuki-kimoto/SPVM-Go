@@ -4,51 +4,13 @@ use strict;
 use warnings;
 use lib 't/lib';
 
-use TestUtil::ServerRunner;
-
 use SPVM 'TestCase::Go::Poll';
 
 my $api = SPVM::api();
 
 my $start_memory_blocks_count = $api->get_memory_blocks_count;
 
-ok(SPVM::TestCase::Go::Poll->gosched_io_cancel);
-
-{
-  my $server = TestUtil::ServerRunner->new(
-    code => sub {
-      my ($port) = @_;
-      
-      TestUtil::ServerRunner->run_echo_server($port);
-    },
-  );
-  
-  ok(SPVM::TestCase::Go::Poll->basic($server->port));
-}
-
-{
-  my $server = TestUtil::ServerRunner->new(
-    code => sub {
-      my ($port) = @_;
-      
-      TestUtil::ServerRunner->run_echo_server($port);
-    },
-  );
-  
-  ok(SPVM::TestCase::Go::Poll->parallel($server->port));
-}
-
-{
-  my $server = TestUtil::ServerRunner->new(
-    code => sub {
-      my ($port) = @_;
-      
-      TestUtil::ServerRunner->run_echo_server($port);
-    },
-  );
-  
-  ok(SPVM::TestCase::Go::Poll->timeout($server->port));
-}
+ok(SPVM::TestCase::Go::Poll->timeout);
 
 $api->destroy_runtime_permanent_vars;
 
