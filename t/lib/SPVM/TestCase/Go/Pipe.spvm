@@ -243,4 +243,31 @@ class TestCase::Go::Pipe {
     return 1;
   }
   
+  static method gosched_pipe_cancel : int () {
+    
+    my $socket_fd1 = -1;
+    my $socket_fd2 = -1;
+    
+    my $non_bloking = 1;
+    Sys->pipepair(\$socket_fd1, \$socket_fd2, $non_bloking);
+    
+    Fn->defer([$socket_fd1 : int, $socket_fd2 : int] method : void () {
+      Sys::Socket->close($socket_fd1);
+      Sys::Socket->close($socket_fd2);
+    });
+    
+    Go->go([$socket_fd1 : int] method : void () {
+      Go->sleep_sec(0.5);
+      Go->gosched_pipe_cancel($socket_fd1);
+    });
+    
+    my $read_data = new_string_len 100;
+    Go->gosched_pipe_read_sec($socket_fd1, $read_data);
+    
+    # Check doing nothing
+    Go->gosched_pipe_cancel($socket_fd1);
+    
+    return 1;
+  }
+
 }
