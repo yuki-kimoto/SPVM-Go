@@ -21,6 +21,7 @@ class Go::Schedule::Info {
     TYPE_PIPE_WRITE,
     TYPE_IO_CANCEL,
     TYPE_PIPE_CANCEL,
+    TYPE_PROCESS_WAIT,
   }
   
   # Fields
