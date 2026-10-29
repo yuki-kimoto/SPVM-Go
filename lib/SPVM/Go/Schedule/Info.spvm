@@ -9,6 +9,7 @@ class Go::Schedule::Info {
   allow Go::Select;
   
   use Go::Channel::Wait;
+  use UV::ProcessOptions;
   
   private enum {
     TYPE_NONE,
@@ -44,6 +45,12 @@ class Go::Schedule::Info {
   has error_id : int;
   
   has exception : string;
+  
+  has process_options : UV::ProcessOptions;
+  
+  has process_exit_code : long;
+  
+  has process_signal_term : int;
   
   # Class Methods
   static method new : Go::Schedule::Info () {
