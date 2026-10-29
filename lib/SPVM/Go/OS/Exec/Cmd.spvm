@@ -3,8 +3,57 @@
 
 class Go::OS::Exec::Cmd {
   
+  # Fields
+  has path : string;
   
-  static method my_method : void () {
+  has args : string[];
+  
+  has env : string[];
+  
+  has dir : string;
+  
+  has stdout_fd : int;
+  
+  has stderr_fd : int;
+  
+  has stdin_fd : int;
+  
+  has extract_fds : int[];
+  
+  has context : Go::Context;
+  
+  # Class Methods
+  static method new : Go::OS::Exec::Cmd () {
+    
+    my $self = new Go::OS::Exec::Cmd;
+    
+    return $self;
+  }
+  
+  static method command : Go::OS::Exec::Cmd ($path : string, $args : string[]) {
+    
+    my $self = new Go::OS::Exec::Cmd;
+    $self->{path} = $path;
+    $self->{args} = $args;
+    
+    return $self;
+  }
+  
+  static method command_context : Go::OS::Exec::Cmd ($ctx : Go::Context, $path : string, $args : string[]) {
+    
+    my $self = new Go::OS::Exec::Cmd;
+    $self->{context} = $ctx;
+    $self->{path} = $path;
+    $self->{args} = $args;
+    
+    return $self;
+  }
+  
+  # Instance Methods
+  method run : void () {
+    
+    die "Not implemented.";
     
   }
+  
 }
