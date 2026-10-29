@@ -40,6 +40,8 @@ lib/SPVM/Go/OS/Exec.pm
 lib/SPVM/Go/OS/Exec.spvm
 lib/SPVM/Go/OS/Exec/Cmd.pm
 lib/SPVM/Go/OS/Exec/Cmd.spvm
+lib/SPVM/Go/OS/FD.pm
+lib/SPVM/Go/OS/FD.spvm
 lib/SPVM/Go/OS/Signal.pm
 lib/SPVM/Go/OS/Signal.spvm
 lib/SPVM/Go/Schedule.pm

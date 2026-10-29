@@ -1,0 +1,38 @@
+# Copyright (c) 2026 Yuki Kimoto
+# MIT License
+
+class Go::OS::FD {
+  
+  private enum {
+    TYPE_UNKNOWN,
+    TYPE_FILE,
+    TYPE_PIPE,
+  };
+  
+  # Fields
+  has type : int;
+  
+  has fd : int;
+  
+  # Class Methods
+  static method new_file : Go::OS::FD ($fd : int) {
+    
+    my $self = new Go::OS::FD;
+    
+    $self->{fd} = $fd;
+    $self->{type} = &TYPE_FILE;
+    
+    return $self;
+  }
+  
+  static method new_pipe_end : Go::OS::FD ($fd : int) {
+    
+    my $self = new Go::OS::FD;
+    
+    $self->{fd} = $fd;
+    $self->{type} = &TYPE_PIPE;
+    
+    return $self;
+  }
+  
+}
