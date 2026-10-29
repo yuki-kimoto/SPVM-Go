@@ -7,7 +7,7 @@ class Go::OS::FD {
     TYPE_UNKNOWN,
     TYPE_FILE,
     TYPE_PIPE,
-  };
+  }
   
   # Fields
   has type : int;

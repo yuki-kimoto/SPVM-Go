@@ -3,8 +3,26 @@
 
 class Go::OS::Exec {
   
+  use Go::OS::Exec::Cmd;
+  use Go::Context;
   
-  static method my_method : void () {
+  static method command : Go::OS::Exec::Cmd ($path : string, $args : string[]) {
     
+    my $self = new Go::OS::Exec::Cmd;
+    $self->{path} = $path;
+    $self->{args} = $args;
+    
+    return $self;
   }
+  
+  static method command_context : Go::OS::Exec::Cmd ($ctx : Go::Context, $path : string, $args : string[]) {
+    
+    my $self = new Go::OS::Exec::Cmd;
+    $self->{context} = $ctx;
+    $self->{path} = $path;
+    $self->{args} = $args;
+    
+    return $self;
+  }
+  
 }

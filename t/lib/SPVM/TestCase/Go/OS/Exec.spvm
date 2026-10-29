@@ -1,0 +1,9 @@
+class TestCase::Go::OS::Exec {
+  use Go::OS::Exec;
+  
+  static method basic : int () {
+    
+    return 1;
+  }
+  
+}

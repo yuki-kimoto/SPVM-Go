@@ -3,48 +3,33 @@
 
 class Go::OS::Exec::Cmd {
   
+  allow Go::OS::Exec;
+  
+  use Go::OS::FD;
+  
   # Fields
-  has path : string;
+  has path : rw string;
   
-  has args : string[];
+  has args : rw string[];
   
-  has env : string[];
+  has env : rw string[];
   
-  has dir : string;
+  has dir : rw string;
   
-  has stdout_fd : int;
+  has stdout_fd : rw Go::OS::FD;
   
-  has stderr_fd : int;
+  has stderr_fd : rw Go::OS::FD;
   
-  has stdin_fd : int;
+  has stdin_fd : rw Go::OS::FD;
   
-  has extract_fds : int[];
+  has extract_fds : rw Go::OS::FD[];
   
-  has context : Go::Context;
+  has context : rw Go::Context;
   
   # Class Methods
   static method new : Go::OS::Exec::Cmd () {
     
     my $self = new Go::OS::Exec::Cmd;
-    
-    return $self;
-  }
-  
-  static method command : Go::OS::Exec::Cmd ($path : string, $args : string[]) {
-    
-    my $self = new Go::OS::Exec::Cmd;
-    $self->{path} = $path;
-    $self->{args} = $args;
-    
-    return $self;
-  }
-  
-  static method command_context : Go::OS::Exec::Cmd ($ctx : Go::Context, $path : string, $args : string[]) {
-    
-    my $self = new Go::OS::Exec::Cmd;
-    $self->{context} = $ctx;
-    $self->{path} = $path;
-    $self->{args} = $args;
     
     return $self;
   }
