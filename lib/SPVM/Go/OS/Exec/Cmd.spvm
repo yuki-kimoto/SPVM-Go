@@ -6,8 +6,10 @@ class Go::OS::Exec::Cmd {
   allow Go::OS::Exec;
   
   use Go::OS::FD;
+  use UV::Constant as UV_C;
+  use UV::ProcessOptions;
+  use UV::StdioContainer;
   
-  # Fields
   has path : rw string;
   
   has args : rw string[];
@@ -26,7 +28,6 @@ class Go::OS::Exec::Cmd {
   
   has context : rw Go::Context;
   
-  # Class Methods
   static method new : Go::OS::Exec::Cmd () {
     
     my $self = new Go::OS::Exec::Cmd;
@@ -34,7 +35,68 @@ class Go::OS::Exec::Cmd {
     return $self;
   }
   
-  # Instance Methods
+  private method _setup_stdio_container : void ($container : UV::StdioContainer, $fd_obj : Go::OS::FD) {
+    
+    if (!$fd_obj) {
+      $container->set_flags(UV_C->UV_IGNORE);
+    }
+    elsif ($fd_obj->{type} == Go::OS::FD->TYPE_FILE) {
+      $container->set_flags(UV_C->UV_INHERIT_FD);
+      $container->set_fd($fd_obj->{fd});
+    }
+    elsif ($fd_obj->{type} == Go::OS::FD->TYPE_PIPE) {
+      $container->set_flags(UV_C->UV_CREATE_PIPE | UV_C->UV_READABLE_PIPE | UV_C->UV_WRITABLE_PIPE);
+    }
+  }
+  
+  method to_uv_process_options : UV::ProcessOptions () {
+    
+    my $options = UV::ProcessOptions->new;
+    
+    $options->set_file($self->{path});
+    $options->set_args($self->{args});
+    $options->set_env($self->{env});
+    if ($self->{dir}) {
+      $options->set_cwd($self->{dir});
+    }
+    
+    my $extra_fds = $self->{extract_fds};
+    my $extra_fds_count = $extra_fds ? @$extra_fds : 0;
+    my $stdio_count = 3 + $extra_fds_count;
+    
+    my $stdio_containers = new UV::StdioContainer[$stdio_count];
+    
+    {
+      my $container = UV::StdioContainer->new;
+      $self->_setup_stdio_container($container, $self->{stdin_fd});
+      $stdio_containers->[0] = $container;
+    }
+    
+    {
+      my $container = UV::StdioContainer->new;
+      $self->_setup_stdio_container($container, $self->{stdout_fd});
+      $stdio_containers->[1] = $container;
+    }
+    
+    {
+      my $container = UV::StdioContainer->new;
+      $self->_setup_stdio_container($container, $self->{stderr_fd});
+      $stdio_containers->[2] = $container;
+    }
+    
+    for (my $i = 0; $i < $extra_fds_count; $i++) {
+      my $stdio_index = 3 + $i;
+      my $container = UV::StdioContainer->new;
+      my $fd_obj = $extra_fds->[$i];
+      $self->_setup_stdio_container($container, $fd_obj);
+      $stdio_containers->[$stdio_index] = $container;
+    }
+    
+    $options->set_stdios($stdio_containers);
+    
+    return $options;
+  }
+  
   method run : void () {
     
     die "Not implemented.";

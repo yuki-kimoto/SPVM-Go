@@ -3,6 +3,8 @@
 
 class Go::OS::FD {
   
+  allow Go::OS::Exec::Cmd;
+  
   private enum {
     TYPE_UNKNOWN,
     TYPE_FILE,
