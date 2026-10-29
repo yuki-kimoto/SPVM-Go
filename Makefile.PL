@@ -71,7 +71,7 @@ unless ($meta) {
 $jobs //= 1;
 
 my %configure_requires_and_prereq_pm = (
-  'SPVM' => '0.990196',
+  'SPVM' => '0.990204',
 );
 WriteMakefile(
   NAME => 'SPVM::Go',
@@ -118,7 +118,7 @@ WriteMakefile(
     'SPVM::Time::Local' => '0.117',
     'SPVM::Time::Local' => '0.117',
     'SPVM::Resource::Coro' => '0.002',
-    'SPVM::UV' => '0.002',
+    'SPVM::UV' => '0.004',
   },
 );
 
