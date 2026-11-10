@@ -129,6 +129,12 @@ class Go::Schedule {
       $goroutine_uv_handle->close_safe;
     }
     
+    my $done = $goroutine->{done};
+    if ($done) {
+      $done->close;
+      $goroutine->{done} = undef;
+    }
+    
     $uv_handle->close_safe;
     
     $self->enable_goroutine($goroutine);
@@ -416,10 +422,9 @@ class Go::Schedule {
             $uv_timer->start($timer_cb, (long)$timeout_msec);
           }
 
-=pod
-          
           my $done = $context->done;
           if ($done) {
+            $goroutine->{done} = $done;
             Go->go([$done : , $uv_process : , $self : , $schedule_info : , $goroutine : , $finished_ref : ] method : void () {
               $done->read;
               if (!$finished_ref->[0]) {
@@ -429,8 +434,6 @@ class Go::Schedule {
               }
             });
           }
-
-=cut
 
         }
         
