@@ -371,6 +371,8 @@ class Go::Schedule {
         }
         my $timeout_msec = $timeout_duration_nsec / 1000000;
         
+        my $finished_ref = [0];
+        
         my $uv_loop = $self->{uv_loop};
         
         my $options = $exec_cmd->to_uv_process_options;
@@ -378,7 +380,11 @@ class Go::Schedule {
         my $uv_process = UV::Handle::Process->new;
         $goroutine->{uv_handle} = $uv_process;
         
-        my $exit_cb = [$goroutine : , $self : , $schedule_info : ] method : void ($uv_proc : UV::Handle::Process, $exit_status : long, $term_signal : int) {
+        my $exit_cb = [$goroutine : , $self : , $schedule_info : , $finished_ref : ] method : void ($uv_proc : UV::Handle::Process, $exit_status : long, $term_signal : int) {
+          if (!$finished_ref->[0]) {
+            $finished_ref->[0] = 1;
+          }
+          
           $schedule_info->{process_exit_status} = $exit_status;
           $schedule_info->{process_term_signal} = $term_signal;
           $self->awake($goroutine, $uv_proc, $schedule_info);
@@ -392,11 +398,29 @@ class Go::Schedule {
           my $uv_timer = UV::Handle::Timer->new;
           $uv_loop->timer_init($uv_timer);
           $goroutine->{timeout_uv_timer} = $uv_timer;
-          my $timer_cb = [$goroutine : , $self : , $schedule_info : , $uv_process : ] method : void ($uv_timer : UV::Handle::Timer) {
-            $uv_process->kill(SIGNAL_C->SIGTERM);
-            $self->awake($goroutine, $uv_timer, $schedule_info);
+          my $timer_cb = [$goroutine : , $self : , $schedule_info : , $uv_process : , $finished_ref : ] method : void ($uv_timer : UV::Handle::Timer) {
+            if (!$finished_ref->[0]) {
+              $finished_ref->[0] = 1;
+              $uv_process->kill(SIGNAL_C->SIGTERM);
+              $self->awake($goroutine, $uv_timer, $schedule_info);
+            }
           };
           $uv_timer->start($timer_cb, $timeout_msec);
+        }
+        
+        my $context = $exec_cmd->{context};
+        if ($context) {
+          my $done = $context->done;
+          if ($done) {
+            Go->go([$done : , $uv_process : , $self : , $schedule_info : , $goroutine : , $finished_ref : ] method : void () {
+              $done->read;
+              if (!$finished_ref->[0]) {
+                $finished_ref->[0] = 1;
+                $uv_process->kill(SIGNAL_C->SIGTERM);
+                $self->awake($goroutine, $uv_process, $schedule_info);
+              }
+            });
+          }
         }
         
         if (Go->ENV_DEBUG) {

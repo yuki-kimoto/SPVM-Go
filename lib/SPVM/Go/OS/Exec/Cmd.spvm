@@ -4,6 +4,7 @@
 class Go::OS::Exec::Cmd {
   
   allow Go::OS::Exec;
+  allow Go::Schedule;
   
   use Go::OS::FD;
   use UV::Constant as UV_C;
@@ -102,24 +103,6 @@ class Go::OS::Exec::Cmd {
     my $schedule_info = Go::Schedule::Info->new;
     $schedule_info->{type} = Go::Schedule::Info->TYPE_PROCESS_WAIT;
     $schedule_info->{process_exec_cmd} = $self;
-    
-    my $context = $self->{context};
-    if ($context) {
-      my $deadline = $context->deadline;
-      if ($deadline) {
-        my $now = Go::Time->now;
-        if ($deadline->after($now)) {
-          my $duration = $deadline->sub($now);
-          my $timeout_duration_nsec = $duration->{nsec};
-          if ($timeout_duration_nsec > 0) {
-            $schedule_info->{timeout_duration_nsec} = $timeout_duration_nsec;
-          }
-        }
-        else {
-          $schedule_info->{timeout_duration_nsec} = 1;
-        }
-      }
-    }
     
     my $schedule = $Go::GO->{schedule};
     
