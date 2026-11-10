@@ -1,9 +1,38 @@
 class TestCase::Go::OS::Exec {
   use Go::OS::Exec;
   
+  use Go;
+  use Go::OS::Exec;
+  use Go::OS::Exec::Cmd;
+  use Go::Sync::WaitGroup;
+  
   static method basic : int () {
     
-    return 1;
+    my $success_ref = [1];
+    
+    my $wg = Go::Sync::WaitGroup->new;
+    $wg->add(1);
+    Go->go([$wg : , $success_ref : ] method : void () {
+      
+      Fn->defer([$wg : ] method : void () {
+        $wg->done;
+      });
+      
+      my $cmd = Go::OS::Exec->command(["perl", "-v"]);
+      
+      my $status = $cmd->run;
+      
+      my $exit_code = $status >> 8;
+      
+      unless ($exit_code == 0) {
+        diag "\$exit_code=$exit_code";
+        $success_ref->[0] = 0;
+      }
+    });
+    
+    $wg->wait;
+    
+    return $success_ref->[0];
   }
   
 }
