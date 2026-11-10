@@ -97,11 +97,11 @@ class Go::OS::Exec::Cmd {
     return $options;
   }
   
-  method run : void () {
+  method run : long () {
     
     my $schedule_info = Go::Schedule::Info->new;
     $schedule_info->{type} = Go::Schedule::Info->TYPE_PROCESS_WAIT;
-    $schedule_info->{exec_cmd} = $self;
+    $schedule_info->{process_exec_cmd} = $self;
     
     my $context = $self->{context};
     if ($context) {

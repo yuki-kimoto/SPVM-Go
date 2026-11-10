@@ -48,7 +48,11 @@ class Go::Schedule::Info {
   
   has exception : string;
   
-  has exec_cmd : Go::OS::Exec::Cmd;
+  has process_exec_cmd : Go::OS::Exec::Cmd;
+  
+  has process_exit_status : long;
+  
+  has process_term_signal : int;
   
   # Class Methods
   static method new : Go::Schedule::Info () {
