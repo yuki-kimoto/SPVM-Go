@@ -21,6 +21,7 @@ class Go::Schedule {
   use Thread::ID;
   use Thread::ThisThread;
   use Sys::IO;
+  use Sys::Signal::Constant as SIGNAL_C;
   
   has goroutines : List of Go::Goroutine;
   
@@ -352,6 +353,55 @@ class Go::Schedule {
           $schedule->awake($goroutine, $uv_timer, $schedule_info);
         };
         $uv_loop->async_init($uv_async, $async_cb);
+      }
+      case Go::Schedule::Info->TYPE_PROCESS_WAIT:
+      {
+        my $timeout_duration_nsec = $schedule_info->{timeout_duration_nsec};
+        my $exec_cmd = $schedule_info->{exec_cmd};
+        
+        unless ($exec_cmd) {
+          die "The exec_cmd in schedule type TYPE_PROCESS_WAIT must be defined.";
+        }
+        
+        my $deadline = (Go::Time)undef;
+        if ($timeout_duration_nsec > 0) {
+          $deadline = Go::Time->now->add(Go::Duration_1l->new($timeout_duration_nsec));
+        }
+        my $timeout_msec = $timeout_duration_nsec / 1000000;
+        
+        my $uv_loop = $self->{uv_loop};
+        
+        my $options = $exec_cmd->to_uv_process_options;
+        
+        my $uv_process = UV::Handle::Process->new;
+        $goroutine->{uv_handle} = $uv_process;
+        
+        my $exit_cb = [$goroutine : Go::Goroutine, $schedule : Go::Schedule = $self, $schedule_info : Go::Schedule::Info, $exec_cmd : Go::OS::Exec::Cmd] method : void ($uv_proc : UV::Handle::Process, $exit_status : long, $term_signal : int) {
+          if ($exit_status != 0 || $term_signal != 0) {
+            $schedule_info->{error_id} = basic_type_id Error;
+            $schedule_info->{exception} = "Process exited with error: exit_status=$exit_status, term_signal=$term_signal";
+          }
+          $schedule->awake($goroutine, $uv_proc, $schedule_info);
+        };
+        
+        $options->set_exit_cb($exit_cb);
+        
+        $uv_loop->spawn($uv_process, $options);
+        
+        if ($timeout_msec > 0) {
+          my $uv_timer = UV::Handle::Timer->new;
+          $uv_loop->timer_init($uv_timer);
+          $goroutine->{timeout_uv_timer} = $uv_timer;
+          my $timer_cb = [$goroutine : Go::Goroutine, $schedule : Go::Schedule = $self, $schedule_info : Go::Schedule::Info, $uv_process : UV::Handle::Process] method : void ($uv_timer : UV::Handle::Timer) {
+            $uv_process->kill(SIGNAL_C->SIGTERM);
+            $schedule->awake($goroutine, $uv_timer, $schedule_info);
+          };
+          $uv_timer->start($timer_cb, $timeout_msec);
+        }
+        
+        if (Go->ENV_DEBUG) {
+          Fn->say_stderr("[Go Debug]Register goroutine wait for process.");
+        }
       }
     }
     
