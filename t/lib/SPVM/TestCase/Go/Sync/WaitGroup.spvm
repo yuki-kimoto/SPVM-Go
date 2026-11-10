@@ -15,9 +15,9 @@ class TestCase::Go::Sync::WaitGroup {
       
       $wg->add(2);
       
-      Go->go([$wg : Go::Sync::WaitGroup] method : void () {
+      Go->go([$wg : ] method : void () {
         
-        Fn->defer([$wg : Go::Sync::WaitGroup] method : void () {
+        Fn->defer([$wg : ] method : void () {
           $wg->done;
         });
         
@@ -25,8 +25,8 @@ class TestCase::Go::Sync::WaitGroup {
         
       });
       
-      Go->go([$wg : Go::Sync::WaitGroup] method : void () {
-        Fn->defer([$wg : Go::Sync::WaitGroup] method : void () {
+      Go->go([$wg : ] method : void () {
+        Fn->defer([$wg : ] method : void () {
           $wg->done;
         });
         
@@ -55,14 +55,14 @@ class TestCase::Go::Sync::WaitGroup {
     
     my $results = new int[2];
     
-    Go->go([$results : int[]] method : void () {
-      Go->go([$results : int[]] method : void () {
+    Go->go([$results : ] method : void () {
+      Go->go([$results : ] method : void () {
         my $wg = Go::Sync::WaitGroup->new;
         
         $wg->add(2);
         
-        my $thread0 = Thread->new([$wg : Go::Sync::WaitGroup, $results : int[]] method : void () {
-          Fn->defer([$wg : Go::Sync::WaitGroup] method : void () {
+        my $thread0 = Thread->new([$wg : , $results : ] method : void () {
+          Fn->defer([$wg : ] method : void () {
             $wg->done;
           });
           
@@ -71,8 +71,8 @@ class TestCase::Go::Sync::WaitGroup {
           $results->[0] = 1;
         });
         
-        my $thread1 = Thread->new([$wg : Go::Sync::WaitGroup, $results : int[]] method : void () {
-          Fn->defer([$wg : Go::Sync::WaitGroup] method : void () {
+        my $thread1 = Thread->new([$wg : , $results : ] method : void () {
+          Fn->defer([$wg : ] method : void () {
             $wg->done;
           });
           
@@ -94,8 +94,8 @@ class TestCase::Go::Sync::WaitGroup {
         $wg->add(400);
         
         for (my $i = 0; $i < 100; $i++) {
-          Go->go([$wg : Go::Sync::WaitGroup] method : void () {
-            Fn->defer([$wg : Go::Sync::WaitGroup] method : void () {
+          Go->go([$wg : ] method : void () {
+            Fn->defer([$wg : ] method : void () {
               $wg->done;
             });
             
@@ -103,8 +103,8 @@ class TestCase::Go::Sync::WaitGroup {
         }
         
         for (my $i = 0; $i < 100; $i++) {
-          my $thread = Thread->new([$wg : Go::Sync::WaitGroup] method : void () {
-            Fn->defer([$wg : Go::Sync::WaitGroup] method : void () {
+          my $thread = Thread->new([$wg : ] method : void () {
+            Fn->defer([$wg : ] method : void () {
               $wg->done;
             });
           });
@@ -113,8 +113,8 @@ class TestCase::Go::Sync::WaitGroup {
         }
         
         for (my $i = 0; $i < 100; $i++) {
-          Go->go([$wg : Go::Sync::WaitGroup] method : void () {
-            Fn->defer([$wg : Go::Sync::WaitGroup] method : void () {
+          Go->go([$wg : ] method : void () {
+            Fn->defer([$wg : ] method : void () {
               $wg->done;
             });
             
@@ -122,8 +122,8 @@ class TestCase::Go::Sync::WaitGroup {
         }
         
         for (my $i = 0; $i < 100; $i++) {
-          my $thread = Thread->new([$wg : Go::Sync::WaitGroup] method : void () {
-            Fn->defer([$wg : Go::Sync::WaitGroup] method : void () {
+          my $thread = Thread->new([$wg : ] method : void () {
+            Fn->defer([$wg : ] method : void () {
               $wg->done;
             });
           });
