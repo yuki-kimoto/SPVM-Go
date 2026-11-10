@@ -11,9 +11,7 @@ class TestCase::Go::Channel {
       
       my $ch = Go->make;
       
-      Go->go([has ch : Go::Channel = $ch] method : void () {
-        
-        my $ch = $self->{ch};
+      Go->go([$ch : ] method : void () {
         
         $ch->write(1);
       });
@@ -42,9 +40,7 @@ class TestCase::Go::Channel {
       
       my $ch = Go->make;
       
-      Go->go([has ch : Go::Channel = $ch] method : void () {
-        
-        my $ch = $self->{ch};
+      Go->go([$ch : ] method : void () {
         
         $ch->write(1);
         
@@ -104,9 +100,7 @@ class TestCase::Go::Channel {
       
       my $ch = Go->make(1);
       
-      Go->go([has ch : Go::Channel = $ch] method : void () {
-        
-        my $ch = $self->{ch};
+      Go->go([$ch : ] method : void () {
         
         my $ok = 0;
         
@@ -139,9 +133,7 @@ class TestCase::Go::Channel {
       
       my $ch = Go->make(1);
       
-      Go->go([has ch : Go::Channel = $ch] method : void () {
-        
-        my $ch = $self->{ch};
+      Go->go([$ch : ] method : void () {
         
         my $ok = 0;
         
@@ -236,9 +228,7 @@ class TestCase::Go::Channel {
         
         my $ch = Go->make(1);
         
-        Go->go([has ch : Go::Channel = $ch] method : void () {
-          
-          my $ch = $self->{ch};
+        Go->go([$ch : ] method : void () {
           
           $ch->write(1);
           
@@ -298,9 +288,7 @@ class TestCase::Go::Channel {
         
         my $ch = Go->make;
         
-        Go->go([has ch : Go::Channel = $ch] method : void () {
-          
-          my $ch = $self->{ch};
+        Go->go([$ch : ] method : void () {
           
           $ch->write(1);
           
@@ -360,9 +348,7 @@ class TestCase::Go::Channel {
         
         my $ch = Go->make(2);
         
-        Go->go([has ch : Go::Channel = $ch] method : void () {
-          
-          my $ch = $self->{ch};
+        Go->go([$ch : ] method : void () {
           
           my $len1 = $ch->len;
           
@@ -406,9 +392,7 @@ class TestCase::Go::Channel {
         
         my $ch = Go->make(2);
         
-        Go->go([has ch : Go::Channel = $ch] method : void () {
-          
-          my $ch = $self->{ch};
+        Go->go([$ch : ] method : void () {
           
           my $len1 = $ch->len;
           
@@ -483,7 +467,7 @@ class TestCase::Go::Channel {
     Go->go(method : void () {
       my $ch = Go->make;
       
-      Go->go([$ch : Go::Channel] method : void () {
+      Go->go([$ch : ] method : void () {
         $ch->write(1);
       });
       
