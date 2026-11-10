@@ -85,7 +85,7 @@ class Go::Schedule {
     }
     else {
       unless ($schedule_info->{type} == Go::Schedule::Info->TYPE_NONE) {
-        $self->add_task([$self : Go::Schedule, $schedule_info : Go::Schedule::Info, $caller_info : CallerInfo] method : void () {
+        $self->add_task([$self : , $schedule_info : , $caller_info : ] method : void () {
           $self->schedule($schedule_info, $caller_info);
         }, $caller_info);
       }
@@ -160,14 +160,14 @@ class Go::Schedule {
         my $uv_poll = UV::Handle::Poll->new;
         $uv_loop->poll_init($uv_poll, $fd);
         $goroutine->{uv_handle} = $uv_poll;
-        my $poll_cb = [$goroutine : Go::Goroutine, $schedule : Go::Schedule = $self, $schedule_info : Go::Schedule::Info, $fd : int] method : void ($uv_poll : UV::Handle::Poll, $status : int, $events : int) {
+        my $poll_cb = [$goroutine : , $self : , $schedule_info : , $fd : ] method : void ($uv_poll : UV::Handle::Poll, $status : int, $events : int) {
           if ($status < 0) {
             $schedule_info->{error_id} = basic_type_id Error;
             $schedule_info->{exception} = UV->strerror($status);
           }
           
-          $schedule->{uv_poll_goroutines_h}->delete("$fd");
-          $schedule->awake($goroutine, $uv_poll, $schedule_info);
+          $self->{uv_poll_goroutines_h}->delete("$fd");
+          $self->awake($goroutine, $uv_poll, $schedule_info);
         };
         
         $uv_poll->start($poll_cb, $events);
@@ -177,9 +177,9 @@ class Go::Schedule {
           my $uv_timer = UV::Handle::Timer->new;
           $uv_loop->timer_init($uv_timer);
           $goroutine->{timeout_uv_timer} = $uv_timer;
-          my $timer_cb = [$goroutine : Go::Goroutine, $schedule : Go::Schedule = $self, $schedule_info : Go::Schedule::Info, $fd : int] method : void ($uv_timer : UV::Handle::Timer) {
-            $schedule->{uv_poll_goroutines_h}->delete("$fd");
-            $schedule->awake($goroutine, $uv_timer, $schedule_info);
+          my $timer_cb = [$goroutine : , $self : , $schedule_info : , $fd : ] method : void ($uv_timer : UV::Handle::Timer) {
+            $self->{uv_poll_goroutines_h}->delete("$fd");
+            $self->awake($goroutine, $uv_timer, $schedule_info);
           };
           $uv_timer->start($timer_cb, $timeout_msec);
         }
@@ -248,27 +248,27 @@ class Go::Schedule {
         $goroutine->{uv_handle} = $uv_pipe;
         
         if ($schedule_type == Go::Schedule::Info->TYPE_PIPE_READ) {
-          my $read_cb = [$goroutine : Go::Goroutine, $schedule : Go::Schedule = $self, $schedule_info : Go::Schedule::Info, $fd : int] method : void ($uv_stream : UV::Handle::Stream, $nread : int, $buffer : string) {
+          my $read_cb = [$goroutine : , $self : , $schedule_info : , $fd : ] method : void ($uv_stream : UV::Handle::Stream, $nread : int, $buffer : string) {
             if ($nread < 0) {
               $schedule_info->{error_id} = basic_type_id Error;
               $schedule_info->{exception} = UV->strerror($nread);
             }
             $schedule_info->{ret_length} = $nread;
-            $schedule->{uv_pipe_goroutines_h}->delete("$fd");
-            $schedule->awake($goroutine, $uv_stream, $schedule_info);
+            $self->{uv_pipe_goroutines_h}->delete("$fd");
+            $self->awake($goroutine, $uv_stream, $schedule_info);
           };
           
           $uv_pipe->read_start((mutable string)$buffer, $buffer_length, $read_cb, $buffer_offset);
         }
         else {
-          my $write_cb = [$goroutine : Go::Goroutine, $schedule : Go::Schedule = $self, $schedule_info : Go::Schedule::Info, $buffer_length : int, $uv_pipe : UV::Handle::Pipe, $fd : int] method : void ($uv_req_write : UV::Request::Write, $status : int) {
+          my $write_cb = [$goroutine : , $self : , $schedule_info : , $buffer_length : , $uv_pipe : , $fd : ] method : void ($uv_req_write : UV::Request::Write, $status : int) {
             if ($status < 0) {
               $schedule_info->{error_id} = basic_type_id Error;
               $schedule_info->{exception} = UV->strerror($status);
             }
             $schedule_info->{ret_length} = $buffer_length;
-            $schedule->{uv_pipe_goroutines_h}->delete("$fd");
-            $schedule->awake($goroutine, $uv_pipe, $schedule_info);
+            $self->{uv_pipe_goroutines_h}->delete("$fd");
+            $self->awake($goroutine, $uv_pipe, $schedule_info);
             $uv_req_write->set_write_cb(undef);
           };
           
@@ -280,9 +280,9 @@ class Go::Schedule {
           my $uv_timer = UV::Handle::Timer->new;
           $uv_loop->timer_init($uv_timer);
           $goroutine->{timeout_uv_timer} = $uv_timer;
-          my $timer_cb = [$goroutine : Go::Goroutine, $schedule : Go::Schedule = $self, $schedule_info : Go::Schedule::Info, $fd : int] method : void ($uv_timer : UV::Handle::Timer) {
-            $schedule->{uv_pipe_goroutines_h}->delete("$fd");
-            $schedule->awake($goroutine, $uv_timer, $schedule_info);
+          my $timer_cb = [$goroutine : , $self : , $schedule_info : , $fd : ] method : void ($uv_timer : UV::Handle::Timer) {
+            $self->{uv_pipe_goroutines_h}->delete("$fd");
+            $self->awake($goroutine, $uv_timer, $schedule_info);
           };
           $uv_timer->start($timer_cb, $timeout_msec);
         }
@@ -330,8 +330,8 @@ class Go::Schedule {
         my $uv_timer = UV::Handle::Timer->new;
         $uv_loop->timer_init($uv_timer);
         $goroutine->{uv_handle} = $uv_timer;
-        my $timer_cb = [$goroutine : Go::Goroutine, $schedule : Go::Schedule = $self, $schedule_info : Go::Schedule::Info] method : void ($uv_timer : UV::Handle::Timer) {
-          $schedule->awake($goroutine, $uv_timer, $schedule_info);
+        my $timer_cb = [$goroutine : , $self : , $schedule_info : ] method : void ($uv_timer : UV::Handle::Timer) {
+          $self->awake($goroutine, $uv_timer, $schedule_info);
         };
         $uv_timer->start($timer_cb, $timeout_msec);
         
@@ -351,8 +351,8 @@ class Go::Schedule {
         my $uv_loop = $self->{uv_loop};
         my $uv_async = UV::Handle::Async->new;
         $goroutine->{uv_handle} = $uv_async;
-        my $async_cb = [$goroutine : Go::Goroutine, $schedule : Go::Schedule = $self, $schedule_info : Go::Schedule::Info] method : void ($uv_timer : UV::Handle::Async) {
-          $schedule->awake($goroutine, $uv_timer, $schedule_info);
+        my $async_cb = [$goroutine : , $self : , $schedule_info : ] method : void ($uv_timer : UV::Handle::Async) {
+          $self->awake($goroutine, $uv_timer, $schedule_info);
         };
         $uv_loop->async_init($uv_async, $async_cb);
       }
@@ -378,7 +378,7 @@ class Go::Schedule {
         my $uv_process = UV::Handle::Process->new;
         $goroutine->{uv_handle} = $uv_process;
         
-        my $exit_cb = [$goroutine : Go::Goroutine, $schedule : Go::Schedule = $self, $schedule_info : Go::Schedule::Info, $exec_cmd : Go::OS::Exec::Cmd] method : void ($uv_proc : UV::Handle::Process, $exit_status : long, $term_signal : int) {
+        my $exit_cb = [$goroutine : , $self : , $schedule_info : , $exec_cmd : ] method : void ($uv_proc : UV::Handle::Process, $exit_status : long, $term_signal : int) {
           if ($exit_status != 0 || $term_signal != 0) {
             $schedule_info->{error_id} = basic_type_id Error;
             $schedule_info->{process_exit_status} = $exit_status;
@@ -386,7 +386,7 @@ class Go::Schedule {
             
             $schedule_info->{exception} = "Process exited with error: exit_status=$exit_status, term_signal=$term_signal";
           }
-          $schedule->awake($goroutine, $uv_proc, $schedule_info);
+          $self->awake($goroutine, $uv_proc, $schedule_info);
         };
         
         $options->set_exit_cb($exit_cb);
@@ -397,9 +397,9 @@ class Go::Schedule {
           my $uv_timer = UV::Handle::Timer->new;
           $uv_loop->timer_init($uv_timer);
           $goroutine->{timeout_uv_timer} = $uv_timer;
-          my $timer_cb = [$goroutine : Go::Goroutine, $schedule : Go::Schedule = $self, $schedule_info : Go::Schedule::Info, $uv_process : UV::Handle::Process] method : void ($uv_timer : UV::Handle::Timer) {
+          my $timer_cb = [$goroutine : , $self : , $schedule_info : , $uv_process : ] method : void ($uv_timer : UV::Handle::Timer) {
             $uv_process->kill(SIGNAL_C->SIGTERM);
-            $schedule->awake($goroutine, $uv_timer, $schedule_info);
+            $self->awake($goroutine, $uv_timer, $schedule_info);
           };
           $uv_timer->start($timer_cb, $timeout_msec);
         }
@@ -464,10 +464,10 @@ class Go::Schedule {
   
   private method run : void () {
     
-    my $process_next_goroutine_cb = [$schedule : Go::Schedule = $self] method : void ($uv_idle : UV::Handle::Idle) {
-      $schedule->process_next_goroutine;
+    my $process_next_goroutine_cb = [$self : ] method : void ($uv_idle : UV::Handle::Idle) {
+      $self->process_next_goroutine;
       
-      unless ($schedule->loop_alive) {
+      unless ($self->loop_alive) {
         $uv_idle->close_safe;
       }
     };
