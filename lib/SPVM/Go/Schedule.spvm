@@ -378,7 +378,7 @@ class Go::Schedule {
         my $uv_process = UV::Handle::Process->new;
         $goroutine->{uv_handle} = $uv_process;
         
-        my $exit_cb = [$goroutine : , $self : , $schedule_info : , $exec_cmd : ] method : void ($uv_proc : UV::Handle::Process, $exit_status : long, $term_signal : int) {
+        my $exit_cb = [$goroutine : , $self : , $schedule_info : ] method : void ($uv_proc : UV::Handle::Process, $exit_status : long, $term_signal : int) {
           if ($exit_status != 0 || $term_signal != 0) {
             $schedule_info->{error_id} = basic_type_id Error;
             $schedule_info->{process_exit_status} = $exit_status;
