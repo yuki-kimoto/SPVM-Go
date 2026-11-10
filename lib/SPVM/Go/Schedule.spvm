@@ -384,10 +384,6 @@ class Go::Schedule {
         $goroutine->{uv_handle} = $uv_process;
         
         my $exit_cb = [$goroutine : , $self : , $schedule_info : , $finished_ref : ] method : void ($uv_proc : UV::Handle::Process, $exit_status : long, $term_signal : int) {
-          if (!$finished_ref->[0]) {
-            $finished_ref->[0] = 1;
-          }
-          
           $schedule_info->{process_exit_status} = $exit_status;
           $schedule_info->{process_term_signal} = $term_signal;
           $self->awake($goroutine, $uv_proc, $schedule_info);
@@ -416,7 +412,8 @@ class Go::Schedule {
               if (!$finished_ref->[0]) {
                 $finished_ref->[0] = 1;
                 $uv_process->kill(SIGNAL_C->SIGTERM);
-                $self->awake($goroutine, $uv_timer, $schedule_info);
+                $uv_timer->close_safe;
+                $goroutine->{timeout_uv_timer} = undef;
               }
             };
             $uv_timer->start($timer_cb, (long)$timeout_msec);
