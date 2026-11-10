@@ -380,11 +380,8 @@ class Go::Schedule {
         
         my $exit_cb = [$goroutine : , $self : , $schedule_info : ] method : void ($uv_proc : UV::Handle::Process, $exit_status : long, $term_signal : int) {
           if ($exit_status != 0 || $term_signal != 0) {
-            $schedule_info->{error_id} = basic_type_id Error;
             $schedule_info->{process_exit_status} = $exit_status;
             $schedule_info->{process_term_signal} = $term_signal;
-            
-            $schedule_info->{exception} = "Process exited with error: exit_status=$exit_status, term_signal=$term_signal";
           }
           $self->awake($goroutine, $uv_proc, $schedule_info);
         };
