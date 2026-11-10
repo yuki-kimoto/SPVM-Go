@@ -153,7 +153,7 @@ class TestCase::Go::Context {
       }
       
       # Wait for the deadline to pass
-      Go->go([$timeout_sec : double] method : void () {
+      Go->go([$timeout_sec : ] method : void () {
         Go->sleep_sec($timeout_sec + 0.1);
       });
       
@@ -250,14 +250,14 @@ class TestCase::Go::Context {
       }
       
       # Cancel the parent context halfway through
-      Go->go([$cancel_parent : Go::Context::CancelCallback] method : void () {
+      Go->go([$cancel_parent : ] method : void () {
         Go->sleep_sec(0.1);
         $cancel_parent->();
       });
       
       # We need to wait in a goroutine to allow the scheduler to run.
       # The main thread calls gosched to start the execution of goroutines.
-      Go->go([$ctx : Go::Context] method : void () {
+      Go->go([$ctx : ] method : void () {
         Go->sleep_sec(0.3);
       });
       
@@ -287,7 +287,7 @@ class TestCase::Go::Context {
       my $ctx = $derived->ctx;
       
       # Wait for the deadline to pass
-      Go->go([$timeout_sec : double] method : void () {
+      Go->go([$timeout_sec : ] method : void () {
         Go->sleep_sec($timeout_sec + 0.1);
       });
       
