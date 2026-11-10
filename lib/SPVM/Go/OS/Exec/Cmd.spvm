@@ -124,6 +124,13 @@ class Go::OS::Exec::Cmd {
     my $schedule = $Go::GO->{schedule};
     
     $schedule->schedule($schedule_info);
+    
+    my $exit_status = $schedule_info->{process_exit_status};
+    my $term_signal = $schedule_info->{process_term_signal};
+    
+    my $status = ($exit_status << 8) | $term_signal;
+    
+    return $status;
   }
   
 }
