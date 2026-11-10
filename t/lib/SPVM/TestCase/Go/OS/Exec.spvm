@@ -23,9 +23,15 @@ class TestCase::Go::OS::Exec {
       my $status = $cmd->run;
       
       my $exit_code = $status >> 8;
+      my $term_signal = $status & 0xff;
       
       unless ($exit_code == 0) {
         diag "\$exit_code=$exit_code";
+        $success_ref->[0] = 0;
+      }
+      
+      unless ($term_signal == 0) {
+        diag "\$term_signal=$term_signal";
         $success_ref->[0] = 0;
       }
     });
