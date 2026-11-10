@@ -263,11 +263,8 @@ class TestCase::Go::Channel {
       
       $ch->close;
       
-      eval { $ch->close; }
-      
-      unless (Fn->contains($@, "This channel is already closed.")) {
-        return 0;
-      }
+      # Double close
+      $ch->close;
       
       my $ok = 0;
       my $value = $ch->read(\$ok);

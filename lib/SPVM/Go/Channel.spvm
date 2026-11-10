@@ -236,7 +236,7 @@ class Go::Channel {
     my $closed = $self->{closed};
     
     if ($closed) {
-      die "This channel is already closed.";
+      return;
     }
     
     my $read_waits = $self->{read_waits};

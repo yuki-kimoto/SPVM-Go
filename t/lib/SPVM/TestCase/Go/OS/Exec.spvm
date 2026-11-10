@@ -74,38 +74,40 @@ class TestCase::Go::OS::Exec {
   }
   
   static method context_done : int () {
-    
+  
     my $success_ref = [1];
-    
+  
     my $wg = Go::Sync::WaitGroup->new;
     $wg->add(1);
     Go->go([$wg : , $success_ref : ] method : void () {
-      
+    
       Fn->defer([$wg : ] method : void () {
         $wg->done;
       });
-      
+    
       my $_ = Go::Context->with_cancel(Go::Context->background);
       my $ctx = $_->ctx;
       my $cancel = $_->cancel;
-      
+    
+      Go->go([$cancel : ] method : void () {
+        Go->sleep_sec(0.5);
+        $cancel->();
+      });
+    
       my $cmd = Go::OS::Exec->command_context($ctx, ["perl", "-e", "while(1){}"]);
-      
-      Go->sleep_sec(0.1);
-      $cancel->();
-      
+    
       my $status = $cmd->run;
-      
+    
       my $exit_code = $status >> 8;
       my $term_signal = $status & 0xff;
-      
+    
       unless ($term_signal > 0) {
         $success_ref->[0] = 0;
       }
     });
-    
+  
     $wg->wait;
-    
+  
     return $success_ref->[0];
   }
   

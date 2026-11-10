@@ -14,6 +14,10 @@ ok(SPVM::TestCase::Go::OS::Exec->basic);
 
 ok(SPVM::TestCase::Go::OS::Exec->context_deadline);
 
+ok(SPVM::TestCase::Go::OS::Exec->context_done);
+
+# ok(SPVM::TestCase::Go::OS::Exec->context_extra);
+
 $api->destroy_runtime_permanent_vars;
 
 my $end_memory_blocks_count = $api->get_memory_blocks_count;

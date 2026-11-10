@@ -129,11 +129,14 @@ class Go::Context {
       $that->{err} = $err;
       $that->{cause} = $cause;
       
+      if ($that->done) {
+        $that->done->close;
+      }
+      
       my $all_children = (List of Go::Context)List->new($that->{children});
       $that->{children} = new Go::Context[0];
       
       while (1) {
-        
         unless ($all_children->length) {
           last;
         }

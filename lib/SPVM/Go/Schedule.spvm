@@ -427,7 +427,7 @@ class Go::Schedule {
               if (!$finished_ref->[0]) {
                 $finished_ref->[0] = 1;
                 $uv_process->kill(SIGNAL_C->SIGTERM);
-                $self->awake($goroutine, $uv_process, $schedule_info);
+                $goroutine->{done} = undef;
               }
             });
           }
