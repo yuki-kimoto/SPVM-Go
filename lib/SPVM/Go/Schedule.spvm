@@ -6,6 +6,8 @@ class Go::Schedule {
   allow Go;
   allow Go::Channel;
   allow Go::Select;
+  allow Go::OS::Exec;
+  allow Go::OS::Exec::Cmd;
   
   use Go::Goroutine;
   use Go::Error::IOTimeout;

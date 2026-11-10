@@ -4,6 +4,8 @@
 class Go {
   version "0.047";
   
+  allow Go::OS::Exec::Cmd;
+  
   use Go::Channel;
   use Go::Schedule;
   use Callback;
