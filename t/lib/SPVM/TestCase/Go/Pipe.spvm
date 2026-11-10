@@ -18,7 +18,7 @@ class TestCase::Go::Pipe {
       
       {
         my $write_length_ref = [-1];
-        Go->go([$write_fh : int, $write_length_ref : int[]] method : void () {
+        Go->go([$write_fh : , $write_length_ref : ] method : void () {
           my $write_buffer = "abc";
           my $write_buffer_length = length $write_buffer;
           $write_length_ref->[0] = Go->gosched_pipe_write($write_fh, $write_buffer, $write_buffer_length);
@@ -45,7 +45,7 @@ class TestCase::Go::Pipe {
       # Optional argument default
       {
         my $write_length_ref = [-1];
-        Go->go([$write_fh : int, $write_length_ref : int[]] method : void () {
+        Go->go([$write_fh : , $write_length_ref : ] method : void () {
           my $write_buffer = "abc";
           $write_length_ref->[0] = Go->gosched_pipe_write($write_fh, $write_buffer);
         });
@@ -70,7 +70,7 @@ class TestCase::Go::Pipe {
       # legnth
       {
         my $write_length_ref = [-1];
-        Go->go([$write_fh : int, $write_length_ref : int[]] method : void () {
+        Go->go([$write_fh : , $write_length_ref : ] method : void () {
           my $write_buffer = "abc";
           my $write_buffer_length = 2;
           $write_length_ref->[0] = Go->gosched_pipe_write($write_fh, $write_buffer, $write_buffer_length);
@@ -97,7 +97,7 @@ class TestCase::Go::Pipe {
       # offset
       {
         my $write_length_ref = [-1];
-        Go->go([$write_fh : int, $write_length_ref : int[]] method : void () {
+        Go->go([$write_fh : , $write_length_ref : ] method : void () {
           my $write_buffer = "abc";
           my $write_buffer_length = 2;
           my $write_buffer_offset = 1;
@@ -129,7 +129,7 @@ class TestCase::Go::Pipe {
       # 0 bytes write
       {
         my $write_length_ref = [-1];
-        Go->go([$write_fh : int, $write_length_ref : int[]] method : void () {
+        Go->go([$write_fh : , $write_length_ref : ] method : void () {
           my $write_buffer = "abc";
           
           {
@@ -164,7 +164,7 @@ class TestCase::Go::Pipe {
       # read multi-times
       {
         my $write_length_ref = [-1];
-        Go->go([$write_fh : int, $write_length_ref : int[]] method : void () {
+        Go->go([$write_fh : , $write_length_ref : ] method : void () {
           my $write_buffer = "abc";
           $write_length_ref->[0] = Go->gosched_pipe_write($write_fh, $write_buffer);
         });
@@ -216,7 +216,7 @@ class TestCase::Go::Pipe {
       
       {
         my $write_length_ref = [-1];
-        Go->go([$write_fh : int, $write_length_ref : int[]] method : void () {
+        Go->go([$write_fh : , $write_length_ref : ] method : void () {
           my $write_buffer = "abc";
           my $write_buffer_length = 0;
           my $write_buffer_offset = 0;
@@ -251,12 +251,12 @@ class TestCase::Go::Pipe {
     my $non_bloking = 1;
     Sys->pipepair(\$socket_fd1, \$socket_fd2, $non_bloking);
     
-    Fn->defer([$socket_fd1 : int, $socket_fd2 : int] method : void () {
+    Fn->defer([$socket_fd1 : , $socket_fd2 : ] method : void () {
       Sys::Socket->close($socket_fd1);
       Sys::Socket->close($socket_fd2);
     });
     
-    Go->go([$socket_fd1 : int] method : void () {
+    Go->go([$socket_fd1 : ] method : void () {
       Go->sleep_sec(0.5);
       Go->gosched_pipe_cancel($socket_fd1);
     });
