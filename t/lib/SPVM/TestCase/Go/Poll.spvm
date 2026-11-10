@@ -33,7 +33,7 @@ class TestCase::Go::Poll {
     # Run echo goroutine
     &spawn_echo($fd2, 0);
     
-    Go->go([$fd1 : int] method : void () {
+    Go->go([$fd1 : ] method : void () {
       my $id = 0;
       &go_send_and_recv_fd($fd1, $id, 0);
       Sys::Socket->close($fd1);
@@ -69,14 +69,14 @@ class TestCase::Go::Poll {
     Sys::Socket::Util->set_blocking($fd2_b, 0);
     &spawn_echo($fd2_b, 0);
     
-    Go->go([$fd1_a : int, $fd1_b : int] method : void () {
-      Go->go([$fd1_a : int] method : void () {
+    Go->go([$fd1_a : , $fd1_b : ] method : void () {
+      Go->go([$fd1_a : ] method : void () {
         my $id = 0;
         &go_send_and_recv_fd($fd1_a, $id, 0);
         Sys::Socket->close($fd1_a);
       });
       
-      Go->go([$fd1_b : int] method : void () {
+      Go->go([$fd1_b : ] method : void () {
         my $id = 1;
         &go_send_and_recv_fd($fd1_b, $id, 0);
         Sys::Socket->close($fd1_b);
@@ -101,13 +101,13 @@ class TestCase::Go::Poll {
     
     my $results = new int[2];
     
-    Go->go([$results : int[]] method : void () {
+    Go->go([$results : ] method : void () {
       my $fd1 = -1;
       my $fd2 = -1;
       Sys::Socket::Util->inet_socketpair(\$fd1, \$fd2, SOCKET->AF_INET, SOCKET->SOCK_STREAM, 0);
       
       # Close sockets on exit
-      Fn->defer([$fd1 : int, $fd2 : int] method : void () {
+      Fn->defer([$fd1 : , $fd2 : ] method : void () {
         Sys::Socket->close($fd1);
         Sys::Socket->close($fd2);
       });
@@ -134,7 +134,7 @@ class TestCase::Go::Poll {
   }
   
   static method spawn_echo : void ($fd : int, $delay_sec : double = 0) {
-    Go->go([$fd : int, $delay_sec : double] method : void () {
+    Go->go([$fd : , $delay_sec : ] method : void () {
       if ($delay_sec > 0) {
         Go->sleep_sec($delay_sec);
       }
@@ -262,7 +262,7 @@ class TestCase::Go::Poll {
     
     Sys::Socket::Util->inet_socketpair(\$socket_fd1, \$socket_fd2, $domain, $type, $protocol);
     
-    Fn->defer([$socket_fd1 : int, $socket_fd2 : int] method : void () {
+    Fn->defer([$socket_fd1 : , $socket_fd2 : ] method : void () {
       Sys::Socket->close($socket_fd1);
       Sys::Socket->close($socket_fd2);
     });
@@ -270,7 +270,7 @@ class TestCase::Go::Poll {
     Sys::Socket::Util->set_blocking($socket_fd1, 0);
     Sys::Socket::Util->set_blocking($socket_fd2, 0);
     
-    Go->go([$socket_fd1 : int] method : void () {
+    Go->go([$socket_fd1 : ] method : void () {
       Go->sleep_sec(0.5);
       Go->gosched_io_cancel($socket_fd1);
     });
