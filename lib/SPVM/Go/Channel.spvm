@@ -266,10 +266,8 @@ class Go::Channel {
     
     $wait->{ok} = (byte)$ok;
     
-    my $goroutine = $wait->{goroutine};
-    
-    if ($goroutine) {
-      my $uv_async = (UV::Handle::Async)$goroutine->{uv_handle};
+    if ($wait->{uv_async}) {
+      my $uv_async = (UV::Handle::Async)$wait->{uv_async};
       $uv_async->send;
     }
   }
