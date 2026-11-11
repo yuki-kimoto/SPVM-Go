@@ -26,8 +26,6 @@ ok(SPVM::TestCase::Go::Channel->close);
 
 ok(SPVM::TestCase::Go::Channel->extra);
 
-ok(SPVM::TestCase::Go::Channel->exception);
-
 ok(SPVM::TestCase::Go::Channel->issues8);
 
 $api->destroy_runtime_permanent_vars;

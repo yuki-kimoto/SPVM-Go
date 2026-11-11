@@ -94,12 +94,6 @@ class Go::Channel {
       
       my $schedule = $self->{schedule};
       
-      my $current_goroutine = $schedule->{current_goroutine};
-      
-      unless ($current_goroutine) {
-        die "There is no currently running goroutine.";
-      }
-      
       $read_wait->{is_wait} = 1;
       
       $self->{read_waits}->push($read_wait);
@@ -202,12 +196,6 @@ class Go::Channel {
         $write_wait->{value} = $value;
         
         my $schedule = $self->{schedule};
-        
-        my $current_goroutine = $schedule->{current_goroutine};
-        
-        unless ($current_goroutine) {
-          die "There is no currently running goroutine.";
-        }
         
         $write_wait->{is_wait} = 1;
         
