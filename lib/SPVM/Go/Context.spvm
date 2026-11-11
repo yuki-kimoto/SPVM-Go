@@ -30,14 +30,25 @@ class Go::Context {
   
   has children : Go::Context[];
   
+  our $BACKGROUND_CONTEXT : Go::Context;
+
+  INIT {
+    $BACKGROUND_CONTEXT = new Go::Context;
+  }
+
+  our $TODO_CONTEXT : Go::Context;
+
+  INIT {
+    $TODO_CONTEXT = new Go::Context;
+  }
+
   # Class Methods
   static method background : Go::Context () {
-    
-    my $self = new Go::Context;
-    
-    $self->init;
-    
-    return $self;
+    return $BACKGROUND_CONTEXT;
+  }
+  
+  static method todo : Go::Context () {
+    return $TODO_CONTEXT;
   }
   
   static method without_cancel : Go::Context ($parent_ctx : Go::Context) {
@@ -115,7 +126,9 @@ class Go::Context {
     $self->init;
     
     $self->{parent} = $parent_ctx;
-    List->new_ref($parent_ctx->{children})->push($self);
+    if (my $parent_children = $parent_ctx->{children}) {
+      List->new_ref($parent_children)->push($self);
+    }
     weaken $self->{parent};
     
     $self->{done} = Go->make;

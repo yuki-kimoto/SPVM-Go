@@ -49,7 +49,9 @@ class Go::Context::Value extends Go::Context {
     $self->SUPER::init;
     
     $self->{parent} = $parent_ctx;
-    List->new_ref($parent_ctx->{children})->push($self);
+    if (my $parent_children = $parent_ctx->{children}) {
+      List->new_ref($parent_children)->push($self);
+    }
     weaken $self->{parent};
     
     $self->{key} = $key;
