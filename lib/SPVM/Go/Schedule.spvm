@@ -130,12 +130,6 @@ class Go::Schedule {
       $goroutine_uv_handle->close_safe;
     }
     
-    my $done = $goroutine->{done};
-    if ($done) {
-      $done->close;
-      $goroutine->{done} = undef;
-    }
-    
     $uv_handle->close_safe;
     
     $self->enable_goroutine($goroutine);
@@ -417,7 +411,7 @@ class Go::Schedule {
             my $timer_cb = [$goroutine : , $self : , $schedule_info : , $uv_process : , $finished_ref : ] method : void ($uv_timer : UV::Handle::Timer) {
               if (!$finished_ref->[0]) {
                 $finished_ref->[0] = 1;
-                $uv_process->kill(SIGNAL_C->SIGTERM);
+                $uv_process->kill(SIGNAL_C->SIGKILL);
                 $uv_timer->close_safe;
                 $goroutine->{timeout_uv_timer} = undef;
               }
@@ -427,17 +421,14 @@ class Go::Schedule {
 
           my $done = $context->done;
           if ($done) {
-            $goroutine->{done} = $done;
             Go->go([$done : , $uv_process : , $self : , $schedule_info : , $goroutine : , $finished_ref : ] method : void () {
               $done->read;
               if (!$finished_ref->[0]) {
                 $finished_ref->[0] = 1;
-                $uv_process->kill(SIGNAL_C->SIGTERM);
-                $goroutine->{done} = undef;
+                $uv_process->kill(SIGNAL_C->SIGKILL);
               }
             });
           }
-
         }
         
         if (Go->ENV_DEBUG) {
