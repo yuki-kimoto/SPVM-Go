@@ -421,6 +421,11 @@ class Go::Schedule {
         
         $uv_loop->spawn($uv_process, $options);
         
+        my $sigkill = 9;
+        
+        # TODO
+        # my $sigkill = SIGNAL_C->SIGKILL;
+                
         my $context = $exec_cmd->{context};
         my $uv_timer = (UV::Handle::Timer)undef;
         if ($context) {
@@ -436,10 +441,10 @@ class Go::Schedule {
             
             $uv_timer = UV::Handle::Timer->new;
             $uv_loop->timer_init($uv_timer);
-            my $timer_cb = [$uv_process : , $finished_ref : , $uv_timer : ] method : void ($uv_timer : UV::Handle::Timer) {
+            my $timer_cb = [$uv_process : , $finished_ref : , $uv_timer : , $sigkill : ,] method : void ($uv_timer : UV::Handle::Timer) {
               if (!$finished_ref->[0]) {
                 $finished_ref->[0] = 1;
-                $uv_process->kill(SIGNAL_C->SIGKILL);
+                $uv_process->kill($sigkill);
               }
               if ($uv_timer) {
                 $uv_timer->close_safe;
@@ -454,11 +459,11 @@ class Go::Schedule {
             $done_or_exit_select->add_read($done);
             $done_or_exit_select->add_read($exit_ch);
             
-            Go->go([$uv_process : , $finished_ref :, $done_or_exit_select :  , $uv_timer : ] method : void () {
+            Go->go([$uv_process : , $finished_ref :, $done_or_exit_select :  , $uv_timer : , $sigkill : ,] method : void () {
               $done_or_exit_select->select;
               if (!$finished_ref->[0]) {
                 $finished_ref->[0] = 1;
-                $uv_process->kill(SIGNAL_C->SIGKILL);
+                $uv_process->kill($sigkill);
               }
               if ($uv_timer) {
                 $uv_timer->close_safe;
