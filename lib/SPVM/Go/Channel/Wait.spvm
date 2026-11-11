@@ -19,6 +19,8 @@ class Go::Channel::Wait {
   
   has ok : byte;
   
+  has uv_async : UV::Handle::Async;
+  
   # Class Methods
   static method new : Go::Channel::Wait () {
     
@@ -26,4 +28,5 @@ class Go::Channel::Wait {
     
     return $self;
   }
+  
 }
