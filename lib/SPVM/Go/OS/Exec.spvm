@@ -6,10 +6,10 @@ class Go::OS::Exec {
   use Go::OS::Exec::Cmd;
   use Go::Context;
   
-  static method command : Go::OS::Exec::Cmd ($ctx : Go::Context, $command : string[]) {
+  static method command : Go::OS::Exec::Cmd ($context : Go::Context, $command : string[]) {
     
     my $self = new Go::OS::Exec::Cmd;
-    $self->{context} = $ctx;
+    $self->{context} = $context;
     $self->{path} = $command->[0];
     $self->{args} = $command;
     

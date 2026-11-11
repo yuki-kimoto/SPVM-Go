@@ -10,9 +10,27 @@ class Go::Context::Derived {
   use Go::Context::CancelCallback;
   
   # Fields
-  has ctx : rw Go::Context;
+  has ctx : rw Go::Context; # Deprecated
   
-  has cancel : rw Go::Context::CancelCallback;
+  has context : virtual rw Go::Context
+      get {
+        return $self->{ctx};
+      }
+      set {
+        $self->{ctx} = $_;
+      }
+  ;
+  
+  has cancel : rw Go::Context::CancelCallback; # Deprecated
+  
+  has cancel_cb : virtual rw Go::Context::CancelCallback
+    get {
+      return $self->{cancel};
+    }
+    set {
+      $self->{cancel} = $_;
+    }
+  ;
   
   # Class Methods
   static method new : Go::Context::Derived () {
