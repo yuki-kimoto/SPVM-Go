@@ -160,7 +160,6 @@ class Go::Schedule {
         
         my $uv_poll = UV::Handle::Poll->new;
         $uv_loop->poll_init($uv_poll, $fd);
-        $goroutine->{uv_handle} = $uv_poll;
         
         my $uv_timer_ref = [(UV::Handle::Timer)undef];
         
@@ -180,7 +179,6 @@ class Go::Schedule {
           }
           
           $uv_poll->close_safe;
-          $goroutine->{uv_handle} = undef;
           
           $self->enable_goroutine($goroutine);
         };
@@ -208,7 +206,6 @@ class Go::Schedule {
             
             $uv_poll->set_poll_cb(undef);
             $uv_poll->close_safe;
-            $goroutine->{uv_handle} = undef;
             
             $self->enable_goroutine($goroutine);
           };
