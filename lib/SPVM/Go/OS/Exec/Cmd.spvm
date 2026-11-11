@@ -101,7 +101,7 @@ class Go::OS::Exec::Cmd {
   method run : long () {
     
     my $schedule_info = Go::Schedule::Info->new;
-    $schedule_info->{type} = Go::Schedule::Info->TYPE_PROCESS_WAIT;
+    $schedule_info->{type} = Go::Schedule::Info->TYPE_PROCESS;
     $schedule_info->{process_exec_cmd} = $self;
     
     my $schedule = $Go::GO->{schedule};
