@@ -126,7 +126,6 @@ class Go::Schedule {
         $schedule_info->{error_id} = basic_type_id Go::Error::IOTimeout;
         $schedule_info->{exception} = "IO timeout occur";
       }
-      $goroutine_timout_uv_timer->stop;
       $goroutine_timout_uv_timer->set_timer_cb(undef);
       $goroutine_uv_handle->close_safe;
     }
@@ -169,7 +168,6 @@ class Go::Schedule {
           }
           
           $self->{uv_poll_goroutines_h}->delete("$fd");
-          $uv_poll->stop;
           $self->awake($goroutine, $uv_poll, $schedule_info);
         };
         
@@ -182,7 +180,6 @@ class Go::Schedule {
           $goroutine->{timeout_uv_timer} = $uv_timer;
           my $timer_cb = [$goroutine : , $self : , $schedule_info : , $fd : ] method : void ($uv_timer : UV::Handle::Timer) {
             $self->{uv_poll_goroutines_h}->delete("$fd");
-            $uv_timer->stop;
             $self->awake($goroutine, $uv_timer, $schedule_info);
           };
           $uv_timer->start($timer_cb, $timeout_msec);
@@ -287,7 +284,6 @@ class Go::Schedule {
           $goroutine->{timeout_uv_timer} = $uv_timer;
           my $timer_cb = [$goroutine : , $self : , $schedule_info : , $fd : ] method : void ($uv_timer : UV::Handle::Timer) {
             $self->{uv_pipe_goroutines_h}->delete("$fd");
-            $uv_timer->stop;
             $self->awake($goroutine, $uv_timer, $schedule_info);
           };
           $uv_timer->start($timer_cb, $timeout_msec);
@@ -337,7 +333,6 @@ class Go::Schedule {
         $uv_loop->timer_init($uv_timer);
         $goroutine->{uv_handle} = $uv_timer;
         my $timer_cb = [$goroutine : , $self : , $schedule_info : ] method : void ($uv_timer : UV::Handle::Timer) {
-          $uv_timer->stop;
           $self->awake($goroutine, $uv_timer, $schedule_info);
         };
         $uv_timer->start($timer_cb, $timeout_msec);
