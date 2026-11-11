@@ -120,14 +120,14 @@ class Go::Schedule {
     
     my $schedule_type = $schedule_info->{type};
     switch ($schedule_type) {
-      case Go::Schedule::Info->TYPE_IO_READ:
-      case Go::Schedule::Info->TYPE_IO_WRITE:
+      case Go::Schedule::Info->TYPE_POLL_READ:
+      case Go::Schedule::Info->TYPE_POLL_WRITE:
       {
         my $timeout_duration_nsec = $schedule_info->{timeout_duration_nsec};
         my $fd = $schedule_info->{fd};
         
         unless ($fd >= 0) {
-          die "The file descriptor \$fd in schedule type TYPE_IO_READ or TYPE_IO_WRITE must be a non-negative value.";
+          die "The file descriptor \$fd in schedule type TYPE_POLL_READ or TYPE_POLL_WRITE must be a non-negative value.";
         }
         
         my $deadline = (Go::Time)undef;
@@ -135,7 +135,7 @@ class Go::Schedule {
           $deadline = Go::Time->now->add(Go::Duration_1l->new($timeout_duration_nsec));
         }
         my $timeout_msec = $timeout_duration_nsec / 1000000;
-        my $events = $schedule_type == Go::Schedule::Info->TYPE_IO_READ ? UV_C->UV_READABLE : UV_C->UV_WRITABLE;
+        my $events = $schedule_type == Go::Schedule::Info->TYPE_POLL_READ ? UV_C->UV_READABLE : UV_C->UV_WRITABLE;
         
         my $uv_loop = $self->{uv_loop};
         
@@ -198,12 +198,12 @@ class Go::Schedule {
           Fn->say_stderr(Format->sprintf("[Go Debug]Register goroutine wait for IO (Callback:%p, QueueNum:%d.)", [(object)$goroutine->{task}, $self->{goroutines}->length]));
         }
       }
-      case Go::Schedule::Info->TYPE_IO_CANCEL:
+      case Go::Schedule::Info->TYPE_POLL_CANCEL:
       {
         my $fd = $schedule_info->{fd};
         
         unless ($fd >= 0) {
-          die "The file descriptor \$fd in schedule type TYPE_IO_CANCEL must be a non-negative value.";
+          die "The file descriptor \$fd in schedule type TYPE_POLL_CANCEL must be a non-negative value.";
         }
         
         my $uv_poll_goroutine = $self->{uv_poll_goroutines_h}{"$fd"};

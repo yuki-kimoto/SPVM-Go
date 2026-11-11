@@ -101,7 +101,7 @@ class Go {
     my $schedule = $GO->{schedule};
     
     my $schedule_info = new Go::Schedule::Info;
-    $schedule_info->{type} = Go::Schedule::Info->TYPE_IO_READ;
+    $schedule_info->{type} = Go::Schedule::Info->TYPE_POLL_READ;
     $schedule_info->{fd} = $fd;
     $schedule_info->{timeout_duration_nsec} = $timeout_duration->{nsec};
     
@@ -127,7 +127,7 @@ class Go {
     my $schedule = $GO->{schedule};
     
     my $schedule_info = new Go::Schedule::Info;
-    $schedule_info->{type} = Go::Schedule::Info->TYPE_IO_WRITE;
+    $schedule_info->{type} = Go::Schedule::Info->TYPE_POLL_WRITE;
     $schedule_info->{fd} = $fd;
     $schedule_info->{timeout_duration_nsec} = $timeout_duration->{nsec};
     
@@ -145,7 +145,7 @@ class Go {
     my $schedule = $GO->{schedule};
     
     my $schedule_info = new Go::Schedule::Info;
-    $schedule_info->{type} = Go::Schedule::Info->TYPE_IO_CANCEL;
+    $schedule_info->{type} = Go::Schedule::Info->TYPE_POLL_CANCEL;
     $schedule_info->{fd} = $fd;
     
     $schedule->schedule($schedule_info, $caller_info);

@@ -15,14 +15,14 @@ class Go::Schedule::Info {
   
   private enum {
     TYPE_NONE,
-    TYPE_IO_READ,
-    TYPE_IO_WRITE,
     TYPE_TIMER,
     TYPE_CHANNEL_READ,
     TYPE_CHANNEL_WRITE,
+    TYPE_POLL_READ,
+    TYPE_POLL_WRITE,
+    TYPE_POLL_CANCEL,
     TYPE_PIPE_READ,
     TYPE_PIPE_WRITE,
-    TYPE_IO_CANCEL,
     TYPE_PIPE_CANCEL,
     TYPE_PROCESS,
   }
