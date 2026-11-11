@@ -285,7 +285,23 @@ class Go::Schedule {
             $schedule_info->{ret_length} = $nread;
             $self->{uv_pipe_goroutines_h}->delete("$fd");
             $uv_stream->read_stop;
-            $self->awake($goroutine, $uv_stream, $schedule_info);
+            
+            my $goroutine_uv_handle = $goroutine->{uv_handle};
+            my $goroutine_timout_uv_timer = $goroutine->{timeout_uv_timer};
+            
+            if ($goroutine_timout_uv_timer) {
+              unless ($uv_stream == $goroutine_uv_handle) {
+                # IO timeout
+                $schedule_info->{error_id} = basic_type_id Go::Error::IOTimeout;
+                $schedule_info->{exception} = "IO timeout occur";
+              }
+              $goroutine_timout_uv_timer->set_timer_cb(undef);
+              $goroutine_uv_handle->close_safe;
+            }
+            
+            $uv_stream->close_safe;
+            
+            $self->enable_goroutine($goroutine);
           };
           
           $uv_pipe->read_start((mutable string)$buffer, $buffer_length, $read_cb, $buffer_offset);
@@ -298,8 +314,25 @@ class Go::Schedule {
             }
             $schedule_info->{ret_length} = $buffer_length;
             $self->{uv_pipe_goroutines_h}->delete("$fd");
-            $self->awake($goroutine, $uv_pipe, $schedule_info);
+            
+            my $goroutine_uv_handle = $goroutine->{uv_handle};
+            my $goroutine_timout_uv_timer = $goroutine->{timeout_uv_timer};
+            
+            if ($goroutine_timout_uv_timer) {
+              unless ($uv_pipe == $goroutine_uv_handle) {
+                # IO timeout
+                $schedule_info->{error_id} = basic_type_id Go::Error::IOTimeout;
+                $schedule_info->{exception} = "IO timeout occur";
+              }
+              $goroutine_timout_uv_timer->set_timer_cb(undef);
+              $goroutine_uv_handle->close_safe;
+            }
+            
+            $uv_pipe->close_safe;
+            
+            $self->enable_goroutine($goroutine);
             $uv_req_write->set_write_cb(undef);
+            
           };
           
           $goroutine->{uv_write}->write($uv_pipe, $buffer, $buffer_length, $write_cb, $buffer_offset);
@@ -310,9 +343,24 @@ class Go::Schedule {
           my $uv_timer = UV::Handle::Timer->new;
           $uv_loop->timer_init($uv_timer);
           $goroutine->{timeout_uv_timer} = $uv_timer;
-          my $timer_cb = [$goroutine : , $self : , $schedule_info : , $fd : ] method : void ($uv_timer : UV::Handle::Timer) {
+          my $timer_cb = [$goroutine : , $self : , $schedule_info : , $fd : ,] method : void ($uv_timer : UV::Handle::Timer) {
             $self->{uv_pipe_goroutines_h}->delete("$fd");
-            $self->awake($goroutine, $uv_timer, $schedule_info);
+            my $goroutine_uv_handle = $goroutine->{uv_handle};
+            my $goroutine_timout_uv_timer = $goroutine->{timeout_uv_timer};
+            
+            if ($goroutine_timout_uv_timer) {
+              unless ($uv_timer == $goroutine_uv_handle) {
+                # IO timeout
+                $schedule_info->{error_id} = basic_type_id Go::Error::IOTimeout;
+                $schedule_info->{exception} = "IO timeout occur";
+              }
+              $goroutine_timout_uv_timer->set_timer_cb(undef);
+              $goroutine_uv_handle->close_safe;
+            }
+            
+            $uv_timer->close_safe;
+            
+            $self->enable_goroutine($goroutine);
           };
           $uv_timer->start($timer_cb, $timeout_msec);
         }
