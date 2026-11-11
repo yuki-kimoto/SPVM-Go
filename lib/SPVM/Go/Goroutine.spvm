@@ -10,7 +10,6 @@ class Go::Goroutine : pointer {
   use Go::Channel;
   use Go::Time;
   use Resource::Coro;
-  use UV::Request::Write;
   
   # Fields
   has schedule_goroutine : Go::Goroutine;
@@ -20,8 +19,6 @@ class Go::Goroutine : pointer {
   has finished : byte;
   
   has disabled : byte;
-  
-  has uv_write : UV::Request::Write;
   
   has caller_info : CallerInfo;
   

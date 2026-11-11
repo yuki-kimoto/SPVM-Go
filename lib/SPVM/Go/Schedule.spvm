@@ -222,10 +222,6 @@ class Go::Schedule {
         }
         my $buffer_offset = $schedule_info->{buffer_offset};
         
-        unless ($goroutine->{uv_write}) {
-          $goroutine->{uv_write} = UV::Request::Write->new;
-        }
-        
         unless ($fd >= 0) {
           die "The file descriptor \$fd in schedule type TYPE_PIPE_READ or TYPE_PIPE_WRITE must be a non-negative value.";
         }
@@ -285,7 +281,9 @@ class Go::Schedule {
           $uv_pipe->read_start((mutable string)$buffer, $buffer_length, $read_cb, $buffer_offset);
         }
         else {
-          my $write_cb = [$schedule_info : , $buffer_length : , $finish_cb : ] method : void ($uv_req_write : UV::Request::Write, $status : int) {
+          my $uv_req_write = UV::Request::Write->new;
+          
+          my $write_cb = [$schedule_info : , $buffer_length : , $finish_cb : , $uv_req_write : ] method : void ($uv_req_write : UV::Request::Write, $status : int) {
             if ($status < 0) {
               $schedule_info->{error_id} = basic_type_id Error;
               $schedule_info->{exception} = UV->strerror($status);
@@ -296,7 +294,7 @@ class Go::Schedule {
             $uv_req_write->set_write_cb(undef);
           };
           
-          $goroutine->{uv_write}->write($uv_pipe, $buffer, $buffer_length, $write_cb, $buffer_offset);
+          $uv_req_write->write($uv_pipe, $buffer, $buffer_length, $write_cb, $buffer_offset);
         }
         
         if ($timeout_msec > 0) {
