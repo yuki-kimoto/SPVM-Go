@@ -16,7 +16,7 @@ ok(SPVM::TestCase::Go::OS::Exec->context_done);
 
 ok(SPVM::TestCase::Go::OS::Exec->context_deadline);
 
-# ok(SPVM::TestCase::Go::OS::Exec->context_extra);
+ok(SPVM::TestCase::Go::OS::Exec->context_extra);
 
 $api->destroy_runtime_permanent_vars;
 
