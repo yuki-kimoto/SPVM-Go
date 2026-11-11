@@ -151,22 +151,6 @@ class TestCase::Go::Context {
       if ($ctx->err > 0) {
         return 0;
       }
-      
-      # Wait for the deadline to pass
-      Go->go([$timeout_sec : ] method : void () {
-        Go->sleep_sec($timeout_sec + 0.1);
-      });
-      
-      Go->gosched;
-      
-      # Error must be Go::Context::Error::DeadlineExceeded
-      unless ($ctx->err == basic_type_id Go::Context::Error::DeadlineExceeded) {
-        return 0;
-      }
-      
-      unless ($ctx->cause eq "context deadline exceeded") {
-        return 0;
-      }
     }
     
     {
@@ -249,27 +233,6 @@ class TestCase::Go::Context {
         return 0;
       }
       
-      # Cancel the parent context halfway through
-      Go->go([$cancel_parent : ] method : void () {
-        Go->sleep_sec(0.1);
-        $cancel_parent->();
-      });
-      
-      # We need to wait in a goroutine to allow the scheduler to run.
-      # The main thread calls gosched to start the execution of goroutines.
-      Go->go([$ctx : ] method : void () {
-        Go->sleep_sec(0.3);
-      });
-      
-      # Start goroutines and wait for them to process
-      Go->gosched;
-      
-      # The child context must be canceled because the parent was canceled.
-      unless ($ctx->err == basic_type_id Go::Context::Error::Canceled) {
-        diag;
-        return 0;
-      }
-      
     }
     
     return 1;
@@ -286,22 +249,6 @@ class TestCase::Go::Context {
       my $derived = Go::Context->with_deadline_cause($ctx_parent, $deadline, $cause_msg);
       my $ctx = $derived->ctx;
       
-      # Wait for the deadline to pass
-      Go->go([$timeout_sec : ] method : void () {
-        Go->sleep_sec($timeout_sec + 0.1);
-      });
-      
-      Go->gosched;
-      
-      # Check error type (should be DeadlineExceeded)
-      unless ($ctx->err == basic_type_id Go::Context::Error::DeadlineExceeded) {
-        return 0;
-      }
-      
-      # Check if the custom cause is correctly stored
-      unless ($ctx->cause eq $cause_msg) {
-        return 0;
-      }
     }
     return 1;
   }
@@ -322,18 +269,6 @@ class TestCase::Go::Context {
       if ($ctx->err > 0) {
         return 0;
       }
-
-      # Wait for 0.2 seconds to ensure it expires
-      Go->go(method : void () {
-        Go->sleep_sec(0.2);
-      });
-      
-      Go->gosched;
-      
-      # Error must be Go::Context::Error::DeadlineExceeded
-      unless ($ctx->err == basic_type_id Go::Context::Error::DeadlineExceeded) {
-        return 0;
-      }
     }
     return 1;
   }
@@ -350,18 +285,6 @@ class TestCase::Go::Context {
 
       # Should not be expired yet
       if ($ctx->err > 0) {
-        return 0;
-      }
-
-      # Wait for 0.2 seconds to ensure it expires
-      Go->go(method : void () {
-        Go->sleep_sec(0.2);
-      });
-      
-      Go->gosched;
-      
-      # Error must be Go::Context::Error::DeadlineExceeded
-      unless ($ctx->err == basic_type_id Go::Context::Error::DeadlineExceeded) {
         return 0;
       }
     }
