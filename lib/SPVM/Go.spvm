@@ -11,6 +11,7 @@ class Go {
   use Callback;
   use Go::Select;
   use Go::Duration_1l;
+  use Go::Context;
   
   our $GO : Go;
   
@@ -245,6 +246,14 @@ class Go {
     my $debug = (int)Sys->env("SPVM_GO_DEBUG");
     
     return $debug;
+  }
+  
+  static method bg : Go::Context () {
+    return Go::Context->background;
+  }
+  
+  static method todo : Go::Context () {
+    return Go::Context->todo;
   }
   
 }
