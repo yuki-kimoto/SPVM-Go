@@ -245,7 +245,6 @@ class Go::Schedule {
         my $fd_dup = Sys::IO->dup($fd);
         $uv_pipe->open($fd_dup);
         $uv_pipe_ref->[0] = $uv_pipe;
-        $goroutine->{uv_handle} = $uv_pipe;
         
         my $uv_timer_ref = [(UV::Handle::Timer)undef];
         
@@ -304,7 +303,6 @@ class Go::Schedule {
           my $uv_timer = UV::Handle::Timer->new;
           $uv_timer_ref->[0] = $uv_timer;
           $uv_loop->timer_init($uv_timer);
-          $goroutine->{timeout_uv_timer} = $uv_timer;
           
           my $timer_cb = [$schedule_info : , $finish_cb : ] method : void ($uv_timer : UV::Handle::Timer) {
             $schedule_info->{error_id} = basic_type_id Go::Error::IOTimeout;
@@ -491,8 +489,6 @@ class Go::Schedule {
   
   private method enable_goroutine : void ($goroutine : Go::Goroutine) {
     $goroutine->{disabled} = 0;
-    $goroutine->{uv_handle} = undef;
-    $goroutine->{timeout_uv_timer} = undef;
     $self->{disabled_goroutines_h}->delete(Fn->to_address($goroutine));
     $self->{goroutines}->push($goroutine);
   }
