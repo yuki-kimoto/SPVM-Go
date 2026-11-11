@@ -242,99 +242,81 @@ class Go::Schedule {
         
         my $uv_loop = $self->{uv_loop};
         
+        my $uv_pipe_ref = [(UV::Handle::Pipe)undef];
         my $uv_pipe = UV::Handle::Pipe->new;
         my $ipc = 0;
         $uv_loop->pipe_init($uv_pipe, $ipc);
         my $fd_dup = Sys::IO->dup($fd);
         $uv_pipe->open($fd_dup);
+        $uv_pipe_ref->[0] = $uv_pipe;
         $goroutine->{uv_handle} = $uv_pipe;
         
+        my $uv_timer_ref = [(UV::Handle::Timer)undef];
+        
+        my $finish_cb = [$self : , $goroutine : , $fd : , $uv_pipe_ref : , $uv_timer_ref : ] method : void () {
+          $self->{uv_pipe_finish_cbs_h}->delete("$fd");
+          
+          my $uv_timer = $uv_timer_ref->[0];
+          if ($uv_timer) {
+            $uv_timer->set_timer_cb(undef);
+            $uv_timer->close_safe;
+            $uv_timer_ref->[0] = undef;
+          }
+          
+          my $uv_pipe = $uv_pipe_ref->[0];
+          if ($uv_pipe) {
+            $uv_pipe->close_safe;
+            $uv_pipe_ref->[0] = undef;
+          }
+          
+          $self->enable_goroutine($goroutine);
+        };
+        
+        $self->{uv_pipe_finish_cbs_h}{"$fd"} = $finish_cb;
+        
         if ($schedule_type == Go::Schedule::Info->TYPE_PIPE_READ) {
-          my $read_cb = [$goroutine : , $self : , $schedule_info : , $fd : ] method : void ($uv_stream : UV::Handle::Stream, $nread : int, $buffer : string) {
+          my $read_cb = [$schedule_info : , $finish_cb : ] method : void ($uv_stream : UV::Handle::Stream, $nread : int, $buffer : string) {
             if ($nread < 0) {
               $schedule_info->{error_id} = basic_type_id Error;
               $schedule_info->{exception} = UV->strerror($nread);
             }
             $schedule_info->{ret_length} = $nread;
-            $self->{uv_pipe_goroutines_h}->delete("$fd");
+            
             $uv_stream->read_stop;
             
-            my $goroutine_uv_handle = $goroutine->{uv_handle};
-            my $goroutine_timout_uv_timer = $goroutine->{timeout_uv_timer};
-            
-            if ($goroutine_timout_uv_timer) {
-              unless ($uv_stream == $goroutine_uv_handle) {
-                # IO timeout
-                $schedule_info->{error_id} = basic_type_id Go::Error::IOTimeout;
-                $schedule_info->{exception} = "IO timeout occur";
-              }
-              $goroutine_timout_uv_timer->set_timer_cb(undef);
-              $goroutine_uv_handle->close_safe;
-            }
-            
-            $uv_stream->close_safe;
-            
-            $self->enable_goroutine($goroutine);
+            $finish_cb->();
           };
           
           $uv_pipe->read_start((mutable string)$buffer, $buffer_length, $read_cb, $buffer_offset);
         }
         else {
-          my $write_cb = [$goroutine : , $self : , $schedule_info : , $buffer_length : , $uv_pipe : , $fd : ] method : void ($uv_req_write : UV::Request::Write, $status : int) {
+          my $write_cb = [$schedule_info : , $buffer_length : , $finish_cb : ] method : void ($uv_req_write : UV::Request::Write, $status : int) {
             if ($status < 0) {
               $schedule_info->{error_id} = basic_type_id Error;
               $schedule_info->{exception} = UV->strerror($status);
             }
             $schedule_info->{ret_length} = $buffer_length;
-            $self->{uv_pipe_goroutines_h}->delete("$fd");
             
-            my $goroutine_uv_handle = $goroutine->{uv_handle};
-            my $goroutine_timout_uv_timer = $goroutine->{timeout_uv_timer};
-            
-            if ($goroutine_timout_uv_timer) {
-              unless ($uv_pipe == $goroutine_uv_handle) {
-                # IO timeout
-                $schedule_info->{error_id} = basic_type_id Go::Error::IOTimeout;
-                $schedule_info->{exception} = "IO timeout occur";
-              }
-              $goroutine_timout_uv_timer->set_timer_cb(undef);
-              $goroutine_uv_handle->close_safe;
-            }
-            
-            $uv_pipe->close_safe;
-            
-            $self->enable_goroutine($goroutine);
+            $finish_cb->();
             $uv_req_write->set_write_cb(undef);
-            
           };
           
           $goroutine->{uv_write}->write($uv_pipe, $buffer, $buffer_length, $write_cb, $buffer_offset);
         }
-        $self->{uv_pipe_goroutines_h}{"$fd"} = $goroutine;
         
         if ($timeout_msec > 0) {
           my $uv_timer = UV::Handle::Timer->new;
+          $uv_timer_ref->[0] = $uv_timer;
           $uv_loop->timer_init($uv_timer);
           $goroutine->{timeout_uv_timer} = $uv_timer;
-          my $timer_cb = [$goroutine : , $self : , $schedule_info : , $fd : ,] method : void ($uv_timer : UV::Handle::Timer) {
-            $self->{uv_pipe_goroutines_h}->delete("$fd");
-            my $goroutine_uv_handle = $goroutine->{uv_handle};
-            my $goroutine_timout_uv_timer = $goroutine->{timeout_uv_timer};
+          
+          my $timer_cb = [$schedule_info : , $finish_cb : ] method : void ($uv_timer : UV::Handle::Timer) {
+            $schedule_info->{error_id} = basic_type_id Go::Error::IOTimeout;
+            $schedule_info->{exception} = "IO timeout occur";
             
-            if ($goroutine_timout_uv_timer) {
-              unless ($uv_timer == $goroutine_uv_handle) {
-                # IO timeout
-                $schedule_info->{error_id} = basic_type_id Go::Error::IOTimeout;
-                $schedule_info->{exception} = "IO timeout occur";
-              }
-              $goroutine_timout_uv_timer->set_timer_cb(undef);
-              $goroutine_uv_handle->close_safe;
-            }
-            
-            $uv_timer->close_safe;
-            
-            $self->enable_goroutine($goroutine);
+            $finish_cb->();
           };
+          
           $uv_timer->start($timer_cb, $timeout_msec);
         }
         
@@ -346,22 +328,10 @@ class Go::Schedule {
       {
         my $fd = $schedule_info->{fd};
         
-        unless ($fd >= 0) {
-          die "The file descriptor \$fd in schedule type TYPE_PIPE_CANCEL must be a non-negative value.";
-        }
+        my $uv_pipe_finish_cb = $self->{uv_pipe_finish_cbs_h}{"$fd"};
         
-        my $uv_pipe_goroutine = $self->{uv_pipe_goroutines_h}{"$fd"};
-        
-        if ($uv_pipe_goroutine) {
-          if ($uv_pipe_goroutine->{uv_handle}) {
-            $uv_pipe_goroutine->{uv_handle}->close_safe;
-          }
-          if ($uv_pipe_goroutine->{timeout_uv_timer}) {
-            $uv_pipe_goroutine->{timeout_uv_timer}->close_safe;
-          }
-          
-          $self->{uv_pipe_goroutines_h}->delete("$fd");
-          $self->enable_goroutine($uv_pipe_goroutine);
+        if ($uv_pipe_finish_cb) {
+          $uv_pipe_finish_cb->();
         }
         
         return;
