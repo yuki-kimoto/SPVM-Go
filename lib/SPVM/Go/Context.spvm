@@ -36,19 +36,13 @@ class Go::Context {
     $BACKGROUND_CONTEXT = new Go::Context;
   }
 
-  our $TODO_CONTEXT : Go::Context;
-
-  INIT {
-    $TODO_CONTEXT = new Go::Context;
-  }
-
   # Class Methods
   static method background : Go::Context () {
     return $BACKGROUND_CONTEXT;
   }
   
   static method todo : Go::Context () {
-    return $TODO_CONTEXT;
+    return $BACKGROUND_CONTEXT;
   }
   
   static method without_cancel : Go::Context ($parent_ctx : Go::Context) {
