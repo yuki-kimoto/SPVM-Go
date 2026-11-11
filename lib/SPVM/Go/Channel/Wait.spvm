@@ -7,9 +7,7 @@ class Go::Channel::Wait {
   allow Go::Schedule;
   allow Go::Channel;
   
-  use Go::Goroutine;
-  
-  has goroutine : Go::Goroutine;
+  has is_wait : byte;
   
   has value : object;
   

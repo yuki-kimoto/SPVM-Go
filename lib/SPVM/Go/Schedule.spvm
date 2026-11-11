@@ -380,7 +380,6 @@ class Go::Schedule {
         my $wait = $schedule_info->{wait};
         my $uv_loop = $self->{uv_loop};
         my $uv_async = UV::Handle::Async->new;
-        $goroutine->{uv_handle} = $uv_async;
         $wait->{uv_async} = $uv_async;
         my $async_cb = [$goroutine : , $self : , $schedule_info : , $wait : ,] method : void ($uv_async : UV::Handle::Async) {
           $wait->{uv_async} = undef;

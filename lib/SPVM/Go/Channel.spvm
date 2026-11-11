@@ -79,9 +79,9 @@ class Go::Channel {
       
       $self->finish_wait($write_wait, $ok);
       
-      my $write_wait_goroutine = $write_wait->{goroutine};
+      my $write_wait_is_wait = $write_wait->{is_wait};
       
-      unless ($write_wait_goroutine) {
+      unless ($write_wait_is_wait) {
         $self->{length}--;
       }
       
@@ -100,7 +100,7 @@ class Go::Channel {
         die "There is no currently running goroutine.";
       }
       
-      $read_wait->{goroutine} = $current_goroutine;
+      $read_wait->{is_wait} = 1;
       
       $self->{read_waits}->push($read_wait);
       
@@ -128,9 +128,9 @@ class Go::Channel {
             
             my $value = $write_wait->{value};
             
-            my $write_wait_goroutine = $write_wait->{goroutine};
+            my $write_wait_is_wait = $write_wait->{is_wait};
             
-            unless ($write_wait_goroutine) {
+            unless ($write_wait_is_wait) {
               $self->{length}--;
             }
             
@@ -209,7 +209,7 @@ class Go::Channel {
           die "There is no currently running goroutine.";
         }
         
-        $write_wait->{goroutine} = $current_goroutine;
+        $write_wait->{is_wait} = 1;
         
         $self->{write_waits}->push($write_wait);
         
