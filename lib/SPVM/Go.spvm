@@ -68,7 +68,7 @@ class Go {
     my $schedule = $GO->{schedule};
     
     my $schedule_info = new Go::Schedule::Info;
-    $schedule_info->{type} = Go::Schedule::Info->TYPE_TIMER;
+    $schedule_info->{type} = Go::Schedule::Info->TYPE_SLEEP;
     $schedule_info->{timeout_duration_nsec} = $duration->{nsec};
     
     my $caller_info = caller;

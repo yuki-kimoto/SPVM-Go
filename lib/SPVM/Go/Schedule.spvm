@@ -374,7 +374,7 @@ class Go::Schedule {
         
         return;
       }
-      case Go::Schedule::Info->TYPE_TIMER:
+      case Go::Schedule::Info->TYPE_SLEEP:
       {
         my $timeout_duration_nsec = $schedule_info->{timeout_duration_nsec};
         my $fd = $schedule_info->{fd};
@@ -396,7 +396,7 @@ class Go::Schedule {
         $uv_timer->start($timer_cb, $timeout_msec);
         
         unless ($deadline) {
-          die "The deadline \$deadline in schedule type TYPE_TIMER must be defined.";
+          die "The deadline \$deadline in schedule type TYPE_SLEEP must be defined.";
         }
         
         if (Go->ENV_DEBUG) {

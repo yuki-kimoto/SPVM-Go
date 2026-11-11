@@ -15,7 +15,7 @@ class Go::Schedule::Info {
   
   private enum {
     TYPE_NONE,
-    TYPE_TIMER,
+    TYPE_SLEEP,
     TYPE_CHANNEL_READ,
     TYPE_CHANNEL_WRITE,
     TYPE_POLL_READ,
