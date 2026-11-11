@@ -161,14 +161,28 @@ class Go::Schedule {
         my $uv_poll = UV::Handle::Poll->new;
         $uv_loop->poll_init($uv_poll, $fd);
         $goroutine->{uv_handle} = $uv_poll;
-        my $poll_cb = [$goroutine : , $self : , $schedule_info : , $fd : ] method : void ($uv_poll : UV::Handle::Poll, $status : int, $events : int) {
+        
+        my $uv_timer_ref = [(UV::Handle::Timer)undef];
+        
+        my $poll_cb = [$goroutine : , $self : , $schedule_info : , $fd : , $uv_timer_ref : ] method : void ($uv_poll : UV::Handle::Poll, $status : int, $events : int) {
           if ($status < 0) {
             $schedule_info->{error_id} = basic_type_id Error;
             $schedule_info->{exception} = UV->strerror($status);
           }
           
           $self->{uv_poll_goroutines_h}->delete("$fd");
-          $self->awake($goroutine, $uv_poll, $schedule_info);
+          
+          my $uv_timer = $uv_timer_ref->[0];
+          if ($uv_timer) {
+            $uv_timer->set_timer_cb(undef);
+            $uv_timer->close_safe;
+            $uv_timer_ref->[0] = undef;
+          }
+          
+          $uv_poll->close_safe;
+          $goroutine->{uv_handle} = undef;
+          
+          $self->enable_goroutine($goroutine);
         };
         
         $uv_poll->start($poll_cb, $events);
@@ -176,12 +190,29 @@ class Go::Schedule {
         
         if ($timeout_msec > 0) {
           my $uv_timer = UV::Handle::Timer->new;
+          $uv_timer_ref->[0] = $uv_timer;
           $uv_loop->timer_init($uv_timer);
-          $goroutine->{timeout_uv_timer} = $uv_timer;
-          my $timer_cb = [$goroutine : , $self : , $schedule_info : , $fd : ] method : void ($uv_timer : UV::Handle::Timer) {
+          
+          my $timer_cb = [$goroutine : , $self : , $schedule_info : , $fd : , $uv_poll : , $uv_timer_ref : ] method : void ($uv_timer : UV::Handle::Timer) {
+            $schedule_info->{error_id} = basic_type_id Go::Error::IOTimeout;
+            $schedule_info->{exception} = "IO timeout occur";
+            
             $self->{uv_poll_goroutines_h}->delete("$fd");
-            $self->awake($goroutine, $uv_timer, $schedule_info);
+            
+            my $t = $uv_timer_ref->[0];
+            if ($t) {
+              $t->set_timer_cb(undef);
+              $t->close_safe;
+              $uv_timer_ref->[0] = undef;
+            }
+            
+            $uv_poll->set_poll_cb(undef);
+            $uv_poll->close_safe;
+            $goroutine->{uv_handle} = undef;
+            
+            $self->enable_goroutine($goroutine);
           };
+          
           $uv_timer->start($timer_cb, $timeout_msec);
         }
         
