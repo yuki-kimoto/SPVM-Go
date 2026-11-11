@@ -381,12 +381,12 @@ class Go::Schedule {
       case Go::Schedule::Info->TYPE_CHANNEL_WRITE:
       {
         my $wait = $schedule_info->{wait};
-        
         my $uv_loop = $self->{uv_loop};
         my $uv_async = UV::Handle::Async->new;
         $goroutine->{uv_handle} = $uv_async;
         my $async_cb = [$goroutine : , $self : , $schedule_info : ] method : void ($uv_async : UV::Handle::Async) {
-          $self->awake($goroutine, $uv_async, $schedule_info);
+          $uv_async->close_safe;
+          $self->enable_goroutine($goroutine);
         };
         $uv_loop->async_init($uv_async, $async_cb);
       }
