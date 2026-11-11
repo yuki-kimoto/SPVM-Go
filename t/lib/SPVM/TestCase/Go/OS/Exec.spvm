@@ -18,7 +18,7 @@ class TestCase::Go::OS::Exec {
         $wg->done;
       });
       
-      my $cmd = Go::OS::Exec->command(["perl", "-e", "print 'Hello';"]);
+      my $cmd = Go::OS::Exec->command(Go->bg, ["perl", "-e", "print 'Hello';"]);
       
       my $status = $cmd->run;
       
@@ -62,7 +62,7 @@ class TestCase::Go::OS::Exec {
         $cancel->();
       });
     
-      my $cmd = Go::OS::Exec->command_context($ctx, ["perl", "-e", "while(1){}"]);
+      my $cmd = Go::OS::Exec->command($ctx, ["perl", "-e", "while(1){}"]);
     
       my $status = $cmd->run;
     
@@ -94,7 +94,7 @@ class TestCase::Go::OS::Exec {
       my $_ = Go::Context->with_timeout_sec(Go::Context->background, 0.5);
       my $ctx = $_->ctx;
       
-      my $cmd = Go::OS::Exec->command_context($ctx, ["perl", "-e", "while(1){}"]);
+      my $cmd = Go::OS::Exec->command($ctx, ["perl", "-e", "while(1){}"]);
       
       my $status = $cmd->run;
       
@@ -127,7 +127,7 @@ class TestCase::Go::OS::Exec {
         my $ctx = $_->ctx;
         my $cancel = $_->cancel;
         
-        my $cmd = Go::OS::Exec->command_context($ctx, ["perl", "-v"]);
+        my $cmd = Go::OS::Exec->command($ctx, ["perl", "-v"]);
         my $status = $cmd->run;
         
         my $exit_code = $status >> 8;
@@ -153,7 +153,7 @@ class TestCase::Go::OS::Exec {
         my $ctx = $_->ctx;
         my $cancel = $_->cancel;
         
-        my $cmd = Go::OS::Exec->command_context($ctx, ["perl", "-e", "while(1){}"]);
+        my $cmd = Go::OS::Exec->command($ctx, ["perl", "-e", "while(1){}"]);
         my $status = $cmd->run;
         
         my $term_signal = $status & 0xff;
@@ -178,7 +178,7 @@ class TestCase::Go::OS::Exec {
         my $ctx = $_->ctx;
         my $cancel = $_->cancel;
         
-        my $cmd = Go::OS::Exec->command_context($ctx, ["perl", "-e", "while(1){}"]);
+        my $cmd = Go::OS::Exec->command($ctx, ["perl", "-e", "while(1){}"]);
         
         Go->go([$cancel : ] method : void () {
           Go->sleep_sec(0.5);
