@@ -64,6 +64,10 @@ class Go::Schedule {
     
     $self->{uv_pipe_goroutines_h} = Hash->new;
     
+    $self->{uv_poll_finish_cbs_h} = Hash->new;
+    
+    $self->{uv_pipe_finish_cbs_h} = Hash->new;
+    
     return $self;
   }
   
