@@ -388,6 +388,26 @@ class Go::Schedule {
           }
         };
         
+        $deadline_cb = [$self : , $goroutine : , $uv_process_ref : , $deadline_uv_timer_ref : , $finished_ref : , $sigkill : ] method : void ($timeout_uv_timer : UV::Handle::Timer) {
+          unless ($finished_ref->[0]) {
+            $finished_ref->[0] = 1;
+            my $uv_proc = $uv_process_ref->[0];
+            if ($uv_proc) {
+              $uv_proc->kill($sigkill);
+            }
+          }
+        };
+        
+        $cancel_cb = [$self : , $goroutine : , $uv_process_ref : , $deadline_uv_timer_ref : , $finished_ref : , $sigkill : ] method : void () {
+          unless ($finished_ref->[0]) {
+            $finished_ref->[0] = 1;
+            my $uv_proc = $uv_process_ref->[0];
+            if ($uv_proc) {
+              $uv_proc->kill($sigkill);
+            }
+          }
+        };
+        
         my $exit_cb = [$schedule_info : , $finish_cb : , $finish_cb_args_ref : ,] method : void ($uv_proc : UV::Handle::Process, $exit_status : long, $term_signal : int) {
           $schedule_info->{process_exit_status} = $exit_status;
           $schedule_info->{process_term_signal} = $term_signal;
