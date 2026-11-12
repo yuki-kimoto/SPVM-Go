@@ -119,6 +119,9 @@ class Go::Schedule {
   
   private method disable_goroutine : void ($goroutine : Go::Goroutine, $schedule_info : Go::Schedule::Info) {
     
+    my $finished_ref = [0];
+    my $finish_cb_args_ref = [(object)undef];
+    
     my $schedule_type = $schedule_info->{type};
     switch ($schedule_type) {
       case Go::Schedule::Info->TYPE_SLEEP:
@@ -395,8 +398,6 @@ class Go::Schedule {
           die "the timeout_duration_nsec in schedule type TYPE_PROCESS must be zero.";
         }
         
-        my $finished_ref = [0];
-        
         my $uv_loop = $self->{uv_loop};
         
         my $options = $exec_cmd->to_uv_process_options;
@@ -405,12 +406,12 @@ class Go::Schedule {
         my $uv_process = UV::Handle::Process->new;
         $uv_process_ref->[0] = $uv_process;
         
-        my $uv_timer_ref = [(UV::Handle::Timer)undef];
+        my $deadline_uv_timer_ref = [(UV::Handle::Timer)undef];
         
         my $finish_ch = Go->make;
         my $sigkill = 9;
         
-        my $finish_cb = [$self : , $goroutine : , $finish_ch : , $uv_process_ref : , $uv_timer_ref : , $finished_ref : , $sigkill : ] method : void ($args : object...) {
+        my $finish_cb = [$self : , $goroutine : , $finish_ch : , $uv_process_ref : , $deadline_uv_timer_ref : , $finished_ref : , $sigkill : ] method : void ($args : object...) {
           my $is_exit = (int)$args->[0];
           
           if ($is_exit) {
@@ -426,11 +427,11 @@ class Go::Schedule {
             }
           }
           
-          my $uv_timer = $uv_timer_ref->[0];
-          if ($uv_timer) {
-            $uv_timer->set_timer_cb(undef);
-            $uv_timer->close_safe;
-            $uv_timer_ref->[0] = undef;
+          my $deadline_uv_timer = $deadline_uv_timer_ref->[0];
+          if ($deadline_uv_timer) {
+            $deadline_uv_timer->set_timer_cb(undef);
+            $deadline_uv_timer->close_safe;
+            $deadline_uv_timer_ref->[0] = undef;
           }
           
           if ($is_exit) {
@@ -444,17 +445,21 @@ class Go::Schedule {
           }
         };
         
-        my $exit_cb = [$schedule_info : , $finish_cb : ] method : void ($uv_proc : UV::Handle::Process, $exit_status : long, $term_signal : int) {
+        my $exit_cb = [$schedule_info : , $finish_cb : , $finish_cb_args_ref : ,] method : void ($uv_proc : UV::Handle::Process, $exit_status : long, $term_signal : int) {
           $schedule_info->{process_exit_status} = $exit_status;
           $schedule_info->{process_term_signal} = $term_signal;
           
           my $is_exit = 1;
+          $finish_cb_args_ref->[0] = [(object)$is_exit];
           $finish_cb->($is_exit);
         };
         
         $options->set_exit_cb($exit_cb);
         
         $uv_loop->spawn($uv_process, $options);
+        
+        my $is_exit = 0;
+        $finish_cb_args_ref->[0] = [(object)$is_exit];
         
         my $context = $schedule_info->{context};
         if ($context) {
@@ -468,16 +473,15 @@ class Go::Schedule {
             }
             my $timeout_msec = $duration_nsec / 1_000_000;
             
-            my $uv_timer = UV::Handle::Timer->new;
-            $uv_timer_ref->[0] = $uv_timer;
-            $uv_loop->timer_init($uv_timer);
+            my $deadline_uv_timer = UV::Handle::Timer->new;
+            $deadline_uv_timer_ref->[0] = $deadline_uv_timer;
+            $uv_loop->timer_init($deadline_uv_timer);
             
-            my $timer_cb = [$finish_cb : ] method : void ($uv_timer : UV::Handle::Timer) {
-              my $is_exit = 0;
-              $finish_cb->($is_exit);
+            my $timer_cb = [$finish_cb : , $finish_cb_args_ref : ,] method : void ($deadline_uv_timer : UV::Handle::Timer) {
+              $finish_cb->((object...)$finish_cb_args_ref->[0]);
             };
             
-            $uv_timer->start($timer_cb, (long)$timeout_msec);
+            $deadline_uv_timer->start($timer_cb, (long)$timeout_msec);
           }
           
           my $cancel_ch = $context->done;
@@ -486,10 +490,9 @@ class Go::Schedule {
             $finish_or_cancel_select->add_read($finish_ch);
             $finish_or_cancel_select->add_read($cancel_ch);
             
-            Go->go([$finish_or_cancel_select : , $finish_cb : ] method : void () {
+            Go->go([$finish_or_cancel_select : , $finish_cb : , $finish_cb_args_ref : ,] method : void () {
               $finish_or_cancel_select->select;
-              my $is_exit = 0;
-              $finish_cb->($is_exit);
+              $finish_cb->((object...)$finish_cb_args_ref->[0]);
             });
           }
         }
