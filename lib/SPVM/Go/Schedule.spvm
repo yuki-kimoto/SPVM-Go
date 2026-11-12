@@ -115,12 +115,10 @@ class Go::Schedule {
   private method disable_goroutine : void ($goroutine : Go::Goroutine, $schedule_info : Go::Schedule::Info) {
     
     my $finished_ref = [0];
-    my $finish_cb_args_ref = [(object)undef];
     my $finish_ch = (Go::Channel)undef;
     my $cancel_ch = (Go::Channel)undef;
     my $deadline_uv_timer_ref = [(UV::Handle::Timer)undef];
     my $uv_loop = $self->{uv_loop};
-    my $finish_cb = (Go::Schedule::Callback::Finish)undef;
     my $timeout_uv_timer_ref = [(UV::Handle::Timer)undef];
     my $deadline_cb = (UV::Callback::Timer)undef;
     my $cancel_cb = (Callback)undef;
@@ -347,28 +345,18 @@ class Go::Schedule {
         
         my $options = $exec_cmd->to_uv_process_options;
         
+        $finish_ch = Go->make;
+        my $sigkill = 9;
+        
         my $uv_process_ref = [(UV::Handle::Process)undef];
         my $uv_process = UV::Handle::Process->new;
         $uv_process_ref->[0] = $uv_process;
         
-        $finish_ch = Go->make;
-        my $sigkill = 9;
-        
-        $finish_cb = [$self : , $goroutine : , $finish_ch : , $uv_process_ref : , $deadline_uv_timer_ref : , $finished_ref : , $sigkill : ] method : void ($args : object...) {
-          my $is_exit = (int)$args->[0];
+        my $exit_cb = [$self : , $goroutine : ,$schedule_info : , $finish_ch : , $deadline_uv_timer_ref : , $uv_process_ref : ] method : void ($uv_proc : UV::Handle::Process, $exit_status : long, $term_signal : int) {
+          $schedule_info->{process_exit_status} = $exit_status;
+          $schedule_info->{process_term_signal} = $term_signal;
           
-          if ($is_exit) {
-            $finish_ch->close;
-          }
-          else {
-            unless ($finished_ref->[0]) {
-              $finished_ref->[0] = 1;
-              my $uv_proc = $uv_process_ref->[0];
-              if ($uv_proc) {
-                $uv_proc->kill($sigkill);
-              }
-            }
-          }
+          $finish_ch->close;
           
           my $deadline_uv_timer = $deadline_uv_timer_ref->[0];
           if ($deadline_uv_timer) {
@@ -377,16 +365,15 @@ class Go::Schedule {
             $deadline_uv_timer_ref->[0] = undef;
           }
           
-          if ($is_exit) {
-            my $uv_proc = $uv_process_ref->[0];
-            if ($uv_proc) {
-              $uv_proc->close_safe;
-              $uv_process_ref->[0] = undef;
-            }
-            
-            $self->enable_goroutine($goroutine);
+          my $uv_proc = $uv_process_ref->[0];
+          if ($uv_proc) {
+            $uv_proc->close_safe;
+            $uv_process_ref->[0] = undef;
           }
+          
+          $self->enable_goroutine($goroutine);
         };
+        $options->set_exit_cb($exit_cb);
         
         $deadline_cb = [$self : , $goroutine : , $uv_process_ref : , $deadline_uv_timer_ref : , $finished_ref : , $sigkill : ] method : void ($timeout_uv_timer : UV::Handle::Timer) {
           unless ($finished_ref->[0]) {
@@ -408,21 +395,7 @@ class Go::Schedule {
           }
         };
         
-        my $exit_cb = [$schedule_info : , $finish_cb : , $finish_cb_args_ref : ,] method : void ($uv_proc : UV::Handle::Process, $exit_status : long, $term_signal : int) {
-          $schedule_info->{process_exit_status} = $exit_status;
-          $schedule_info->{process_term_signal} = $term_signal;
-          
-          my $is_exit = 1;
-          $finish_cb_args_ref->[0] = [(object)$is_exit];
-          $finish_cb->($is_exit);
-        };
-        
-        $options->set_exit_cb($exit_cb);
-        
         $uv_loop->spawn($uv_process, $options);
-        
-        my $is_exit = 0;
-        $finish_cb_args_ref->[0] = [(object)$is_exit];
       }
     }
     
@@ -451,7 +424,7 @@ class Go::Schedule {
         $deadline_uv_timer_ref->[0] = $deadline_uv_timer;
         $uv_loop->timer_init($deadline_uv_timer);
         
-        my $deadline_timer_cb = [$deadline_cb : , $finish_cb_args_ref : ,] method : void ($deadline_uv_timer : UV::Handle::Timer) {
+        my $deadline_timer_cb = [$deadline_cb : , ] method : void ($deadline_uv_timer : UV::Handle::Timer) {
           $deadline_cb->($deadline_uv_timer);
         };
         
