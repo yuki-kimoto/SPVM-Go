@@ -489,9 +489,11 @@ class Go::Schedule {
       my $finish_or_cancel_select = Go->new_select;
       $finish_or_cancel_select->add_read($finish_ch);
       $finish_or_cancel_select->add_read($cancel_ch);
-      Go->go([$finish_or_cancel_select : , $cancel_cb : ] method : void () {
-        $finish_or_cancel_select->select;
-        $cancel_cb->();
+       Go->go([$finish_or_cancel_select : , $finish_ch : , $cancel_ch : , $cancel_cb : ] method : void () {
+        my $result = $finish_or_cancel_select->select;
+        if ($result->channel == $cancel_ch) {
+          $cancel_cb->();
+        }
       });
     }
     
