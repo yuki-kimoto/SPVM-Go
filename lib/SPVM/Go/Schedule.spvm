@@ -119,7 +119,6 @@ class Go::Schedule {
     my $cancel_ch = (Go::Channel)undef;
     my $deadline_uv_timer_ref = [(UV::Handle::Timer)undef];
     my $uv_loop = $self->{uv_loop};
-    my $timeout_uv_timer_ref = [(UV::Handle::Timer)undef];
     my $deadline_cb = (UV::Callback::Timer)undef;
     my $cancel_cb = (Callback)undef;
     
@@ -127,18 +126,18 @@ class Go::Schedule {
     switch ($schedule_type) {
       case Go::Schedule::Info->TYPE_SLEEP:
       {
-        my $finish_cb = [$self : , $goroutine : , $timeout_uv_timer_ref : ] method : void ($args : object...) {
-          my $timeout_uv_timer = $timeout_uv_timer_ref->[0];
-          if ($timeout_uv_timer) {
-            $timeout_uv_timer->set_timer_cb(undef);
-            $timeout_uv_timer->close_safe;
-            $timeout_uv_timer_ref->[0] = undef;
+        my $finish_cb = [$self : , $goroutine : , $deadline_uv_timer_ref : ] method : void ($args : object...) {
+          my $deadline_uv_timer = $deadline_uv_timer_ref->[0];
+          if ($deadline_uv_timer) {
+            $deadline_uv_timer->set_timer_cb(undef);
+            $deadline_uv_timer->close_safe;
+            $deadline_uv_timer_ref->[0] = undef;
           }
           
           $self->enable_goroutine($goroutine);
         };
         
-        $deadline_cb = [$finish_cb : ] method : void ($timeout_uv_timer : UV::Handle::Timer) {
+        $deadline_cb = [$finish_cb : ] method : void ($deadline_uv_timer : UV::Handle::Timer) {
           $finish_cb->();
         };
       }
@@ -183,14 +182,14 @@ class Go::Schedule {
         $uv_poll_ref->[0] = $uv_poll;
         $uv_loop->poll_init($uv_poll, $fd);
         
-        my $finish_cb = [$self : , $goroutine : , $fd : , $uv_poll_ref : , $timeout_uv_timer_ref : ] method : void ($args : object...) {
+        my $finish_cb = [$self : , $goroutine : , $fd : , $uv_poll_ref : , $deadline_uv_timer_ref : ] method : void ($args : object...) {
           $self->{uv_poll_finish_cbs_h}->delete("$fd");
           
-          my $timeout_uv_timer = $timeout_uv_timer_ref->[0];
-          if ($timeout_uv_timer) {
-            $timeout_uv_timer->set_timer_cb(undef);
-            $timeout_uv_timer->close_safe;
-            $timeout_uv_timer_ref->[0] = undef;
+          my $deadline_uv_timer = $deadline_uv_timer_ref->[0];
+          if ($deadline_uv_timer) {
+            $deadline_uv_timer->set_timer_cb(undef);
+            $deadline_uv_timer->close_safe;
+            $deadline_uv_timer_ref->[0] = undef;
           }
           
           my $uv_poll = $uv_poll_ref->[0];
@@ -217,7 +216,7 @@ class Go::Schedule {
         
         $uv_poll->start($poll_cb, $events);
         
-        $deadline_cb = [$schedule_info : , $finish_cb : ] method : void ($timeout_uv_timer : UV::Handle::Timer) {
+        $deadline_cb = [$schedule_info : , $finish_cb : ] method : void ($deadline_uv_timer : UV::Handle::Timer) {
           $schedule_info->{error_id} = basic_type_id Go::Error::IOTimeout;
           $schedule_info->{exception} = "IO timeout occur";
           
@@ -259,14 +258,14 @@ class Go::Schedule {
         $uv_pipe->open($fd_dup);
         $uv_pipe_ref->[0] = $uv_pipe;
         
-        my $finish_cb = [$self : , $goroutine : , $fd : , $uv_pipe_ref : , $timeout_uv_timer_ref : ] method : void ($args : object...) {
+        my $finish_cb = [$self : , $goroutine : , $fd : , $uv_pipe_ref : , $deadline_uv_timer_ref : ] method : void ($args : object...) {
           $self->{uv_pipe_finish_cbs_h}->delete("$fd");
           
-          my $timeout_uv_timer = $timeout_uv_timer_ref->[0];
-          if ($timeout_uv_timer) {
-            $timeout_uv_timer->set_timer_cb(undef);
-            $timeout_uv_timer->close_safe;
-            $timeout_uv_timer_ref->[0] = undef;
+          my $deadline_uv_timer = $deadline_uv_timer_ref->[0];
+          if ($deadline_uv_timer) {
+            $deadline_uv_timer->set_timer_cb(undef);
+            $deadline_uv_timer->close_safe;
+            $deadline_uv_timer_ref->[0] = undef;
           }
           
           my $uv_pipe = $uv_pipe_ref->[0];
@@ -312,7 +311,7 @@ class Go::Schedule {
           $uv_req_write->write($uv_pipe, $buffer, $buffer_length, $write_cb, $buffer_offset);
         }
         
-        $deadline_cb = [$schedule_info : , $finish_cb : ] method : void ($timeout_uv_timer : UV::Handle::Timer) {
+        $deadline_cb = [$schedule_info : , $finish_cb : ] method : void ($deadline_uv_timer : UV::Handle::Timer) {
           $schedule_info->{error_id} = basic_type_id Go::Error::IOTimeout;
           $schedule_info->{exception} = "IO timeout occur";
           
@@ -352,7 +351,7 @@ class Go::Schedule {
         my $uv_process = UV::Handle::Process->new;
         $uv_process_ref->[0] = $uv_process;
         
-        my $exit_cb = [$self : , $goroutine : ,$schedule_info : , $finish_ch : , $deadline_uv_timer_ref : , $uv_process_ref : ] method : void ($uv_proc : UV::Handle::Process, $exit_status : long, $term_signal : int) {
+        my $exit_cb = [$self : , $goroutine : , $schedule_info : , $finish_ch : , $deadline_uv_timer_ref : , $uv_process_ref : ] method : void ($uv_proc : UV::Handle::Process, $exit_status : long, $term_signal : int) {
           $schedule_info->{process_exit_status} = $exit_status;
           $schedule_info->{process_term_signal} = $term_signal;
           
@@ -375,7 +374,7 @@ class Go::Schedule {
         };
         $options->set_exit_cb($exit_cb);
         
-        $deadline_cb = [$self : , $goroutine : , $uv_process_ref : , $deadline_uv_timer_ref : , $finished_ref : , $sigkill : ] method : void ($timeout_uv_timer : UV::Handle::Timer) {
+        $deadline_cb = [$self : , $goroutine : , $uv_process_ref : , $deadline_uv_timer_ref : , $finished_ref : , $sigkill : ] method : void ($deadline_uv_timer : UV::Handle::Timer) {
           unless ($finished_ref->[0]) {
             $finished_ref->[0] = 1;
             my $uv_proc = $uv_process_ref->[0];
@@ -399,13 +398,13 @@ class Go::Schedule {
       }
     }
     
+    # Calculate timeout and deadline, then pick the earlier one
+    my $final_timeout_msec = -1L;
+    
     my $timeout_duration_nsec = $schedule_info->{timeout_duration_nsec};
-    my $timeout_msec = $timeout_duration_nsec / 1000000;
-    if ($timeout_msec > 0) {
-      my $timeout_uv_timer = UV::Handle::Timer->new;
-      $timeout_uv_timer_ref->[0] = $timeout_uv_timer;
-      $uv_loop->timer_init($timeout_uv_timer);
-      $timeout_uv_timer->start($deadline_cb, $timeout_msec);
+    if ($timeout_duration_nsec > 0) {
+      my $timeout_msec = $timeout_duration_nsec / 1000000;
+      $final_timeout_msec = $timeout_msec;
     }
     
     my $context = $schedule_info->{context};
@@ -418,36 +417,44 @@ class Go::Schedule {
         if ($duration_nsec < 0) {
           $duration_nsec = 0L;
         }
-        my $timeout_msec = $duration_nsec / 1_000_000;
+        my $deadline_msec = $duration_nsec / 1_000_000;
         
-        my $deadline_uv_timer = UV::Handle::Timer->new;
-        $deadline_uv_timer_ref->[0] = $deadline_uv_timer;
-        $uv_loop->timer_init($deadline_uv_timer);
-        
-        my $deadline_timer_cb = [$deadline_cb : , ] method : void ($deadline_uv_timer : UV::Handle::Timer) {
-          $deadline_cb->($deadline_uv_timer);
-        };
-        
-        $deadline_uv_timer->start($deadline_timer_cb, (long)$timeout_msec);
+        if ($final_timeout_msec < 0 || $deadline_msec < $final_timeout_msec) {
+          $final_timeout_msec = $deadline_msec;
+        }
       }
       
       $cancel_ch = $context->done;
-      if ($cancel_ch) {
-        my $finish_or_cancel_select = Go->new_select;
-        if ($finish_ch) {
-          $finish_or_cancel_select->add_read($finish_ch);
-        }
-        if ($cancel_ch) {
-          $finish_or_cancel_select->add_read($cancel_ch);
-        }
-        Go->go([$finish_or_cancel_select : , $cancel_cb : ,] method : void () {
-          $finish_or_cancel_select->select;
-          $cancel_cb->();
-        });
-      }
     }
     
-
+    if ($final_timeout_msec >= 0 && $deadline_cb) {
+      my $deadline_uv_timer = UV::Handle::Timer->new;
+      $deadline_uv_timer_ref->[0] = $deadline_uv_timer;
+      $uv_loop->timer_init($deadline_uv_timer);
+      
+      my $deadline_timer_cb = [$deadline_cb : ] method : void ($deadline_uv_timer : UV::Handle::Timer) {
+        $deadline_cb->($deadline_uv_timer);
+      };
+      
+      $deadline_uv_timer->start($deadline_timer_cb, (long)$final_timeout_msec);
+    }
+    
+    if ($cancel_ch) {
+      my $finish_or_cancel_select = Go->new_select;
+      if ($finish_ch) {
+        $finish_or_cancel_select->add_read($finish_ch);
+      }
+      if ($cancel_ch) {
+        $finish_or_cancel_select->add_read($cancel_ch);
+      }
+      Go->go([$finish_or_cancel_select : , $cancel_cb : ] method : void () {
+        $finish_or_cancel_select->select;
+        if ($cancel_cb) {
+          $cancel_cb->();
+        }
+      });
+    }
+    
     my $goroutine_address = Fn->to_address($goroutine);
     $self->{disabled_goroutines_h}->{$goroutine_address} = $goroutine;
     $goroutine->{disabled} = 1;
