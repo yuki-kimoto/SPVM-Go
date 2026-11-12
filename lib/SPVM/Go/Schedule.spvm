@@ -464,7 +464,10 @@ class Go::Schedule {
       $cancel_ch = $context->done;
     }
     
-    if ($final_timeout_msec >= 0 && $deadline_cb) {
+    if ($final_timeout_msec >= 0) {
+      unless ($deadline_cb) {
+        die "[Unexpected Error]\$cance_cb is not defined.";
+      }
       my $deadline_uv_timer = UV::Handle::Timer->new;
       $deadline_uv_timer_ref->[0] = $deadline_uv_timer;
       $uv_loop->timer_init($deadline_uv_timer);
@@ -476,7 +479,10 @@ class Go::Schedule {
       $deadline_uv_timer->start($deadline_timer_cb, (long)$final_timeout_msec);
     }
     
-    if ($cancel_ch && $cancel_cb) {
+    if ($cancel_ch) {
+      unless ($cancel_cb) {
+        die "[Unexpected Error]\$cance_cb is not defined.";
+      }
       my $finish_or_cancel_select = Go->new_select;
       if ($finish_ch) {
         $finish_or_cancel_select->add_read($finish_ch);
