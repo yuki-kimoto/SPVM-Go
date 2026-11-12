@@ -192,7 +192,6 @@ class Go {
     my $schedule_info = new Go::Schedule::Info;
     $schedule_info->{type} = Go::Schedule::Info->TYPE_POLL_WRITE;
     $schedule_info->{fd} = $fd;
-    $schedule_info->{timeout_duration_nsec} = $timeout_duration->{nsec};
     $schedule_info->{context} = $context;
     
     $schedule->schedule($schedule_info, $caller_info);
@@ -254,7 +253,6 @@ class Go {
     my $schedule_info = new Go::Schedule::Info;
     $schedule_info->{type} = Go::Schedule::Info->TYPE_PIPE_READ;
     $schedule_info->{fd} = $fd;
-    $schedule_info->{timeout_duration_nsec} = $timeout_duration->{nsec};
     $schedule_info->{buffer} = $string;
     $schedule_info->{buffer_length} = $length;
     $schedule_info->{buffer_offset} = $offset;
@@ -306,7 +304,6 @@ class Go {
     my $schedule_info = new Go::Schedule::Info;
     $schedule_info->{type} = Go::Schedule::Info->TYPE_PIPE_WRITE;
     $schedule_info->{fd} = $fd;
-    $schedule_info->{timeout_duration_nsec} = $timeout_duration->{nsec};
     $schedule_info->{buffer} = $string;
     $schedule_info->{buffer_length} = $length;
     $schedule_info->{buffer_offset} = $offset;
