@@ -24,6 +24,7 @@ class Go::Schedule {
   use Thread::ThisThread;
   use Sys::IO;
   use Sys::Signal::Constant as SIGNAL_C;
+  use Go::Schedule::Callback::Finish;
   
   has goroutines : List of Go::Goroutine;
   
@@ -387,11 +388,11 @@ class Go::Schedule {
         my $exec_cmd = $schedule_info->{process_exec_cmd};
         
         unless ($exec_cmd) {
-          die "The exec_cmd in schedule type TYPE_PROCESS must be defined.";
+          die "the exec_cmd in schedule type TYPE_PROCESS must be defined.";
         }
         
         if ($schedule_info->{timeout_duration_nsec} != 0) {
-          die "The timeout_duration_nsec in schedule type TYPE_PROCESS must be zero.";
+          die "the timeout_duration_nsec in schedule type TYPE_PROCESS must be zero.";
         }
         
         my $finished_ref = [0];
@@ -400,15 +401,30 @@ class Go::Schedule {
         
         my $options = $exec_cmd->to_uv_process_options;
         
+        my $uv_process_ref = [(UV::Handle::Process)undef];
         my $uv_process = UV::Handle::Process->new;
+        $uv_process_ref->[0] = $uv_process;
         
         my $uv_timer_ref = [(UV::Handle::Timer)undef];
         
         my $exit_ch = Go->make;
-        my $exit_cb = [$goroutine : , $self : , $schedule_info : , $finished_ref : , $exit_ch : , $uv_timer_ref : ] method : void ($uv_proc : UV::Handle::Process, $exit_status : long, $term_signal : int) {
-          $exit_ch->close;
-          $schedule_info->{process_exit_status} = $exit_status;
-          $schedule_info->{process_term_signal} = $term_signal;
+        my $sigkill = 9;
+        
+        my $finish_cb = [$self : , $goroutine : , $exit_ch : , $uv_process_ref : , $uv_timer_ref : , $finished_ref : , $sigkill : ] method : void ($args : object...) {
+          my $is_exit = (int)$args->[0];
+          
+          if ($is_exit) {
+            $exit_ch->close;
+          }
+          else {
+            unless ($finished_ref->[0]) {
+              $finished_ref->[0] = 1;
+              my $uv_proc = $uv_process_ref->[0];
+              if ($uv_proc) {
+                $uv_proc->kill($sigkill);
+              }
+            }
+          }
           
           my $uv_timer = $uv_timer_ref->[0];
           if ($uv_timer) {
@@ -417,20 +433,29 @@ class Go::Schedule {
             $uv_timer_ref->[0] = undef;
           }
           
-          $uv_proc->close_safe;
+          if ($is_exit) {
+            my $uv_proc = $uv_process_ref->[0];
+            if ($uv_proc) {
+              $uv_proc->close_safe;
+              $uv_process_ref->[0] = undef;
+            }
+            
+            $self->enable_goroutine($goroutine);
+          }
+        };
+        
+        my $exit_cb = [$schedule_info : , $finish_cb : ] method : void ($uv_proc : UV::Handle::Process, $exit_status : long, $term_signal : int) {
+          $schedule_info->{process_exit_status} = $exit_status;
+          $schedule_info->{process_term_signal} = $term_signal;
           
-          $self->enable_goroutine($goroutine);
+          my $is_exit = 1;
+          $finish_cb->($is_exit);
         };
         
         $options->set_exit_cb($exit_cb);
         
         $uv_loop->spawn($uv_process, $options);
         
-        my $sigkill = 9;
-        
-        # TODO
-        # my $sigkill = SIGNAL_C->SIGKILL;
-                
         my $context = $exec_cmd->{context};
         if ($context) {
           my $deadline = $context->deadline;
@@ -447,46 +472,30 @@ class Go::Schedule {
             $uv_timer_ref->[0] = $uv_timer;
             $uv_loop->timer_init($uv_timer);
             
-            my $timer_cb = [$uv_process : , $finished_ref : , $uv_timer_ref : , $sigkill : ] method : void ($uv_timer : UV::Handle::Timer) {
-              if (!$finished_ref->[0]) {
-                $finished_ref->[0] = 1;
-                $uv_process->kill($sigkill);
-              }
-              my $t = $uv_timer_ref->[0];
-              if ($t) {
-                $t->set_timer_cb(undef);
-                $t->close_safe;
-                $uv_timer_ref->[0] = undef;
-              }
+            my $timer_cb = [$finish_cb : ] method : void ($uv_timer : UV::Handle::Timer) {
+              my $is_exit = 0;
+              $finish_cb->($is_exit);
             };
             
             $uv_timer->start($timer_cb, (long)$timeout_msec);
           }
-
+          
           my $done = $context->done;
           if ($done) {
             my $done_or_exit_select = Go->new_select;
             $done_or_exit_select->add_read($done);
             $done_or_exit_select->add_read($exit_ch);
             
-            Go->go([$uv_process : , $finished_ref :, $done_or_exit_select : , $uv_timer_ref : , $sigkill : ] method : void () {
+            Go->go([$done_or_exit_select : , $finish_cb : ] method : void () {
               $done_or_exit_select->select;
-              if (!$finished_ref->[0]) {
-                $finished_ref->[0] = 1;
-                $uv_process->kill($sigkill);
-              }
-              my $t = $uv_timer_ref->[0];
-              if ($t) {
-                $t->set_timer_cb(undef);
-                $t->close_safe;
-                $uv_timer_ref->[0] = undef;
-              }
+              my $is_exit = 0;
+              $finish_cb->($is_exit);
             });
           }
         }
         
         if (Go->ENV_DEBUG) {
-          Fn->say_stderr("[Go Debug]Register goroutine wait for process.");
+          Fn->say_stderr("[go debug]register goroutine wait for process.");
         }
       }
     }

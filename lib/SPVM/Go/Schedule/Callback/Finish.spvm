@@ -1,0 +1,7 @@
+# Copyright (c) 2026 Yuki Kimoto
+# MIT License
+
+class Go::Schedule::Callback::Finish : interface_t {
+  
+  required method : void ($args : object...);
+}
