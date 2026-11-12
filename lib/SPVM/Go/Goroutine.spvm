@@ -7,8 +7,6 @@ class Go::Goroutine : pointer {
   allow Go::Channel;
   
   use Callback;
-  use Go::Channel;
-  use Go::Time;
   use Resource::Coro;
   
   # Fields
