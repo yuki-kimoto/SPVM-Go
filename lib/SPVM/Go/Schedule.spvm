@@ -133,8 +133,6 @@ class Go::Schedule {
     switch ($schedule_type) {
       case Go::Schedule::Info->TYPE_SLEEP:
       {
-        my $uv_loop = $self->{uv_loop};
-        
         my $finish_cb = [$self : , $goroutine : , $timeout_uv_timer_ref : ] method : void ($args : object...) {
           my $t = $timeout_uv_timer_ref->[0];
           if ($t) {
@@ -158,8 +156,6 @@ class Go::Schedule {
       case Go::Schedule::Info->TYPE_CHANNEL_WRITE:
       {
         my $wait = $schedule_info->{wait};
-        my $uv_loop = $self->{uv_loop};
-        
         my $uv_async_ref = [(UV::Handle::Async)undef];
         my $uv_async = UV::Handle::Async->new;
         $uv_async_ref->[0] = $uv_async;
@@ -193,8 +189,6 @@ class Go::Schedule {
         }
         
         my $events = $schedule_type == Go::Schedule::Info->TYPE_POLL_READ ? UV_C->UV_READABLE : UV_C->UV_WRITABLE;
-        
-        my $uv_loop = $self->{uv_loop};
         
         my $uv_poll_ref = [(UV::Handle::Poll)undef];
         my $uv_poll = UV::Handle::Poll->new;
@@ -271,8 +265,6 @@ class Go::Schedule {
         unless ($fd >= 0) {
           die "The file descriptor \$fd in schedule type TYPE_PIPE_READ or TYPE_PIPE_WRITE must be a non-negative value.";
         }
-        
-        my $uv_loop = $self->{uv_loop};
         
         my $uv_pipe_ref = [(UV::Handle::Pipe)undef];
         my $uv_pipe = UV::Handle::Pipe->new;
