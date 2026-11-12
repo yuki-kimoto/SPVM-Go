@@ -451,8 +451,8 @@ class Go::Schedule {
         $deadline_uv_timer_ref->[0] = $deadline_uv_timer;
         $uv_loop->timer_init($deadline_uv_timer);
         
-        my $deadline_timer_cb = [$finish_cb : , $finish_cb_args_ref : ,] method : void ($deadline_uv_timer : UV::Handle::Timer) {
-          $finish_cb->((object...)$finish_cb_args_ref->[0]);
+        my $deadline_timer_cb = [$deadline_cb : , $finish_cb_args_ref : ,] method : void ($deadline_uv_timer : UV::Handle::Timer) {
+          $deadline_cb->($deadline_uv_timer);
         };
         
         $deadline_uv_timer->start($deadline_timer_cb, (long)$timeout_msec);
@@ -467,9 +467,9 @@ class Go::Schedule {
         if ($cancel_ch) {
           $finish_or_cancel_select->add_read($cancel_ch);
         }
-        Go->go([$finish_or_cancel_select : , $finish_cb : , $finish_cb_args_ref : ,] method : void () {
+        Go->go([$finish_or_cancel_select : , $cancel_cb : ,] method : void () {
           $finish_or_cancel_select->select;
-          $finish_cb->((object...)$finish_cb_args_ref->[0]);
+          $cancel_cb->();
         });
       }
     }
