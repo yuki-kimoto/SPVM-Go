@@ -140,6 +140,10 @@ class Go::Schedule {
         $deadline_cb = [$finish_cb : ] method : void ($deadline_uv_timer : UV::Handle::Timer) {
           $finish_cb->();
         };
+        
+        $cancel_cb = [$finish_cb : ] method : void () {
+          $finish_cb->();
+        };
       }
       case Go::Schedule::Info->TYPE_CHANNEL_READ:
       case Go::Schedule::Info->TYPE_CHANNEL_WRITE:
@@ -167,6 +171,20 @@ class Go::Schedule {
         };
         
         $uv_loop->async_init($uv_async, $async_cb);
+        
+        $deadline_cb = [$schedule_info : , $finish_cb : ] method : void ($deadline_uv_timer : UV::Handle::Timer) {
+          $schedule_info->{error_id} = basic_type_id Go::Context::Error::DeadlineExceeded;
+          $schedule_info->{exception} = "Context deadline exceeded";
+          
+          $finish_cb->();
+        };
+        
+        $cancel_cb = [$schedule_info : , $finish_cb : ] method : void () {
+          $schedule_info->{error_id} = basic_type_id Go::Context::Error::Canceled;
+          $schedule_info->{exception} = "Context canceled";
+          
+          $finish_cb->();
+        };
       }
       case Go::Schedule::Info->TYPE_POLL_READ:
       case Go::Schedule::Info->TYPE_POLL_WRITE:
@@ -217,8 +235,15 @@ class Go::Schedule {
         $uv_poll->start($poll_cb, $events);
         
         $deadline_cb = [$schedule_info : , $finish_cb : ] method : void ($deadline_uv_timer : UV::Handle::Timer) {
-          $schedule_info->{error_id} = basic_type_id Go::Error::IOTimeout;
-          $schedule_info->{exception} = "IO timeout occur";
+          $schedule_info->{error_id} = basic_type_id Go::Context::Error::DeadlineExceeded;
+          $schedule_info->{exception} = "Context deadline exceeded";
+          
+          $finish_cb->();
+        };
+        
+        $cancel_cb = [$schedule_info : , $finish_cb : ] method : void () {
+          $schedule_info->{error_id} = basic_type_id Go::Context::Error::Canceled;
+          $schedule_info->{exception} = "Context canceled";
           
           $finish_cb->();
         };
@@ -312,8 +337,15 @@ class Go::Schedule {
         }
         
         $deadline_cb = [$schedule_info : , $finish_cb : ] method : void ($deadline_uv_timer : UV::Handle::Timer) {
-          $schedule_info->{error_id} = basic_type_id Go::Error::IOTimeout;
-          $schedule_info->{exception} = "IO timeout occur";
+          $schedule_info->{error_id} = basic_type_id Go::Context::Error::DeadlineExceeded;
+          $schedule_info->{exception} = "Context deadline exceeded";
+          
+          $finish_cb->();
+        };
+        
+        $cancel_cb = [$schedule_info : , $finish_cb : ] method : void () {
+          $schedule_info->{error_id} = basic_type_id Go::Context::Error::Canceled;
+          $schedule_info->{exception} = "Context canceled";
           
           $finish_cb->();
         };
@@ -335,11 +367,11 @@ class Go::Schedule {
         my $exec_cmd = $schedule_info->{process_exec_cmd};
         
         unless ($exec_cmd) {
-          die "the exec_cmd in schedule type TYPE_PROCESS must be defined.";
+          die "The exec_cmd in schedule type TYPE_PROCESS must be defined.";
         }
         
         if ($schedule_info->{timeout_duration_nsec} != 0) {
-          die "the timeout_duration_nsec in schedule type TYPE_PROCESS must be zero.";
+          die "The timeout_duration_nsec in schedule type TYPE_PROCESS must be zero.";
         }
         
         my $options = $exec_cmd->to_uv_process_options;
@@ -374,7 +406,10 @@ class Go::Schedule {
         };
         $options->set_exit_cb($exit_cb);
         
-        $deadline_cb = [$self : , $goroutine : , $uv_process_ref : , $deadline_uv_timer_ref : , $finished_ref : , $sigkill : ] method : void ($deadline_uv_timer : UV::Handle::Timer) {
+        $deadline_cb = [$self : , $schedule_info : , $goroutine : , $uv_process_ref : , $deadline_uv_timer_ref : , $finished_ref : , $sigkill : ] method : void ($deadline_uv_timer : UV::Handle::Timer) {
+          $schedule_info->{error_id} = basic_type_id Go::Context::Error::DeadlineExceeded;
+          $schedule_info->{exception} = "Context deadline exceeded";
+          
           unless ($finished_ref->[0]) {
             $finished_ref->[0] = 1;
             my $uv_proc = $uv_process_ref->[0];
@@ -384,7 +419,10 @@ class Go::Schedule {
           }
         };
         
-        $cancel_cb = [$self : , $goroutine : , $uv_process_ref : , $deadline_uv_timer_ref : , $finished_ref : , $sigkill : ] method : void () {
+        $cancel_cb = [$self : , $schedule_info : , $goroutine : , $uv_process_ref : , $deadline_uv_timer_ref : , $finished_ref : , $sigkill : ] method : void () {
+          $schedule_info->{error_id} = basic_type_id Go::Context::Error::Canceled;
+          $schedule_info->{exception} = "Context canceled";
+          
           unless ($finished_ref->[0]) {
             $finished_ref->[0] = 1;
             my $uv_proc = $uv_process_ref->[0];
@@ -398,7 +436,6 @@ class Go::Schedule {
       }
     }
     
-    # Calculate timeout and deadline, then pick the earlier one
     my $final_timeout_msec = -1L;
     
     my $timeout_duration_nsec = $schedule_info->{timeout_duration_nsec};
@@ -439,7 +476,7 @@ class Go::Schedule {
       $deadline_uv_timer->start($deadline_timer_cb, (long)$final_timeout_msec);
     }
     
-    if ($cancel_ch) {
+    if ($cancel_ch && $cancel_cb) {
       my $finish_or_cancel_select = Go->new_select;
       if ($finish_ch) {
         $finish_or_cancel_select->add_read($finish_ch);

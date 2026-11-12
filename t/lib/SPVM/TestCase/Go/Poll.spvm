@@ -116,7 +116,7 @@ class TestCase::Go::Poll {
       eval { Go->gosched_io_read_sec($fd1, 0.25); };
       
       if ($@) {
-        if (eval_error_id is_error Go::Error::IOTimeout) {
+        if (eval_error_id isa_error Go::Error::IOTimeout) {
           $results->[0] = 1;
         }
         $@ = undef;
