@@ -109,7 +109,7 @@ class Go {
   static method gosched_io_read : void ($fd : int, $timeout_duration : Go::Duration_1l = undef) {
     
     my $caller_info = caller;
-    &gosched_io_read_with_caller_info($fd, $timeout_duration, $caller_info);
+    &gosched_io_read_with_caller_info(Go->bg, $fd, $timeout_duration, $caller_info);
   }
   
   static method gosched_io_read_sec : void ($fd : int, $timeout_sec : double = 0) {
@@ -117,10 +117,10 @@ class Go {
     my $timeout_duration = Go::Duration_1l->new_from_sec($timeout_sec);
     
     my $caller_info = caller;
-    &gosched_io_read_with_caller_info($fd, $timeout_duration, $caller_info);
+    &gosched_io_read_with_caller_info(Go->bg, $fd, $timeout_duration, $caller_info);
   }
   
-  private static method gosched_io_read_with_caller_info : void ($fd : int, $timeout_duration : Go::Duration_1l = undef, $caller_info : CallerInfo = undef) {
+  private static method gosched_io_read_with_caller_info : void ($context : Go::Context, $fd : int, $timeout_duration : Go::Duration_1l = undef, $caller_info : CallerInfo = undef) {
     
     my $schedule = $GO->{schedule};
     
@@ -128,6 +128,7 @@ class Go {
     $schedule_info->{type} = Go::Schedule::Info->TYPE_POLL_READ;
     $schedule_info->{fd} = $fd;
     $schedule_info->{timeout_duration_nsec} = $timeout_duration->{nsec};
+    $schedule_info->{context} = $context;
     
     $schedule->schedule($schedule_info, $caller_info);
   }
@@ -135,7 +136,7 @@ class Go {
   static method gosched_io_write : void ($fd : int, $timeout_duration : Go::Duration_1l = undef) {
     
     my $caller_info = caller;
-    &gosched_io_write_with_caller_info($fd, $timeout_duration, $caller_info);
+    &gosched_io_write_with_caller_info(Go->bg, $fd, $timeout_duration, $caller_info);
   }
   
   static method gosched_io_write_sec : void ($fd : int, $timeout_sec : double = 0) {
@@ -143,10 +144,10 @@ class Go {
     my $timeout_duration = Go::Duration_1l->new_from_sec($timeout_sec);
     
     my $caller_info = caller;
-    &gosched_io_write_with_caller_info($fd, $timeout_duration, $caller_info);
+    &gosched_io_write_with_caller_info(Go->bg, $fd, $timeout_duration, $caller_info);
   }
   
-  static method gosched_io_write_with_caller_info : void ($fd : int, $timeout_duration : Go::Duration_1l = undef, $caller_info : CallerInfo = undef) {
+  static method gosched_io_write_with_caller_info : void ($context : Go::Context, $fd : int, $timeout_duration : Go::Duration_1l = undef, $caller_info : CallerInfo = undef) {
     
     my $schedule = $GO->{schedule};
     
@@ -154,6 +155,7 @@ class Go {
     $schedule_info->{type} = Go::Schedule::Info->TYPE_POLL_WRITE;
     $schedule_info->{fd} = $fd;
     $schedule_info->{timeout_duration_nsec} = $timeout_duration->{nsec};
+    $schedule_info->{context} = $context;
     
     $schedule->schedule($schedule_info, $caller_info);
   }
