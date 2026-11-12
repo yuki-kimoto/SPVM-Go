@@ -155,16 +155,34 @@ class Go {
   
   static method gosched_io_write : void ($fd : int, $timeout_duration : Go::Duration_1l = undef) {
     
+    my $context = (Go::Context)undef;
+    if ($timeout_duration->{nsec} > 0) {
+      my $_ = Go::Context->with_timeout(Go->bg, $timeout_duration);
+      $context = $_->context;
+    }
+    else {
+      $context = Go->bg;
+    }
+    
     my $caller_info = caller;
-    &gosched_io_write_with_caller_info(Go->bg, $fd, $timeout_duration, $caller_info);
+    &gosched_io_write_with_caller_info($context, $fd, $timeout_duration, $caller_info);
   }
   
   static method gosched_io_write_sec : void ($fd : int, $timeout_sec : double = 0) {
     
     my $timeout_duration = Go::Duration_1l->new_from_sec($timeout_sec);
     
+    my $context = (Go::Context)undef;
+    if ($timeout_duration->{nsec} > 0) {
+      my $_ = Go::Context->with_timeout(Go->bg, $timeout_duration);
+      $context = $_->context;
+    }
+    else {
+      $context = Go->bg;
+    }
+    
     my $caller_info = caller;
-    &gosched_io_write_with_caller_info(Go->bg, $fd, $timeout_duration, $caller_info);
+    &gosched_io_write_with_caller_info($context, $fd, $timeout_duration, $caller_info);
   }
   
   static method gosched_io_write_with_caller_info : void ($context : Go::Context, $fd : int, $timeout_duration : Go::Duration_1l = undef, $caller_info : CallerInfo = undef) {
