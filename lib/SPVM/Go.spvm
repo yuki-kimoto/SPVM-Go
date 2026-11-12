@@ -283,5 +283,28 @@ class Go {
     return Go::Context->todo;
   }
   
+  static method gosched_io_read_v2 : void ($context : Go::Context, $fd : int) {
+    
+    my $caller_info = caller;
+    &gosched_io_read_with_caller_info($context, $fd, undef, $caller_info);
+  }
+  
+  static method gosched_io_write_v2 : void ($context : Go::Context, $fd : int) {
+    
+    my $caller_info = caller;
+    &gosched_io_write_with_caller_info($context, $fd, undef, $caller_info);
+  }
+  
+  static method gosched_pipe_read_v2 : int ($context : Go::Context, $fd : int, $string : mutable string, $length : int = -1, $offset : int = 0) {
+    
+    my $caller_info = caller;
+    return &gosched_pipe_read_with_caller_info($context, $fd, $string, $length, $offset, undef, $caller_info);
+  }
+  
+  static method gosched_pipe_write_v2 : int ($context : Go::Context, $fd : int, $string : string, $length : int = -1, $offset : int = 0) {
+    
+    my $caller_info = caller;
+    return &gosched_pipe_write_with_caller_info($context, $fd, $string, $length, $offset, undef, $caller_info);
+  }
 }
 
