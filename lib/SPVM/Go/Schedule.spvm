@@ -123,6 +123,9 @@ class Go::Schedule {
     my $finish_cb_args_ref = [(object)undef];
     my $finish_ch = (Go::Channel)undef;
     my $cancel_ch = (Go::Channel)undef;
+    my $deadline_uv_timer_ref = [(UV::Handle::Timer)undef];
+    my $uv_loop = $self->{uv_loop};
+    my $finish_cb = (Go::Schedule::Callback::Finish)undef;
     
     my $schedule_type = $schedule_info->{type};
     switch ($schedule_type) {
@@ -400,20 +403,16 @@ class Go::Schedule {
           die "the timeout_duration_nsec in schedule type TYPE_PROCESS must be zero.";
         }
         
-        my $uv_loop = $self->{uv_loop};
-        
         my $options = $exec_cmd->to_uv_process_options;
         
         my $uv_process_ref = [(UV::Handle::Process)undef];
         my $uv_process = UV::Handle::Process->new;
         $uv_process_ref->[0] = $uv_process;
         
-        my $deadline_uv_timer_ref = [(UV::Handle::Timer)undef];
-        
         $finish_ch = Go->make;
         my $sigkill = 9;
         
-        my $finish_cb = [$self : , $goroutine : , $finish_ch : , $uv_process_ref : , $deadline_uv_timer_ref : , $finished_ref : , $sigkill : ] method : void ($args : object...) {
+        $finish_cb = [$self : , $goroutine : , $finish_ch : , $uv_process_ref : , $deadline_uv_timer_ref : , $finished_ref : , $sigkill : ] method : void ($args : object...) {
           my $is_exit = (int)$args->[0];
           
           if ($is_exit) {
@@ -463,48 +462,52 @@ class Go::Schedule {
         my $is_exit = 0;
         $finish_cb_args_ref->[0] = [(object)$is_exit];
         
-        my $context = $schedule_info->{context};
-        if ($context) {
-          my $deadline = $context->deadline;
-          if ($deadline) {
-            my $now = Go::Time->now;
-            my $duration = $deadline->sub($now);
-            my $duration_nsec = $duration->{nsec};
-            if ($duration_nsec < 0) {
-              $duration_nsec = 0L;
-            }
-            my $timeout_msec = $duration_nsec / 1_000_000;
-            
-            my $deadline_uv_timer = UV::Handle::Timer->new;
-            $deadline_uv_timer_ref->[0] = $deadline_uv_timer;
-            $uv_loop->timer_init($deadline_uv_timer);
-            
-            my $timer_cb = [$finish_cb : , $finish_cb_args_ref : ,] method : void ($deadline_uv_timer : UV::Handle::Timer) {
-              $finish_cb->((object...)$finish_cb_args_ref->[0]);
-            };
-            
-            $deadline_uv_timer->start($timer_cb, (long)$timeout_msec);
-          }
-          
-          $cancel_ch = $context->done;
-          if ($cancel_ch) {
-            my $finish_or_cancel_select = Go->new_select;
-            $finish_or_cancel_select->add_read($finish_ch);
-            $finish_or_cancel_select->add_read($cancel_ch);
-            
-            Go->go([$finish_or_cancel_select : , $finish_cb : , $finish_cb_args_ref : ,] method : void () {
-              $finish_or_cancel_select->select;
-              $finish_cb->((object...)$finish_cb_args_ref->[0]);
-            });
-          }
-        }
-        
         if (Go->ENV_DEBUG) {
           Fn->say_stderr("[go debug]register goroutine wait for process.");
         }
       }
     }
     
+    my $context = $schedule_info->{context};
+    if ($context) {
+      my $deadline = $context->deadline;
+      if ($deadline) {
+        my $now = Go::Time->now;
+        my $duration = $deadline->sub($now);
+        my $duration_nsec = $duration->{nsec};
+        if ($duration_nsec < 0) {
+          $duration_nsec = 0L;
+        }
+        my $timeout_msec = $duration_nsec / 1_000_000;
+        
+        my $deadline_uv_timer = UV::Handle::Timer->new;
+        $deadline_uv_timer_ref->[0] = $deadline_uv_timer;
+        $uv_loop->timer_init($deadline_uv_timer);
+        
+        my $timer_cb = [$finish_cb : , $finish_cb_args_ref : ,] method : void ($deadline_uv_timer : UV::Handle::Timer) {
+          $finish_cb->((object...)$finish_cb_args_ref->[0]);
+        };
+        
+        $deadline_uv_timer->start($timer_cb, (long)$timeout_msec);
+      }
+      
+      $cancel_ch = $context->done;
+      if ($cancel_ch) {
+        my $finish_or_cancel_select = Go->new_select;
+        if ($finish_ch) {
+          $finish_or_cancel_select->add_read($finish_ch);
+        }
+        if ($cancel_ch) {
+          $finish_or_cancel_select->add_read($cancel_ch);
+        }
+        Go->go([$finish_or_cancel_select : , $finish_cb : , $finish_cb_args_ref : ,] method : void () {
+          $finish_or_cancel_select->select;
+          $finish_cb->((object...)$finish_cb_args_ref->[0]);
+        });
+      }
+    }
+    
+
     my $goroutine_address = Fn->to_address($goroutine);
     $self->{disabled_goroutines_h}->{$goroutine_address} = $goroutine;
     $goroutine->{disabled} = 1;
