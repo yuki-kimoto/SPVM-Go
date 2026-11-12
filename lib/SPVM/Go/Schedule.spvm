@@ -110,11 +110,6 @@ class Go::Schedule {
     my $goroutine = Go::Goroutine->new($task, undef, $caller_info);
     
     $self->{goroutines}->push($goroutine);
-    
-    if (Go->ENV_DEBUG) {
-      Fn->say_stderr(Format->sprintf("[Go Debug]Push new goroutine with the callback %p.", [(object)$task]));
-    }
-    
   }
   
   private method disable_goroutine : void ($goroutine : Go::Goroutine, $schedule_info : Go::Schedule::Info) {
@@ -136,8 +131,8 @@ class Go::Schedule {
         my $finish_cb = [$self : , $goroutine : , $timeout_uv_timer_ref : ] method : void ($args : object...) {
           my $timeout_uv_timer = $timeout_uv_timer_ref->[0];
           if ($timeout_uv_timer) {
-            $t->set_timer_cb(undef);
-            $t->close_safe;
+            $timeout_uv_timer->set_timer_cb(undef);
+            $timeout_uv_timer->close_safe;
             $timeout_uv_timer_ref->[0] = undef;
           }
           
@@ -147,10 +142,6 @@ class Go::Schedule {
         $timeout_timer_cb = [$finish_cb : ] method : void ($timeout_uv_timer : UV::Handle::Timer) {
           $finish_cb->();
         };
-        
-        if (Go->ENV_DEBUG) {
-          Fn->say_stderr(Format->sprintf("[Go Debug]Register goroutine wait for timer (Callback:%p, QueueNum:%d.)", [(object)$goroutine->{task}, $self->{goroutines}->length]));
-        }
       }
       case Go::Schedule::Info->TYPE_CHANNEL_READ:
       case Go::Schedule::Info->TYPE_CHANNEL_WRITE:
@@ -234,10 +225,6 @@ class Go::Schedule {
           
           $finish_cb->();
         };
-        
-        if (Go->ENV_DEBUG) {
-          Fn->say_stderr(Format->sprintf("[Go Debug]Register goroutine wait for IO (Callback:%p, QueueNum:%d.)", [(object)$goroutine->{task}, $self->{goroutines}->length]));
-        }
       }
       case Go::Schedule::Info->TYPE_POLL_CANCEL:
       {
@@ -333,10 +320,6 @@ class Go::Schedule {
           
           $finish_cb->();
         };
-        
-        if (Go->ENV_DEBUG) {
-          Fn->say_stderr(Format->sprintf("[Go Debug]Register goroutine wait for pipe (Callback:%p, QueueNum:%d.)", [(object)$goroutine->{task}, $self->{goroutines}->length]));
-        }
       }
       case Go::Schedule::Info->TYPE_PIPE_CANCEL:
       {
@@ -420,10 +403,6 @@ class Go::Schedule {
         
         my $is_exit = 0;
         $finish_cb_args_ref->[0] = [(object)$is_exit];
-        
-        if (Go->ENV_DEBUG) {
-          Fn->say_stderr("[go debug]register goroutine wait for process.");
-        }
       }
     }
     
@@ -498,21 +477,11 @@ class Go::Schedule {
     my $goroutine = $goroutines->shift;
     
     if ($goroutine->{finished}) {
-      if (Go->ENV_DEBUG) {
-        diag Fn->sprintf("[Go Debug]Finish goroutine. \$task=%p.", $goroutine->{task});
-      }
     }
     else {
       if ($goroutine->{disabled}) {
-        if (Go->ENV_DEBUG) {
-         diag Fn->sprintf("[Go Debug]Skip disabled goroutine. \$task=%p.", $goroutine->{task});
-        }
       }
       else {
-        if (Go->ENV_DEBUG) {
-          diag Fn->sprintf("[Go Debug]Restart goroutine. \$task=%p.", $goroutine->{task});
-        }
-        
         $goroutines->push($goroutine);
         
         my $schedule_goroutine = $self->{schedule_goroutine};
