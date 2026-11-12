@@ -66,11 +66,14 @@ class Go {
   
   static method sleep : void ($duration : Go::Duration_1l = undef) {
     
+    my $_ = Go::Context->with_timeout(Go->bg, $duration);
+    my $context = $_->context;
+    
     my $schedule = $GO->{schedule};
     
     my $schedule_info = new Go::Schedule::Info;
     $schedule_info->{type} = Go::Schedule::Info->TYPE_SLEEP;
-    $schedule_info->{timeout_duration_nsec} = $duration->{nsec};
+    $schedule_info->{context} = $context;
     
     my $caller_info = caller;
     $schedule->schedule($schedule_info, $caller_info);
