@@ -120,6 +120,48 @@ class Go::Schedule {
     
     my $schedule_type = $schedule_info->{type};
     switch ($schedule_type) {
+      case Go::Schedule::Info->TYPE_SLEEP:
+      {
+        my $timeout_duration_nsec = $schedule_info->{timeout_duration_nsec};
+        
+        my $deadline = (Go::Time)undef;
+        if ($timeout_duration_nsec > 0) {
+          $deadline = Go::Time->now->add(Go::Duration_1l->new($timeout_duration_nsec));
+        }
+        
+        unless ($deadline) {
+          die "The deadline \$deadline in schedule type TYPE_SLEEP must be defined.";
+        }
+        
+        my $timeout_msec = $timeout_duration_nsec / 1000000;
+        my $uv_loop = $self->{uv_loop};
+        
+        my $uv_timer_ref = [(UV::Handle::Timer)undef];
+        my $uv_timer = UV::Handle::Timer->new;
+        $uv_timer_ref->[0] = $uv_timer;
+        $uv_loop->timer_init($uv_timer);
+        
+        my $finish_cb = [$self : , $goroutine : , $uv_timer_ref : ] method : void () {
+          my $t = $uv_timer_ref->[0];
+          if ($t) {
+            $t->set_timer_cb(undef);
+            $t->close_safe;
+            $uv_timer_ref->[0] = undef;
+          }
+          
+          $self->enable_goroutine($goroutine);
+        };
+        
+        my $timer_cb = [$finish_cb : ] method : void ($uv_timer : UV::Handle::Timer) {
+          $finish_cb->();
+        };
+        
+        $uv_timer->start($timer_cb, $timeout_msec);
+        
+        if (Go->ENV_DEBUG) {
+          Fn->say_stderr(Format->sprintf("[Go Debug]Register goroutine wait for timer (Callback:%p, QueueNum:%d.)", [(object)$goroutine->{task}, $self->{goroutines}->length]));
+        }
+      }
       case Go::Schedule::Info->TYPE_POLL_READ:
       case Go::Schedule::Info->TYPE_POLL_WRITE:
       {
@@ -327,35 +369,6 @@ class Go::Schedule {
         }
         
         return;
-      }
-      case Go::Schedule::Info->TYPE_SLEEP:
-      {
-        my $timeout_duration_nsec = $schedule_info->{timeout_duration_nsec};
-        my $fd = $schedule_info->{fd};
-        
-        my $deadline = (Go::Time)undef;
-        if ($timeout_duration_nsec > 0) {
-          $deadline = Go::Time->now->add(Go::Duration_1l->new($timeout_duration_nsec));
-        }
-        
-        my $timeout_msec = $timeout_duration_nsec / 1000000;
-        my $uv_loop = $self->{uv_loop};
-        my $uv_timer = UV::Handle::Timer->new;
-        $uv_loop->timer_init($uv_timer);
-        
-        my $timer_cb = [$goroutine : , $self : ,] method : void ($uv_timer : UV::Handle::Timer) {
-          $uv_timer->close_safe;
-          $self->enable_goroutine($goroutine);
-        };
-        $uv_timer->start($timer_cb, $timeout_msec);
-        
-        unless ($deadline) {
-          die "The deadline \$deadline in schedule type TYPE_SLEEP must be defined.";
-        }
-        
-        if (Go->ENV_DEBUG) {
-          Fn->say_stderr(Format->sprintf("[Go Debug]Register goroutine wait for timer (Callback:%p, QueueNum:%d.)", [(object)$goroutine->{task}, $self->{goroutines}->length]));
-        }
       }
       case Go::Schedule::Info->TYPE_CHANNEL_READ:
       case Go::Schedule::Info->TYPE_CHANNEL_WRITE:
