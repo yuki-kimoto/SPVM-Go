@@ -38,9 +38,9 @@ class Go::Schedule {
   
   has uv_loop : UV::Loop;
   
-  has uv_poll_finish_cbs_h : Hash of Callback;
+  has uv_poll_finish_cbs_h : Hash of Go::Schedule::Callback::Finish;
   
-  has uv_pipe_finish_cbs_h : Hash of Callback;
+  has uv_pipe_finish_cbs_h : Hash of Go::Schedule::Callback::Finish;
   
   # Class Methods
   private static method new : Go::Schedule () {
@@ -133,7 +133,7 @@ class Go::Schedule {
         $uv_timer_ref->[0] = $uv_timer;
         $uv_loop->timer_init($uv_timer);
         
-        my $finish_cb = [$self : , $goroutine : , $uv_timer_ref : ] method : void () {
+        my $finish_cb = [$self : , $goroutine : , $uv_timer_ref : ] method : void ($args : object...) {
           my $t = $uv_timer_ref->[0];
           if ($t) {
             $t->set_timer_cb(undef);
@@ -165,7 +165,7 @@ class Go::Schedule {
         $uv_async_ref->[0] = $uv_async;
         $wait->{uv_async} = $uv_async;
         
-        my $finish_cb = [$self : , $goroutine : , $wait : , $uv_async_ref : ] method : void () {
+        my $finish_cb = [$self : , $goroutine : , $wait : , $uv_async_ref : ] method : void ($args : object...) {
           $wait->{uv_async} = undef;
           
           my $async = $uv_async_ref->[0];
@@ -205,7 +205,7 @@ class Go::Schedule {
         
         my $uv_timer_ref = [(UV::Handle::Timer)undef];
         
-        my $finish_cb = [$self : , $goroutine : , $fd : , $uv_poll_ref : , $uv_timer_ref : ] method : void () {
+        my $finish_cb = [$self : , $goroutine : , $fd : , $uv_poll_ref : , $uv_timer_ref : ] method : void ($args : object...) {
           $self->{uv_poll_finish_cbs_h}->delete("$fd");
           
           my $uv_timer = $uv_timer_ref->[0];
@@ -299,7 +299,7 @@ class Go::Schedule {
         
         my $uv_timer_ref = [(UV::Handle::Timer)undef];
         
-        my $finish_cb = [$self : , $goroutine : , $fd : , $uv_pipe_ref : , $uv_timer_ref : ] method : void () {
+        my $finish_cb = [$self : , $goroutine : , $fd : , $uv_pipe_ref : , $uv_timer_ref : ] method : void ($args : object...) {
           $self->{uv_pipe_finish_cbs_h}->delete("$fd");
           
           my $uv_timer = $uv_timer_ref->[0];
