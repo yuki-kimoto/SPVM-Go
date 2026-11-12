@@ -121,6 +121,8 @@ class Go::Schedule {
     
     my $finished_ref = [0];
     my $finish_cb_args_ref = [(object)undef];
+    my $finish_ch = (Go::Channel)undef;
+    my $cancel_ch = (Go::Channel)undef;
     
     my $schedule_type = $schedule_info->{type};
     switch ($schedule_type) {
@@ -408,7 +410,7 @@ class Go::Schedule {
         
         my $deadline_uv_timer_ref = [(UV::Handle::Timer)undef];
         
-        my $finish_ch = Go->make;
+        $finish_ch = Go->make;
         my $sigkill = 9;
         
         my $finish_cb = [$self : , $goroutine : , $finish_ch : , $uv_process_ref : , $deadline_uv_timer_ref : , $finished_ref : , $sigkill : ] method : void ($args : object...) {
@@ -484,7 +486,7 @@ class Go::Schedule {
             $deadline_uv_timer->start($timer_cb, (long)$timeout_msec);
           }
           
-          my $cancel_ch = $context->done;
+          $cancel_ch = $context->done;
           if ($cancel_ch) {
             my $finish_or_cancel_select = Go->new_select;
             $finish_or_cancel_select->add_read($finish_ch);
