@@ -178,7 +178,7 @@ class Go {
   static method gosched_pipe_read : int ($fd : int, $string : mutable string, $length : int = -1, $offset : int = 0, $timeout_duration : Go::Duration_1l = undef) {
     
     my $caller_info = caller;
-    return &gosched_pipe_read_with_caller_info($fd, $string, $length, $offset, $timeout_duration, $caller_info);
+    return &gosched_pipe_read_with_caller_info(Go->bg, $fd, $string, $length, $offset, $timeout_duration, $caller_info);
   }
   
   static method gosched_pipe_read_sec : int ($fd : int, $string : mutable string, $length : int = -1, $offset : int = 0, $timeout_sec : double = 0) {
@@ -186,10 +186,10 @@ class Go {
     my $timeout_duration = Go::Duration_1l->new_from_sec($timeout_sec);
     
     my $caller_info = caller;
-    return &gosched_pipe_read_with_caller_info($fd, $string, $length, $offset, $timeout_duration, $caller_info);
+    return &gosched_pipe_read_with_caller_info(Go->bg, $fd, $string, $length, $offset, $timeout_duration, $caller_info);
   }
   
-  private static method gosched_pipe_read_with_caller_info : int ($fd : int, $string : mutable string, $length : int = -1, $offset : int = 0, $timeout_duration : Go::Duration_1l = undef, $caller_info : CallerInfo = undef) {
+  private static method gosched_pipe_read_with_caller_info : int ($context : Go::Context, $fd : int, $string : mutable string, $length : int = -1, $offset : int = 0, $timeout_duration : Go::Duration_1l = undef, $caller_info : CallerInfo = undef) {
     
     my $schedule = $GO->{schedule};
     
@@ -200,6 +200,7 @@ class Go {
     $schedule_info->{buffer} = $string;
     $schedule_info->{buffer_length} = $length;
     $schedule_info->{buffer_offset} = $offset;
+    $schedule_info->{context} = $context;
     
     $schedule->schedule($schedule_info, $caller_info);
     
