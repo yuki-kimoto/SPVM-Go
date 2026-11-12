@@ -14,7 +14,7 @@ class TestCase::Go::Pipe {
       my $write_fh = -1;
       my $non_blocking = 1;
       
-      Go::Goroutine->_pipepair(\$read_fh, \$write_fh, $non_blocking);
+      Sys->pipepair(\$read_fh, \$write_fh, $non_blocking);
       
       {
         my $write_length_ref = [-1];
@@ -212,7 +212,7 @@ class TestCase::Go::Pipe {
       my $write_fh = -1;
       my $non_blocking = 1;
       
-      Go::Goroutine->_pipepair(\$read_fh, \$write_fh, $non_blocking);
+      Sys->pipepair(\$read_fh, \$write_fh, $non_blocking);
       
       {
         my $write_length_ref = [-1];
