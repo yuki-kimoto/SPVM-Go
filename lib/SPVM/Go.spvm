@@ -12,6 +12,7 @@ class Go {
   use Go::Select;
   use Go::Duration_1l;
   use Go::Context;
+  use Go::Sync::WaitGroup;
   
   our $GO : Go;
   
@@ -377,5 +378,14 @@ class Go {
     my $caller_info = caller;
     return &gosched_pipe_write_with_caller_info($context, $fd, $string, $length, $offset, $caller_info);
   }
+  
+  static method new_wait_group : Go::Sync::WaitGroup ($add : int = 0) {
+    
+    my $wg = Go::Sync::WaitGroup->new;
+    $wg->add($add);
+    
+    return $wg;
+  }
+  
 }
 
