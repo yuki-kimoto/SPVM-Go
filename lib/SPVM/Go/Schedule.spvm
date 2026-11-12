@@ -407,14 +407,14 @@ class Go::Schedule {
         
         my $uv_timer_ref = [(UV::Handle::Timer)undef];
         
-        my $exit_ch = Go->make;
+        my $finish_ch = Go->make;
         my $sigkill = 9;
         
-        my $finish_cb = [$self : , $goroutine : , $exit_ch : , $uv_process_ref : , $uv_timer_ref : , $finished_ref : , $sigkill : ] method : void ($args : object...) {
+        my $finish_cb = [$self : , $goroutine : , $finish_ch : , $uv_process_ref : , $uv_timer_ref : , $finished_ref : , $sigkill : ] method : void ($args : object...) {
           my $is_exit = (int)$args->[0];
           
           if ($is_exit) {
-            $exit_ch->close;
+            $finish_ch->close;
           }
           else {
             unless ($finished_ref->[0]) {
@@ -480,14 +480,14 @@ class Go::Schedule {
             $uv_timer->start($timer_cb, (long)$timeout_msec);
           }
           
-          my $done = $context->done;
-          if ($done) {
-            my $done_or_exit_select = Go->new_select;
-            $done_or_exit_select->add_read($done);
-            $done_or_exit_select->add_read($exit_ch);
+          my $cancel_ch = $context->done;
+          if ($cancel_ch) {
+            my $finish_or_cancel_select = Go->new_select;
+            $finish_or_cancel_select->add_read($finish_ch);
+            $finish_or_cancel_select->add_read($cancel_ch);
             
-            Go->go([$done_or_exit_select : , $finish_cb : ] method : void () {
-              $done_or_exit_select->select;
+            Go->go([$finish_or_cancel_select : , $finish_cb : ] method : void () {
+              $finish_or_cancel_select->select;
               my $is_exit = 0;
               $finish_cb->($is_exit);
             });
