@@ -115,7 +115,7 @@ class Go::Schedule {
   private method disable_goroutine : void ($goroutine : Go::Goroutine, $schedule_info : Go::Schedule::Info) {
     
     my $finished_ref = [0];
-    my $finish_ch = (Go::Channel)undef;
+    my $finish_ch = Go->make;
     my $cancel_ch = (Go::Channel)undef;
     my $deadline_uv_timer_ref = [(UV::Handle::Timer)undef];
     my $uv_loop = $self->{uv_loop};
@@ -126,7 +126,9 @@ class Go::Schedule {
     switch ($schedule_type) {
       case Go::Schedule::Info->TYPE_SLEEP:
       {
-        my $finish_cb = [$self : , $goroutine : , $deadline_uv_timer_ref : ] method : void ($args : object...) {
+        my $finish_cb = [$self : , $goroutine : , $finish_ch : , $deadline_uv_timer_ref : ] method : void ($args : object...) {
+          $finish_ch->close;
+          
           my $deadline_uv_timer = $deadline_uv_timer_ref->[0];
           if ($deadline_uv_timer) {
             $deadline_uv_timer->set_timer_cb(undef);
@@ -154,7 +156,8 @@ class Go::Schedule {
         $uv_async_ref->[0] = $uv_async;
         $wait->{uv_async} = $uv_async;
         
-        my $finish_cb = [$self : , $goroutine : , $wait : , $uv_async_ref : ] method : void ($args : object...) {
+        my $finish_cb = [$self : , $goroutine : , $finish_ch : , $wait : , $uv_async_ref : ] method : void ($args : object...) {
+          $finish_ch->close;
           $wait->{uv_async} = undef;
           
           my $async = $uv_async_ref->[0];
@@ -200,7 +203,8 @@ class Go::Schedule {
         $uv_poll_ref->[0] = $uv_poll;
         $uv_loop->poll_init($uv_poll, $fd);
         
-        my $finish_cb = [$self : , $goroutine : , $fd : , $uv_poll_ref : , $deadline_uv_timer_ref : ] method : void ($args : object...) {
+        my $finish_cb = [$self : , $goroutine : , $finish_ch : , $fd : , $uv_poll_ref : , $deadline_uv_timer_ref : ] method : void ($args : object...) {
+          $finish_ch->close;
           $self->{uv_poll_finish_cbs_h}->delete("$fd");
           
           my $deadline_uv_timer = $deadline_uv_timer_ref->[0];
@@ -283,7 +287,8 @@ class Go::Schedule {
         $uv_pipe->open($fd_dup);
         $uv_pipe_ref->[0] = $uv_pipe;
         
-        my $finish_cb = [$self : , $goroutine : , $fd : , $uv_pipe_ref : , $deadline_uv_timer_ref : ] method : void ($args : object...) {
+        my $finish_cb = [$self : , $goroutine : , $finish_ch : , $fd : , $uv_pipe_ref : , $deadline_uv_timer_ref : ] method : void ($args : object...) {
+          $finish_ch->close;
           $self->{uv_pipe_finish_cbs_h}->delete("$fd");
           
           my $deadline_uv_timer = $deadline_uv_timer_ref->[0];
@@ -370,13 +375,8 @@ class Go::Schedule {
           die "The exec_cmd in schedule type TYPE_PROCESS must be defined.";
         }
         
-        if ($schedule_info->{timeout_duration_nsec} != 0) {
-          die "The timeout_duration_nsec in schedule type TYPE_PROCESS must be zero.";
-        }
-        
         my $options = $exec_cmd->to_uv_process_options;
         
-        $finish_ch = Go->make;
         my $sigkill = 9;
         
         my $uv_process_ref = [(UV::Handle::Process)undef];
@@ -466,7 +466,7 @@ class Go::Schedule {
     
     if ($final_timeout_msec >= 0) {
       unless ($deadline_cb) {
-        die "[Unexpected Error]\$cance_cb is not defined.";
+        die "[Unexpected Error]\$deadline_cb is not defined.";
       }
       my $deadline_uv_timer = UV::Handle::Timer->new;
       $deadline_uv_timer_ref->[0] = $deadline_uv_timer;
@@ -481,7 +481,7 @@ class Go::Schedule {
     
     if ($cancel_ch) {
       unless ($cancel_cb) {
-        die "[Unexpected Error]\$cance_cb is not defined.";
+        die "[Unexpected Error]\$cancel_cb is not defined.";
       }
       my $finish_or_cancel_select = Go->new_select;
       if ($finish_ch) {
