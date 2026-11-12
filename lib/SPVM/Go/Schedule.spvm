@@ -134,8 +134,8 @@ class Go::Schedule {
       case Go::Schedule::Info->TYPE_SLEEP:
       {
         my $finish_cb = [$self : , $goroutine : , $timeout_uv_timer_ref : ] method : void ($args : object...) {
-          my $t = $timeout_uv_timer_ref->[0];
-          if ($t) {
+          my $timeout_uv_timer = $timeout_uv_timer_ref->[0];
+          if ($timeout_uv_timer) {
             $t->set_timer_cb(undef);
             $t->close_safe;
             $timeout_uv_timer_ref->[0] = undef;
