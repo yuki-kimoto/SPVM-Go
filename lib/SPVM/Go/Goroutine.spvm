@@ -10,9 +10,9 @@ class Go::Goroutine : pointer {
   use Resource::Coro;
   
   # Fields
-  has schedule_goroutine : Go::Goroutine;
-  
   has task : Callback;
+  
+  has return_back_goroutine : Go::Goroutine;
   
   has finished : byte;
   
@@ -21,13 +21,13 @@ class Go::Goroutine : pointer {
   has caller_info : CallerInfo;
   
   # Class Methods
-  static method new : Go::Goroutine ($task :  Callback = undef, $schedule_goroutine : Go::Goroutine = undef, $caller_info : CallerInfo = undef) {
+  static method new : Go::Goroutine ($task :  Callback = undef, $return_back_goroutine : Go::Goroutine = undef, $caller_info : CallerInfo = undef) {
     
     my $self = new Go::Goroutine;
     
     $self->{task} = $task;
     
-    $self->{schedule_goroutine} = $schedule_goroutine;
+    $self->{return_back_goroutine} = $return_back_goroutine;
     
     $self->{caller_info} = $caller_info // caller;
     

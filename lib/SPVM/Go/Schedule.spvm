@@ -521,7 +521,7 @@ class Go::Schedule {
         
         my $schedule_goroutine = $self->{schedule_goroutine};
         
-        $goroutine->{schedule_goroutine} = $schedule_goroutine;
+        $goroutine->{return_back_goroutine} = $schedule_goroutine;
         
         $self->{current_goroutine} = $goroutine;
         
