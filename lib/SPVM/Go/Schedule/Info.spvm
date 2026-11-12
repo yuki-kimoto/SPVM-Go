@@ -12,6 +12,7 @@ class Go::Schedule::Info {
   use Go::Channel::Wait;
   use UV::ProcessOptions;
   use Go::OS::Exec::Cmd;
+  use Go::Context;
   
   private enum {
     TYPE_NONE,
@@ -33,6 +34,8 @@ class Go::Schedule::Info {
   has fd : int;
   
   has timeout_duration_nsec : long;
+  
+  has context : Go::Context;
   
   has wait : Go::Channel::Wait;
   

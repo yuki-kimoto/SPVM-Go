@@ -103,6 +103,7 @@ class Go::OS::Exec::Cmd {
     my $schedule_info = Go::Schedule::Info->new;
     $schedule_info->{type} = Go::Schedule::Info->TYPE_PROCESS;
     $schedule_info->{process_exec_cmd} = $self;
+    $schedule_info->{context} = $self->{context};
     
     my $schedule = $Go::GO->{schedule};
     

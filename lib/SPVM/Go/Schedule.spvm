@@ -456,7 +456,7 @@ class Go::Schedule {
         
         $uv_loop->spawn($uv_process, $options);
         
-        my $context = $exec_cmd->{context};
+        my $context = $schedule_info->{context};
         if ($context) {
           my $deadline = $context->deadline;
           if ($deadline) {
