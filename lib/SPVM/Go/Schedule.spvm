@@ -280,7 +280,6 @@ class Go::Schedule {
       case Go::Schedule::Info->TYPE_PIPE_READ:
       case Go::Schedule::Info->TYPE_PIPE_WRITE:
       {
-        my $timeout_duration_nsec = $schedule_info->{timeout_duration_nsec};
         my $fd = $schedule_info->{fd};
         my $buffer = $schedule_info->{buffer};
         my $buffer_length = $schedule_info->{buffer_length};
@@ -292,8 +291,6 @@ class Go::Schedule {
         unless ($fd >= 0) {
           die "The file descriptor \$fd in schedule type TYPE_PIPE_READ or TYPE_PIPE_WRITE must be a non-negative value.";
         }
-        
-        my $timeout_msec = $timeout_duration_nsec / 1000000;
         
         my $uv_loop = $self->{uv_loop};
         
@@ -360,18 +357,19 @@ class Go::Schedule {
           $uv_req_write->write($uv_pipe, $buffer, $buffer_length, $write_cb, $buffer_offset);
         }
         
+        $timeout_timer_cb = [$schedule_info : , $finish_cb : ] method : void ($timeout_uv_timer : UV::Handle::Timer) {
+          $schedule_info->{error_id} = basic_type_id Go::Error::IOTimeout;
+          $schedule_info->{exception} = "IO timeout occur";
+          
+          $finish_cb->();
+        };
+        
+        my $timeout_duration_nsec = $schedule_info->{timeout_duration_nsec};
+        my $timeout_msec = $timeout_duration_nsec / 1000000;
         if ($timeout_msec > 0) {
           my $timeout_uv_timer = UV::Handle::Timer->new;
           $timeout_uv_timer_ref->[0] = $timeout_uv_timer;
           $uv_loop->timer_init($timeout_uv_timer);
-          
-          my $timeout_timer_cb = [$schedule_info : , $finish_cb : ] method : void ($timeout_uv_timer : UV::Handle::Timer) {
-            $schedule_info->{error_id} = basic_type_id Go::Error::IOTimeout;
-            $schedule_info->{exception} = "IO timeout occur";
-            
-            $finish_cb->();
-          };
-          
           $timeout_uv_timer->start($timeout_timer_cb, $timeout_msec);
         }
         
