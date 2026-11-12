@@ -480,21 +480,18 @@ class Go::Schedule {
     }
     
     if ($cancel_ch) {
+      unless ($finish_ch) {
+        die "[Unexpected Error]\$finish_ch is not defined.";
+      }
       unless ($cancel_cb) {
         die "[Unexpected Error]\$cancel_cb is not defined.";
       }
       my $finish_or_cancel_select = Go->new_select;
-      if ($finish_ch) {
-        $finish_or_cancel_select->add_read($finish_ch);
-      }
-      if ($cancel_ch) {
-        $finish_or_cancel_select->add_read($cancel_ch);
-      }
+      $finish_or_cancel_select->add_read($finish_ch);
+      $finish_or_cancel_select->add_read($cancel_ch);
       Go->go([$finish_or_cancel_select : , $cancel_cb : ] method : void () {
         $finish_or_cancel_select->select;
-        if ($cancel_cb) {
-          $cancel_cb->();
-        }
+        $cancel_cb->();
       });
     }
     
