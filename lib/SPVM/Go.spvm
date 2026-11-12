@@ -83,6 +83,29 @@ class Go {
     &sleep($duration);
   }
   
+  static method after : Go::Channel ($duration : Go::Duration_1l = undef) {
+    
+    my $duration_nsec = $duration->{nsec};
+    
+    my $ch = Go->make;
+    
+    Go->go([$ch : , $duration_nsec : ] method : void () {
+      my $duration = Go::Duration_1l->new($duration_nsec);
+      Go->sleep($duration);
+      
+      $ch->write(1);
+    });
+    
+    return $ch;
+  }
+  
+  static method after_sec : Go::Channel ($sec : double = 0) {
+    
+    my $duration = Go::Duration_1l->new_from_sec($sec);
+    
+    return &after($duration);
+  }
+  
   static method gosched_io_read : void ($fd : int, $timeout_duration : Go::Duration_1l = undef) {
     
     my $caller_info = caller;
