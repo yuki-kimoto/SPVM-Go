@@ -121,8 +121,9 @@ class Go::Schedule {
     my $deadline_uv_timer_ref = [(UV::Handle::Timer)undef];
     my $uv_loop = $self->{uv_loop};
     my $finish_cb = (Go::Schedule::Callback::Finish)undef;
-    my $timeout_timer_cb = (UV::Callback::Timer)undef;
     my $timeout_uv_timer_ref = [(UV::Handle::Timer)undef];
+    my $deadline_cb = (UV::Callback::Timer)undef;
+    my $cancel_cb = (Callback)undef;
     
     my $schedule_type = $schedule_info->{type};
     switch ($schedule_type) {
@@ -139,7 +140,7 @@ class Go::Schedule {
           $self->enable_goroutine($goroutine);
         };
         
-        $timeout_timer_cb = [$finish_cb : ] method : void ($timeout_uv_timer : UV::Handle::Timer) {
+        $deadline_cb = [$finish_cb : ] method : void ($timeout_uv_timer : UV::Handle::Timer) {
           $finish_cb->();
         };
       }
@@ -179,8 +180,6 @@ class Go::Schedule {
           die "The file descriptor \$fd in schedule type TYPE_POLL_READ or TYPE_POLL_WRITE must be a non-negative value.";
         }
         
-        my $events = $schedule_type == Go::Schedule::Info->TYPE_POLL_READ ? UV_C->UV_READABLE : UV_C->UV_WRITABLE;
-        
         my $uv_poll_ref = [(UV::Handle::Poll)undef];
         my $uv_poll = UV::Handle::Poll->new;
         $uv_poll_ref->[0] = $uv_poll;
@@ -208,6 +207,7 @@ class Go::Schedule {
         
         $self->{uv_poll_finish_cbs_h}{"$fd"} = $finish_cb;
         
+        my $events = $schedule_type == Go::Schedule::Info->TYPE_POLL_READ ? UV_C->UV_READABLE : UV_C->UV_WRITABLE;
         my $poll_cb = [$schedule_info : , $finish_cb : ] method : void ($uv_poll : UV::Handle::Poll, $status : int, $events : int) {
           if ($status < 0) {
             $schedule_info->{error_id} = basic_type_id Error;
@@ -219,7 +219,7 @@ class Go::Schedule {
         
         $uv_poll->start($poll_cb, $events);
         
-        $timeout_timer_cb = [$schedule_info : , $finish_cb : ] method : void ($timeout_uv_timer : UV::Handle::Timer) {
+        $deadline_cb = [$schedule_info : , $finish_cb : ] method : void ($timeout_uv_timer : UV::Handle::Timer) {
           $schedule_info->{error_id} = basic_type_id Go::Error::IOTimeout;
           $schedule_info->{exception} = "IO timeout occur";
           
@@ -314,7 +314,7 @@ class Go::Schedule {
           $uv_req_write->write($uv_pipe, $buffer, $buffer_length, $write_cb, $buffer_offset);
         }
         
-        $timeout_timer_cb = [$schedule_info : , $finish_cb : ] method : void ($timeout_uv_timer : UV::Handle::Timer) {
+        $deadline_cb = [$schedule_info : , $finish_cb : ] method : void ($timeout_uv_timer : UV::Handle::Timer) {
           $schedule_info->{error_id} = basic_type_id Go::Error::IOTimeout;
           $schedule_info->{exception} = "IO timeout occur";
           
@@ -412,7 +412,7 @@ class Go::Schedule {
       my $timeout_uv_timer = UV::Handle::Timer->new;
       $timeout_uv_timer_ref->[0] = $timeout_uv_timer;
       $uv_loop->timer_init($timeout_uv_timer);
-      $timeout_uv_timer->start($timeout_timer_cb, $timeout_msec);
+      $timeout_uv_timer->start($deadline_cb, $timeout_msec);
     }
     
     my $context = $schedule_info->{context};
