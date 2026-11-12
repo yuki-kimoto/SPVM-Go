@@ -33,8 +33,6 @@ class Go::Schedule::Info {
   
   has fd : int;
   
-  has timeout_duration_nsec : long;
-  
   has context : Go::Context;
   
   has wait : Go::Channel::Wait;

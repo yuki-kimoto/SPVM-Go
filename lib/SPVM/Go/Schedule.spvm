@@ -436,14 +436,6 @@ class Go::Schedule {
       }
     }
     
-    my $final_timeout_msec = -1L;
-    
-    my $timeout_duration_nsec = $schedule_info->{timeout_duration_nsec};
-    if ($timeout_duration_nsec > 0) {
-      my $timeout_msec = $timeout_duration_nsec / 1000000;
-      $final_timeout_msec = $timeout_msec;
-    }
-    
     my $context = $schedule_info->{context};
     if ($context) {
       my $deadline = $context->deadline;
@@ -456,27 +448,21 @@ class Go::Schedule {
         }
         my $deadline_msec = $duration_nsec / 1_000_000;
         
-        if ($final_timeout_msec < 0 || $deadline_msec < $final_timeout_msec) {
-          $final_timeout_msec = $deadline_msec;
+        unless ($deadline_cb) {
+          die "[Unexpected Error]\$deadline_cb is not defined.";
         }
+        my $deadline_uv_timer = UV::Handle::Timer->new;
+        $deadline_uv_timer_ref->[0] = $deadline_uv_timer;
+        $uv_loop->timer_init($deadline_uv_timer);
+        
+        my $deadline_timer_cb = [$deadline_cb : ] method : void ($deadline_uv_timer : UV::Handle::Timer) {
+          $deadline_cb->($deadline_uv_timer);
+        };
+        
+        $deadline_uv_timer->start($deadline_timer_cb, (long)$deadline_msec);
       }
       
       $cancel_ch = $context->done;
-    }
-    
-    if ($final_timeout_msec >= 0) {
-      unless ($deadline_cb) {
-        die "[Unexpected Error]\$deadline_cb is not defined.";
-      }
-      my $deadline_uv_timer = UV::Handle::Timer->new;
-      $deadline_uv_timer_ref->[0] = $deadline_uv_timer;
-      $uv_loop->timer_init($deadline_uv_timer);
-      
-      my $deadline_timer_cb = [$deadline_cb : ] method : void ($deadline_uv_timer : UV::Handle::Timer) {
-        $deadline_cb->($deadline_uv_timer);
-      };
-      
-      $deadline_uv_timer->start($deadline_timer_cb, (long)$final_timeout_msec);
     }
     
     if ($cancel_ch) {
@@ -489,7 +475,7 @@ class Go::Schedule {
       my $finish_or_cancel_select = Go->new_select;
       $finish_or_cancel_select->add_read($finish_ch);
       $finish_or_cancel_select->add_read($cancel_ch);
-       Go->go([$finish_or_cancel_select : , $finish_ch : , $cancel_ch : , $cancel_cb : ] method : void () {
+      Go->go([$finish_or_cancel_select : , $finish_ch : , $cancel_ch : , $cancel_cb : ] method : void () {
         my $result = $finish_or_cancel_select->select;
         if ($result->channel == $cancel_ch) {
           $cancel_cb->();
