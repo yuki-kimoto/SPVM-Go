@@ -1,3 +1,13 @@
+0.048 2026-11-13
+  [New Features]
+    * Add bg and todo shortcut methods to Go class for context creation.
+    * Add after and after_sec methods to Go class, mimicking time.After in Go.
+    * Add new_command method and Go::OS::Exec / Go::OS::Exec::Cmd classes to execute external commands with context support.
+    * Add new_wait_group method to Go class.
+    * Add gosched_poll_write and gosched_pipe_read_v2 / gosched_pipe_write_v2 methods with Go::Context support.
+  [Incompatible Changes]
+    * Deprecate legacy gosched_io_read/write and gosched_pipe_read/write methods in favor of context-aware versions.
+
 0.047 2026-09-28
   [New Features]
     * Add gosched_pipe_cancel method to Go class.
