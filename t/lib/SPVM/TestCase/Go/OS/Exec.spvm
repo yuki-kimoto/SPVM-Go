@@ -17,7 +17,7 @@ class TestCase::Go::OS::Exec {
         $wg->done;
       });
       
-      my $cmd = Go::OS::Exec->command(Go->bg, ["perl", "-e", "print 'Hello';"]);
+      my $cmd = Go->new_command(Go->bg, ["perl", "-e", "print 'Hello';"]);
       
       my $status = $cmd->run;
       

@@ -13,6 +13,7 @@ class Go {
   use Go::Duration_1l;
   use Go::Context;
   use Go::Sync::WaitGroup;
+  use Go::OS::Exec::Cmd;
   
   our $GO : Go;
   
@@ -387,5 +388,12 @@ class Go {
     return $wg;
   }
   
+  static method new_command : Go::OS::Exec::Cmd ($context : Go::Context, $command : string[]) {
+    
+    my $cmd = Go::OS::Exec->command($context, $command);
+    
+    return $cmd;
+  }
+
 }
 

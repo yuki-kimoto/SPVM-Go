@@ -190,6 +190,12 @@ C<static method new_wait_group : L<Go::Sync::WaitGroup|SPVM::Go::Sync::WaitGroup
 
 Creates a new L<Go::Sync::WaitGroup|SPVM::Go::Sync::WaitGroup> object given the initial counter value $add.
 
+=head2 new_command
+
+C<static method new_command : L<Go::OS::Exec::Cmd|SPVM::Go::OS::Exec::Cmd> ($context : L<Go::Context|SPVM::Go::Context>, $command : string[]);>
+
+Creates a new L<Go::OS::Exec::Cmd|SPVM::Go::OS::Exec::Cmd> object given the context $context and the command arguments $command.
+
 =head2 ENV_DEBUG
 
 C<static method ENV_DEBUG : int ();>
