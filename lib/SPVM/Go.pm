@@ -504,6 +504,30 @@ C<static method new_command : L<Go::OS::Exec::Cmd|SPVM::Go::OS::Exec::Cmd> ($con
 
 Creates a new L<Go::OS::Exec::Cmd|SPVM::Go::OS::Exec::Cmd> object given the context $context and the command arguments $command.
 
+=head2 after
+
+C<static method after : L<Go::Channel|SPVM::Go::Channel> ($duration : L<Go::Duration_1l|SPVM::Go::Duration_1l> = undef);>
+
+Waits for the duration $duration and then sends a value to the returned channel, mimicking C<time.After> in the Go programming language.
+
+=head2 after_sec
+
+C<static method after_sec : L<Go::Channel|SPVM::Go::Channel> ($sec : double = 0);>
+
+Same as L</"after">, but waits for the seconds $sec.
+
+=head2 bg
+
+C<static method bg : L<Go::Context|SPVM::Go::Context> ();>
+
+Returns a non-nil, empty L<Go::Context|SPVM::Go::Context> that is never canceled, has no values, and has no deadline, acting as a shortcut for C<Go::Context->background>.
+
+=head2 todo
+
+C<static method todo : L<Go::Context|SPVM::Go::Context> ();>
+
+Returns a non-nil, empty L<Go::Context|SPVM::Go::Context> to be used when it is unclear which context to use or it is yet to be available, acting as a shortcut for C<Go::Context->todo>.
+
 =head2 ENV_DEBUG
 
 C<static method ENV_DEBUG : int ();>
