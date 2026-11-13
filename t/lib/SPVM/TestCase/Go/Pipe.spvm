@@ -21,13 +21,13 @@ class TestCase::Go::Pipe {
         Go->go([$write_fh : , $write_length_ref : ] method : void () {
           my $write_buffer = "abc";
           my $write_buffer_length = length $write_buffer;
-          $write_length_ref->[0] = Go->gosched_pipe_write($write_fh, $write_buffer, $write_buffer_length);
+          $write_length_ref->[0] = Go->gosched_pipe_write_v2(Go->bg, $write_fh, $write_buffer, $write_buffer_length);
         });
         Go->gosched;
         
         my $read_buffer = new_string_len 3;
         my $read_buffer_length = length $read_buffer;
-        my $read_length = Go->gosched_pipe_read($read_fh, $read_buffer, $read_buffer_length);
+        my $read_length = Go->gosched_pipe_read_v2(Go->bg, $read_fh, $read_buffer, $read_buffer_length);
         
         unless ($write_length_ref->[0] == 3) {
           return 0;
