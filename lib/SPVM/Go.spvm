@@ -356,13 +356,13 @@ class Go {
     return Go::Context->todo;
   }
   
-  static method gosched_io_read_v2 : void ($context : Go::Context, $fd : int) {
+  static method gosched_poll_read : void ($context : Go::Context, $fd : int) {
     
     my $caller_info = caller;
     &gosched_io_read_with_caller_info($context, $fd, $caller_info);
   }
   
-  static method gosched_io_write_v2 : void ($context : Go::Context, $fd : int) {
+  static method gosched_poll_write : void ($context : Go::Context, $fd : int) {
     
     my $caller_info = caller;
     &gosched_io_write_with_caller_info($context, $fd, $caller_info);

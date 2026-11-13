@@ -231,13 +231,21 @@ class TestCase::Go::Poll {
 
   static method go_send : int ($socket : int, $buf : string, $flags : int, $addr : Sys::Socket::Sockaddr = undef, $timeout : double = 0) {
     
+    my $context = Go->bg;
+    if ($timeout > 0) {
+      my $_ = Go::Context->with_timeout_sec($context, $timeout);
+      $context = $_->context;
+    }
+    
     my $send_length = -1;
     while (1) {
-      eval { $send_length = Sys->send($socket, $buf, 0); }
+      # Send data
+      eval { $send_length = Sys->send($socket, $buf, $flags); }
       
       if ($@) {
+        # Check would block or interrupted
         if (Sys::Socket::Errno->errno == Sys::Socket::Errno->EWOULDBLOCK || Sys::Socket::Errno->errno == Errno->EINTR) {
-          Go->gosched_io_write_sec($socket, $timeout);
+          Go->gosched_poll_write($context, $socket);
         }
         else {
           die $@;
