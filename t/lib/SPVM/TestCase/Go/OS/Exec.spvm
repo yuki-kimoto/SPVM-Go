@@ -10,8 +10,7 @@ class TestCase::Go::OS::Exec {
     
     my $success_ref = [1];
     
-    my $wg = Go::Sync::WaitGroup->new;
-    $wg->add(1);
+    my $wg = Go->new_wait_group(1);
     Go->go([$wg : , $success_ref : ] method : void () {
       
       Fn->defer([$wg : ] method : void () {
@@ -45,8 +44,7 @@ class TestCase::Go::OS::Exec {
   
     my $success_ref = [1];
   
-    my $wg = Go::Sync::WaitGroup->new;
-    $wg->add(1);
+    my $wg = Go->new_wait_group(1);
     Go->go([$wg : , $success_ref : ] method : void () {
     
       Fn->defer([$wg : ] method : void () {
@@ -83,8 +81,7 @@ class TestCase::Go::OS::Exec {
     
     my $success_ref = [1];
     
-    my $wg = Go::Sync::WaitGroup->new;
-    $wg->add(1);
+    my $wg = Go->new_wait_group(1);
     Go->go([$wg : , $success_ref : ] method : void () {
       
       Fn->defer([$wg : ] method : void () {
@@ -116,8 +113,7 @@ class TestCase::Go::OS::Exec {
     my $success_ref = [1];
     
     {
-      my $wg = Go::Sync::WaitGroup->new;
-      $wg->add(1);
+      my $wg = Go->new_wait_group(1);
       Go->go([$wg : , $success_ref : ] method : void () {
         Fn->defer([$wg : ] method : void () {
           $wg->done;
@@ -142,8 +138,7 @@ class TestCase::Go::OS::Exec {
     }
 
     {
-      my $wg = Go::Sync::WaitGroup->new;
-      $wg->add(1);
+      my $wg = Go->new_wait_group(1);
       Go->go([$wg : , $success_ref : ] method : void () {
         Fn->defer([$wg : ] method : void () {
           $wg->done;
@@ -167,8 +162,7 @@ class TestCase::Go::OS::Exec {
     }
     
     {
-      my $wg = Go::Sync::WaitGroup->new;
-      $wg->add(1);
+      my $wg = Go->new_wait_group(1);
       Go->go([$wg : , $success_ref : ] method : void () {
         Fn->defer([$wg : ] method : void () {
           $wg->done;
@@ -184,7 +178,7 @@ class TestCase::Go::OS::Exec {
           Go->sleep_sec(0.5);
           $cancel_cb->();
         });
-      
+        
         my $status = $cmd->run;
         
         my $term_signal = $status & 0xff;

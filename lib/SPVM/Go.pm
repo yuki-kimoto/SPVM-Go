@@ -184,6 +184,12 @@ C<static method sleep_sec : void ($sec : double = 0);>
 
 Same as L</"sleep">, but sleeps the seconds $sec.
 
+=head2 new_wait_group
+
+C<static method new_wait_group : L<Go::Sync::WaitGroup|SPVM::Go::Sync::WaitGroup> ($add : int = 0);>
+
+Creates a new L<Go::Sync::WaitGroup|SPVM::Go::Sync::WaitGroup> object given the initial counter value $add.
+
 =head2 ENV_DEBUG
 
 C<static method ENV_DEBUG : int ();>
