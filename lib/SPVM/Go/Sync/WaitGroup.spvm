@@ -7,7 +7,6 @@ class Go::Sync::WaitGroup {
   use Sync::Mutex;
   use Fn;
   use Sys;
-  use Sys::OS;
   
   use UV::Handle::Pipe;
   use UV::Constant as UV_C;
@@ -86,40 +85,23 @@ class Go::Sync::WaitGroup {
     
     # Notify waiter via pipe on non-Windows platforms
     if ($count == 0) {
-      unless (Sys::OS->is_windows) {
-        my $write_fd = $self->{write_fd};
-        my $buf = "1";
-        &syswrite_pipe($write_fd, $buf, 1);
-      }
+      my $write_fd = $self->{write_fd};
+      my $buf = "1";
+      &syswrite_pipe($write_fd, $buf, 1);
     }
   }
   
   method wait : void () {
-    # Use busy-loop on Windows
-    if (Sys::OS->is_windows) {
-      while (1) {
-        my $count = $self->{count};
-        
-        if ($count == 0) {
-          return;
-        }
-        
-        Go->gosched;
-      }
+    if ($self->{count} == 0) {
+      return;
     }
-    # Use non-blocking pipe read on POSIX platforms
-    else {
-      if ($self->{count} == 0) {
-        return;
-      }
-      
-      my $read_fd = $self->{read_fd};
-      
-      Go->gosched_io_read($read_fd);
-      
-      my $buf = new_string_len(1);
-      Sys->sysread($read_fd, $buf, 1);
-    }
+    
+    my $read_fd = $self->{read_fd};
+    
+    Go->gosched_io_read($read_fd);
+    
+    my $buf = new_string_len(1);
+    Sys->sysread($read_fd, $buf, 1);
   }
   
   private static method syswrite_pipe : int ($fd : int, $buffer : string, $buffer_length : int = -1, $buffer_offset : int = 0) {
