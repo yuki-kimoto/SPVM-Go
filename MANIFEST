@@ -34,6 +34,8 @@ lib/SPVM/Go/Error/IOTimeout.pm
 lib/SPVM/Go/Error/IOTimeout.spvm
 lib/SPVM/Go/Fsnotify.pm
 lib/SPVM/Go/Fsnotify.spvm
+lib/SPVM/Go/Fsnotify/Event.pm
+lib/SPVM/Go/Fsnotify/Event.spvm
 lib/SPVM/Go/Goroutine.build
 lib/SPVM/Go/Goroutine.c
 lib/SPVM/Go/Goroutine.pm

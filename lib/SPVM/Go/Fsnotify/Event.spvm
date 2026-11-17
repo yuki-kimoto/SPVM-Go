@@ -1,0 +1,24 @@
+# Copyright (c) 2026 Yuki Kimoto
+# MIT License
+
+class Go::Fsnotify::Event {
+  version_from Go;
+  
+  enum {
+    CREATE = 1,
+    WRITE  = 2,
+    REMOVE = 4,
+    RENAME = 8,
+    CHMOD  = 16,
+  }
+  
+  # Fields
+  has name : rw string;
+  has op : rw int;
+  
+  # Class Methods
+  static method new : Go::Fsnotify::Event () {
+    my $self = new Go::Fsnotify::Event;
+    return $self;
+  }
+}
