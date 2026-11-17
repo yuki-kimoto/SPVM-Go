@@ -6,6 +6,10 @@ use lib 't/lib';
 
 use SPVM 'TestCase::Go::OS::Signal';
 
+if ($^O eq 'MSWin32') {
+  plan skip_all => 'Signal tests cannot be performed using raise on Windows';
+}
+
 my $api = SPVM::api();
 
 my $start_memory_blocks_count = $api->get_memory_blocks_count;
