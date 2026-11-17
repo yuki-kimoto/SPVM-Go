@@ -8,21 +8,20 @@ class Go::OS::Signal {
   use Go::Channel;
   use Hash;
   use UV::Handle::Signal;
-  use Int;
   
-  our $NOTIFIED_SIGNALS_H : Hash of Go::Channel[];
+  our $NOTIFIED_CHANNELS_H : Hash of Go::Channel[];
   
   our $UV_SIGNALS_H : Hash of UV::Handle::Signal;
   
   INIT {
-    $NOTIFIED_SIGNALS_H = Hash->new;
+    $NOTIFIED_CHANNELS_H = Hash->new;
     $UV_SIGNALS_H = Hash->new;
   }
   
   static method ignore : void ($signal : int) {
     
-    if ($NOTIFIED_SIGNALS_H) {
-      $NOTIFIED_SIGNALS_H->delete("$signal");
+    if ($NOTIFIED_CHANNELS_H) {
+      $NOTIFIED_CHANNELS_H->delete("$signal");
     }
     
     my $go = $Go::GO;
@@ -58,11 +57,11 @@ class Go::OS::Signal {
       die "\$channel must be defined.";
     }
     
-    unless ($NOTIFIED_SIGNALS_H->{"$signal"}) {
-      $NOTIFIED_SIGNALS_H->{"$signal"} = new Go::Channel[0];
+    unless ($NOTIFIED_CHANNELS_H->{"$signal"}) {
+      $NOTIFIED_CHANNELS_H->{"$signal"} = new Go::Channel[0];
     }
     
-    List->new_ref($NOTIFIED_SIGNALS_H->{"$signal"})->push($channel);
+    List->new_ref($NOTIFIED_CHANNELS_H->{"$signal"})->push($channel);
     
     my $go = $Go::GO;
     unless ($go) {
@@ -83,7 +82,7 @@ class Go::OS::Signal {
       
       # Notify channels
       my $signal_cb = [$signal : int] method : void ($uv_signal_handle : UV::Handle::Signal, $signum : int) {
-        if ($NOTIFIED_SIGNALS_H && (my $channels = $NOTIFIED_SIGNALS_H->{"$signal"})) {
+        if ($NOTIFIED_CHANNELS_H && (my $channels = $NOTIFIED_CHANNELS_H->{"$signal"})) {
           for my $channel (@$channels) {
             my $select = Go->new_select;
             $select->set_non_blocking(1);
@@ -100,7 +99,7 @@ class Go::OS::Signal {
   }
   
   static method stop : void ($channel : Go::Channel, $signal : int) {
-    my $channels = $NOTIFIED_SIGNALS_H ? $NOTIFIED_SIGNALS_H->{"$signal"} : undef;
+    my $channels = $NOTIFIED_CHANNELS_H ? $NOTIFIED_CHANNELS_H->{"$signal"} : undef;
     if ($channels) {
       my $new_channels = (List of Go::Channel)List->new(new Go::Channel[0]);
       for my $_ (@$channels) {
@@ -108,14 +107,14 @@ class Go::OS::Signal {
           $new_channels->push($_);
         }
       }
-      $NOTIFIED_SIGNALS_H->{"$signal"} = $new_channels->to_array;
+      $NOTIFIED_CHANNELS_H->{"$signal"} = $new_channels->to_array;
       
-      if (@{$NOTIFIED_SIGNALS_H->{"$signal"}} == 0) {
-        $NOTIFIED_SIGNALS_H->delete("$signal");
+      if (@{$NOTIFIED_CHANNELS_H->{"$signal"}} == 0) {
+        $NOTIFIED_CHANNELS_H->delete("$signal");
       }
     }
     
-    my $has_notified = $NOTIFIED_SIGNALS_H && $NOTIFIED_SIGNALS_H->{"$signal"} && @{$NOTIFIED_SIGNALS_H->{"$signal"}} > 0;
+    my $has_notified = $NOTIFIED_CHANNELS_H && $NOTIFIED_CHANNELS_H->{"$signal"} && @{$NOTIFIED_CHANNELS_H->{"$signal"}} > 0;
     
     unless ($has_notified) {
       if ($UV_SIGNALS_H && (my $uv_signal = $UV_SIGNALS_H->{"$signal"})) {
@@ -144,7 +143,7 @@ class Go::OS::Signal {
       }
     }
     
-    $NOTIFIED_SIGNALS_H = Hash->new;
+    $NOTIFIED_CHANNELS_H = Hash->new;
     $UV_SIGNALS_H = Hash->new;
   }
   
