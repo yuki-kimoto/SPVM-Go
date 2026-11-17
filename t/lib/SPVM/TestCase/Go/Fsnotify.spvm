@@ -42,7 +42,15 @@ class TestCase::Go::Fsnotify {
       my $ok = 0;
       my $event = (Go::Fsnotify::Event)$events_ch->read(\$ok);
       
-      warn $event->name;
+      unless ($event->name eq $target_file) {
+        diag $event->name;
+        $success_ref->[0] = 0;
+      }
+      
+      unless ($event->op != 0) {
+        diag $event->op;
+        $success_ref->[0] = 0;
+      }
       
       unless ($ok) {
         $success_ref->[0] = 0;
