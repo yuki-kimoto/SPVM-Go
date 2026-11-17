@@ -8,7 +8,7 @@
     * Deprecate Go::OS::Signal#stop_signal_handler will be removed.
     * Change internal signal implementation to use libuv; signals raised by raise() can no longer be captured.
   [Performance Improvement]
-    * Go::Sync::WaitGroup#wait does not use busy loop.
+    * Go::Sync::WaitGroup#wait does not use busy loop instead of Windows.
 0.048 2026-11-13
   [New Features]
     * Add bg and todo shortcut methods to Go class for context creation.

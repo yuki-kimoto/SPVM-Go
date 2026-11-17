@@ -7,6 +7,7 @@ class Go::Sync::WaitGroup {
   use Sync::Mutex;
   use Fn;
   use Sys;
+  use Sys::OS;
   
   has count : int;
   
@@ -23,12 +24,15 @@ class Go::Sync::WaitGroup {
     
     $self->{mutex} = Sync::Mutex->new;
     
-    my $read_fd = 0;
-    my $write_fd = 0;
-    Sys->pipepair(\$read_fd, \$write_fd, 1);
-    
-    $self->{read_fd} = $read_fd;
-    $self->{write_fd} = $write_fd;
+    # Initialize pipepair only on non-Windows platforms
+    unless (Sys::OS->is_windows) {
+      my $read_fd = 0;
+      my $write_fd = 0;
+      Sys->pipepair(\$read_fd, \$write_fd, 1);
+      
+      $self->{read_fd} = $read_fd;
+      $self->{write_fd} = $write_fd;
+    }
     
     return $self;
   }
@@ -76,23 +80,41 @@ class Go::Sync::WaitGroup {
     
     $self->{count} = $count;
     
+    # Notify waiter via pipe on non-Windows platforms
     if ($count == 0) {
-      my $write_fd = $self->{write_fd};
-      my $buf = "1";
-      Sys->syswrite($write_fd, $buf, 1);
+      unless (Sys::OS->is_windows) {
+        my $write_fd = $self->{write_fd};
+        my $buf = "1";
+        Sys->syswrite($write_fd, $buf, 1);
+      }
     }
   }
   
   method wait : void () {
-    if ($self->{count} == 0) {
-      return;
+    # Use busy-loop on Windows
+    if (Sys::OS->is_windows) {
+      while (1) {
+        my $count = $self->{count};
+        
+        if ($count == 0) {
+          return;
+        }
+        
+        Go->gosched;
+      }
     }
-    
-    my $read_fd = $self->{read_fd};
-    
-    Go->gosched_io_read($read_fd);
-    
-    my $buf = new_string_len(1);
-    Sys->sysread($read_fd, $buf, 1);
+    # Use non-blocking pipe read on POSIX platforms
+    else {
+      if ($self->{count} == 0) {
+        return;
+      }
+      
+      my $read_fd = $self->{read_fd};
+      
+      Go->gosched_io_read($read_fd);
+      
+      my $buf = new_string_len(1);
+      Sys->sysread($read_fd, $buf, 1);
+    }
   }
 }
