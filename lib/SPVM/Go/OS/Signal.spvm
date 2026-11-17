@@ -1,52 +1,72 @@
-# Copyright (c) 2023 Yuki Kimoto
+# Copyright (c) 2026 Yuki Kimoto
 # MIT License
 
 class Go::OS::Signal {
   version_from Go;
   
-  allow Go::Schedule;
-  
   use Go;
   use Go::Channel;
-  use Sys::Signal;
-  use Sys::IO::Constant as IO;
-  use Sys;
-  use Errno;
-  use Thread;
-  use Go::Sync::WaitGroup;
   use Hash;
-  use Sys::Signal::Handler;
-  use Sync::Mutex;
-  use Sys::Process;
+  use UV::Handle::Signal;
+  use Int;
   
-  # Class Variables
-  our $SIGNAL_READ_FD : int;
+  our $NOTIFIED_SIGNALS_H : Hash of Go::Channel[];
+  
+  our $IGNORED_SIGNALS_H : Hash of Int;
+  
+  our $UV_SIGNALS_H : Hash of UV::Handle::Signal;
+  
   INIT {
-    $SIGNAL_READ_FD = -1;
+    $NOTIFIED_SIGNALS_H = Hash->new;
+    $IGNORED_SIGNALS_H = Hash->new;
+    $UV_SIGNALS_H = Hash->new;
   }
-  
-  our $SIGNAL_WRITE_FD : int;
-  INIT {
-    $SIGNAL_WRITE_FD = -1;
-  }
-  
-  our $NOTIFIED_SIGNALS_H : cache Hash of Go::Channel[];
-  
-  our $SIGNAL_HANDLER_WG : cache Go::Sync::WaitGroup;
   
   static method ignore : void ($signal : int) {
+    unless ($IGNORED_SIGNALS_H) {
+      $IGNORED_SIGNALS_H = Hash->new;
+    }
+    $IGNORED_SIGNALS_H->{"$signal"} = Int->new(1);
     
-    Sys::Signal->signal($signal, Sys::Signal->SIG_GO);
+    if ($NOTIFIED_SIGNALS_H) {
+      $NOTIFIED_SIGNALS_H->delete("$signal");
+    }
     
-    $NOTIFIED_SIGNALS_H->{"$signal"} = new Go::Channel[0];
+    my $go = $Go::GO;
+    unless ($go) {
+      die "Go is not initialized.";
+    }
+    my $schedule = $go->{schedule};
+    unless ($schedule) {
+      die "Go schedule is not initialized.";
+    }
+    my $uv_loop = $schedule->{uv_loop};
+    unless ($uv_loop) {
+      die "UV loop is not initialized.";
+    }
+    
+    unless ($UV_SIGNALS_H->{"$signal"}) {
+      my $uv_signal = UV::Handle::Signal->new;
+      $uv_loop->signal_init($uv_signal);
+      
+      # Trap signal and do nothing
+      my $signal_cb = method : void ($uv_signal_handle : UV::Handle::Signal, $signum : int) {
+        
+      };
+      
+      $uv_signal->start($signal_cb, $signal);
+      
+      $UV_SIGNALS_H->{"$signal"} = $uv_signal;
+    }
   }
   
   static method notify : void ($channel : Go::Channel, $signal : int) {
-    
-    Sys::Signal->signal($signal, Sys::Signal->SIG_GO);
-    
     unless ($channel) {
       die "\$channel must be defined.";
+    }
+    
+    if ($IGNORED_SIGNALS_H) {
+      $IGNORED_SIGNALS_H->delete("$signal");
     }
     
     unless ($NOTIFIED_SIGNALS_H->{"$signal"}) {
@@ -54,134 +74,92 @@ class Go::OS::Signal {
     }
     
     List->new_ref($NOTIFIED_SIGNALS_H->{"$signal"})->push($channel);
+    
+    my $go = $Go::GO;
+    unless ($go) {
+      die "Go is not initialized.";
+    }
+    my $schedule = $go->{schedule};
+    unless ($schedule) {
+      die "Go schedule is not initialized.";
+    }
+    my $uv_loop = $schedule->{uv_loop};
+    unless ($uv_loop) {
+      die "UV loop is not initialized.";
+    }
+    
+    unless ($UV_SIGNALS_H->{"$signal"}) {
+      my $uv_signal = UV::Handle::Signal->new;
+      $uv_loop->signal_init($uv_signal);
+      
+      # Notify channels
+      my $signal_cb = [$signal : int] method : void ($uv_signal_handle : UV::Handle::Signal, $signum : int) {
+        if ($NOTIFIED_SIGNALS_H && (my $channels = $NOTIFIED_SIGNALS_H->{"$signal"})) {
+          for my $channel (@$channels) {
+            my $select = Go->new_select;
+            $select->set_non_blocking(1);
+            $select->add_write($channel, $signal);
+            $select->select;
+          }
+        }
+      };
+      
+      $uv_signal->start($signal_cb, $signal);
+      
+      $UV_SIGNALS_H->{"$signal"} = $uv_signal;
+    }
   }
   
   static method stop : void ($channel : Go::Channel, $signal : int) {
-    
-    Sys::Signal->signal($signal, Sys::Signal->SIG_GO);
-    
-    my $channels = $NOTIFIED_SIGNALS_H->{"$signal"} // new Go::Channel[0];
-    my $new_channels = (List of Go::Channel)List->new(new Go::Channel[0]);
-    for my $_ (@$channels) {
-      unless ($_ == $channel) {
-        $new_channels->push($_);
+    my $channels = $NOTIFIED_SIGNALS_H ? $NOTIFIED_SIGNALS_H->{"$signal"} : undef;
+    if ($channels) {
+      my $new_channels = (List of Go::Channel)List->new(new Go::Channel[0]);
+      for my $_ (@$channels) {
+        unless ($_ == $channel) {
+          $new_channels->push($_);
+        }
+      }
+      $NOTIFIED_SIGNALS_H->{"$signal"} = $new_channels->to_array;
+      
+      if (@{$NOTIFIED_SIGNALS_H->{"$signal"}} == 0) {
+        $NOTIFIED_SIGNALS_H->delete("$signal");
       }
     }
     
-    $NOTIFIED_SIGNALS_H->{"$signal"} = $new_channels->to_array;
+    my $has_notified = $NOTIFIED_SIGNALS_H && $NOTIFIED_SIGNALS_H->{"$signal"} && @{$NOTIFIED_SIGNALS_H->{"$signal"}} > 0;
+    my $has_ignored = $IGNORED_SIGNALS_H && $IGNORED_SIGNALS_H->{"$signal"};
+    
+    unless ($has_notified || $has_ignored) {
+      if ($UV_SIGNALS_H && (my $uv_signal = $UV_SIGNALS_H->{"$signal"})) {
+        $uv_signal->stop;
+        $uv_signal->close_safe;
+        $UV_SIGNALS_H->delete("$signal");
+      }
+    }
   }
   
   static method start_signal_handler : void () {
     
-    if (&is_signal_handler_running) {
-      return;
-    }
-    
-    my $signal_read_fd = -1;
-    my $signal_write_fd = -1;
-    
-    Sys->pipe(\$signal_read_fd, \$signal_write_fd);
-    
-    $SIGNAL_READ_FD = $signal_read_fd;
-    
-    $SIGNAL_WRITE_FD = $signal_write_fd;
-    
-    Sys::Signal->SET_SIG_GO_WRITE_FD($signal_write_fd);
-    
-    $NOTIFIED_SIGNALS_H = Hash->new;
-    
-    $SIGNAL_HANDLER_WG = Go::Sync::WaitGroup->new;
-    $SIGNAL_HANDLER_WG->add(1);
-    
-    Go->go(method : void () {
-      
-      Fn->defer(method : void () {
-        $SIGNAL_HANDLER_WG->done;
-      });
-      
-      while (1) {
-        unless ($SIGNAL_READ_FD > -1) {
-          return;
-        }
-        
-        my $buffer = (mutable string)new_string_len 4;
-        
-        my $read_error_ref = [0];
-        
-        my $thred_wg = Go::Sync::WaitGroup->new;
-        $thred_wg->add(1);
-        my $thread = Thread->new([$thred_wg : Go::Sync::WaitGroup, $buffer : mutable string, $read_error_ref : int[]] method : void () {
-          Fn->defer([$thred_wg : Go::Sync::WaitGroup] method : void () {
-            $thred_wg->done;
-          });
-          
-          eval { Sys::IO->read($SIGNAL_READ_FD, $buffer, 4); }
-          if ($@) {
-            $read_error_ref->[0] = 1;
-          }
-        });
-        $thred_wg->wait;
-        $thread->join;
-        
-        if ($read_error_ref->[0]) {
-          next;
-        }
-        
-        my $numbers = new int [1];
-        
-        Fn->memcpy($numbers, 0, $buffer, 0, 4);
-        
-        my $got_signal = $numbers->[0];
-        
-        if ($NOTIFIED_SIGNALS_H && (my $channels = $NOTIFIED_SIGNALS_H->{"$got_signal"})) {
-          for my $channel (@$channels) {
-            my $select = Go->new_select;
-            $select->set_non_blocking(1);
-            $select->add_write($channel, $got_signal);
-            $select->select;
-          }
-        }
-        
-        Go->sleep_sec(0.01);
-      }
-      
-    });
-    
   }
   
   static method stop_signal_handler : void () {
-    
-    unless (&is_signal_handler_running) {
+    unless ($UV_SIGNALS_H) {
       return;
     }
     
-    if ($NOTIFIED_SIGNALS_H) {
-      for my $signal (@{$NOTIFIED_SIGNALS_H->keys}) {
-        Sys::Signal->signal((int)$signal, Sys::Signal->SIG_DFL);
+    for my $signal (@{$UV_SIGNALS_H->keys}) {
+      if (my $uv_signal = $UV_SIGNALS_H->{"$signal"}) {
+        $uv_signal->stop;
+        $uv_signal->close_safe;
       }
     }
-    $NOTIFIED_SIGNALS_H = undef;
     
-    my $signal_write_fd = $SIGNAL_WRITE_FD;
-    $SIGNAL_WRITE_FD = -1;
-    
-    my $signal_read_fd = $SIGNAL_READ_FD;
-    $SIGNAL_READ_FD = -1;
-    
-    Sys::Signal->SET_SIG_GO_WRITE_FD(-1);
-    
-    Sys::IO->close($signal_write_fd);
-    
-    Sys::IO->close($signal_read_fd);
-    
-    $SIGNAL_HANDLER_WG->wait;
-    
-    $SIGNAL_HANDLER_WG = undef;
+    $NOTIFIED_SIGNALS_H = Hash->new;
+    $IGNORED_SIGNALS_H = Hash->new;
+    $UV_SIGNALS_H = Hash->new;
   }
   
   static method is_signal_handler_running : int () {
-    
-    return $SIGNAL_READ_FD > -1;
+    return ($NOTIFIED_SIGNALS_H || $IGNORED_SIGNALS_H) ? 1 : 0;
   }
-  
 }

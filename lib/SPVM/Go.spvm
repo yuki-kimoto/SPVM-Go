@@ -5,6 +5,7 @@ class Go {
   version "0.048";
   
   allow Go::OS::Exec::Cmd;
+  allow Go::OS::Signal;
   
   use Go::Channel;
   use Go::Schedule;

@@ -18,9 +18,9 @@ ok(SPVM::TestCase::Go::OS::Signal->multi_signals);
 
 ok(SPVM::TestCase::Go::OS::Signal->duplicated_signals);
 
-ok(SPVM::TestCase::Go::OS::Signal->stop);
-
 ok(SPVM::TestCase::Go::OS::Signal->ignore);
+
+ok(SPVM::TestCase::Go::OS::Signal->stop);
 
 $api->destroy_runtime_permanent_vars;
 
