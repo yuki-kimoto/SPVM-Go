@@ -40,9 +40,9 @@ class TestCase::Go::Fsnotify {
       my $events_ch = $watcher->events;
       
       my $ok = 0;
-      my $filename = (string)$events_ch->read(\$ok);
+      my $event = (Go::Fsnotify::Event)$events_ch->read(\$ok);
       
-      warn $filename;
+      warn $event->name;
       
       unless ($ok) {
         $success_ref->[0] = 0;

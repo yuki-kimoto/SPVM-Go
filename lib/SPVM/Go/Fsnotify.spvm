@@ -10,6 +10,8 @@ class Go::Fsnotify {
   use UV::Loop;
   use UV::Handle::FsEvent;
   use UV::Callback::FsEvent;
+  use Go::Fsnotify::Event;
+  use UV::Constant as UV_C;
   use Hash;
   use Fn;
   
@@ -66,8 +68,18 @@ class Go::Fsnotify {
         # Handle error
       }
       else {
-        # Direct write to channel
-        $events_ch->write("$dir/$filename");
+        my $op = 0;
+        if ($events & UV_C->UV_RENAME) {
+          $op |= Go::Fsnotify::Event->RENAME;
+        }
+        if ($events & UV_C->UV_CHANGE) {
+          $op |= Go::Fsnotify::Event->WRITE;
+        }
+        
+        my $event = Go::Fsnotify::Event->new;
+        $event->set_name("$dir/$filename");
+        $event->set_op($op);
+        $events_ch->write($event);
       }
     };
     
