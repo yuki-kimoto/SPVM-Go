@@ -10,53 +10,50 @@ class TestCase::Go::Fsnotify {
   static method basic : int ($temp_dir : string) {
     
     my $success_ref = [1];
-    
-    my $wg = Go->new_wait_group(1);
-    Go->go([$wg : , $success_ref : , $temp_dir : ] method : void () {
-      
-      Fn->defer([$wg : ] method : void () {
-        $wg->done;
+    {
+      my $wg = Go->new_wait_group(1);
+      Go->go([$wg : , $success_ref : , $temp_dir : ] method : void () {
+        
+        Fn->defer([$wg : ] method : void () {
+          $wg->done;
+        });
+        
+        my $watcher = Go::Fsnotify->new;
+        
+        $watcher->add($temp_dir);
+        
+        my $target_file = "$temp_dir/test_fs_event.txt";
+        
+        Go->go([$target_file : ] method : void () {
+          Go->sleep_sec(0.1);
+          Sys->open(my $_ = [(Sys::IO::FileStream)undef], "w", $target_file);
+          my $fh = $_->[0];
+          Sys->print($fh, "hello fs_event");
+          Sys->close($fh);
+        });
+        
+        my $events_ch = $watcher->events;
+        
+        my $event = (Go::Fsnotify::Event)$events_ch->read;
+        
+        unless ($event) {
+          diag;
+          $success_ref->[0] = 0;
+        }
+        
+        unless ($event->name) {
+          diag;
+          $success_ref->[0] = 0;
+        }
+        
+        if ($event->op == 0) {
+          diag;
+          $success_ref->[0] = 0;
+        }
       });
       
-      my $watcher = Go::Fsnotify->new;
-      
-      Fn->defer([$watcher : ] method : void () {
-        $watcher->close;
-      });
-      
-      $watcher->add($temp_dir);
-      
-      my $target_file = "$temp_dir/test_fs_event.txt";
-      
-      Go->go([$target_file : ] method : void () {
-        Go->sleep_sec(0.1);
-        Sys->open(my $_ = [(Sys::IO::FileStream)undef], "w", $target_file);
-        my $fh = $_->[0];
-        Sys->print($fh, "hello fs_event");
-        Sys->close($fh);
-      });
-      
-      my $events_ch = $watcher->events;
-      
-      my $event = (Go::Fsnotify::Event)$events_ch->read;
-      
-      unless ($event) {
-        diag;
-        $success_ref->[0] = 0;
-      }
-      
-      unless ($event->name) {
-        diag;
-        $success_ref->[0] = 0;
-      }
-      
-      if ($event->op == 0) {
-        diag;
-        $success_ref->[0] = 0;
-      }
-    });
-    
-    $wg->wait;
+      $wg->wait;
+    }
     
     return $success_ref->[0];
   }

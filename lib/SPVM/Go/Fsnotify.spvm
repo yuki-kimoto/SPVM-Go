@@ -110,4 +110,8 @@ class Go::Fsnotify {
     
     $self->{events_ch}->close;
   }
+  
+  method DESTROY : void () {
+    $self->close;
+  }
 }
