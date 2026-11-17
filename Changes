@@ -1,3 +1,13 @@
+0.049 2026-11-17
+  [Requirement Changes]
+    * Require SPVM::UV 0.009.
+  [New Features]
+    * Add reset method to Go::OS::Signal.
+  [Incompatible Changes]
+    * Deprecate Go::OS::Signal#start_signal_handler will be removed.
+    * Deprecate Go::OS::Signal#stop_signal_handler will be removed.
+    * Change internal signal implementation to use libuv; signals raised by raise() can no longer be captured.
+
 0.048 2026-11-13
   [New Features]
     * Add bg and todo shortcut methods to Go class for context creation.
