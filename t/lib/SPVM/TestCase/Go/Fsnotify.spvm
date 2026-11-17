@@ -10,6 +10,8 @@ class TestCase::Go::Fsnotify {
   static method basic : int ($temp_dir : string) {
     
     my $success_ref = [1];
+    
+    # Basic
     {
       my $wg = Go->new_wait_group(1);
       Go->go([$wg : , $success_ref : , $temp_dir : ] method : void () {
@@ -29,6 +31,105 @@ class TestCase::Go::Fsnotify {
           Sys->open(my $_ = [(Sys::IO::FileStream)undef], "w", $target_file);
           my $fh = $_->[0];
           Sys->print($fh, "hello fs_event");
+          Sys->close($fh);
+        });
+        
+        my $events_ch = $watcher->events;
+        
+        my $event = (Go::Fsnotify::Event)$events_ch->read;
+        
+        unless ($event) {
+          diag;
+          $success_ref->[0] = 0;
+        }
+        
+        unless ($event->name) {
+          diag;
+          $success_ref->[0] = 0;
+        }
+        
+        if ($event->op == 0) {
+          diag;
+          $success_ref->[0] = 0;
+        }
+      });
+      
+      $wg->wait;
+    }
+    
+    my $dir1 = "$temp_dir/dir1";
+    my $dir2 = "$temp_dir/dir2";
+    Sys->mkdir($dir1, 0777);
+    Sys->mkdir($dir2, 0777);
+    
+    # Add two dirs. Add file to dir1
+    {
+      my $wg = Go->new_wait_group(1);
+      Go->go([$wg : , $success_ref : , $temp_dir : , $dir1 : , $dir2 : ,] method : void () {
+        
+        Fn->defer([$wg : ] method : void () {
+          $wg->done;
+        });
+        
+        my $watcher = Go::Fsnotify->new;
+        
+        $watcher->add($dir1);
+        $watcher->add($dir2);
+        
+        my $target_file = "$dir1/test_dir1.txt";
+        
+        Go->go([$target_file : ] method : void () {
+          Go->sleep_sec(0.1);
+          Sys->open(my $_ = [(Sys::IO::FileStream)undef], "w", $target_file);
+          my $fh = $_->[0];
+          Sys->print($fh, "hello dir1");
+          Sys->close($fh);
+        });
+        
+        my $events_ch = $watcher->events;
+        
+        my $event = (Go::Fsnotify::Event)$events_ch->read;
+        
+        unless ($event) {
+          diag;
+          $success_ref->[0] = 0;
+        }
+        
+        unless ($event->name) {
+          diag;
+          $success_ref->[0] = 0;
+        }
+        
+        if ($event->op == 0) {
+          diag;
+          $success_ref->[0] = 0;
+        }
+      });
+      
+      $wg->wait;
+    }
+    
+    # Add two dirs. Add file to dir2
+    {
+      my $wg = Go->new_wait_group(1);
+      Go->go([$wg : , $success_ref : , $temp_dir :,  $dir1 : , $dir2 : ,] method : void () {
+        
+        Fn->defer([$wg : ] method : void () {
+          $wg->done;
+        });
+        
+        my $watcher = Go::Fsnotify->new;
+        
+        $watcher->add($dir1);
+        $watcher->add($dir2);
+        
+        my $target_file = "$dir2/test_dir2.txt";
+        
+        Go->go([$target_file : ] method : void () {
+          Go->sleep_sec(0.1);
+          Sys->open(my $_ = [(Sys::IO::FileStream)undef], "w", $target_file);
+          my $fh = $_->[0];
+          Sys->print($fh, "hello dir2");
           Sys->close($fh);
         });
         
