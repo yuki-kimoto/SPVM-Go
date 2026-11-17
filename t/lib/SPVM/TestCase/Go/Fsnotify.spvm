@@ -43,12 +43,16 @@ class TestCase::Go::Fsnotify {
           $success_ref->[0] = 0;
         }
         
-        unless ($event->name) {
+        my $event_name = $event->name;
+        diag "[Test Output]\$event_name:$event_name.";
+        unless ($event_name) {
           diag;
           $success_ref->[0] = 0;
         }
         
-        if ($event->op == 0) {
+        my $event_op = $event->op;
+        diag "[Test Output]\$event_op:$event_op.";
+        if ($event_op == 0) {
           diag;
           $success_ref->[0] = 0;
         }
