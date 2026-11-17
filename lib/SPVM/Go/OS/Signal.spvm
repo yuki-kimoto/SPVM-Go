@@ -12,21 +12,14 @@ class Go::OS::Signal {
   
   our $NOTIFIED_SIGNALS_H : Hash of Go::Channel[];
   
-  our $IGNORED_SIGNALS_H : Hash of Int;
-  
   our $UV_SIGNALS_H : Hash of UV::Handle::Signal;
   
   INIT {
     $NOTIFIED_SIGNALS_H = Hash->new;
-    $IGNORED_SIGNALS_H = Hash->new;
     $UV_SIGNALS_H = Hash->new;
   }
   
   static method ignore : void ($signal : int) {
-    unless ($IGNORED_SIGNALS_H) {
-      $IGNORED_SIGNALS_H = Hash->new;
-    }
-    $IGNORED_SIGNALS_H->{"$signal"} = Int->new(1);
     
     if ($NOTIFIED_SIGNALS_H) {
       $NOTIFIED_SIGNALS_H->delete("$signal");
@@ -63,10 +56,6 @@ class Go::OS::Signal {
   static method notify : void ($channel : Go::Channel, $signal : int) {
     unless ($channel) {
       die "\$channel must be defined.";
-    }
-    
-    if ($IGNORED_SIGNALS_H) {
-      $IGNORED_SIGNALS_H->delete("$signal");
     }
     
     unless ($NOTIFIED_SIGNALS_H->{"$signal"}) {
@@ -127,9 +116,8 @@ class Go::OS::Signal {
     }
     
     my $has_notified = $NOTIFIED_SIGNALS_H && $NOTIFIED_SIGNALS_H->{"$signal"} && @{$NOTIFIED_SIGNALS_H->{"$signal"}} > 0;
-    my $has_ignored = $IGNORED_SIGNALS_H && $IGNORED_SIGNALS_H->{"$signal"};
     
-    unless ($has_notified || $has_ignored) {
+    unless ($has_notified) {
       if ($UV_SIGNALS_H && (my $uv_signal = $UV_SIGNALS_H->{"$signal"})) {
         $uv_signal->stop;
         $uv_signal->close_safe;
@@ -157,7 +145,6 @@ class Go::OS::Signal {
     }
     
     $NOTIFIED_SIGNALS_H = Hash->new;
-    $IGNORED_SIGNALS_H = Hash->new;
     $UV_SIGNALS_H = Hash->new;
   }
   
