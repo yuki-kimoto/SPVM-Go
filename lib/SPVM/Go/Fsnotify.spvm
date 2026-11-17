@@ -77,7 +77,7 @@ class Go::Fsnotify {
         }
         
         my $event = Go::Fsnotify::Event->new;
-        $event->set_name("$dir/$filename");
+        $event->set_name($filename);
         $event->set_op($op);
         $events_ch->write($event);
       }
