@@ -2,9 +2,93 @@
 # MIT License
 
 class Go::Fsnotify {
+  version_from Go;
   
+  use Go;
+  use Go::Channel;
+  use UV;
+  use UV::Loop;
+  use UV::Handle::FsEvent;
+  use UV::Callback::FsEvent;
   
-  static method my_method : void () {
+  # Fields
+  has fs_event : UV::Handle::FsEvent;
+  has events_ch : Go::Channel;
+  has errors_ch : Go::Channel;
+  has closed : int;
+  
+  # Class Methods
+  static method new : Go::Fsnotify () {
+    my $self = new Go::Fsnotify;
     
+    my $go = $Go::GO;
+    unless ($go) {
+      die "Go is not initialized.";
+    }
+    my $schedule = $go->{schedule};
+    unless ($schedule) {
+      die "Go schedule is not initialized.";
+    }
+    my $uv_loop = $schedule->{uv_loop};
+    unless ($uv_loop) {
+      die "UV loop is not initialized.";
+    }
+    
+    # Create channels using Go->make
+    $self->{events_ch} = Go->make(100);
+    $self->{errors_ch} = Go->make(10);
+    
+    my $fs_event = UV::Handle::FsEvent->new;
+    $uv_loop->fs_event_init($fs_event);
+    
+    $self->{fs_event} = $fs_event;
+    
+    return $self;
+  }
+  
+  # Instance Methods
+  method add : void ($path : string) {
+    my $fs_event = $self->{fs_event};
+    my $events_ch = $self->{events_ch};
+    my $errors_ch = $self->{errors_ch};
+    
+    my $cb = UV::Callback::FsEvent->new(method : void ($handle : UV::Handle::FsEvent, $filename : string, $events : int, $status : int) {
+      if ($status < 0) {
+        # Handle fs event error
+      }
+      else {
+        # Notify event via channel
+        my $select = Go->new_select;
+        $select->set_non_blocking(1);
+        $select->add_write($events_ch, $filename);
+        $select->select;
+      }
+    });
+    
+    $fs_event->start($cb, $path, 0);
+  }
+  
+  method events : Go::Channel () {
+    return $self->{events_ch};
+  }
+  
+  method errors : Go::Channel () {
+    return $self->{errors_ch};
+  }
+  
+  method close : void () {
+    if ($self->{closed}) {
+      return;
+    }
+    $self->{closed} = 1;
+    
+    my $fs_event = $self->{fs_event};
+    if ($fs_event) {
+      $fs_event->stop;
+      $fs_event->close;
+    }
+    
+    $self->{events_ch}->close;
+    $self->{errors_ch}->close;
   }
 }
