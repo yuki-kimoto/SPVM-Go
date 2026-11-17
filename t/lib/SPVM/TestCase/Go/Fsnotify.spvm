@@ -4,7 +4,6 @@ class TestCase::Go::Fsnotify {
   use Go::Fsnotify;
   use Go::Sync::WaitGroup;
   use Fn;
-  use File::Spec;
   use Sys;
   use Sys::IO::FileStream;
   
