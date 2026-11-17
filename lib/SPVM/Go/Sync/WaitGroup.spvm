@@ -9,6 +9,10 @@ class Go::Sync::WaitGroup {
   use Sys;
   use Sys::OS;
   
+  use UV::Handle::Pipe;
+  use UV::Constant as UV_C;
+  use UV::Request::Write;
+  
   has count : int;
   
   has mutex : Sync::Mutex;
@@ -117,4 +121,44 @@ class Go::Sync::WaitGroup {
       Sys->sysread($read_fd, $buf, 1);
     }
   }
+  
+  private static method syswrite_pipe : int ($fd : int, $buffer : string, $buffer_length : int = -1, $buffer_offset : int = 0) {
+    if ($fd < 0) {
+      die "The file descriptor \$fd must be a non-negative value.";
+    }
+    
+    if ($buffer_length < 0) {
+      $buffer_length = length $buffer;
+    }
+    
+    # Create a new uv loop
+    my $uv_loop = UV::Loop->new;
+    
+    my $uv_pipe = UV::Handle::Pipe->new;
+    my $ipc = 0;
+    $uv_loop->pipe_init($uv_pipe, $ipc);
+    my $fd_dup = Sys::IO->dup($fd);
+    $uv_pipe->open($fd_dup);
+    
+    my $uv_req_write = UV::Request::Write->new;
+    
+    my $status_ref = [0];
+    my $write_cb = [$status_ref : ] method : void ($uv_req_write : UV::Request::Write, $status : int) {
+      $status_ref->[0] = $status;
+      $uv_req_write->set_write_cb(undef);
+    };
+    
+    $uv_req_write->write($uv_pipe, $buffer, $buffer_length, $write_cb, $buffer_offset);
+    
+    $uv_loop->run(UV_C->UV_RUN_DEFAULT);
+    
+    $uv_pipe->close_safe;
+    
+    if ($status_ref->[0] < 0) {
+      die UV->strerror($status_ref->[0]);
+    }
+    
+    return $buffer_length;
+  }
+  
 }
