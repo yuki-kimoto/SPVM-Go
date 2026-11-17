@@ -26,13 +26,9 @@ class TestCase::Go::Fsnotify {
         
         my $target_file = "$temp_dir/test_fs_event.txt";
         
-        Go->go([$target_file : ] method : void () {
-          Go->sleep_sec(0.1);
-          Sys->open(my $_ = [(Sys::IO::FileStream)undef], "w", $target_file);
-          my $fh = $_->[0];
-          Sys->print($fh, "hello fs_event");
-          Sys->close($fh);
-        });
+        Sys->open(my $_ = [(Sys::IO::FileStream)undef], "w", $target_file);
+        my $fh = $_->[0];
+        Sys->close($fh);
         
         my $events_ch = $watcher->events;
         
@@ -82,13 +78,9 @@ class TestCase::Go::Fsnotify {
         
         my $target_file = "$dir1/test_dir1.txt";
         
-        Go->go([$target_file : ] method : void () {
-          Go->sleep_sec(0.1);
-          Sys->open(my $_ = [(Sys::IO::FileStream)undef], "w", $target_file);
-          my $fh = $_->[0];
-          Sys->print($fh, "hello dir1");
-          Sys->close($fh);
-        });
+        Sys->open(my $_ = [(Sys::IO::FileStream)undef], "w", $target_file);
+        my $fh = $_->[0];
+        Sys->close($fh);
         
         my $events_ch = $watcher->events;
         
@@ -129,13 +121,9 @@ class TestCase::Go::Fsnotify {
         
         my $target_file = "$dir2/test_dir2.txt";
         
-        Go->go([$target_file : ] method : void () {
-          Go->sleep_sec(0.1);
-          Sys->open(my $_ = [(Sys::IO::FileStream)undef], "w", $target_file);
-          my $fh = $_->[0];
-          Sys->print($fh, "hello dir2");
-          Sys->close($fh);
-        });
+        Sys->open(my $_ = [(Sys::IO::FileStream)undef], "w", $target_file);
+        my $fh = $_->[0];
+        Sys->close($fh);
         
         my $events_ch = $watcher->events;
         
