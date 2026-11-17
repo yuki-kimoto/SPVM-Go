@@ -9,6 +9,7 @@ class Go::Schedule {
   allow Go::OS::Exec;
   allow Go::OS::Exec::Cmd;
   allow Go::OS::Signal;
+  allow Go::Fsnotify;
   
   use Go::Goroutine;
   use Go::Error::IOTimeout;

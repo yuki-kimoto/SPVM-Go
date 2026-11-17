@@ -6,6 +6,7 @@ class Go {
   
   allow Go::OS::Exec::Cmd;
   allow Go::OS::Signal;
+  allow Go::Fsnotify;
   
   use Go::Channel;
   use Go::Schedule;

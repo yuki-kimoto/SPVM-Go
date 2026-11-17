@@ -1,0 +1,59 @@
+class TestCase::Go::Fsnotify {
+  
+  use Go;
+  use Go::Fsnotify;
+  use Go::Sync::WaitGroup;
+  use Fn;
+  use File::Spec;
+  use Sys;
+  use Sys::IO::FileStream;
+  
+  static method basic : int ($temp_dir : string) {
+    
+    my $success_ref = [1];
+    
+    my $wg = Go->new_wait_group(1);
+    Go->go([$wg : , $success_ref : , $temp_dir : ] method : void () {
+      
+      Fn->defer([$wg : ] method : void () {
+        $wg->done;
+      });
+      
+      my $watcher = Go::Fsnotify->new;
+      
+      Fn->defer([$watcher : ] method : void () {
+        $watcher->close;
+      });
+      
+      $watcher->add($temp_dir);
+      
+      my $target_file = "$temp_dir/test_fs_event.txt";
+      
+      Go->go([$target_file : ] method : void () {
+        Go->sleep_sec(0.1);
+        Sys->open(my $_ = [(Sys::IO::FileStream)undef], "w", $target_file);
+        my $fh = $_->[0];
+        Sys->print($fh, "hello fs_event");
+        Sys->close($fh);
+      });
+      
+      my $events_ch = $watcher->events;
+      
+      my $ok = 0;
+      my $filename = (string)$events_ch->read(\$ok);
+      
+      warn $filename;
+      
+      unless ($ok) {
+        $success_ref->[0] = 0;
+      }
+      
+      Sys->unlink($target_file);
+    });
+    
+    $wg->wait;
+    
+    return $success_ref->[0];
+  }
+
+}

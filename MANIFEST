@@ -71,6 +71,7 @@ t/Go-Channel.t
 t/Go-Context.t
 t/Go-Duration_1l.t
 t/Go-Exec.t
+t/Go-Fsnotify.t
 t/Go-Goroutine.t
 t/Go-OS-Signal.t
 t/Go-Pipe.t
@@ -83,6 +84,7 @@ t/lib/SPVM/TestCase/Go.spvm
 t/lib/SPVM/TestCase/Go/Channel.spvm
 t/lib/SPVM/TestCase/Go/Context.spvm
 t/lib/SPVM/TestCase/Go/Duration_1l.spvm
+t/lib/SPVM/TestCase/Go/Fsnotify.spvm
 t/lib/SPVM/TestCase/Go/Goroutine.spvm
 t/lib/SPVM/TestCase/Go/OS/Exec.spvm
 t/lib/SPVM/TestCase/Go/OS/Signal.spvm

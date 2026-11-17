@@ -10,11 +10,12 @@ class Go::Fsnotify {
   use UV::Loop;
   use UV::Handle::FsEvent;
   use UV::Callback::FsEvent;
+  use Hash;
+  use Fn;
   
   # Fields
-  has fs_event : UV::Handle::FsEvent;
+  has fs_events_h : Hash of UV::Handle::FsEvent;
   has events_ch : Go::Channel;
-  has errors_ch : Go::Channel;
   has closed : int;
   
   # Class Methods
@@ -34,46 +35,49 @@ class Go::Fsnotify {
       die "UV loop is not initialized.";
     }
     
-    # Create channels using Go->make
+    $self->{fs_events_h} = Hash->new;
     $self->{events_ch} = Go->make(100);
-    $self->{errors_ch} = Go->make(10);
-    
-    my $fs_event = UV::Handle::FsEvent->new;
-    $uv_loop->fs_event_init($fs_event);
-    
-    $self->{fs_event} = $fs_event;
     
     return $self;
   }
   
   # Instance Methods
-  method add : void ($path : string) {
-    my $fs_event = $self->{fs_event};
-    my $events_ch = $self->{events_ch};
-    my $errors_ch = $self->{errors_ch};
+  method add : void ($dir : string) {
+    if ($self->{closed}) {
+      die "Watcher is closed.";
+    }
     
-    my $cb = UV::Callback::FsEvent->new(method : void ($handle : UV::Handle::FsEvent, $filename : string, $events : int, $status : int) {
+    # Return if already watched
+    if ($self->{fs_events_h}->exists($dir)) {
+      return;
+    }
+    
+    my $go = $Go::GO;
+    my $schedule = $go->{schedule};
+    my $uv_loop = $schedule->{uv_loop};
+    
+    my $fs_event = UV::Handle::FsEvent->new;
+    $uv_loop->fs_event_init($fs_event);
+    
+    my $events_ch = $self->{events_ch};
+    
+    my $cb = [$events_ch : , $dir : ,] method : void ($handle : UV::Handle::FsEvent, $filename : string, $events : int, $status : int) {
       if ($status < 0) {
-        # Handle fs event error
+        # Handle error
       }
       else {
-        # Notify event via channel
-        my $select = Go->new_select;
-        $select->set_non_blocking(1);
-        $select->add_write($events_ch, $filename);
-        $select->select;
+        # Direct write to channel
+        $events_ch->write("$dir/$filename");
       }
-    });
+    };
     
-    $fs_event->start($cb, $path, 0);
+    $fs_event->start($cb, $dir, 0);
+    
+    $self->{fs_events_h}->set($dir, $fs_event);
   }
   
   method events : Go::Channel () {
     return $self->{events_ch};
-  }
-  
-  method errors : Go::Channel () {
-    return $self->{errors_ch};
   }
   
   method close : void () {
@@ -82,13 +86,16 @@ class Go::Fsnotify {
     }
     $self->{closed} = 1;
     
-    my $fs_event = $self->{fs_event};
-    if ($fs_event) {
-      $fs_event->stop;
-      $fs_event->close;
+    # Stop and close all fs event handles
+    my $fs_events_h = $self->{fs_events_h};
+    for my $dir (@{$fs_events_h->keys}) {
+      my $fs_event = $fs_events_h->get($dir);
+      if ($fs_event) {
+        $fs_event->stop;
+        $fs_event->close_safe;
+      }
     }
     
     $self->{events_ch}->close;
-    $self->{errors_ch}->close;
   }
 }
