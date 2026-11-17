@@ -5,10 +5,16 @@ class Go::Sync::WaitGroup {
   version_from Go;
   use Go;
   use Sync::Mutex;
+  use Fn;
+  use Sys;
   
   has count : int;
   
   has mutex : Sync::Mutex;
+  
+  has read_fd : int;
+  
+  has write_fd : int;
   
   # Class Methods
   static method new : Go::Sync::WaitGroup () {
@@ -16,6 +22,13 @@ class Go::Sync::WaitGroup {
     my $self = new Go::Sync::WaitGroup;
     
     $self->{mutex} = Sync::Mutex->new;
+    
+    my $read_fd = 0;
+    my $write_fd = 0;
+    Sys->pipepair(\$read_fd, \$write_fd, 1);
+    
+    $self->{read_fd} = $read_fd;
+    $self->{write_fd} = $write_fd;
     
     return $self;
   }
@@ -25,39 +38,61 @@ class Go::Sync::WaitGroup {
     
     my $mutex = $self->{mutex};
     
-    {
-      $mutex->lock;
-      
-      my $count = $self->{count};
-      
-      $count += $delta;
-        
-      my $count_is_negative = $count < 0;
-      
-      if ($count_is_negative) {
-        die "The count field must be greater than or equal to 0.";
-      }
-      
-      $self->{count} = $count;
-      
+    $mutex->lock;
+    
+    Fn->defer([$mutex : , ] method : void () {
       $mutex->unlock;
+    });
+    
+    my $count = $self->{count};
+    
+    $count += $delta;
+      
+    my $count_is_negative = $count < 0;
+    
+    if ($count_is_negative) {
+      die "The count field must be greater than or equal to 0.";
     }
+    
+    $self->{count} = $count;
   }
   
   method done : void () {
-    $self->add(-1);
+    my $mutex = $self->{mutex};
+    
+    $mutex->lock;
+    
+    Fn->defer([$mutex : , ] method : void () {
+      $mutex->unlock;
+    });
+    
+    my $count = $self->{count} - 1;
+    
+    my $count_is_negative = $count < 0;
+    
+    if ($count_is_negative) {
+      die "The count field must be greater than or equal to 0.";
+    }
+    
+    $self->{count} = $count;
+    
+    if ($count == 0) {
+      my $write_fd = $self->{write_fd};
+      my $buf = "1";
+      Sys->syswrite($write_fd, $buf, 1);
+    }
   }
   
   method wait : void () {
-    
-    while (1) {
-      my $count = $self->{count};
-      
-      if ($count == 0) {
-        return;
-      }
-      
-      Go->gosched;
+    if ($self->{count} == 0) {
+      return;
     }
+    
+    my $read_fd = $self->{read_fd};
+    
+    Go->gosched_io_read($read_fd);
+    
+    my $buf = new_string_len(1);
+    Sys->sysread($read_fd, $buf, 1);
   }
 }
