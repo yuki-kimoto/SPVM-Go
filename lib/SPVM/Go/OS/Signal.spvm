@@ -19,7 +19,6 @@ class Go::OS::Signal {
   }
   
   static method ignore : void ($signal : int) {
-    
     if ($NOTIFIED_CHANNELS_H) {
       $NOTIFIED_CHANNELS_H->delete("$signal");
     }
@@ -61,7 +60,19 @@ class Go::OS::Signal {
       $NOTIFIED_CHANNELS_H->{"$signal"} = new Go::Channel[0];
     }
     
-    List->new_ref($NOTIFIED_CHANNELS_H->{"$signal"})->push($channel);
+    # Prevent duplicate channel registration
+    my $channels = $NOTIFIED_CHANNELS_H->{"$signal"};
+    my $exists = 0;
+    for my $ch (@$channels) {
+      if ($ch == $channel) {
+        $exists = 1;
+        last;
+      }
+    }
+    
+    unless ($exists) {
+      List->new_ref($NOTIFIED_CHANNELS_H->{"$signal"})->push($channel);
+    }
     
     my $go = $Go::GO;
     unless ($go) {
@@ -82,11 +93,11 @@ class Go::OS::Signal {
       
       # Notify channels
       my $signal_cb = [$signal : int] method : void ($uv_signal_handle : UV::Handle::Signal, $signum : int) {
-        if ($NOTIFIED_CHANNELS_H && (my $channels = $NOTIFIED_CHANNELS_H->{"$signal"})) {
-          for my $channel (@$channels) {
+        if ($NOTIFIED_CHANNELS_H && (my $target_channels = $NOTIFIED_CHANNELS_H->{"$signal"})) {
+          for my $ch (@$target_channels) {
             my $select = Go->new_select;
             $select->set_non_blocking(1);
-            $select->add_write($channel, $signal);
+            $select->add_write($ch, $signal);
             $select->select;
           }
         }

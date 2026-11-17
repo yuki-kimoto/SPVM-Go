@@ -1,7 +1,5 @@
 package SPVM::Go::OS::Signal;
 
-
-
 1;
 
 =head1 Name
@@ -15,28 +13,16 @@ Go::OS::Signal class in L<SPVM> provides a way to handle OS signals using channe
 =head1 Usage
 
   use Go::OS::Signal;
-  use Sys::Signal::Constant as SIGNAL;
+  use Sys::Signal::Constant as SIGNAL_C;
   use Sys;
   
-  Go::OS::Signal->start_signal_handler;
+  my $ch = Go->make(1);
   
-  Go->go(method : void () {
-    
-    Fn->defer(method : void () {
-      Go::OS::Signal->stop_signal_handler;
-    });
-    
-    my $ch = Go->make(1);
-    
-    Go::OS::Signal->notify($ch, SIGNAL->SIGTERM);
-    
-    Sys->kill(SIGNAL->SIGTERM, Sys->process_id);
-    
-    my $signal = $ch->read;
-    
-  });
+  Go::OS::Signal->notify($ch, SIGNAL_C->SIGTERM);
   
-  Go->gosched;
+  Sys->kill(SIGNAL_C->SIGTERM, Sys->process_id);
+  
+  my $signal = $ch->read;
 
 =head1 Class Methods
 
@@ -68,32 +54,24 @@ See Sys::Signal::Constant about the values of signals.
 
 C<static method start_signal_handler : void ();>
 
-Starts signal handling.
-
-This method should be called before the first goroutine execution and L</"stop_signal_handler"> method should be called at the beggining of the first goroutine execution using C<defer>.
-
-  Go::OS::Signal->start_signal_handler;
-  
-  Go->go(method : void () {
-    
-    Fn->defer(method : void () {
-      Go::OS::Signal->stop_signal_handler;
-    });
-    
-    # Do something
-  });
-  
-  Go->gosched;
+Deprecated. Will be removed.
 
 =head2 stop_signal_handler
 
 C<static method stop_signal_handler : void ();>
 
-Stops signal handling. See L</"start_signal_handler"> method about the usage.
+Deprecated. Will be removed.
+
+=head2 reset
+
+C<static method reset : void ();>
+
+Resets all signal handlers and clears registered channels.
 
 =head1 Copyright & License
 
-Copyright (c) 2023 Yuki Kimoto
+Copyright (c) 2026 Yuki Kimoto
 
 MIT License
 
+=cut
