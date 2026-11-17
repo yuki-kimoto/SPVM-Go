@@ -138,10 +138,12 @@ class Go::OS::Signal {
     }
   }
   
+  # Deprecated. Will be removed.
   static method start_signal_handler : void () {
     
   }
   
+  # Deprecated. Will be removed.
   static method stop_signal_handler : void () {
     unless ($UV_SIGNALS_H) {
       return;
@@ -157,6 +159,10 @@ class Go::OS::Signal {
     $NOTIFIED_SIGNALS_H = Hash->new;
     $IGNORED_SIGNALS_H = Hash->new;
     $UV_SIGNALS_H = Hash->new;
+  }
+  
+  static method reset : void () {
+    &stop_signal_handler();
   }
   
   static method is_signal_handler_running : int () {
