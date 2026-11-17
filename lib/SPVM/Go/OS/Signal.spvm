@@ -164,8 +164,4 @@ class Go::OS::Signal {
   static method reset : void () {
     &stop_signal_handler();
   }
-  
-  static method is_signal_handler_running : int () {
-    return ($NOTIFIED_SIGNALS_H || $IGNORED_SIGNALS_H) ? 1 : 0;
-  }
 }
