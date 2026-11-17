@@ -89,7 +89,7 @@ class Go::Sync::WaitGroup {
       unless (Sys::OS->is_windows) {
         my $write_fd = $self->{write_fd};
         my $buf = "1";
-        Sys->syswrite($write_fd, $buf, 1);
+        &syswrite_pipe($write_fd, $buf, 1);
       }
     }
   }
@@ -143,16 +143,15 @@ class Go::Sync::WaitGroup {
     my $uv_req_write = UV::Request::Write->new;
     
     my $status_ref = [0];
-    my $write_cb = [$status_ref : ] method : void ($uv_req_write : UV::Request::Write, $status : int) {
+    my $write_cb = [$status_ref : , $uv_pipe : ,] method : void ($uv_req_write : UV::Request::Write, $status : int) {
       $status_ref->[0] = $status;
       $uv_req_write->set_write_cb(undef);
+      $uv_pipe->close_safe;
     };
     
     $uv_req_write->write($uv_pipe, $buffer, $buffer_length, $write_cb, $buffer_offset);
     
     $uv_loop->run(UV_C->UV_RUN_DEFAULT);
-    
-    $uv_pipe->close_safe;
     
     if ($status_ref->[0] < 0) {
       die UV->strerror($status_ref->[0]);
