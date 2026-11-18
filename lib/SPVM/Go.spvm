@@ -2,7 +2,7 @@
 # MIT License
 
 class Go {
-  version "0.051";
+  version "0.052";
   
   allow Go::OS::Exec::Cmd;
   allow Go::OS::Signal;
