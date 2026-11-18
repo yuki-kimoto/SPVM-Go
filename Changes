@@ -1,3 +1,7 @@
+0.053 2026-11-19
+  [Incompatible Changes]
+    * Rename ctx to context, cancel to cancel_cb in Go::Context::Derived. 
+
 0.052 2026-11-18
   [Incompatible Changes]
     * Go#gosched_io_xxx methods are renamed to gosched_poll_xxx and receive context.

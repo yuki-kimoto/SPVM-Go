@@ -166,8 +166,8 @@ class Go::Context {
     };
     
     my $derived = my $_ = Go::Context::Derived->new;
-    $_->set_ctx($self);
-    $_->set_cancel($cancel);
+    $_->set_context($self);
+    $_->set_cancel_cb($cancel);
     
     if ($deadline) {
       if ($parent_context->{deadline}) {
