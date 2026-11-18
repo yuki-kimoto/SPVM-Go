@@ -27,15 +27,12 @@ class Go::Sync::WaitGroup {
     
     $self->{mutex} = Sync::Mutex->new;
     
-    # Initialize pipepair only on non-Windows platforms
-    unless (Sys::OS->is_windows) {
-      my $read_fd = 0;
-      my $write_fd = 0;
-      Sys->pipepair(\$read_fd, \$write_fd, 1);
-      
-      $self->{read_fd} = $read_fd;
-      $self->{write_fd} = $write_fd;
-    }
+    my $read_fd = 0;
+    my $write_fd = 0;
+    Sys->pipepair(\$read_fd, \$write_fd, 1);
+    
+    $self->{read_fd} = $read_fd;
+    $self->{write_fd} = $write_fd;
     
     return $self;
   }
