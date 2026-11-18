@@ -1,6 +1,8 @@
 0.050 2026-11-17
   [New Features]
     * Add Go::Fsnotify to watch file changes.
+  [Performance Improvement]
+    * Go::Sync::WaitGroup#wait does not use busy loop also in Windows.
     
 0.049 2026-11-17
   [Requirement Changes]
