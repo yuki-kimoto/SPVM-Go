@@ -97,7 +97,7 @@ class Go::Sync::WaitGroup {
     
     my $buf = new_string_len(1);
     
-    Go->gosched_pipe_read_v2(Go->bg, $read_fd, $buf, 1);
+    Go->gosched_pipe_read(Go->bg, $read_fd, $buf, 1);
   }
   
   private static method syswrite_pipe : int ($fd : int, $buffer : string, $buffer_length : int = -1, $buffer_offset : int = 0) {

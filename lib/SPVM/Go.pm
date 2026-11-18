@@ -98,11 +98,11 @@ Exceptions:
 
 This method must be called from the main thread. Otherwise an exception is thrown.
 
-=head2 gosched_io_read
+=head2 gosched_poll_read
 
 B<Deprecated:> This method will be removed in the near future.
 
-C<static method gosched_io_read : void ($fd : int, $timeout_duration : Go::Duration_1l = undef);>
+C<static method gosched_poll_read : void ($context : Go::Context, $fd : int, $timeout_duration : Go::Duration_1l = undef);>
 
 Suspends the current goroutine for IO reading given the file descriptor $fd and the value of the timeout nanosecnods $timeout_duration.
 
@@ -118,19 +118,11 @@ $timeout must be less than or equal to Fn->INT_MAX. Otherwise an exception is th
 
 If IO timeout occurs, an exception is thrown set C<eval_error_id> to the basic type ID of the L<Go::Error::IOTimeout|SPVM::Go::Error::IOTimeout> class.
 
-=head2 gosched_io_read_sec
+=head2 gosched_poll_write
 
 B<Deprecated:> This method will be removed in the near future.
 
-C<static method gosched_io_read_sec : void ($fd : int, $timeout_sec : double = 0);>
-
-Same as L<"/gosched_io_read">, but the timeout is the seconds $timeout_sec.
-
-=head2 gosched_io_write
-
-B<Deprecated:> This method will be removed in the near future.
-
-C<static method gosched_io_write : void ($fd : int, $timeout_duration : Go::Duration_1l = undef);>
+C<static method gosched_poll_write : void ($context : Go::Context, $fd : int, $timeout_duration : Go::Duration_1l = undef);>
 
 Suspends the current goroutine for IO writing given the file descriptor $fd and the timeout $timeout.
 
@@ -146,39 +138,25 @@ $timeout must be less than or equal to Fn->INT_MAX. Otherwise an exception is th
 
 If IO timeout occurs, an exception is thrown set C<eval_error_id> to the basic type ID of the L<Go::Error::IOTimeout|SPVM::Go::Error::IOTimeout> class.
 
-=head2 gosched_io_write_sec
+=head2 gosched_pipe_read
 
-B<Deprecated:> This method will be removed in the near future.
-
-C<static method gosched_io_write_sec : void ($fd : int, $timeout_sec : double = 0);>
-
-Same as L<"/gosched_io_write">, but the timeout is the seconds $timeout_sec.
-
-=head2 gosched_poll_write
-
-C<static method gosched_poll_write : void ($context : L<Go::Context|SPVM::Go::Context>, $fd : int);>
-
-Suspends the current goroutine for poll writing given the context $context and the file descriptor $fd.
-
-=head2 gosched_pipe_read_v2
-
-C<static method gosched_pipe_read_v2 : int ($context : L<Go::Context|SPVM::Go::Context>, $fd : int, $string : mutable string, $length : int = -1, $offset : int = 0);>
+C<static method gosched_pipe_read : int ($context : L<Go::Context|SPVM::Go::Context>, $fd : int, $string : mutable string, $length : int = -1, $offset : int = 0);>
 
 Suspends the current goroutine for pipe reading given the context $context, the file descriptor $fd, the buffer $string, the length $length, and the offset $offset.
 
 Note: C<gosched_pipe_read> will be replaced by the implementation of C<gosched_pipe_read_v2>.
 
-=head2 gosched_pipe_write_v2
+=head2 gosched_pipe_write
 
-C<static method gosched_pipe_write_v2 : int ($context : L<Go::Context|SPVM::Go::Context>, $fd : int, $string : string, $length : int = -1, $offset : int = 0);>
+C<static method gosched_pipe_write : int ($context : L<Go::Context|SPVM::Go::Context>, $fd : int, $string : string, $length : int = -1, $offset : int = 0);>
 
 Suspends the current goroutine for pipe writing given the context $context, the file descriptor $fd, the buffer $string, the length $length, and the offset $offset.
 
 Note: C<gosched_pipe_write> will be replaced by the implementation of C<gosched_pipe_write_v2>.
 
-=head2 gosched_io_cancel
+=head2 gosched_poll_cancel
 
-C<static method gosched_io_cancel : void ($fd : int);>
+C<static method gosched_poll_cancel : void ($fd : int);>
 
 Cancels suspending the current goroutine for IO read/write given the file descriptor $fd
 
@@ -379,100 +357,6 @@ The control is transferred to the scheduler.
 Exceptions:
 
 This method must be called from the main thread. Otherwise an exception is thrown.
-
-=head2 gosched_io_read
-
-B<Deprecated:> This method will be removed in the near future.
-
-C<static method gosched_io_read : void ($fd : int, $timeout_duration : Go::Duration_1l = undef);>
-
-Suspends the current goroutine for IO reading given the file descriptor $fd and the value of the timeout nanosecnods $timeout_duration.
-
-The control is transferred to the scheduler.
-
-Exceptions:
-
-This method must be called from the main thread. Otherwise an exception is thrown.
-
-$timeout must be greater than 0. Otherwise an exception is thrown.
-
-$timeout must be less than or equal to Fn->INT_MAX. Otherwise an exception is thrown.
-
-If IO timeout occurs, an exception is thrown set C<eval_error_id> to the basic type ID of the L<Go::Error::IOTimeout|SPVM::Go::Error::IOTimeout> class.
-
-=head2 gosched_io_read_sec
-
-B<Deprecated:> This method will be removed in the near future.
-
-C<static method gosched_io_read_sec : void ($fd : int, $timeout_sec : double = 0);>
-
-Same as L<"/gosched_io_read">, but the timeout is the seconds $timeout_sec.
-
-=head2 gosched_io_write
-
-B<Deprecated:> This method will be removed in the near future.
-
-C<static method gosched_io_write : void ($fd : int, $timeout_duration : Go::Duration_1l = undef);>
-
-Suspends the current goroutine for IO writing given the file descriptor $fd and the timeout $timeout.
-
-The control is transferred to the scheduler.
-
-Exceptions:
-
-This method must be called from the main thread. Otherwise an exception is thrown.
-
-$timeout must be greater than 0. Otherwise an exception is thrown.
-
-$timeout must be less than or equal to Fn->INT_MAX. Otherwise an exception is thrown.
-
-If IO timeout occurs, an exception is thrown set C<eval_error_id> to the basic type ID of the L<Go::Error::IOTimeout|SPVM::Go::Error::IOTimeout> class.
-
-=head2 gosched_io_write_sec
-
-B<Deprecated:> This method will be removed in the near future.
-
-C<static method gosched_io_write_sec : void ($fd : int, $timeout_sec : double = 0);>
-
-Same as L<"/gosched_io_write">, but the timeout is the seconds $timeout_sec.
-
-=head2 gosched_poll_write
-
-C<static method gosched_poll_write : void ($context : L<Go::Context|SPVM::Go::Context>, $fd : int);>
-
-Suspends the current goroutine for poll writing given the context $context and the file descriptor $fd.
-
-=head2 gosched_pipe_read_v2
-
-C<static method gosched_pipe_read_v2 : int ($context : L<Go::Context|SPVM::Go::Context>, $fd : int, $string : mutable string, $length : int = -1, $offset : int = 0);>
-
-Suspends the current goroutine for pipe reading given the context $context, the file descriptor $fd, the buffer $string, the length $length, and the offset $offset.
-
-Note: C<gosched_pipe_read> will be replaced by the implementation of C<gosched_pipe_read_v2>.
-
-=head2 gosched_pipe_write_v2
-
-C<static method gosched_pipe_write_v2 : int ($context : L<Go::Context|SPVM::Go::Context>, $fd : int, $string : string, $length : int = -1, $offset : int = 0);>
-
-Suspends the current goroutine for pipe writing given the context $context, the file descriptor $fd, the buffer $string, the length $length, and the offset $offset.
-
-Note: C<gosched_pipe_write> will be replaced by the implementation of C<gosched_pipe_write_v2>.
-
-=head2 gosched_io_cancel
-
-C<static method gosched_io_cancel : void ($fd : int);>
-
-Cancels suspending the current goroutine for IO read/write given the file descriptor $fd
-
-The control is transferred to the scheduler.
-
-=head2 gosched_pipe_cancel
-
-C<static method gosched_pipe_cancel : void ($fd : int);>
-
-Cancels suspending the current goroutine for pipe read/write given the file descriptor $fd
-
-The control is transferred to the scheduler.
 
 =head2 sleep
 

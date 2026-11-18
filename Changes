@@ -1,3 +1,10 @@
+0.052 2026-11-18
+  [Incompatible Changes]
+    * Go#gosched_io_xxx methods are renamed to gosched_poll_xxx and receive context.
+    * Remove Go#xxx_sec methods.
+  [Internal Changes]
+    * Remove v2 methods.
+    
 0.051 2026-11-18
   [Incompatible Changes]
     * Go::OS::Signal class becomes OO class.

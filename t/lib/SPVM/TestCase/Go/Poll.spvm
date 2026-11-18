@@ -113,7 +113,7 @@ class TestCase::Go::Poll {
       });
       
       # Test read timeout
-      eval { Go->gosched_io_read_sec($fd1, 0.25); };
+      eval { Go->gosched_poll_read(Go::Context->with_timeout_sec(Go->bg, 0.25)->context, $fd1); };
       
       if ($@) {
         if (eval_error_id isa_error Go::Error::IOTimeout) {
@@ -265,7 +265,7 @@ class TestCase::Go::Poll {
     return $send_length;
   }
 
-  static method gosched_io_cancel : int () {
+  static method gosched_poll_cancel : int () {
     
     my $socket_fd1 = -1;
     my $socket_fd2 = -1;
@@ -286,13 +286,13 @@ class TestCase::Go::Poll {
     
     Go->go([$socket_fd1 : ] method : void () {
       Go->sleep_sec(0.5);
-      Go->gosched_io_cancel($socket_fd1);
+      Go->gosched_poll_cancel($socket_fd1);
     });
     
-    Go->gosched_io_read_sec($socket_fd1, 100);
+    Go->gosched_poll_read(Go::Context->with_timeout_sec(Go->bg, 100)->context, $socket_fd1);
     
     # Check doing nothing
-    Go->gosched_io_cancel($socket_fd1);
+    Go->gosched_poll_cancel($socket_fd1);
     
     return 1;
   }
