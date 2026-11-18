@@ -1,3 +1,10 @@
+0.051 2026-11-18
+  [Incompatible Changes]
+    * Go::OS::Signal class becomes OO class.
+    
+  [Performance Improvement]
+    * Go::Sync::WaitGroup#wait does not use busy loop also in Windows.
+    
 0.050 2026-11-17
   [New Features]
     * Add Go::Fsnotify to watch file changes.

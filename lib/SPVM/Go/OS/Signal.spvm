@@ -9,18 +9,25 @@ class Go::OS::Signal {
   use Hash;
   use UV::Handle::Signal;
   
-  our $NOTIFIED_CHANNELS_H : Hash of Go::Channel[];
+  has notified_channels_h : Hash of Go::Channel[];
   
-  our $UV_SIGNALS_H : Hash of UV::Handle::Signal;
+  has uv_signals_h : Hash of UV::Handle::Signal;
   
-  INIT {
-    $NOTIFIED_CHANNELS_H = Hash->new;
-    $UV_SIGNALS_H = Hash->new;
+  static method new : Go::OS::Signal () {
+    my $self = new Go::OS::Signal;
+    
+    $self->{notified_channels_h} = Hash->new;
+    $self->{uv_signals_h} = Hash->new;
+    
+    return $self;
   }
   
-  static method ignore : void ($signal : int) {
-    if ($NOTIFIED_CHANNELS_H) {
-      $NOTIFIED_CHANNELS_H->delete("$signal");
+  method ignore : void ($signal : int) {
+    my $notified_channels_h = $self->{notified_channels_h};
+    my $uv_signals_h = $self->{uv_signals_h};
+    
+    if ($notified_channels_h) {
+      $notified_channels_h->delete("$signal");
     }
     
     my $go = $Go::GO;
@@ -36,7 +43,7 @@ class Go::OS::Signal {
       die "UV loop is not initialized.";
     }
     
-    unless ($UV_SIGNALS_H->{"$signal"}) {
+    unless ($uv_signals_h->{"$signal"}) {
       my $uv_signal = UV::Handle::Signal->new;
       $uv_loop->signal_init($uv_signal);
       
@@ -47,21 +54,24 @@ class Go::OS::Signal {
       
       $uv_signal->start($signal_cb, $signal);
       
-      $UV_SIGNALS_H->{"$signal"} = $uv_signal;
+      $uv_signals_h->{"$signal"} = $uv_signal;
     }
   }
   
-  static method notify : void ($channel : Go::Channel, $signal : int) {
+  method notify : void ($channel : Go::Channel, $signal : int) {
     unless ($channel) {
       die "\$channel must be defined.";
     }
     
-    unless ($NOTIFIED_CHANNELS_H->{"$signal"}) {
-      $NOTIFIED_CHANNELS_H->{"$signal"} = new Go::Channel[0];
+    my $notified_channels_h = $self->{notified_channels_h};
+    my $uv_signals_h = $self->{uv_signals_h};
+    
+    unless ($notified_channels_h->{"$signal"}) {
+      $notified_channels_h->{"$signal"} = new Go::Channel[0];
     }
     
     # Prevent duplicate channel registration
-    my $channels = $NOTIFIED_CHANNELS_H->{"$signal"};
+    my $channels = $notified_channels_h->{"$signal"};
     my $exists = 0;
     for my $ch (@$channels) {
       if ($ch == $channel) {
@@ -71,7 +81,7 @@ class Go::OS::Signal {
     }
     
     unless ($exists) {
-      List->new_ref($NOTIFIED_CHANNELS_H->{"$signal"})->push($channel);
+      List->new_ref($notified_channels_h->{"$signal"})->push($channel);
     }
     
     my $go = $Go::GO;
@@ -87,13 +97,14 @@ class Go::OS::Signal {
       die "UV loop is not initialized.";
     }
     
-    unless ($UV_SIGNALS_H->{"$signal"}) {
+    unless ($uv_signals_h->{"$signal"}) {
       my $uv_signal = UV::Handle::Signal->new;
       $uv_loop->signal_init($uv_signal);
       
-      # Notify channels
-      my $signal_cb = [$signal : int] method : void ($uv_signal_handle : UV::Handle::Signal, $signum : int) {
-        if ($NOTIFIED_CHANNELS_H && (my $target_channels = $NOTIFIED_CHANNELS_H->{"$signal"})) {
+      # Capture only notified_channels_h to avoid circular reference with $sig
+      my $notified_channels_h = $self->{notified_channels_h};
+      my $signal_cb = [$signal : int, $notified_channels_h : Hash of Go::Channel[]] method : void ($uv_signal_handle : UV::Handle::Signal, $signum : int) {
+        if ($notified_channels_h && (my $target_channels = $notified_channels_h->{"$signal"})) {
           for my $ch (@$target_channels) {
             my $select = Go->new_select;
             $select->set_non_blocking(1);
@@ -105,12 +116,15 @@ class Go::OS::Signal {
       
       $uv_signal->start($signal_cb, $signal);
       
-      $UV_SIGNALS_H->{"$signal"} = $uv_signal;
+      $uv_signals_h->{"$signal"} = $uv_signal;
     }
   }
   
-  static method stop : void ($channel : Go::Channel, $signal : int) {
-    my $channels = $NOTIFIED_CHANNELS_H ? $NOTIFIED_CHANNELS_H->{"$signal"} : undef;
+  method stop : void ($channel : Go::Channel, $signal : int) {
+    my $notified_channels_h = $self->{notified_channels_h};
+    my $uv_signals_h = $self->{uv_signals_h};
+    
+    my $channels = $notified_channels_h ? $notified_channels_h->{"$signal"} : undef;
     if ($channels) {
       my $new_channels = (List of Go::Channel)List->new(new Go::Channel[0]);
       for my $_ (@$channels) {
@@ -118,47 +132,43 @@ class Go::OS::Signal {
           $new_channels->push($_);
         }
       }
-      $NOTIFIED_CHANNELS_H->{"$signal"} = $new_channels->to_array;
+      $notified_channels_h->{"$signal"} = $new_channels->to_array;
       
-      if (@{$NOTIFIED_CHANNELS_H->{"$signal"}} == 0) {
-        $NOTIFIED_CHANNELS_H->delete("$signal");
+      if (@{$notified_channels_h->{"$signal"}} == 0) {
+        $notified_channels_h->delete("$signal");
       }
     }
     
-    my $has_notified = $NOTIFIED_CHANNELS_H && $NOTIFIED_CHANNELS_H->{"$signal"} && @{$NOTIFIED_CHANNELS_H->{"$signal"}} > 0;
+    my $has_notified = $notified_channels_h && $notified_channels_h->{"$signal"} && @{$notified_channels_h->{"$signal"}} > 0;
     
     unless ($has_notified) {
-      if ($UV_SIGNALS_H && (my $uv_signal = $UV_SIGNALS_H->{"$signal"})) {
+      if ($uv_signals_h && (my $uv_signal = $uv_signals_h->{"$signal"})) {
         $uv_signal->stop;
         $uv_signal->close_safe;
-        $UV_SIGNALS_H->delete("$signal");
+        $uv_signals_h->delete("$signal");
       }
     }
   }
   
-  # Deprecated. Will be removed.
-  static method start_signal_handler : void () {
+  method reset : void () {
+    my $uv_signals_h = $self->{uv_signals_h};
     
-  }
-  
-  # Deprecated. Will be removed.
-  static method stop_signal_handler : void () {
-    unless ($UV_SIGNALS_H) {
+    unless ($uv_signals_h) {
       return;
     }
     
-    for my $signal (@{$UV_SIGNALS_H->keys}) {
-      if (my $uv_signal = $UV_SIGNALS_H->{"$signal"}) {
+    for my $signal (@{$uv_signals_h->keys}) {
+      if (my $uv_signal = $uv_signals_h->{"$signal"}) {
         $uv_signal->stop;
         $uv_signal->close_safe;
       }
     }
     
-    $NOTIFIED_CHANNELS_H = Hash->new;
-    $UV_SIGNALS_H = Hash->new;
+    $self->{notified_channels_h} = Hash->new;
+    $self->{uv_signals_h} = Hash->new;
   }
   
-  static method reset : void () {
-    &stop_signal_handler();
+  method DESTROY : void () {
+    $self->reset;
   }
 }
