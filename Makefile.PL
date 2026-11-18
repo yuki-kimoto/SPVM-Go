@@ -110,7 +110,7 @@ WriteMakefile(
   },
   PREREQ_PM => {
     %configure_requires_and_prereq_pm,
-    'SPVM::Sys' => '0.574',
+    'SPVM::Sys' => '0.586',
     'SPVM::Time::HiRes' => '0.005',
     'SPVM::Thread' => '0.009',
     'SPVM::Math' => '1.011',
