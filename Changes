@@ -1,4 +1,6 @@
 0.053 2026-11-19
+  [Requirement Changes]
+    * Require SPVM::Sys 0.586.
   [Incompatible Changes]
     * Rename ctx to context, cancel to cancel_cb in Go::Context::Derived. 
 
