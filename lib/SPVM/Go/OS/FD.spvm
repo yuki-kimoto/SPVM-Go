@@ -16,8 +16,10 @@ class Go::OS::FD {
   
   has fd : ro int;
   
+  has is_write : byte;
+  
   # Class Methods
-  static method new_file : Go::OS::FD ($fd : int) {
+  static method new_inherit : Go::OS::FD ($fd : int) {
     
     my $self = new Go::OS::FD;
     
@@ -27,7 +29,7 @@ class Go::OS::FD {
     return $self;
   }
   
-  static method new_pipe_end : Go::OS::FD ($fd : int) {
+  static method new_pipe_read : Go::OS::FD ($fd : int) {
     
     my $self = new Go::OS::FD;
     
@@ -37,4 +39,15 @@ class Go::OS::FD {
     return $self;
   }
   
+  static method new_pipe_write : Go::OS::FD ($fd : int) {
+    
+    my $self = new Go::OS::FD;
+    
+    $self->{fd} = $fd;
+    $self->{type} = &TYPE_PIPE;
+    $self->{is_write} = 1;
+    
+    return $self;
+  }
+
 }
