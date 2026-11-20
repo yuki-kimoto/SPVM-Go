@@ -41,16 +41,32 @@ class Go::OS::Exec::Cmd {
     if (!$fd_obj) {
       $container->set_flags(UV_C->UV_IGNORE);
     }
-    elsif ($fd_obj->{type} == Go::OS::Exec::FD->TYPE_FILE) {
-      $container->set_flags(UV_C->UV_INHERIT_FD);
-      $container->set_fd($fd_obj->{fd});
-    }
-    elsif ($fd_obj->{type} == Go::OS::Exec::FD->TYPE_PIPE) {
-      my $uv_loop = Go->uv_loop;
-      my $uv_pipe = UV::Handle::Pipe->new;
-      $uv_loop->pipe_init($uv_pipe, 0);
-      $container->set_flags(UV_C->UV_CREATE_PIPE | UV_C->UV_READABLE_PIPE | UV_C->UV_WRITABLE_PIPE);
-      $container->set_stream($uv_pipe);
+    else {
+      my $type = $fd_obj->{type};
+      
+      switch ($type) {
+        case Go::OS::Exec::FD->TYPE_FILE : {
+          $container->set_flags(UV_C->UV_INHERIT_FD);
+          $container->set_fd($fd_obj->{fd});
+        }
+        case Go::OS::Exec::FD->TYPE_PIPE : {
+          my $uv_loop = Go->uv_loop;
+          my $uv_pipe = UV::Handle::Pipe->new;
+          $uv_loop->pipe_init($uv_pipe, 0);
+          my $flags = UV_C->UV_CREATE_PIPE;
+          if ($fd_obj->{is_write}) {
+            $flags |= UV_C->UV_WRITABLE_PIPE;
+          }
+          else {
+            $flags |= UV_C->UV_READABLE_PIPE;
+          }
+          $container->set_flags($flags);
+          $container->set_stream($uv_pipe);
+        }
+        default : {
+          die "[Unexpected Error]Invalid Go::OS::Exec::FD type:\$type=$type";
+        }
+      }
     }
   }
   
