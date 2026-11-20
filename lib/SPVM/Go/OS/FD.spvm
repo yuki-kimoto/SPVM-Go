@@ -12,9 +12,9 @@ class Go::OS::FD {
   }
   
   # Fields
-  has type : int;
+  has type : ro int;
   
-  has fd : int;
+  has fd : ro int;
   
   # Class Methods
   static method new_file : Go::OS::FD ($fd : int) {
