@@ -444,7 +444,7 @@ class Go::Schedule {
             if ($flags & UV_C->UV_CREATE_PIPE) {
               # Get pipe stream and target write fd from exec_cmd
               my $uv_pipe = (UV::Handle::Pipe)$stdio->stream;
-              my $fd_obj = (Go::OS::FD)undef;
+              my $fd_obj = (Go::OS::Exec::FD)undef;
               if ($i == 0) {
                 $fd_obj = $exec_cmd->{stdin_fd};
               }

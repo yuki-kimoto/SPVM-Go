@@ -1,7 +1,7 @@
 # Copyright (c) 2026 Yuki Kimoto
 # MIT License
 
-class Go::OS::FD {
+class Go::OS::Exec::FD {
   
   allow Go::OS::Exec::Cmd;
   
@@ -19,9 +19,9 @@ class Go::OS::FD {
   has is_write : byte;
   
   # Class Methods
-  static method new_inherit : Go::OS::FD ($fd : int) {
+  static method new_inherit : Go::OS::Exec::FD ($fd : int) {
     
-    my $self = new Go::OS::FD;
+    my $self = new Go::OS::Exec::FD;
     
     $self->{fd} = $fd;
     $self->{type} = &TYPE_FILE;
@@ -29,9 +29,9 @@ class Go::OS::FD {
     return $self;
   }
   
-  static method new_pipe_read : Go::OS::FD ($fd : int) {
+  static method new_pipe_read : Go::OS::Exec::FD ($fd : int) {
     
-    my $self = new Go::OS::FD;
+    my $self = new Go::OS::Exec::FD;
     
     $self->{fd} = $fd;
     $self->{type} = &TYPE_PIPE;
@@ -39,9 +39,9 @@ class Go::OS::FD {
     return $self;
   }
   
-  static method new_pipe_write : Go::OS::FD ($fd : int) {
+  static method new_pipe_write : Go::OS::Exec::FD ($fd : int) {
     
-    my $self = new Go::OS::FD;
+    my $self = new Go::OS::Exec::FD;
     
     $self->{fd} = $fd;
     $self->{type} = &TYPE_PIPE;

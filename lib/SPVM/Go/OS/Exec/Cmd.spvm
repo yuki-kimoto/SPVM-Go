@@ -6,7 +6,7 @@ class Go::OS::Exec::Cmd {
   allow Go::OS::Exec;
   allow Go::Schedule;
   
-  use Go::OS::FD;
+  use Go::OS::Exec::FD;
   use UV::Constant as UV_C;
   use UV::ProcessOptions;
   use UV::StdioContainer;
@@ -19,13 +19,13 @@ class Go::OS::Exec::Cmd {
   
   has dir : rw string;
   
-  has stdout_fd : rw Go::OS::FD;
+  has stdout_fd : rw Go::OS::Exec::FD;
   
-  has stderr_fd : rw Go::OS::FD;
+  has stderr_fd : rw Go::OS::Exec::FD;
   
-  has stdin_fd : rw Go::OS::FD;
+  has stdin_fd : rw Go::OS::Exec::FD;
   
-  has extract_fds : rw Go::OS::FD[];
+  has extract_fds : rw Go::OS::Exec::FD[];
   
   has context : rw Go::Context;
   
@@ -36,16 +36,16 @@ class Go::OS::Exec::Cmd {
     return $self;
   }
   
-  private method _setup_stdio_container : void ($container : UV::StdioContainer, $fd_obj : Go::OS::FD) {
+  private method _setup_stdio_container : void ($container : UV::StdioContainer, $fd_obj : Go::OS::Exec::FD) {
     
     if (!$fd_obj) {
       $container->set_flags(UV_C->UV_IGNORE);
     }
-    elsif ($fd_obj->{type} == Go::OS::FD->TYPE_FILE) {
+    elsif ($fd_obj->{type} == Go::OS::Exec::FD->TYPE_FILE) {
       $container->set_flags(UV_C->UV_INHERIT_FD);
       $container->set_fd($fd_obj->{fd});
     }
-    elsif ($fd_obj->{type} == Go::OS::FD->TYPE_PIPE) {
+    elsif ($fd_obj->{type} == Go::OS::Exec::FD->TYPE_PIPE) {
       my $uv_loop = Go->uv_loop;
       my $uv_pipe = UV::Handle::Pipe->new;
       $uv_loop->pipe_init($uv_pipe, 0);
