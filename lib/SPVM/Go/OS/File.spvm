@@ -36,6 +36,8 @@ class Go::OS::File {
   
   has uv_stream : UV::Handle::Stream;
   
+  has no_close : byte;
+  
   # Class Methods
   static method new_file : Go::OS::File ($fd : int) {
     
@@ -47,6 +49,7 @@ class Go::OS::File {
     
     $self->{fd} = $fd;
     $self->{type} = &TYPE_FILE;
+    $self->{no_close} = 1;
     
     return $self;
   }
@@ -61,6 +64,7 @@ class Go::OS::File {
     
     $self->{fd} = $fd;
     $self->{type} = &TYPE_PIPE_END;
+    $self->{no_close} = 1;
     
     return $self;
   }
@@ -75,15 +79,26 @@ class Go::OS::File {
     return $self;
   }
   
-  method close_pipe_end : void () {
+  method close : void () {
     
-    my $uv_stream = $self->{uv_stream};
-    
-    if ($uv_stream) {
-      $uv_stream->close_safe;
-      $self->{uv_stream} = undef;
+    if ($self->{no_close}) {
+      die "'no_close' field is specified.";
     }
-    
+    else {
+      my $type = $self->{type};
+      
+      if ($type == &TYPE_PIPE_END) {
+        my $uv_stream = $self->{uv_stream};
+        
+        if ($uv_stream) {
+          $uv_stream->close_safe;
+          $self->{uv_stream} = undef;
+        }
+      }
+      else {
+        die "Not supported.";
+      }
+    }
   }
   
   method sysread : int ($context : Go::Context, $string : mutable string, $length : int = -1, $offset : int = 0) {
@@ -126,7 +141,9 @@ class Go::OS::File {
   
   method DESTROY : void () {
     
-    $self->close_pipe_end;
+    unless ($self->{no_close}) {
+      $self->close;
+    }
   }
   
 }
