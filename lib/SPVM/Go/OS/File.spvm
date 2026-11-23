@@ -86,6 +86,30 @@ class Go::OS::File {
     
   }
   
+  method sysread_pipe : int ($context : Go::Context, $string : mutable string, $length : int = -1, $offset : int = 0) {
+    
+    my $uv_stream = $self->{uv_stream};
+    
+    my $fd = -1;
+    $uv_stream->fileno(\$fd);
+    
+    my $read_length = Go->gosched_pipe_read($context, $fd, $string, $length, $offset);
+    
+    return $read_length;
+  }
+  
+  method syswrite_pipe : int ($context : Go::Context, $string : string, $length : int = -1, $offset : int = 0) {
+    
+    my $uv_stream = $self->{uv_stream};
+    
+    my $fd = -1;
+    $uv_stream->fileno(\$fd);
+    
+    my $read_length = Go->gosched_pipe_write($context, $fd, $string, $length, $offset);
+    
+    return $read_length;
+  }
+  
   method DESTROY : void () {
     
     $self->close_pipe_end;
