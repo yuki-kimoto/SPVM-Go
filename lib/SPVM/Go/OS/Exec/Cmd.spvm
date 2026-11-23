@@ -6,7 +6,7 @@ class Go::OS::Exec::Cmd {
   allow Go::OS::Exec;
   allow Go::Schedule;
   
-  use Go::OS::Exec::FD;
+  use Go::OS::File;
   use UV::Constant as UV_C;
   use UV::ProcessOptions;
   use UV::StdioContainer;
@@ -19,13 +19,13 @@ class Go::OS::Exec::Cmd {
   
   has dir : rw string;
   
-  has stdout_fd : rw Go::OS::Exec::FD;
+  has stdout : rw Go::OS::File;
   
-  has stderr_fd : rw Go::OS::Exec::FD;
+  has stderr : rw Go::OS::File;
   
-  has stdin_fd : rw Go::OS::Exec::FD;
+  has stdin : rw Go::OS::File;
   
-  has extract_fds : rw Go::OS::Exec::FD[];
+  has extra_files : rw Go::OS::File[];
   
   has context : rw Go::Context;
   
@@ -36,7 +36,7 @@ class Go::OS::Exec::Cmd {
     return $self;
   }
   
-  private method _setup_stdio_container : void ($container : UV::StdioContainer, $fd_obj : Go::OS::Exec::FD) {
+  private method _setup_stdio_container : void ($container : UV::StdioContainer, $fd_obj : Go::OS::File) {
     
     if (!$fd_obj) {
       $container->set_flags(UV_C->UV_IGNORE);
@@ -45,26 +45,20 @@ class Go::OS::Exec::Cmd {
       my $type = $fd_obj->{type};
       
       switch ($type) {
-        case Go::OS::Exec::FD->TYPE_FILE : {
+        case Go::OS::File->TYPE_FILE : {
           $container->set_flags(UV_C->UV_INHERIT_FD);
           $container->set_fd($fd_obj->{fd});
         }
-        case Go::OS::Exec::FD->TYPE_PIPE : {
+        case Go::OS::File->TYPE_PIPE_END : {
           my $uv_loop = Go->uv_loop;
           my $uv_pipe = UV::Handle::Pipe->new;
           $uv_loop->pipe_init($uv_pipe, 0);
-          my $flags = UV_C->UV_CREATE_PIPE;
-          if ($fd_obj->{is_write}) {
-            $flags |= UV_C->UV_WRITABLE_PIPE;
-          }
-          else {
-            $flags |= UV_C->UV_READABLE_PIPE;
-          }
+          my $flags = UV_C->UV_CREATE_PIPE | UV_C->UV_WRITABLE_PIPE | UV_C->UV_READABLE_PIPE;
           $container->set_flags($flags);
           $container->set_stream($uv_pipe);
         }
         default : {
-          die "[Unexpected Error]Invalid Go::OS::Exec::FD type:\$type=$type";
+          die "[Unexpected Error]Invalid Go::OS::File type:\$type=$type";
         }
       }
     }
@@ -81,7 +75,7 @@ class Go::OS::Exec::Cmd {
       $options->set_cwd($self->{dir});
     }
     
-    my $extra_fds = $self->{extract_fds};
+    my $extra_fds = $self->{extra_files};
     my $extra_fds_count = $extra_fds ? @$extra_fds : 0;
     my $stdio_count = 3 + $extra_fds_count;
     
@@ -89,19 +83,19 @@ class Go::OS::Exec::Cmd {
     
     {
       my $container = UV::StdioContainer->new;
-      $self->_setup_stdio_container($container, $self->{stdin_fd});
+      $self->_setup_stdio_container($container, $self->{stdin});
       $stdio_containers->[0] = $container;
     }
     
     {
       my $container = UV::StdioContainer->new;
-      $self->_setup_stdio_container($container, $self->{stdout_fd});
+      $self->_setup_stdio_container($container, $self->{stdout});
       $stdio_containers->[1] = $container;
     }
     
     {
       my $container = UV::StdioContainer->new;
-      $self->_setup_stdio_container($container, $self->{stderr_fd});
+      $self->_setup_stdio_container($container, $self->{stderr});
       $stdio_containers->[2] = $container;
     }
     

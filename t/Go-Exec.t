@@ -22,7 +22,7 @@ ok(SPVM::TestCase::Go::OS::Exec->stdout);
 
 ok(SPVM::TestCase::Go::OS::Exec->stderr);
 
-ok(SPVM::TestCase::Go::OS::Exec->extra_fds);
+ok(SPVM::TestCase::Go::OS::Exec->extra_files);
 
 ok(SPVM::TestCase::Go::OS::Exec->env);
 

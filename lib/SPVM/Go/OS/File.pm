@@ -1,4 +1,4 @@
-package SPVM::Go::OS::Exec::FD;
+package SPVM::Go::OS::File;
 
 
 
@@ -8,15 +8,15 @@ package SPVM::Go::OS::Exec::FD;
 
 =head1 Name
 
-SPVM::Go::OS::Exec::FD - Short Description
+SPVM::Go::OS::File - Short Description
 
 =head1 Description
 
-Go::OS::Exec::FD class in L<SPVM> has methods to do someting.
+Go::OS::File class in L<SPVM> has methods to do someting.
 
 =head1 Usage
 
-  use Go::OS::Exec::FD;
+  use Go::OS::File;
 
 =head1 Details
 

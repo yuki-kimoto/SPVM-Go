@@ -444,24 +444,24 @@ class Go::Schedule {
             if ($flags & UV_C->UV_CREATE_PIPE) {
               # Get pipe stream and target write fd from exec_cmd
               my $uv_pipe = (UV::Handle::Pipe)$stdio->stream;
-              my $fd_obj = (Go::OS::Exec::FD)undef;
+              my $go_file = (Go::OS::File)undef;
               if ($i == 0) {
-                $fd_obj = $exec_cmd->{stdin_fd};
+                $go_file = $exec_cmd->{stdin};
               }
               elsif ($i == 1) {
-                $fd_obj = $exec_cmd->{stdout_fd};
+                $go_file = $exec_cmd->{stdout};
               }
               elsif ($i == 2) {
-                $fd_obj = $exec_cmd->{stderr_fd};
+                $go_file = $exec_cmd->{stderr};
               }
               else {
-                my $extra_fds = $exec_cmd->{extract_fds};
-                if ($extra_fds) {
-                  $fd_obj = $extra_fds->[$i - 3];
+                my $extra_files = $exec_cmd->{extra_files};
+                if ($extra_files) {
+                  $go_file = $extra_files->[$i - 3];
                 }
               }
               
-              my $write_fd = $fd_obj->fd;
+              my $write_fd = $go_file->fd;
               my $write_pipe = UV::Handle::Pipe->new;
               $uv_loop->pipe_init($write_pipe, 0);
               $write_pipe->open(Sys::IO->dup($write_fd));

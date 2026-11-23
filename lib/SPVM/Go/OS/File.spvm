@@ -1,0 +1,94 @@
+# Copyright (c) 2026 Yuki Kimoto
+# MIT License
+
+class Go::OS::File {
+  
+  allow Go::OS::Exec::Cmd;
+  
+  use UV::Handle::Stream;
+  
+  private enum {
+    TYPE_UNKNOWN,
+    TYPE_FILE,
+    TYPE_PIPE_END,
+  }
+  
+  # Class Variables
+  our $STDIN : ro Go::OS::File;
+  INIT {
+    $STDIN = &new_file(0);
+  }
+  
+  our $STDOUT : ro Go::OS::File;
+  INIT {
+    $STDOUT = &new_file(1);
+  }
+  
+  our $STDERR : ro Go::OS::File;
+  INIT {
+    $STDERR = &new_file(2);
+  }
+  
+  # Fields
+  has type : ro int;
+  
+  has fd : ro int;
+  
+  has uv_stream : UV::Handle::Stream;
+  
+  # Class Methods
+  static method new_file : Go::OS::File ($fd : int) {
+    
+    unless ($fd >= 0) {
+      die "The file descriptor \$fd must be a non-negative number.";
+    }
+    
+    my $self = new Go::OS::File;
+    
+    $self->{fd} = $fd;
+    $self->{type} = &TYPE_FILE;
+    
+    return $self;
+  }
+  
+  static method new_pipe_end : Go::OS::File ($fd : int) {
+    
+    unless ($fd >= 0) {
+      die "The file descriptor \$fd must be a non-negative number.";
+    }
+    
+    my $self = new Go::OS::File;
+    
+    $self->{fd} = $fd;
+    $self->{type} = &TYPE_PIPE_END;
+    
+    return $self;
+  }
+  
+  static method prepare_pipe_end : Go::OS::File () {
+    
+    my $self = new Go::OS::File;
+    
+    $self->{fd} = -1;
+    $self->{type} = &TYPE_PIPE_END;
+    
+    return $self;
+  }
+  
+  method close_pipe_end : void () {
+    
+    my $uv_stream = $self->{uv_stream};
+    
+    if ($uv_stream) {
+      $uv_stream->close_safe;
+      $self->{uv_stream} = undef;
+    }
+    
+  }
+  
+  method DESTROY : void () {
+    
+    $self->close_pipe_end;
+  }
+  
+}

@@ -209,10 +209,10 @@ class TestCase::Go::OS::Exec {
       my $write_fd = -1;
       Sys->pipepair(\$read_fd, \$write_fd, 1);
       
-      my $stdout_fd = Go::OS::Exec::FD->new_pipe_write($write_fd);
+      my $stdout = Go::OS::File->new_pipe_end($write_fd);
       
       my $cmd = Go::OS::Exec->command(Go->bg, ["perl", "-e", "print 'out:hello';"]);
-      $cmd->set_stdout_fd($stdout_fd);
+      $cmd->set_stdout($stdout);
       
       my $status = $cmd->run;
       my $exit_code = $status >> 8;
@@ -256,10 +256,10 @@ class TestCase::Go::OS::Exec {
         Sys::IO->close($read_fd);
       });
       
-      my $stderr_fd = Go::OS::Exec::FD->new_pipe_write($write_fd);
+      my $stderr = Go::OS::File->new_pipe_end($write_fd);
       
       my $cmd = Go::OS::Exec->command(Go->bg, ["perl", "-e", "print STDERR 'err:hello';"]);
-      $cmd->set_stderr_fd($stderr_fd);
+      $cmd->set_stderr($stderr);
       
       my $status = $cmd->run;
       my $exit_code = $status >> 8;
@@ -284,7 +284,7 @@ class TestCase::Go::OS::Exec {
     return $success_ref->[0];
   }
   
-  static method extra_fds : int () {
+  static method extra_files : int () {
     
     my $success_ref = [1];
     
@@ -304,10 +304,10 @@ class TestCase::Go::OS::Exec {
       });
       
       # Extra FDs start at stdio index 3 (fd 3)
-      my $extra_fd = Go::OS::Exec::FD->new_pipe_write($write_fd);
+      my $extra_fd = Go::OS::File->new_pipe_end($write_fd);
       
       my $cmd = Go::OS::Exec->command(Go->bg, ["perl", "-e", "open(my \$fh, '>&=', 3) or die \$!; print \$fh 'extra:hello'; close(\$fh);"]);
-      $cmd->set_extract_fds([$extra_fd]);
+      $cmd->set_extra_files([$extra_fd]);
       
       my $status = $cmd->run;
       my $exit_code = $status >> 8;
@@ -351,10 +351,10 @@ class TestCase::Go::OS::Exec {
         Sys::IO->close($read_fd);
       });
       
-      my $stdout_fd = Go::OS::Exec::FD->new_pipe_write($write_fd);
+      my $stdout = Go::OS::File->new_pipe_end($write_fd);
       
       my $cmd = Go::OS::Exec->command(Go->bg, ["perl", "-e", "print \$ENV{'TEST_EXEC_ENV'};"]);
-      $cmd->set_stdout_fd($stdout_fd);
+      $cmd->set_stdout($stdout);
       $cmd->set_env(["TEST_EXEC_ENV=hello_env"]);
       
       my $status = $cmd->run;
