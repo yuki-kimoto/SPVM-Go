@@ -86,28 +86,42 @@ class Go::OS::File {
     
   }
   
-  method sysread_pipe : int ($context : Go::Context, $string : mutable string, $length : int = -1, $offset : int = 0) {
+  method sysread : int ($context : Go::Context, $string : mutable string, $length : int = -1, $offset : int = 0) {
     
-    my $uv_stream = $self->{uv_stream};
+    my $type = $self->{type};
     
-    my $fd = -1;
-    $uv_stream->fileno(\$fd);
-    
-    my $read_length = Go->gosched_pipe_read($context, $fd, $string, $length, $offset);
-    
-    return $read_length;
+    if ($type == &TYPE_PIPE_END) {
+      my $uv_stream = $self->{uv_stream};
+      
+      my $fd = -1;
+      $uv_stream->fileno(\$fd);
+      
+      my $read_length = Go->gosched_pipe_read($context, $fd, $string, $length, $offset);
+      
+      return $read_length;
+    }
+    else {
+      die "Not supported.";
+    }
   }
   
-  method syswrite_pipe : int ($context : Go::Context, $string : string, $length : int = -1, $offset : int = 0) {
+  method syswrite : int ($context : Go::Context, $string : string, $length : int = -1, $offset : int = 0) {
     
-    my $uv_stream = $self->{uv_stream};
+    my $type = $self->{type};
     
-    my $fd = -1;
-    $uv_stream->fileno(\$fd);
-    
-    my $read_length = Go->gosched_pipe_write($context, $fd, $string, $length, $offset);
-    
-    return $read_length;
+    if ($type == &TYPE_PIPE_END) {
+      my $uv_stream = $self->{uv_stream};
+      
+      my $fd = -1;
+      $uv_stream->fileno(\$fd);
+      
+      my $read_length = Go->gosched_pipe_write($context, $fd, $string, $length, $offset);
+      
+      return $read_length;
+    }
+    else {
+      die "Not supported.";
+    }
   }
   
   method DESTROY : void () {

@@ -215,7 +215,7 @@ class TestCase::Go::OS::Exec {
       my $term_signal = $status & 0xff;
       
       my $buf = new_string_len 4096;
-      my $len = $stdout->sysread_pipe(Go->bg, $buf);
+      my $len = $stdout->sysread(Go->bg, $buf);
       
       unless ($exit_code == 0 && $term_signal == 0) {
         diag "\$exit_code=$exit_code, \$term_signal=$term_signal";
@@ -254,7 +254,7 @@ class TestCase::Go::OS::Exec {
       my $term_signal = $status & 0xff;
       
       my $buf = new_string_len 4096;
-      my $len = $stderr->sysread_pipe(Go->bg, $buf);
+      my $len = $stderr->sysread(Go->bg, $buf);
       
       unless ($exit_code == 0 && $term_signal == 0) {
         diag "\$exit_code=$exit_code, \$term_signal=$term_signal";
@@ -294,7 +294,7 @@ class TestCase::Go::OS::Exec {
       my $term_signal = $status & 0xff;
       
       my $buf = new_string_len 4096;
-      my $len = $extra_file->sysread_pipe(Go->bg, $buf);
+      my $len = $extra_file->sysread(Go->bg, $buf);
       
       unless ($exit_code == 0 && $term_signal == 0) {
         diag "\$exit_code=$exit_code, \$term_signal=$term_signal";
@@ -334,7 +334,7 @@ class TestCase::Go::OS::Exec {
       my $term_signal = $status & 0xff;
       
       my $buf = new_string_len 4096;
-      my $len = $stdout->sysread_pipe(Go->bg, $buf);
+      my $len = $stdout->sysread(Go->bg, $buf);
       
       unless ($exit_code == 0 && $term_signal == 0) {
         diag "\$exit_code=$exit_code, \$term_signal=$term_signal";
