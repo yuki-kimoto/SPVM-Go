@@ -56,6 +56,7 @@ class Go::OS::Exec::Cmd {
           my $flags = UV_C->UV_CREATE_PIPE | UV_C->UV_WRITABLE_PIPE | UV_C->UV_READABLE_PIPE;
           $container->set_flags($flags);
           $container->set_stream($uv_pipe);
+          $go_file->{uv_stream} = $uv_pipe;
         }
         default : {
           die "[Unexpected Error]Invalid Go::OS::File type:\$type=$type";
