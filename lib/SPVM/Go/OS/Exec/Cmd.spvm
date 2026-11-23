@@ -36,18 +36,18 @@ class Go::OS::Exec::Cmd {
     return $self;
   }
   
-  private method _setup_stdio_container : void ($container : UV::StdioContainer, $fd_obj : Go::OS::File) {
+  private method _setup_stdio_container : void ($container : UV::StdioContainer, $go_file : Go::OS::File) {
     
-    if (!$fd_obj) {
+    if (!$go_file) {
       $container->set_flags(UV_C->UV_IGNORE);
     }
     else {
-      my $type = $fd_obj->{type};
+      my $type = $go_file->{type};
       
       switch ($type) {
         case Go::OS::File->TYPE_FILE : {
           $container->set_flags(UV_C->UV_INHERIT_FD);
-          $container->set_fd($fd_obj->{fd});
+          $container->set_fd($go_file->{fd});
         }
         case Go::OS::File->TYPE_PIPE_END : {
           my $uv_loop = Go->uv_loop;
@@ -102,8 +102,8 @@ class Go::OS::Exec::Cmd {
     for (my $i = 0; $i < $extra_fds_count; $i++) {
       my $stdio_index = 3 + $i;
       my $container = UV::StdioContainer->new;
-      my $fd_obj = $extra_fds->[$i];
-      $self->_setup_stdio_container($container, $fd_obj);
+      my $go_file = $extra_fds->[$i];
+      $self->_setup_stdio_container($container, $go_file);
       $stdio_containers->[$stdio_index] = $container;
     }
     
