@@ -2,6 +2,8 @@
   [Incompatible Changes]
     * Rewrite Go::OS::Exec, Go::OS::File, Go::OS::Cmd. Rename Go::OS::FD to Go::OS::File.
       And fix stdout, stdin, stderr, extra_fds bugs.
+  [Bug Fix]
+    * Fix gosched_pipe_read EOF bug.
 0.053 2026-11-19
   [Requirement Changes]
     * Require SPVM::Sys 0.586.
