@@ -26,6 +26,8 @@ ok(SPVM::TestCase::Go::OS::Exec->extra_files);
 
 ok(SPVM::TestCase::Go::OS::Exec->env);
 
+ok(SPVM::TestCase::Go::OS::Exec->stdin);
+
 $api->destroy_runtime_permanent_vars;
 
 my $end_memory_blocks_count = $api->get_memory_blocks_count;

@@ -352,4 +352,51 @@ class TestCase::Go::OS::Exec {
     return $success_ref->[0];
   }
   
+  static method stdin : int () {
+    
+    my $success_ref = [1];
+    
+    my $wg = Go->new_wait_group(1);
+    Go->go([$wg : , $success_ref : ] method : void () {
+      
+      Fn->defer([$wg : ] method : void () {
+        $wg->done;
+      });
+      
+      my $stdin = Go::OS::File->prepare_pipe_end;
+      my $stdout = Go::OS::File->prepare_pipe_end;
+      
+      # Write input data to child stdin in a goroutine
+      Go->go([$stdin : ] method : void () {
+        $stdin->syswrite(Go->bg, "in:hello");
+        $stdin->close;
+      });
+      
+      my $cmd = Go::OS::Exec->command(Go->bg, ["perl", "-e", "local \$/; my \$in = <STDIN>; print \$in;"]);
+      $cmd->set_stdin($stdin);
+      $cmd->set_stdout($stdout);
+      
+      my $status = $cmd->run;
+      my $exit_code = $status >> 8;
+      my $term_signal = $status & 0xff;
+      
+      my $buf = new_string_len 4096;
+      my $len = $stdout->sysread(Go->bg, $buf);
+      
+      unless ($exit_code == 0 && $term_signal == 0) {
+        diag "\$exit_code=$exit_code, \$term_signal=$term_signal";
+        $success_ref->[0] = 0;
+      }
+      
+      unless ($len == 8 && Fn->substr($buf, 0, $len) eq "in:hello") {
+        diag "\$len=$len, \$buf=$buf";
+        $success_ref->[0] = 0;
+      }
+    });
+    
+    $wg->wait;
+    
+    return $success_ref->[0];
+  }
+  
 }
