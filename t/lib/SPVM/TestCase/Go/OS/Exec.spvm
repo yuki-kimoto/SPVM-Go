@@ -205,11 +205,15 @@ class TestCase::Go::OS::Exec {
         $wg->done;
       });
       
-      my $read_fd = -1;
-      my $write_fd = -1;
-      Sys->pipepair(\$read_fd, \$write_fd, 1);
+      my $fd = -1;
+      my $ohter_fd = -1;
+      Sys->pipepair(\$fd, \$ohter_fd, 1);
       
-      my $stdout = Go::OS::File->new_pipe_end($write_fd);
+      Fn->defer([$fd : int] method : void () {
+        Sys::IO->close($fd);
+      });
+      
+      my $stdout = Go::OS::File->new_pipe_end($ohter_fd);
       
       my $cmd = Go::OS::Exec->command(Go->bg, ["perl", "-e", "print 'out:hello';"]);
       $cmd->set_stdout($stdout);
@@ -219,7 +223,7 @@ class TestCase::Go::OS::Exec {
       my $term_signal = $status & 0xff;
       
       my $buf = new_string_len 4096;
-      my $len = Go->gosched_pipe_read(Go->bg, $read_fd, $buf);
+      my $len = Go->gosched_pipe_read(Go->bg, $fd, $buf);
       
       unless ($exit_code == 0 && $term_signal == 0) {
         diag "\$exit_code=$exit_code, \$term_signal=$term_signal";
@@ -248,15 +252,15 @@ class TestCase::Go::OS::Exec {
         $wg->done;
       });
       
-      my $read_fd = -1;
-      my $write_fd = -1;
-      Sys->pipepair(\$read_fd, \$write_fd, 1);
+      my $fd = -1;
+      my $ohter_fd = -1;
+      Sys->pipepair(\$fd, \$ohter_fd, 1);
       
-      Fn->defer([$read_fd : int] method : void () {
-        Sys::IO->close($read_fd);
+      Fn->defer([$fd : int] method : void () {
+        Sys::IO->close($fd);
       });
       
-      my $stderr = Go::OS::File->new_pipe_end($write_fd);
+      my $stderr = Go::OS::File->new_pipe_end($ohter_fd);
       
       my $cmd = Go::OS::Exec->command(Go->bg, ["perl", "-e", "print STDERR 'err:hello';"]);
       $cmd->set_stderr($stderr);
@@ -266,7 +270,7 @@ class TestCase::Go::OS::Exec {
       my $term_signal = $status & 0xff;
       
       my $buf = new_string_len 4096;
-      my $len = Go->gosched_pipe_read(Go->bg, $read_fd, $buf);
+      my $len = Go->gosched_pipe_read(Go->bg, $fd, $buf);
       
       unless ($exit_code == 0 && $term_signal == 0) {
         diag "\$exit_code=$exit_code, \$term_signal=$term_signal";
@@ -295,16 +299,16 @@ class TestCase::Go::OS::Exec {
         $wg->done;
       });
       
-      my $read_fd = -1;
-      my $write_fd = -1;
-      Sys->pipepair(\$read_fd, \$write_fd, 1);
+      my $fd = -1;
+      my $ohter_fd = -1;
+      Sys->pipepair(\$fd, \$ohter_fd, 1);
       
-      Fn->defer([$read_fd : int] method : void () {
-        Sys::IO->close($read_fd);
+      Fn->defer([$fd : int] method : void () {
+        Sys::IO->close($fd);
       });
       
       # Extra FDs start at stdio index 3 (fd 3)
-      my $extra_fd = Go::OS::File->new_pipe_end($write_fd);
+      my $extra_fd = Go::OS::File->new_pipe_end($ohter_fd);
       
       my $cmd = Go::OS::Exec->command(Go->bg, ["perl", "-e", "open(my \$fh, '>&=', 3) or die \$!; print \$fh 'extra:hello'; close(\$fh);"]);
       $cmd->set_extra_files([$extra_fd]);
@@ -314,7 +318,7 @@ class TestCase::Go::OS::Exec {
       my $term_signal = $status & 0xff;
       
       my $buf = new_string_len 4096;
-      my $len = Go->gosched_pipe_read(Go->bg, $read_fd, $buf);
+      my $len = Go->gosched_pipe_read(Go->bg, $fd, $buf);
       
       unless ($exit_code == 0 && $term_signal == 0) {
         diag "\$exit_code=$exit_code, \$term_signal=$term_signal";
@@ -343,15 +347,15 @@ class TestCase::Go::OS::Exec {
         $wg->done;
       });
       
-      my $read_fd = -1;
-      my $write_fd = -1;
-      Sys->pipepair(\$read_fd, \$write_fd, 1);
+      my $fd = -1;
+      my $ohter_fd = -1;
+      Sys->pipepair(\$fd, \$ohter_fd, 1);
       
-      Fn->defer([$read_fd : int] method : void () {
-        Sys::IO->close($read_fd);
+      Fn->defer([$fd : int] method : void () {
+        Sys::IO->close($fd);
       });
       
-      my $stdout = Go::OS::File->new_pipe_end($write_fd);
+      my $stdout = Go::OS::File->new_pipe_end($ohter_fd);
       
       my $cmd = Go::OS::Exec->command(Go->bg, ["perl", "-e", "print \$ENV{'TEST_EXEC_ENV'};"]);
       $cmd->set_stdout($stdout);
@@ -362,7 +366,7 @@ class TestCase::Go::OS::Exec {
       my $term_signal = $status & 0xff;
       
       my $buf = new_string_len 4096;
-      my $len = Go->gosched_pipe_read(Go->bg, $read_fd, $buf);
+      my $len = Go->gosched_pipe_read(Go->bg, $fd, $buf);
       
       unless ($exit_code == 0 && $term_signal == 0) {
         diag "\$exit_code=$exit_code, \$term_signal=$term_signal";
