@@ -461,10 +461,10 @@ class Go::Schedule {
                 }
               }
               
-              my $write_fd = $go_file->fd;
+              my $ohter_fd = $go_file->fd;
               my $write_pipe = UV::Handle::Pipe->new;
               $uv_loop->pipe_init($write_pipe, 0);
-              $write_pipe->open(Sys::IO->dup($write_fd));
+              $write_pipe->open(Sys::IO->dup($ohter_fd));
               
               my $eof_reached_ref = [0];
               my $pending_writes_ref = [0];
