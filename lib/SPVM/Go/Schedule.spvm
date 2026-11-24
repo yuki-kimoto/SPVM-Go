@@ -314,10 +314,18 @@ class Go::Schedule {
         if ($schedule_type == Go::Schedule::Info->TYPE_PIPE_READ) {
           my $read_cb = [$schedule_info : , $finish_cb : ] method : void ($uv_stream : UV::Handle::Stream, $nread : int, $buffer : string) {
             if ($nread < 0) {
-              $schedule_info->{error_id} = basic_type_id Error;
-              $schedule_info->{exception} = UV->strerror($nread);
+              if ($nread == UV_C->UV_EOF) {
+                $schedule_info->{ret_length} = 0;
+              }
+              else {
+                $schedule_info->{error_id} = basic_type_id Error;
+                $schedule_info->{exception} = UV->strerror($nread);
+                $schedule_info->{ret_length} = $nread;
+              }
             }
-            $schedule_info->{ret_length} = $nread;
+            else {
+              $schedule_info->{ret_length} = $nread;
+            }
             
             $uv_stream->read_stop;
             
