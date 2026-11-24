@@ -475,4 +475,35 @@ class TestCase::Go::OS::Exec {
     return $success_ref->[0];
   }
   
+  static method new_file : int () {
+    
+    my $success_ref = [1];
+    
+    my $wg = Go->new_wait_group(1);
+    Go->go([$wg : , $success_ref : ] method : void () {
+      
+      Fn->defer([$wg : ] method : void () {
+        $wg->done;
+      });
+      
+      # Wrap stderr fd 2 via new_file (no_close = 1)
+      my $stderr = Go::OS::File->new_file(2);
+      
+      my $cmd = Go::OS::Exec->command(Go->bg, ["perl", "-e", "print STDERR \"[Test Output]new_file\\n\";"]);
+      $cmd->set_stderr($stderr);
+      
+      my $status = $cmd->run;
+      my $exit_code = $status >> 8;
+      my $term_signal = $status & 0xff;
+      
+      unless ($exit_code == 0 && $term_signal == 0) {
+        diag "\$exit_code=$exit_code, \$term_signal=$term_signal";
+        $success_ref->[0] = 0;
+      }
+    });
+    
+    $wg->wait;
+    
+    return $success_ref->[0];
+  }
 }

@@ -1,3 +1,7 @@
+0.054 2026-11-24
+  [Incompatible Changes]
+    * Rewrite Go::OS::Exec, Go::OS::File, Go::OS::Cmd. Rename Go::OS::FD to Go::OS::File.
+    
 0.053 2026-11-19
   [Requirement Changes]
     * Require SPVM::Sys 0.586.
