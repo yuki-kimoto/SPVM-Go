@@ -477,16 +477,17 @@ class Go::Schedule {
                 my $dst_pipe = $dst_pipes->[$d];
 
                 # Copy chunks sequentially from $src_pipe to $dst_pipe
-                my $write_req = UV::Request::Write->new;
                 my $read_data = new_string_len 4096;
-                my $read_cb = [$dst_pipe : , $read_data : , $write_req : ,] method : void ($uv_stream : UV::Handle::Stream, $nread : int, $buf : string) {
+                my $read_cb = [$dst_pipe : , $read_data : ,] method : void ($uv_stream : UV::Handle::Stream, $nread : int, $buf : string) {
 
                   my $read_cb = $self;
 
                   $uv_stream->read_stop;
 
                   if ($nread > 0) {
-                    my $write_cb = [$dst_pipe : , $uv_stream : , $read_data : , $read_cb : ,] method : void ($req : UV::Request::Write, $status : int) {
+                    my $write_data = copy $buf;
+                    my $write_req = UV::Request::Write->new;
+                    my $write_cb = [$dst_pipe : , $uv_stream : , $read_data : , $read_cb : , $write_req : ,] method : void ($req : UV::Request::Write, $status : int) {
                       if ($status < 0) {
                         unless ($status == UV_C->UV_EPIPE) {
                           die "libuv error:" . UV->strerror($status);
@@ -499,9 +500,10 @@ class Go::Schedule {
                       $req->set_write_cb(undef);
                     };
 
-                    $write_req->write($dst_pipe, $buf, $nread, $write_cb);
+                    $write_req->write($dst_pipe, $write_data, $nread, $write_cb);
                   }
                   elsif ($nread < 0) {
+                    $uv_stream->close_safe;
                     $dst_pipe->close_safe;
                     unless ($nread == UV_C->UV_EOF) {
                       die "libuv error:" . UV->strerror($nread);
