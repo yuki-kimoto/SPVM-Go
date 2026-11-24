@@ -108,8 +108,7 @@ class Go::OS::File {
     if ($type == &TYPE_PIPE_END) {
       my $uv_stream = $self->{uv_stream};
       
-      my $fd = -1;
-      $uv_stream->fileno(\$fd);
+      my $fd = $self->{fd};
       
       my $read_length = Go->gosched_pipe_read($context, $fd, $string, $length, $offset);
       
@@ -127,8 +126,7 @@ class Go::OS::File {
     if ($type == &TYPE_PIPE_END) {
       my $uv_stream = $self->{uv_stream};
       
-      my $fd = -1;
-      $uv_stream->fileno(\$fd);
+      my $fd = $self->{fd};
       
       my $read_length = Go->gosched_pipe_write($context, $fd, $string, $length, $offset);
       
