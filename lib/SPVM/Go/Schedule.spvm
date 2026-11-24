@@ -492,9 +492,11 @@ class Go::Schedule {
                           die "libuv error:" . UV->strerror($status);
                         }
                       }
+                      else {
+                        $uv_stream->read_start($read_data, length $read_data, $read_cb);
+                      }
                       
                       $req->set_write_cb(undef);
-                      $uv_stream->read_start($read_data, length $read_data, $read_cb);
                     };
 
                     $write_req->write($dst_pipe, $buf, $nread, $write_cb);
