@@ -462,24 +462,24 @@ class Go::Schedule {
               }
               
               my $ohter_fd = $go_file->ohter_fd;
-              my $write_pipe = UV::Handle::Pipe->new;
-              $uv_loop->pipe_init($write_pipe, 0);
-              $write_pipe->open(Sys::IO->dup($ohter_fd));
+              my $other_pipe = UV::Handle::Pipe->new;
+              $uv_loop->pipe_init($other_pipe, 0);
+              $other_pipe->open(Sys::IO->dup($ohter_fd));
               
               my $eof_reached_ref = [0];
               my $pending_writes_ref = [0];
               my $active_reqs = (List of UV::Request::Write)List->new(new UV::Request::Write[0]);
               
-              my $close_if_done = [$write_pipe : , $uv_pipe : , $eof_reached_ref : , $pending_writes_ref : ] method : void () {
+              my $close_if_done = [$other_pipe : , $uv_pipe : , $eof_reached_ref : , $pending_writes_ref : ] method : void () {
                 if ($eof_reached_ref->[0] && $pending_writes_ref->[0] == 0) {
-                  $write_pipe->close_safe;
+                  $other_pipe->close_safe;
                   $uv_pipe->close_safe;
                 }
               };
-              weaken $close_if_done->{write_pipe};
+              weaken $close_if_done->{other_pipe};
               weaken $close_if_done->{uv_pipe};
               
-              my $read_cb = [$write_pipe : , $uv_pipe : , $eof_reached_ref : , $pending_writes_ref : , $close_if_done : , $active_reqs : ] method : void ($uv_stream : UV::Handle::Stream, $nread : int, $read_data : string) {
+              my $read_cb = [$other_pipe : , $uv_pipe : , $eof_reached_ref : , $pending_writes_ref : , $close_if_done : , $active_reqs : ] method : void ($uv_stream : UV::Handle::Stream, $nread : int, $read_data : string) {
                 if ($nread > 0) {
                   # Copy exact bytes read before async write
                   my $chunk = Fn->substr($read_data, 0, (int)$nread);
@@ -488,15 +488,15 @@ class Go::Schedule {
                   my $write_req = UV::Request::Write->new;
                   $active_reqs->push($write_req);
                   
-                  my $write_cb = [$write_pipe : , $pending_writes_ref : , $close_if_done : , $active_reqs : , $write_req : ] method : void ($req : UV::Request::Write, $status : int) {
+                  my $write_cb = [$other_pipe : , $pending_writes_ref : , $close_if_done : , $active_reqs : , $write_req : ] method : void ($req : UV::Request::Write, $status : int) {
                     $req->set_write_cb(undef);
                     $pending_writes_ref->[0]--;
                     $close_if_done->();
                   };
-                  weaken $write_cb->{write_pipe};
+                  weaken $write_cb->{other_pipe};
                   weaken $write_cb->{write_req};
                   
-                  $write_req->write($write_pipe, $chunk, length $chunk, $write_cb);
+                  $write_req->write($other_pipe, $chunk, length $chunk, $write_cb);
                 }
                 # EOF or errors
                 elsif ($nread < 0) {
@@ -506,7 +506,7 @@ class Go::Schedule {
                   $close_if_done->();
                 }
               };
-              weaken $read_cb->{write_pipe};
+              weaken $read_cb->{other_pipe};
               weaken $read_cb->{uv_pipe};
               
               my $read_data = new_string_len 4096;
