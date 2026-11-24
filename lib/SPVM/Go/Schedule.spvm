@@ -470,8 +470,6 @@ class Go::Schedule {
               
               my $other_uv_pipe = $go_file->{other_uv_pipe};
               
-              my $write_req = UV::Request::Write->new;
-              
               my $src_pipes = [$uv_pipe, $other_uv_pipe];
               my $dst_pipes = [$other_uv_pipe, $uv_pipe];
               for (my $d = 0; $d < 2; $d++) {
@@ -479,6 +477,7 @@ class Go::Schedule {
                 my $dst_pipe = $dst_pipes->[$d];
 
                 # Copy chunks sequentially from $src_pipe to $dst_pipe
+                my $write_req = UV::Request::Write->new;
                 my $read_data = new_string_len 4096;
                 my $read_cb = [$dst_pipe : , $read_data : , $write_req : ,] method : void ($uv_stream : UV::Handle::Stream, $nread : int, $buf : string) {
 
