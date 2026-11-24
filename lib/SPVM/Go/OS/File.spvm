@@ -4,6 +4,7 @@
 class Go::OS::File {
   
   allow Go::OS::Exec::Cmd;
+  allow Go::Schedule;
   
   use UV::Handle::Stream;
   
@@ -38,7 +39,9 @@ class Go::OS::File {
   
   has no_close : byte;
   
-  has ohter_fd : ro int;
+  has other_fd : ro int;
+  
+  has other_fd_closed : ro int;
   
   # Class Methods
   static method new_file : Go::OS::File ($fd : int) {
@@ -61,11 +64,11 @@ class Go::OS::File {
     my $self = new Go::OS::File;
     
     my $fd = -1;
-    my $ohter_fd = -1;
-    Sys->pipepair(\$fd, \$ohter_fd, 1);
+    my $other_fd = -1;
+    Sys->pipepair(\$fd, \$other_fd, 1);
     
     $self->{fd} = $fd;
-    $self->{ohter_fd} = $ohter_fd;
+    $self->{other_fd} = $other_fd;
     $self->{type} = &TYPE_PIPE_END;
     
     return $self;
