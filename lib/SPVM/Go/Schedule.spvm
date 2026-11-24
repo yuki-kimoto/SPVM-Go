@@ -502,7 +502,6 @@ class Go::Schedule {
                     $write_req->write($dst_pipe, $buf, $nread, $write_cb);
                   }
                   elsif ($nread < 0) {
-                    $uv_stream->close_safe;
                     $dst_pipe->close_safe;
                     unless ($nread == UV_C->UV_EOF) {
                       die "libuv error:" . UV->strerror($nread);
