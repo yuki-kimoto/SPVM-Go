@@ -76,7 +76,12 @@ class Go::OS::File {
     
     my $self = new Go::OS::File;
     
-    $self->{fd} = -1;
+    my $fd = -1;
+    my $ohter_fd = -1;
+    Sys->pipepair(\$fd, \$ohter_fd, 1);
+    
+    $self->{fd} = $fd;
+    $self->{ohter_fd} = $ohter_fd;
     $self->{type} = &TYPE_PIPE_END;
     
     return $self;
