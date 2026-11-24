@@ -496,6 +496,9 @@ class Go::Schedule {
                   elsif ($nread < 0) {
                     $uv_stream->close_safe;
                     $dst_pipe->close_safe;
+                    unless ($nread == UV_C->UV_EOF) {
+                      die "libuv error:" . UV->strerror($nread);
+                    }
                   }
                 };
                 weaken $read_cb->{dst_pipe};
