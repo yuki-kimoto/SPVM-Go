@@ -485,13 +485,10 @@ class Go::Schedule {
                   $uv_stream->read_stop;
 
                   if ($nread > 0) {
-                    my $write_data = copy $buf;
                     my $write_req = UV::Request::Write->new;
                     my $write_cb = [$dst_pipe : , $uv_stream : , $read_data : , $read_cb : , $write_req : ,] method : void ($req : UV::Request::Write, $status : int) {
                       if ($status < 0) {
-                        unless ($status == UV_C->UV_EPIPE) {
-                          die "libuv error:" . UV->strerror($status);
-                        }
+                        die "libuv error:" . UV->strerror($status);
                       }
                       
                       $uv_stream->read_start($read_data, length $read_data, $read_cb);
@@ -499,7 +496,7 @@ class Go::Schedule {
                       $req->set_write_cb(undef);
                     };
 
-                    $write_req->write($dst_pipe, $write_data, $nread, $write_cb);
+                    $write_req->write($dst_pipe, $buf, $nread, $write_cb);
                   }
                   elsif ($nread < 0) {
                     $uv_stream->close_safe;
