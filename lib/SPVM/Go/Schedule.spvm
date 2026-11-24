@@ -482,6 +482,8 @@ class Go::Schedule {
 
                   my $read_cb = $self;
 
+                  $uv_stream->read_stop;
+
                   if ($nread > 0) {
                     my $write_data = copy $buf;
                     my $write_req = UV::Request::Write->new;
@@ -489,6 +491,7 @@ class Go::Schedule {
                       if ($status < 0) {
                         die "libuv error:" . UV->strerror($status);
                       }
+                      $uv_stream->read_start($read_data, length $read_data, $read_cb);
                       
                       $req->set_write_cb(undef);
                     };
