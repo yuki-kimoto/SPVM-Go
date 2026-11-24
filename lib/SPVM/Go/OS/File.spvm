@@ -105,7 +105,7 @@ class Go::OS::File {
       return $read_length;
     }
     else {
-      die "Not supported.";
+      die "[Unexpected Error]Not supported type. \$type=$type.";
     }
   }
   
@@ -121,7 +121,7 @@ class Go::OS::File {
       return $read_length;
     }
     else {
-      die "Not supported.";
+      die "[Unexpected Error]Not supported type. \$type=$type.";
     }
   }
   
@@ -129,19 +129,14 @@ class Go::OS::File {
     
     my $type = $self->{type};
     
-    if ($type == &TYPE_PIPE_END) {
-      if (my $uv_stream = $self->{uv_stream}) {
-        $uv_stream->close_safe;
-        $self->{uv_stream} = undef;
-      }
-      
-      if (my $other_uv_pipe = $self->{other_uv_pipe}) {
-        $other_uv_pipe->close_safe;
-        $self->{other_uv_pipe} = undef;
-      }
+    if (my $uv_stream = $self->{uv_stream}) {
+      $uv_stream->close_safe;
+      $self->{uv_stream} = undef;
     }
-    else {
-      die "Not supported.";
+    
+    if (my $other_uv_pipe = $self->{other_uv_pipe}) {
+      $other_uv_pipe->close_safe;
+      $self->{other_uv_pipe} = undef;
     }
     
     unless ($self->{no_close}) {
