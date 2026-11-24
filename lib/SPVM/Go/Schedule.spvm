@@ -461,14 +461,14 @@ class Go::Schedule {
               }
               
               my $other_fd = $go_file->{other_fd};
-              my $other_pipe = UV::Handle::Pipe->new;
-              $uv_loop->pipe_init($other_pipe, 0);
-              $other_pipe->open($other_fd);
+              my $other_uv_pipe = UV::Handle::Pipe->new;
+              $uv_loop->pipe_init($other_uv_pipe, 0);
+              $other_uv_pipe->open($other_fd);
               
               my $write_req = UV::Request::Write->new;
               
-              my $src_pipes = [$uv_pipe, $other_pipe];
-              my $dst_pipes = [$other_pipe, $uv_pipe];
+              my $src_pipes = [$uv_pipe, $other_uv_pipe];
+              my $dst_pipes = [$other_uv_pipe, $uv_pipe];
               for (my $d = 0; $d < 2; $d++) {
                 my $src_pipe = $src_pipes->[$d];
                 my $dst_pipe = $dst_pipes->[$d];
