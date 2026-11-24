@@ -504,7 +504,9 @@ class TestCase::Go::OS::Exec {
       });
       $wg->wait;
     }
-    
+
+=pod
+
     {
       my $wg = Go->new_wait_group(1);
       Go->go([$wg : , $success_ref : ] method : void () {
@@ -582,7 +584,9 @@ class TestCase::Go::OS::Exec {
       });
       $wg->wait;
     }
-    
+
+=cut
+
     return $success_ref->[0];
   }
 }
