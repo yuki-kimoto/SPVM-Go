@@ -86,26 +86,9 @@ class Go::OS::File {
       die "'no_close' field is specified.";
     }
     else {
-      my $type = $self->{type};
-      
-      if ($type == &TYPE_PIPE_END) {
-        if (my $uv_stream = $self->{uv_stream}) {
-          $uv_stream->close_safe;
-          $self->{uv_stream} = undef;
-        }
-        
-        if (my $other_uv_pipe = $self->{other_uv_pipe}) {
-          $other_uv_pipe->close_safe;
-          $self->{other_uv_pipe} = undef;
-        }
-        
-        if ($self->{opened}) {
-          Sys::IO->close($self->{fd});
-          $self->{opened} = 0;
-        }
-      }
-      else {
-        die "Not supported.";
+      if ($self->{opened}) {
+        Sys::IO->close($self->{fd});
+        $self->{opened} = 0;
       }
     }
   }
@@ -143,6 +126,23 @@ class Go::OS::File {
   }
   
   method DESTROY : void () {
+    
+    my $type = $self->{type};
+    
+    if ($type == &TYPE_PIPE_END) {
+      if (my $uv_stream = $self->{uv_stream}) {
+        $uv_stream->close_safe;
+        $self->{uv_stream} = undef;
+      }
+      
+      if (my $other_uv_pipe = $self->{other_uv_pipe}) {
+        $other_uv_pipe->close_safe;
+        $self->{other_uv_pipe} = undef;
+      }
+    }
+    else {
+      die "Not supported.";
+    }
     
     unless ($self->{no_close}) {
       $self->close;
