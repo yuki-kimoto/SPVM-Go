@@ -474,8 +474,6 @@ class Go::Schedule {
                 $uv_stream->read_stop;
                 
                 if ($nread > 0) {
-                  $uv_stream->read_stop;
-                  
                   my $write_cb = [$other_pipe : , $uv_stream : , $read_data : , $read_cb : ,] method : void ($req : UV::Request::Write, $status : int) {
                     $req->set_write_cb(undef);
                     $uv_stream->read_start($read_data, length $read_data, $read_cb);
