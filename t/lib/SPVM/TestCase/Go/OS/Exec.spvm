@@ -399,4 +399,80 @@ class TestCase::Go::OS::Exec {
     return $success_ref->[0];
   }
   
+  static method pipe_extra : int () {
+    
+    my $success_ref = [1];
+    
+    my $wg = Go->new_wait_group(1);
+    Go->go([$wg : , $success_ref : ] method : void () {
+      
+      Fn->defer([$wg : ] method : void () {
+        $wg->done;
+      });
+      
+      # Build test payload larger than a single 4096-byte pipe buffer chunk
+      my $expected = "";
+      for (my $i = 0; $i < 10000; $i++) {
+        my $ch = (string)($i % 10);
+        $expected .= $ch;
+      }
+      my $expected_len = length $expected;
+      
+      my $stdin = Go::OS::File->prepare_pipe_end;
+      my $stdout = Go::OS::File->prepare_pipe_end;
+      
+      # Write in small chunks so pipe forwarding is exercised repeatedly
+      Go->go([$stdin : , $expected : , $expected_len : ] method : void () {
+        my $chunk_size = 137;
+        my $offset = 0;
+        while ($offset < $expected_len) {
+          my $len = $expected_len - $offset;
+          if ($len > $chunk_size) {
+            $len = $chunk_size;
+          }
+          my $chunk = Fn->substr($expected, $offset, $len);
+          my $written = $stdin->syswrite(Go->bg, $chunk);
+          if ($written <= 0) {
+            last;
+          }
+          $offset += $written;
+        }
+        $stdin->close;
+      });
+      
+      my $cmd = Go::OS::Exec->command(Go->bg, ["perl", "-e", "binmode STDIN; binmode STDOUT; local \$/; my \$in = <STDIN>; print \$in;"]);
+      $cmd->set_stdin($stdin);
+      $cmd->set_stdout($stdout);
+      
+      my $status = $cmd->run;
+      my $exit_code = $status >> 8;
+      my $term_signal = $status & 0xff;
+      
+      # Read back in small chunks until EOF
+      my $actual = "";
+      my $buf = new_string_len 128;
+      while (1) {
+        my $n = $stdout->sysread(Go->bg, $buf);
+        if ($n <= 0) {
+          last;
+        }
+        $actual .= Fn->substr($buf, 0, $n);
+      }
+      
+      unless ($exit_code == 0 && $term_signal == 0) {
+        diag "\$exit_code=$exit_code, \$term_signal=$term_signal";
+        $success_ref->[0] = 0;
+      }
+      
+      unless ($actual eq $expected) {
+        diag "length mismatch or content mismatch: actual_len=" . (string)(length $actual) . ", expected_len=" . (string)$expected_len;
+        $success_ref->[0] = 0;
+      }
+    });
+    
+    $wg->wait;
+    
+    return $success_ref->[0];
+  }
+  
 }
