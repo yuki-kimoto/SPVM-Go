@@ -38,6 +38,8 @@ class Go::OS::File {
   
   has no_close : byte;
   
+  has ohter_fd : ro int;
+  
   # Class Methods
   static method new_file : Go::OS::File ($fd : int) {
     
@@ -54,15 +56,16 @@ class Go::OS::File {
     return $self;
   }
   
-  static method new_pipe_end : Go::OS::File ($fd : int) {
+  static method new_pipe_end : Go::OS::File ($ohter_fd : int) {
     
-    unless ($fd >= 0) {
+    unless ($ohter_fd >= 0) {
       die "The file descriptor \$fd must be a non-negative number.";
     }
     
     my $self = new Go::OS::File;
     
-    $self->{fd} = $fd;
+    $self->{fd} = -1;
+    $self->{ohter_fd} = $ohter_fd;
     $self->{type} = &TYPE_PIPE_END;
     $self->{no_close} = 1;
     

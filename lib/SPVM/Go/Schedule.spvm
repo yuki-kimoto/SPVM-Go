@@ -461,7 +461,7 @@ class Go::Schedule {
                 }
               }
               
-              my $ohter_fd = $go_file->fd;
+              my $ohter_fd = $go_file->ohter_fd;
               my $write_pipe = UV::Handle::Pipe->new;
               $uv_loop->pipe_init($write_pipe, 0);
               $write_pipe->open(Sys::IO->dup($ohter_fd));
