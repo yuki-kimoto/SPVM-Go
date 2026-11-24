@@ -505,6 +505,32 @@ class TestCase::Go::OS::Exec {
       $wg->wait;
     }
 
+    {
+      my $wg = Go->new_wait_group(1);
+      Go->go([$wg : , $success_ref : ] method : void () {
+        
+        Fn->defer([$wg : ] method : void () {
+          $wg->done;
+        });
+        
+        # Test Go::OS::File->STDERR
+        my $stderr = Go::OS::File->STDERR;
+        
+        my $cmd = Go::OS::Exec->command(Go->bg, ["perl", "-e", "print STDERR \"[Test Output]STDERR\\n\";"]);
+        $cmd->set_stderr($stderr);
+        
+        my $status = $cmd->run;
+        my $exit_code = $status >> 8;
+        my $term_signal = $status & 0xff;
+        
+        unless ($exit_code == 0 && $term_signal == 0) {
+          diag "\$exit_code=$exit_code, \$term_signal=$term_signal";
+          $success_ref->[0] = 0;
+        }
+      });
+      $wg->wait;
+    }
+    
 =pod
 
     {
@@ -520,32 +546,6 @@ class TestCase::Go::OS::Exec {
         
         my $cmd = Go::OS::Exec->command(Go->bg, ["perl", "-e", "print STDOUT \"# [Test Output]STDOUT\\n\";"]);
         $cmd->set_stdout($stdout);
-        
-        my $status = $cmd->run;
-        my $exit_code = $status >> 8;
-        my $term_signal = $status & 0xff;
-        
-        unless ($exit_code == 0 && $term_signal == 0) {
-          diag "\$exit_code=$exit_code, \$term_signal=$term_signal";
-          $success_ref->[0] = 0;
-        }
-      });
-      $wg->wait;
-    }
-    
-    {
-      my $wg = Go->new_wait_group(1);
-      Go->go([$wg : , $success_ref : ] method : void () {
-        
-        Fn->defer([$wg : ] method : void () {
-          $wg->done;
-        });
-        
-        # Test Go::OS::File->STDERR
-        my $stderr = Go::OS::File->STDERR;
-        
-        my $cmd = Go::OS::Exec->command(Go->bg, ["perl", "-e", "print STDERR \"[Test Output]STDERR\\n\";"]);
-        $cmd->set_stderr($stderr);
         
         my $status = $cmd->run;
         my $exit_code = $status >> 8;
