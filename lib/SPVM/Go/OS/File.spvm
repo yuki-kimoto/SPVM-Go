@@ -96,6 +96,7 @@ class Go::OS::File {
         if ($uv_stream) {
           $uv_stream->close_safe;
           $self->{uv_stream} = undef;
+          Sys::IO->close($self->{fd});
         }
       }
       else {
