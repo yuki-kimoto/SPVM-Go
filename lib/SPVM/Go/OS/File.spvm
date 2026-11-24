@@ -39,7 +39,9 @@ class Go::OS::File {
   
   has no_close : byte;
   
-  has other_fd : ro int;
+  has opened : byte;
+  
+  has other_uv_pipe : UV::Handle::Pipe;
   
   # Class Methods
   static method new_file : Go::OS::File ($fd : int) {
@@ -65,9 +67,15 @@ class Go::OS::File {
     my $other_fd = -1;
     Sys->pipepair(\$fd, \$other_fd, 1);
     
+    my $uv_loop = Go->uv_loop;
+    my $other_uv_pipe = UV::Handle::Pipe->new;
+    $uv_loop->pipe_init($other_uv_pipe, 0);
+    $other_uv_pipe->open($other_fd);
+    
     $self->{fd} = $fd;
-    $self->{other_fd} = $other_fd;
+    $self->{other_uv_pipe} = $other_uv_pipe;
     $self->{type} = &TYPE_PIPE_END;
+    $self->{opened} = 1;
     
     return $self;
   }
@@ -81,12 +89,19 @@ class Go::OS::File {
       my $type = $self->{type};
       
       if ($type == &TYPE_PIPE_END) {
-        my $uv_stream = $self->{uv_stream};
-        
-        if ($uv_stream) {
+        if (my $uv_stream = $self->{uv_stream}) {
           $uv_stream->close_safe;
           $self->{uv_stream} = undef;
+        }
+        
+        if (my $other_uv_pipe = $self->{other_uv_pipe}) {
+          $other_uv_pipe->close_safe;
+          $self->{other_uv_pipe} = undef;
+        }
+        
+        if ($self->{opened}) {
           Sys::IO->close($self->{fd});
+          $self->{opened} = 0;
         }
       }
       else {

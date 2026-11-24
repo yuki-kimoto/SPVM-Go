@@ -460,10 +460,7 @@ class Go::Schedule {
                 }
               }
               
-              my $other_fd = $go_file->{other_fd};
-              my $other_uv_pipe = UV::Handle::Pipe->new;
-              $uv_loop->pipe_init($other_uv_pipe, 0);
-              $other_uv_pipe->open($other_fd);
+              my $other_uv_pipe = $go_file->{other_uv_pipe};
               
               my $write_req = UV::Request::Write->new;
               
