@@ -41,8 +41,6 @@ class Go::OS::File {
   
   has other_fd : ro int;
   
-  has other_fd_closed : ro int;
-  
   # Class Methods
   static method new_file : Go::OS::File ($fd : int) {
     

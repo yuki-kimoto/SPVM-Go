@@ -465,29 +465,60 @@ class Go::Schedule {
               $uv_loop->pipe_init($other_pipe, 0);
               $other_pipe->open($other_fd);
               
-              my $read_data = new_string_len 4096;
               my $write_req = UV::Request::Write->new;
-              my $read_cb = [$other_pipe : , $read_data : , $write_req : ,] method : void ($uv_stream : UV::Handle::Stream, $nread : int, $buf : string) {
-                
-                my $read_cb = $self;
-                
-                $uv_stream->read_stop;
-                
-                if ($nread > 0) {
-                  my $write_cb = [$other_pipe : , $uv_stream : , $read_data : , $read_cb : ,] method : void ($req : UV::Request::Write, $status : int) {
-                    $req->set_write_cb(undef);
-                    $uv_stream->read_start($read_data, length $read_data, $read_cb);
-                  };
-                  
-                  $write_req->write($other_pipe, $buf, $nread, $write_cb);
-                }
-                elsif ($nread < 0) {
-                  $uv_stream->close_safe;
-                  $other_pipe->close_safe;
-                }
-              };
               
-              $uv_pipe->read_start($read_data, length $read_data, $read_cb);
+              # Read from $uv_pipe and write to $other_pipe
+              {
+                my $read_data = new_string_len 4096;
+                my $read_cb = [$other_pipe : , $read_data : , $write_req : ,] method : void ($uv_stream : UV::Handle::Stream, $nread : int, $buf : string) {
+                  
+                  my $read_cb = $self;
+                  
+                  $uv_stream->read_stop;
+                  
+                  if ($nread > 0) {
+                    my $write_cb = [$other_pipe : , $uv_stream : , $read_data : , $read_cb : ,] method : void ($req : UV::Request::Write, $status : int) {
+                      $req->set_write_cb(undef);
+                      $uv_stream->read_start($read_data, length $read_data, $read_cb);
+                    };
+                    
+                    $write_req->write($other_pipe, $buf, $nread, $write_cb);
+                  }
+                  elsif ($nread < 0) {
+                    $uv_stream->close_safe;
+                    $other_pipe->close_safe;
+                  }
+                };
+                
+                weaken $read_cb->{other_pipe};
+                $uv_pipe->read_start($read_data, length $read_data, $read_cb);
+              }
+              
+              # Read from $other_pipe and write to $uv_pipe
+              {
+                my $read_data = new_string_len 4096;
+                my $read_cb = [$uv_pipe : , $read_data : , $write_req : ,] method : void ($uv_stream : UV::Handle::Stream, $nread : int, $buf : string) {
+                  
+                  my $read_cb = $self;
+                  
+                  $uv_stream->read_stop;
+                  
+                  if ($nread > 0) {
+                    my $write_cb = [$uv_pipe : , $uv_stream : , $read_data : , $read_cb : ,] method : void ($req : UV::Request::Write, $status : int) {
+                      $req->set_write_cb(undef);
+                      $uv_stream->read_start($read_data, length $read_data, $read_cb);
+                    };
+                    
+                    $write_req->write($uv_pipe, $buf, $nread, $write_cb);
+                  }
+                  elsif ($nread < 0) {
+                    $uv_stream->close_safe;
+                    $uv_pipe->close_safe;
+                  }
+                };
+                weaken $read_cb->{uv_pipe};
+                $other_pipe->read_start($read_data, length $read_data, $read_cb);
+              }
             }
           }
         }
