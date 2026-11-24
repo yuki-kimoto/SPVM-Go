@@ -129,14 +129,14 @@ class Go::OS::File {
     
     my $type = $self->{type};
     
-    if (my $uv_stream = $self->{uv_stream}) {
-      $uv_stream->close_safe;
-      $self->{uv_stream} = undef;
-    }
-    
     if (my $other_uv_pipe = $self->{other_uv_pipe}) {
       $other_uv_pipe->close_safe;
       $self->{other_uv_pipe} = undef;
+    }
+    
+    if (my $uv_stream = $self->{uv_stream}) {
+      $uv_stream->close_safe;
+      $self->{uv_stream} = undef;
     }
     
     unless ($self->{no_close}) {
