@@ -114,7 +114,17 @@ class Go::OS::Exec::Cmd {
     return $options;
   }
   
-  method run : long () {
+  has _finish_ch : Go::Channel;
+  
+  has _exit_status_ref : long[];
+  
+  has _term_signal_ref : int[];
+  
+  has _error_id_ref : int[];
+  
+  has _exception_ref : string[];
+
+  method start : void () {
     
     my $exec_cmd = $self;
     my $context = $self->{context};
@@ -123,15 +133,22 @@ class Go::OS::Exec::Cmd {
     my $sigkill = 9;
     my $finished_ref = [0];
     my $finish_ch = Go->make;
+    $self->{_finish_ch} = $finish_ch;
+    
     my $cancel_ch = (Go::Channel)undef;
     my $deadline_uv_timer_ref = [(UV::Handle::Timer)undef];
     my $uv_loop = Go->uv_loop;
     my $deadline_cb = (UV::Callback::Timer)undef;
     my $cancel_cb = (Callback)undef;
+    
     my $exit_status_ref = [(long)0];
     my $term_signal_ref = [(int)0];
     my $error_id_ref = [(int)0];
     my $exception_ref = [(string)undef];
+    $self->{_exit_status_ref} = $exit_status_ref;
+    $self->{_term_signal_ref} = $term_signal_ref;
+    $self->{_error_id_ref} = $error_id_ref;
+    $self->{_exception_ref} = $exception_ref;
     
     my $uv_process_ref = [(UV::Handle::Process)undef];
     my $uv_process = UV::Handle::Process->new;
@@ -181,7 +198,6 @@ class Go::OS::Exec::Cmd {
         }
       }
     };
-    # weaken $deadline_cb->{uv_process_ref};
     $deadline_cb_ref->[0] = $deadline_cb;
     
     $cancel_cb = [$error_id_ref : , $exception_ref : , $uv_process_ref : , $finished_ref : , $sigkill : ] method : void () {
@@ -196,7 +212,6 @@ class Go::OS::Exec::Cmd {
         }
       }
     };
-    # weaken $cancel_cb->{uv_process_ref};
     $cancel_cb_ref->[0] = $cancel_cb;
     
     $uv_loop->spawn($uv_process, $options);
@@ -246,19 +261,36 @@ class Go::OS::Exec::Cmd {
         }
       });
     }
+  }
+  
+  method wait : long () {
     
-    $finish_ch->read;
+    my $finish_ch = $self->{_finish_ch};
+    if ($finish_ch) {
+      $finish_ch->read;
+    }
     
-    if ($error_id_ref->[0]) {
+    my $error_id_ref = $self->{_error_id_ref};
+    my $exception_ref = $self->{_exception_ref};
+    if ($error_id_ref && $error_id_ref->[0]) {
       die $error_id_ref->[0], $exception_ref->[0];
     }
     
-    my $exit_status = $exit_status_ref->[0];
-    my $term_signal = $term_signal_ref->[0];
+    my $exit_status_ref = $self->{_exit_status_ref};
+    my $term_signal_ref = $self->{_term_signal_ref};
+    my $exit_status = $exit_status_ref ? $exit_status_ref->[0] : 0L;
+    my $term_signal = $term_signal_ref ? $term_signal_ref->[0] : 0;
     
     my $status = ($exit_status << 8) | $term_signal;
     
     return $status;
+  }
+  
+  method run : long () {
+    
+    $self->start;
+    
+    return $self->wait;
   }
   
 }
