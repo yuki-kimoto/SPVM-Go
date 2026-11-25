@@ -67,46 +67,6 @@ class Go::Schedule {
   }
   
   # Instance Methods
-  private method schedule : int ($schedule_info : Go::Schedule::Info, $caller_info : CallerInfo = undef) {
-    
-    my $called_from_main_thread = Thread::ID->eq(Thread::ThisThread->get_id, $self->{thread_id});
-    
-    unless ($called_from_main_thread) {
-      die "The schedule method in the Go::Schedule class must be called from the main thread.";
-    }
-    
-    my $current_goroutine = $self->{current_goroutine};
-    
-    if ($current_goroutine) {
-      unless ($schedule_info->{type} == Go::Schedule::Info->TYPE_NONE) {
-        $self->disable_goroutine($current_goroutine, $schedule_info);
-      }
-      
-      my $schedule_goroutine = $self->{schedule_goroutine};
-      
-      Go::Goroutine->transfer($current_goroutine, $schedule_goroutine);
-    }
-    else {
-      unless ($schedule_info->{type} == Go::Schedule::Info->TYPE_NONE) {
-        $self->add_task([$self : , $schedule_info : , $caller_info : ] method : void () {
-          $self->schedule($schedule_info, $caller_info);
-        }, $caller_info);
-      }
-      
-      $self->run;
-      
-      $self->{schedule_goroutine} = undef;
-      
-      $self->{current_goroutine} = undef;
-    }
-    
-    if ($schedule_info->{error_id}) {
-      my $error_id = $schedule_info->{error_id};
-      my $exception = $schedule_info->{exception};
-      die $error_id, $exception;
-    }
-  }
-  
   private method add_task : void ($task : Callback, $caller_info : CallerInfo) {
     
     my $goroutine = Go::Goroutine->new($task, undef, $caller_info);
@@ -272,5 +232,29 @@ class Go::Schedule {
       $self->{current_goroutine} = undef;
     }
   }
-
+  
+  private method schedule : int ($caller_info : CallerInfo = undef) {
+    
+    my $called_from_main_thread = Thread::ID->eq(Thread::ThisThread->get_id, $self->{thread_id});
+    
+    unless ($called_from_main_thread) {
+      die "The schedule method in the Go::Schedule class must be called from the main thread.";
+    }
+    
+    my $current_goroutine = $self->{current_goroutine};
+    
+    if ($current_goroutine) {
+      my $schedule_goroutine = $self->{schedule_goroutine};
+      
+      Go::Goroutine->transfer($current_goroutine, $schedule_goroutine);
+    }
+    else {
+      $self->run;
+      
+      $self->{schedule_goroutine} = undef;
+      
+      $self->{current_goroutine} = undef;
+    }
+  }
+  
 }
