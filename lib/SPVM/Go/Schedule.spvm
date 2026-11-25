@@ -149,48 +149,6 @@ class Go::Schedule {
           $finish_cb->();
         };
       }
-      case Go::Schedule::Info->TYPE_CHANNEL_READ:
-      case Go::Schedule::Info->TYPE_CHANNEL_WRITE:
-      {
-        my $wait = $schedule_info->{wait};
-        my $uv_async_ref = [(UV::Handle::Async)undef];
-        my $uv_async = UV::Handle::Async->new;
-        $uv_async_ref->[0] = $uv_async;
-        $wait->{uv_async} = $uv_async;
-        
-        my $finish_cb = [$self : , $goroutine : , $finish_ch : , $wait : , $uv_async_ref : ] method : void ($args : object...) {
-          $finish_ch->close;
-          $wait->{uv_async} = undef;
-          
-          my $async = $uv_async_ref->[0];
-          if ($async) {
-            $async->close_safe;
-            $uv_async_ref->[0] = undef;
-          }
-          
-          $self->enable_goroutine($goroutine);
-        };
-        
-        my $async_cb = [$finish_cb : ] method : void ($uv_async : UV::Handle::Async) {
-          $finish_cb->();
-        };
-        
-        $uv_loop->async_init($uv_async, $async_cb);
-        
-        $deadline_cb = [$schedule_info : , $finish_cb : ] method : void ($deadline_uv_timer : UV::Handle::Timer) {
-          $schedule_info->{error_id} = basic_type_id Go::Context::Error::DeadlineExceeded;
-          $schedule_info->{exception} = "Context deadline exceeded";
-          
-          $finish_cb->();
-        };
-        
-        $cancel_cb = [$schedule_info : , $finish_cb : ] method : void () {
-          $schedule_info->{error_id} = basic_type_id Go::Context::Error::Canceled;
-          $schedule_info->{exception} = "Context canceled";
-          
-          $finish_cb->();
-        };
-      }
       case Go::Schedule::Info->TYPE_POLL_READ:
       case Go::Schedule::Info->TYPE_POLL_WRITE:
       {

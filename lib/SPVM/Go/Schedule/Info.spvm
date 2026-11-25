@@ -17,8 +17,6 @@ class Go::Schedule::Info {
   private enum {
     TYPE_NONE,
     TYPE_SLEEP,
-    TYPE_CHANNEL_READ,
-    TYPE_CHANNEL_WRITE,
     TYPE_POLL_READ,
     TYPE_POLL_WRITE,
     TYPE_POLL_CANCEL,
@@ -34,8 +32,6 @@ class Go::Schedule::Info {
   has fd : int;
   
   has context : Go::Context;
-  
-  has wait : Go::Channel::Wait;
   
   has buffer : string;
   
