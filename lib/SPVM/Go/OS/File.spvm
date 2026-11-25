@@ -86,7 +86,7 @@ class Go::OS::File {
     }
   }
   
-  method sysread : int ($context : Go::Context, $string : mutable string, $length : int = -1, $offset : int = 0) {
+  method read : int ($context : Go::Context, $string : mutable string, $length : int = -1, $offset : int = 0) {
     
     my $type = $self->{type};
     
@@ -99,7 +99,7 @@ class Go::OS::File {
     }
   }
   
-  method syswrite : int ($context : Go::Context, $string : string, $length : int = -1, $offset : int = 0) {
+  method write : int ($context : Go::Context, $string : string, $length : int = -1, $offset : int = 0) {
     
     my $type = $self->{type};
     
