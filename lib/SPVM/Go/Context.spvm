@@ -127,14 +127,18 @@ class Go::Context {
     
     $self->{done} = Go->make;
     
-    my $cancel = [$err : int, $cause : string, $that : Go::Context = $self] method : void ($cause : string) {
+    my $default_err = $err;
+    my $default_cause = $cause;
+    
+    # Cancel with explicit error ID and cause, then propagate to children
+    my $cancel_with_err = [$that : Go::Context = $self] method : void ($cancel_err : int, $cancel_cause : string) {
       
       if ($that->err > 0) {
         return;
       }
       
-      $that->{err} = $err;
-      $that->{cause} = $cause;
+      $that->{err} = $cancel_err;
+      $that->{cause} = $cancel_cause;
       
       if ($that->done) {
         $that->done->close;
@@ -155,14 +159,20 @@ class Go::Context {
         unless ($child isa Go::Context::Value) {
           if ($child->done) {
             $child->done->close;
-            $child->{err} = $err;
-            $child->{cause} = $cause;
+            $child->{err} = $cancel_err;
+            $child->{cause} = $cancel_cause;
           }
         }
         
         $all_children->push_($child->{children});
         $child->{children} = new Go::Context[0];
       }
+    };
+    
+    my $cancel = [$cancel_with_err : , $default_err : int, $default_cause : string] method : void ($override_cause : string = undef) {
+      
+      my $use_cause = $override_cause ? $override_cause : $default_cause;
+      $cancel_with_err->($default_err, $use_cause);
     };
     
     my $derived = my $_ = Go::Context::Derived->new;
