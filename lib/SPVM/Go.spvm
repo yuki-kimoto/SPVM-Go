@@ -64,7 +64,7 @@ class Go {
     my $schedule = $GO->{schedule};
     
     my $caller_info = caller;
-    $schedule->schedule($caller_info);
+    $schedule->schedule(undef, $caller_info);
   }
   
   static method sleep : void ($duration : Go::Duration_1l) {

@@ -276,7 +276,7 @@ class Go::Channel {
     $uv_loop->async_init($uv_async, $async_cb);
     
     my $caller_info = caller;
-    $schedule->start($goroutine_ref, $caller_info);
+    $schedule->schedule($goroutine_ref, $caller_info);
   }
   
 }
