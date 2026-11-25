@@ -189,6 +189,28 @@ class Go {
     
     $uv_poll->start($poll_cb, $events);
     
+    &_setup_context($context, $uv_loop, $finish_ch, $deadline_uv_timer_ref, $error_id_ref, $exception_ref, $finish_cb);
+    
+    $finish_ch->read;
+    
+    if ($error_id_ref->[0]) {
+      die $error_id_ref->[0], $exception_ref->[0];
+    }
+  }
+  
+  private static method _setup_context : void (
+    $context : Go::Context,
+    $uv_loop : UV::Loop,
+    $finish_ch : Go::Channel,
+    $deadline_uv_timer_ref : UV::Handle::Timer[],
+    $error_id_ref : int[],
+    $exception_ref : string[],
+    $finish_cb : Go::Schedule::Callback::Finish
+  ) {
+    unless ($context) {
+      return;
+    }
+    
     my $deadline = $context->deadline;
     if ($deadline) {
       my $deadline_cb = [$error_id_ref : , $exception_ref : , $finish_cb : ] method : void ($deadline_uv_timer : UV::Handle::Timer) {
@@ -235,12 +257,6 @@ class Go {
           $cancel_cb->();
         }
       });
-    }
-    
-    $finish_ch->read;
-    
-    if ($error_id_ref->[0]) {
-      die $error_id_ref->[0], $exception_ref->[0];
     }
   }
   
