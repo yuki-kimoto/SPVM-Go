@@ -16,9 +16,6 @@ class Go::Schedule::Info {
   
   private enum {
     TYPE_NONE,
-    TYPE_POLL_READ,
-    TYPE_POLL_WRITE,
-    TYPE_POLL_CANCEL,
     TYPE_PIPE_READ,
     TYPE_PIPE_WRITE,
     TYPE_PIPE_CANCEL,

@@ -127,26 +127,123 @@ class Go {
   
   private static method gosched_poll_read_with_caller_info : void ($context : Go::Context, $fd : int, $caller_info : CallerInfo = undef) {
     
-    my $schedule = $GO->{schedule};
-    
-    my $schedule_info = new Go::Schedule::Info;
-    $schedule_info->{type} = Go::Schedule::Info->TYPE_POLL_READ;
-    $schedule_info->{fd} = $fd;
-    $schedule_info->{context} = $context;
-    
-    $schedule->schedule($schedule_info, $caller_info);
+    &gosched_poll_io($context, $fd, 1);
   }
   
   static method gosched_poll_write_with_caller_info : void ($context : Go::Context, $fd : int, $caller_info : CallerInfo = undef) {
     
+    &gosched_poll_io($context, $fd, 0);
+  }
+  
+  private static method gosched_poll_io : void ($context : Go::Context, $fd : int, $is_read : int) {
+    
+    unless ($fd >= 0) {
+      die "The file descriptor \$fd in schedule type TYPE_POLL_READ or TYPE_POLL_WRITE must be a non-negative value.";
+    }
+    
     my $schedule = $GO->{schedule};
+    my $uv_loop = $schedule->{uv_loop};
+    my $finish_ch = Go->make;
+    my $deadline_uv_timer_ref = [(UV::Handle::Timer)undef];
+    my $error_id_ref = [(int)0];
+    my $exception_ref = [(string)undef];
     
-    my $schedule_info = new Go::Schedule::Info;
-    $schedule_info->{type} = Go::Schedule::Info->TYPE_POLL_WRITE;
-    $schedule_info->{fd} = $fd;
-    $schedule_info->{context} = $context;
+    my $uv_poll_ref = [(UV::Handle::Poll)undef];
+    my $uv_poll = UV::Handle::Poll->new;
+    $uv_poll_ref->[0] = $uv_poll;
+    $uv_loop->poll_init($uv_poll, $fd);
     
-    $schedule->schedule($schedule_info, $caller_info);
+    # Clean up handles and wake waiting goroutine
+    my $finish_cb = [$schedule : , $finish_ch : , $fd : , $uv_poll_ref : , $deadline_uv_timer_ref : ] method : void ($args : object...) {
+      $finish_ch->close;
+      $schedule->{uv_poll_finish_cbs_h}->delete("$fd");
+      
+      my $deadline_uv_timer = $deadline_uv_timer_ref->[0];
+      if ($deadline_uv_timer) {
+        $deadline_uv_timer->set_timer_cb(undef);
+        $deadline_uv_timer->close_safe;
+        $deadline_uv_timer_ref->[0] = undef;
+      }
+      
+      my $uv_poll = $uv_poll_ref->[0];
+      if ($uv_poll) {
+        $uv_poll->set_poll_cb(undef);
+        $uv_poll->close_safe;
+        $uv_poll_ref->[0] = undef;
+      }
+    };
+    
+    $schedule->{uv_poll_finish_cbs_h}{"$fd"} = $finish_cb;
+    
+    my $events = $is_read ? UV_C->UV_READABLE : UV_C->UV_WRITABLE;
+    my $poll_cb = [$error_id_ref : , $exception_ref : , $finish_cb : ] method : void ($uv_poll : UV::Handle::Poll, $status : int, $events : int) {
+      if ($status < 0) {
+        $error_id_ref->[0] = basic_type_id Error;
+        $exception_ref->[0] = UV->strerror($status);
+      }
+      
+      $finish_cb->();
+    };
+    
+    $uv_poll->start($poll_cb, $events);
+    
+    my $deadline_cb = [$error_id_ref : , $exception_ref : , $finish_cb : ] method : void ($deadline_uv_timer : UV::Handle::Timer) {
+      $error_id_ref->[0] = basic_type_id Go::Context::Error::DeadlineExceeded;
+      $exception_ref->[0] = "Context deadline exceeded";
+      
+      $finish_cb->();
+    };
+    
+    my $cancel_cb = [$error_id_ref : , $exception_ref : , $finish_cb : ] method : void () {
+      $error_id_ref->[0] = basic_type_id Go::Context::Error::Canceled;
+      $exception_ref->[0] = "Context canceled";
+      
+      $finish_cb->();
+    };
+    
+    my $cancel_ch = (Go::Channel)undef;
+    if ($context) {
+      my $deadline = $context->deadline;
+      if ($deadline) {
+        my $now = Go::Time->now;
+        my $duration = $deadline->sub($now);
+        my $duration_nsec = $duration->{nsec};
+        if ($duration_nsec < 0) {
+          $duration_nsec = 0L;
+        }
+        my $deadline_msec = $duration_nsec / 1_000_000;
+        
+        my $deadline_uv_timer = UV::Handle::Timer->new;
+        $deadline_uv_timer_ref->[0] = $deadline_uv_timer;
+        $uv_loop->timer_init($deadline_uv_timer);
+        
+        my $deadline_timer_cb = [$deadline_cb : ] method : void ($deadline_uv_timer : UV::Handle::Timer) {
+          $deadline_cb->($deadline_uv_timer);
+        };
+        
+        $deadline_uv_timer->start($deadline_timer_cb, (long)$deadline_msec);
+      }
+      
+      $cancel_ch = $context->done;
+    }
+    
+    if ($cancel_ch) {
+      my $finish_or_cancel_select = Go->new_select;
+      $finish_or_cancel_select->add_read($finish_ch);
+      $finish_or_cancel_select->add_read($cancel_ch);
+      Go->go([$finish_or_cancel_select : , $finish_ch : , $cancel_ch : , $cancel_cb : ] method : void () {
+        my $result = $finish_or_cancel_select->select;
+        if ($result->channel == $cancel_ch) {
+          $cancel_cb->();
+        }
+      });
+    }
+    
+    $finish_ch->read;
+    
+    if ($error_id_ref->[0]) {
+      die $error_id_ref->[0], $exception_ref->[0];
+    }
   }
   
   static method gosched_poll_cancel : void ($fd : int) {
@@ -158,12 +255,11 @@ class Go {
   static method gosched_poll_cancel_with_caller_info : void ($fd : int, $caller_info : CallerInfo = undef) {
     
     my $schedule = $GO->{schedule};
+    my $uv_poll_finish_cb = $schedule->{uv_poll_finish_cbs_h}{"$fd"};
     
-    my $schedule_info = new Go::Schedule::Info;
-    $schedule_info->{type} = Go::Schedule::Info->TYPE_POLL_CANCEL;
-    $schedule_info->{fd} = $fd;
-    
-    $schedule->schedule($schedule_info, $caller_info);
+    if ($uv_poll_finish_cb) {
+      $uv_poll_finish_cb->();
+    }
   }
   
   static method gosched_pipe_read : int ($context : Go::Context, $fd : int, $string : mutable string, $length : int = -1, $offset : int = 0) {
