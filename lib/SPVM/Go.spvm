@@ -191,24 +191,16 @@ class Go {
     
     $uv_poll->start($poll_cb, $events);
     
-    my $deadline_cb = [$error_id_ref : , $exception_ref : , $finish_cb : ] method : void ($deadline_uv_timer : UV::Handle::Timer) {
-      $error_id_ref->[0] = basic_type_id Go::Context::Error::DeadlineExceeded;
-      $exception_ref->[0] = "Context deadline exceeded";
-      
-      $finish_cb->();
-    };
-    
-    my $cancel_cb = [$error_id_ref : , $exception_ref : , $finish_cb : ] method : void () {
-      $error_id_ref->[0] = basic_type_id Go::Context::Error::Canceled;
-      $exception_ref->[0] = "Context canceled";
-      
-      $finish_cb->();
-    };
-    
-    my $cancel_ch = (Go::Channel)undef;
     if ($context) {
       my $deadline = $context->deadline;
       if ($deadline) {
+        my $deadline_cb = [$error_id_ref : , $exception_ref : , $finish_cb : ] method : void ($deadline_uv_timer : UV::Handle::Timer) {
+          $error_id_ref->[0] = basic_type_id Go::Context::Error::DeadlineExceeded;
+          $exception_ref->[0] = "Context deadline exceeded";
+          
+          $finish_cb->();
+        };
+        
         my $now = Go::Time->now;
         my $duration = $deadline->sub($now);
         my $duration_nsec = $duration->{nsec};
@@ -228,19 +220,25 @@ class Go {
         $deadline_uv_timer->start($deadline_timer_cb, (long)$deadline_msec);
       }
       
-      $cancel_ch = $context->done;
-    }
-    
-    if ($cancel_ch) {
-      my $finish_or_cancel_select = Go->new_select;
-      $finish_or_cancel_select->add_read($finish_ch);
-      $finish_or_cancel_select->add_read($cancel_ch);
-      Go->go([$finish_or_cancel_select : , $finish_ch : , $cancel_ch : , $cancel_cb : ] method : void () {
-        my $result = $finish_or_cancel_select->select;
-        if ($result->channel == $cancel_ch) {
-          $cancel_cb->();
-        }
-      });
+      my $cancel_ch = $context->done;
+      if ($cancel_ch) {
+        my $cancel_cb = [$error_id_ref : , $exception_ref : , $finish_cb : ] method : void () {
+          $error_id_ref->[0] = basic_type_id Go::Context::Error::Canceled;
+          $exception_ref->[0] = "Context canceled";
+          
+          $finish_cb->();
+        };
+        
+        my $finish_or_cancel_select = Go->new_select;
+        $finish_or_cancel_select->add_read($finish_ch);
+        $finish_or_cancel_select->add_read($cancel_ch);
+        Go->go([$finish_or_cancel_select : , $finish_ch : , $cancel_ch : , $cancel_cb : ] method : void () {
+          my $result = $finish_or_cancel_select->select;
+          if ($result->channel == $cancel_ch) {
+            $cancel_cb->();
+          }
+        });
+      }
     }
     
     $finish_ch->read;
