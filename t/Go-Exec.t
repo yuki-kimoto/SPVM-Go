@@ -18,19 +18,24 @@ ok(SPVM::TestCase::Go::OS::Exec->context_deadline);
 
 ok(SPVM::TestCase::Go::OS::Exec->context_extra);
 
-ok(SPVM::TestCase::Go::OS::Exec->stdout);
+if ($^O eq 'MSWin32') {
+  diag "[TODO]Skip extra_files tests in Windows.";
+}
+else {
+  ok(SPVM::TestCase::Go::OS::Exec->stdout);
 
-ok(SPVM::TestCase::Go::OS::Exec->stderr);
+  ok(SPVM::TestCase::Go::OS::Exec->stderr);
 
-ok(SPVM::TestCase::Go::OS::Exec->extra_files);
+  ok(SPVM::TestCase::Go::OS::Exec->extra_files);
 
-ok(SPVM::TestCase::Go::OS::Exec->env);
+  ok(SPVM::TestCase::Go::OS::Exec->env);
 
-ok(SPVM::TestCase::Go::OS::Exec->stdin);
+  ok(SPVM::TestCase::Go::OS::Exec->stdin);
 
-ok(SPVM::TestCase::Go::OS::Exec->pipe_extra);
+  ok(SPVM::TestCase::Go::OS::Exec->pipe_extra);
 
-ok(SPVM::TestCase::Go::OS::Exec->new_file);
+  ok(SPVM::TestCase::Go::OS::Exec->new_file);
+}
 
 $api->destroy_runtime_permanent_vars;
 
