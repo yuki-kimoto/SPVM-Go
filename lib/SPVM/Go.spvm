@@ -32,33 +32,6 @@ class Go {
     $GO = $go;
   }
   
-  static method go : void ($task : Callback) {
-    
-    my $schedule = $GO->{schedule};
-    
-    my $caller_info = caller;
-    
-    $schedule->add_task($task, $caller_info);
-  }
-  
-  static method make : Go::Channel ($capacity : int = 0) {
-    
-    my $schedule = $GO->{schedule};
-    
-    my $channel = Go::Channel->new({schedule => $schedule, capacity => $capacity});
-    
-    return $channel;
-  }
-  
-  static method new_select : Go::Select () {
-    
-    my $schedule = $GO->{schedule};
-    
-    my $select = Go::Select->new($schedule);
-    
-    return $select;
-  }
-  
   static method gosched : void () {
     
     my $schedule = $GO->{schedule};
@@ -66,60 +39,14 @@ class Go {
     $schedule->schedule;
   }
   
-  static method sleep : void ($duration : Go::Duration_1l) {
+  static method gosched_poll_read : void ($context : Go::Context, $fd : int) {
     
-    my $nsec = $duration->{nsec};
-    if ($nsec <= 0L) {
-      return;
-    }
-    
-    my $timeout_msec = (long)($nsec / 1_000_000L);
-    
-    my $uv_loop = Go->uv_loop;
-    my $timer = UV::Handle::Timer->new;
-    $uv_loop->timer_init($timer);
-    
-    my $sleep_ch = Go->make(1);
-    
-    my $timer_cb = [$timer : , $sleep_ch : ] method : void ($uv_timer : UV::Handle::Timer) {
-      $uv_timer->set_timer_cb(undef);
-      $uv_timer->close_safe;
-      $sleep_ch->write(1);
-    };
-    
-    $timer->start($timer_cb, $timeout_msec);
-    
-    $sleep_ch->read;
+    &gosched_poll_io($context, $fd, 1);
   }
   
-  static method sleep_sec : void ($sec : double = 0) {
+  static method gosched_poll_write : void ($context : Go::Context, $fd : int) {
     
-    my $duration = Go::Duration_1l->new_from_sec($sec);
-    
-    &sleep($duration);
-  }
-  
-  static method after : Go::Channel ($duration : Go::Duration_1l = undef) {
-    
-    my $duration_nsec = $duration->{nsec};
-    
-    my $ch = Go->make;
-    
-    Go->go([$ch : , $duration_nsec : ] method : void () {
-      my $duration = Go::Duration_1l->new($duration_nsec);
-      Go->sleep($duration);
-      
-      $ch->write(1);
-    });
-    
-    return $ch;
-  }
-  
-  static method after_sec : Go::Channel ($sec : double = 0) {
-    
-    my $duration = Go::Duration_1l->new_from_sec($sec);
-    
-    return &after($duration);
+    &gosched_poll_io($context, $fd, 0);
   }
   
   private static method gosched_poll_io : void ($context : Go::Context, $fd : int, $is_read : int) {
@@ -267,26 +194,6 @@ class Go {
   static method gosched_pipe_write : int ($context : Go::Context, $fd : int, $string : string, $length : int = -1, $offset : int = 0) {
     
     return &gosched_pipe_io($context, $fd, $string, $length, $offset, 0);
-  }
-  
-  static method gosched_pipe_cancel : void ($fd : int) {
-    
-    my $schedule = $GO->{schedule};
-    my $uv_pipe_finish_cb = $schedule->{uv_pipe_finish_cbs_h}{"$fd"};
-    
-    if ($uv_pipe_finish_cb) {
-      $uv_pipe_finish_cb->();
-    }
-  }
-  
-  static method gosched_poll_read : void ($context : Go::Context, $fd : int) {
-    
-    &gosched_poll_io($context, $fd, 1);
-  }
-  
-  static method gosched_poll_write : void ($context : Go::Context, $fd : int) {
-    
-    &gosched_poll_io($context, $fd, 0);
   }
   
   private static method gosched_pipe_io : int ($context : Go::Context, $fd : int, $buffer : string, $buffer_length : int, $buffer_offset : int, $is_read : int) {
@@ -438,6 +345,99 @@ class Go {
     }
     
     return $ret_length_ref->[0];
+  }
+  
+  static method gosched_pipe_cancel : void ($fd : int) {
+    
+    my $schedule = $GO->{schedule};
+    my $uv_pipe_finish_cb = $schedule->{uv_pipe_finish_cbs_h}{"$fd"};
+    
+    if ($uv_pipe_finish_cb) {
+      $uv_pipe_finish_cb->();
+    }
+  }
+  
+  static method go : void ($task : Callback) {
+    
+    my $schedule = $GO->{schedule};
+    
+    my $caller_info = caller;
+    
+    $schedule->add_task($task, $caller_info);
+  }
+  
+  static method make : Go::Channel ($capacity : int = 0) {
+    
+    my $schedule = $GO->{schedule};
+    
+    my $channel = Go::Channel->new({schedule => $schedule, capacity => $capacity});
+    
+    return $channel;
+  }
+  
+  static method new_select : Go::Select () {
+    
+    my $schedule = $GO->{schedule};
+    
+    my $select = Go::Select->new($schedule);
+    
+    return $select;
+  }
+  
+  static method sleep : void ($duration : Go::Duration_1l) {
+    
+    my $nsec = $duration->{nsec};
+    if ($nsec <= 0L) {
+      return;
+    }
+    
+    my $timeout_msec = (long)($nsec / 1_000_000L);
+    
+    my $uv_loop = Go->uv_loop;
+    my $timer = UV::Handle::Timer->new;
+    $uv_loop->timer_init($timer);
+    
+    my $sleep_ch = Go->make(1);
+    
+    my $timer_cb = [$timer : , $sleep_ch : ] method : void ($uv_timer : UV::Handle::Timer) {
+      $uv_timer->set_timer_cb(undef);
+      $uv_timer->close_safe;
+      $sleep_ch->write(1);
+    };
+    
+    $timer->start($timer_cb, $timeout_msec);
+    
+    $sleep_ch->read;
+  }
+  
+  static method sleep_sec : void ($sec : double = 0) {
+    
+    my $duration = Go::Duration_1l->new_from_sec($sec);
+    
+    &sleep($duration);
+  }
+  
+  static method after : Go::Channel ($duration : Go::Duration_1l = undef) {
+    
+    my $duration_nsec = $duration->{nsec};
+    
+    my $ch = Go->make;
+    
+    Go->go([$ch : , $duration_nsec : ] method : void () {
+      my $duration = Go::Duration_1l->new($duration_nsec);
+      Go->sleep($duration);
+      
+      $ch->write(1);
+    });
+    
+    return $ch;
+  }
+  
+  static method after_sec : Go::Channel ($sec : double = 0) {
+    
+    my $duration = Go::Duration_1l->new_from_sec($sec);
+    
+    return &after($duration);
   }
   
   static method bg : Go::Context () {
