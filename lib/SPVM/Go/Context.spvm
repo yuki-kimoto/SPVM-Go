@@ -131,21 +131,21 @@ class Go::Context {
     my $default_cause = $cause;
     
     # Cancel with explicit error ID and cause, then propagate to children
-    my $cancel_with_err = [$that : Go::Context = $self] method : void ($cancel_err : int, $cancel_cause : string) {
+    my $cancel_with_err = [$self : ,] method : void ($cancel_err : int, $cancel_cause : string) {
       
-      if ($that->err > 0) {
+      if ($self->err > 0) {
         return;
       }
       
-      $that->{err} = $cancel_err;
-      $that->{cause} = $cancel_cause;
+      $self->{err} = $cancel_err;
+      $self->{cause} = $cancel_cause;
       
-      if ($that->done) {
-        $that->done->close;
+      if ($self->done) {
+        $self->done->close;
       }
       
-      my $all_children = (List of Go::Context)List->new($that->{children});
-      $that->{children} = new Go::Context[0];
+      my $all_children = (List of Go::Context)List->new($self->{children});
+      $self->{children} = new Go::Context[0];
       
       while (1) {
         unless ($all_children->length) {
