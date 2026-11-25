@@ -6,7 +6,15 @@ class Go::OS::File {
   allow Go::OS::Exec::Cmd;
   allow Go::Schedule;
   
+  use Fn;
+  use Go;
+  use Go::Context;
+  use Go::Select;
+  use Go::Select::Result;
+  use UV;
+  use UV::Constant as UV_C;
   use UV::Handle::Stream;
+  use UV::Request::Write;
   
   private enum {
     TYPE_UNKNOWN,
@@ -39,10 +47,6 @@ class Go::OS::File {
   
   has no_close : byte;
   
-  has opened : byte;
-  
-  has other_uv_pipe : UV::Handle::Pipe;
-  
   # Class Methods
   static method new_file : Go::OS::File ($fd : int) {
     
@@ -63,19 +67,8 @@ class Go::OS::File {
     
     my $self = new Go::OS::File;
     
-    my $fd = -1;
-    my $other_fd = -1;
-    Sys->pipepair(\$fd, \$other_fd, 1);
-    
-    my $uv_loop = Go->uv_loop;
-    my $other_uv_pipe = UV::Handle::Pipe->new;
-    $uv_loop->pipe_init($other_uv_pipe, 0);
-    $other_uv_pipe->open($other_fd);
-    
-    $self->{fd} = $fd;
-    $self->{other_uv_pipe} = $other_uv_pipe;
+    $self->{fd} = -1;
     $self->{type} = &TYPE_PIPE_END;
-    $self->{opened} = 1;
     
     return $self;
   }
@@ -86,9 +79,9 @@ class Go::OS::File {
       die "'no_close' field is specified.";
     }
     else {
-      if ($self->{opened}) {
-        Sys::IO->close($self->{fd});
-        $self->{opened} = 0;
+      if (my $uv_stream = $self->{uv_stream}) {
+        $uv_stream->close_safe;
+        $self->{uv_stream} = undef;
       }
     }
   }
@@ -98,11 +91,8 @@ class Go::OS::File {
     my $type = $self->{type};
     
     if ($type == &TYPE_PIPE_END) {
-      my $fd = $self->{fd};
-      
-      my $read_length = Go->gosched_pipe_read($context, $fd, $string, $length, $offset);
-      
-      return $read_length;
+      my $uv_stream = $self->{uv_stream};
+      return &sysread_uv_stream($context, $uv_stream, $string, $length, $offset);
     }
     else {
       die "[Unexpected Error]Not supported type. \$type=$type.";
@@ -114,30 +104,191 @@ class Go::OS::File {
     my $type = $self->{type};
     
     if ($type == &TYPE_PIPE_END) {
-      my $fd = $self->{fd};
-      
-      my $read_length = Go->gosched_pipe_write($context, $fd, $string, $length, $offset);
-      
-      return $read_length;
+      my $uv_stream = $self->{uv_stream};
+      return &syswrite_uv_stream($context, $uv_stream, $string, $length, $offset);
     }
     else {
       die "[Unexpected Error]Not supported type. \$type=$type.";
     }
   }
   
+  static method sysread_uv_stream : int ($context : Go::Context, $uv_stream : UV::Handle::Stream, $string : mutable string, $length : int = -1, $offset : int = 0) {
+    
+    unless ($uv_stream) {
+      die "The uv_stream must be defined.";
+    }
+    
+    my $string_len = length $string;
+    if ($offset < 0 || $offset > $string_len) {
+      die "The offset is out of range.";
+    }
+    
+    if ($length < 0) {
+      $length = $string_len - $offset;
+    }
+    if ($offset + $length > $string_len) {
+      die "The length is out of range.";
+    }
+    if ($length == 0) {
+      return 0;
+    }
+    
+    my $done_ch = $context ? $context->done : undef;
+    my $result_ch = Go->make(1);
+    my $done_ref = [0];
+    my $read_buf = new_string_len $length;
+    
+    # Send read result once
+    my $send_result = [$result_ch : , $done_ref : ] method : void ($nread : int, $buf : string, $err : int) {
+      if ($done_ref->[0]) {
+        return;
+      }
+      $done_ref->[0] = 1;
+      $result_ch->write([(object)$nread, $buf, $err]);
+    };
+    
+    my $read_cb = [$uv_stream : , $send_result : , $done_ref : ] method : void ($stream : UV::Handle::Stream, $nread : int, $buf : mutable string) {
+      $stream->read_stop;
+      
+      if ($done_ref->[0]) {
+        return;
+      }
+      
+      if ($nread > 0) {
+        my $copy_buf = new_string_len $nread;
+        Fn->memcpy($copy_buf, 0, $buf, 0, $nread);
+        $send_result->($nread, $copy_buf, 0);
+      }
+      elsif ($nread == 0) {
+        # Retry read on empty callback
+        $stream->read_start($buf, length $buf, $self);
+      }
+      elsif ($nread == UV_C->UV_EOF) {
+        $send_result->(0, undef, 0);
+      }
+      else {
+        $send_result->(-1, undef, $nread);
+      }
+    };
+    weaken $read_cb->{uv_stream};
+    
+    $uv_stream->read_start($read_buf, $length, $read_cb);
+    
+    my $res = (object[])undef;
+    if ($done_ch) {
+      my $select = Go->new_select;
+      $select->add_read($result_ch);
+      $select->add_read($done_ch);
+      
+      my $selected = $select->select;
+      if ($selected->channel == $result_ch && !$selected->is_write) {
+        $res = (object[])$selected->value;
+      }
+      elsif ($selected->channel == $done_ch && !$selected->is_write) {
+        # Stop read on context done
+        $done_ref->[0] = 1;
+        $uv_stream->read_stop;
+        die $context->err;
+      }
+    }
+    else {
+      $res = (object[])$result_ch->read;
+    }
+    
+    my $nread = (int)$res->[0];
+    my $err = (int)$res->[2];
+    if ($err < 0) {
+      die "libuv read error:" . UV->strerror($err);
+    }
+    if ($nread > 0) {
+      my $data = (string)$res->[1];
+      Fn->memcpy($string, $offset, $data, 0, $nread);
+    }
+    
+    return $nread;
+  }
+  
+  static method syswrite_uv_stream : int ($context : Go::Context, $uv_stream : UV::Handle::Stream, $string : string, $length : int = -1, $offset : int = 0) {
+    
+    unless ($uv_stream) {
+      die "The uv_stream must be defined.";
+    }
+    
+    unless ($string) {
+      die "The string must be defined.";
+    }
+    
+    my $string_len = length $string;
+    if ($offset < 0 || $offset > $string_len) {
+      die "The offset is out of range.";
+    }
+    
+    if ($length < 0) {
+      $length = $string_len - $offset;
+    }
+    if ($offset + $length > $string_len) {
+      die "The length is out of range.";
+    }
+    if ($length == 0) {
+      return 0;
+    }
+    
+    my $done_ch = $context ? $context->done : undef;
+    my $result_ch = Go->make(1);
+    my $done_ref = [0];
+    
+    my $write_buf = new_string_len $length;
+    Fn->memcpy($write_buf, 0, $string, $offset, $length);
+    
+    my $write_req = UV::Request::Write->new;
+    my $write_cb = [$result_ch : , $done_ref : , $write_req : , $length : ] method : void ($req : UV::Request::Write, $status : int) {
+      $req->set_write_cb(undef);
+      if ($done_ref->[0]) {
+        return;
+      }
+      $done_ref->[0] = 1;
+      if ($status < 0) {
+        $result_ch->write([-1, $status]);
+      }
+      else {
+        $result_ch->write([$length, 0]);
+      }
+    };
+    
+    $write_req->write($uv_stream, $write_buf, $length, $write_cb);
+    
+    my $res = (int[])undef;
+    if ($done_ch) {
+      my $select = Go->new_select;
+      $select->add_write($result_ch, 1);
+      $select->add_read($done_ch);
+      
+      my $selected = $select->select;
+      if ($selected->channel == $result_ch && $selected->is_write) {
+        $res = (int[])$selected->value;
+      }
+      elsif ($selected->channel == $done_ch && !$selected->is_write) {
+        # Ignore late callback after done
+        $done_ref->[0] = 1;
+        die $context->err;
+      }
+    }
+    else {
+      $res = (int[])$result_ch->read;
+    }
+    
+    my $written = $res->[0];
+    my $status = $res->[1];
+    if ($status < 0) {
+      die "libuv write error:" . UV->strerror($status);
+    }
+    
+    return $written;
+  }
+  
   method DESTROY : void () {
     
     my $type = $self->{type};
-    
-    if (my $other_uv_pipe = $self->{other_uv_pipe}) {
-      $other_uv_pipe->close_safe;
-      $self->{other_uv_pipe} = undef;
-    }
-    
-    if (my $uv_stream = $self->{uv_stream}) {
-      $uv_stream->close_safe;
-      $self->{uv_stream} = undef;
-    }
     
     unless ($self->{no_close}) {
       $self->close;
