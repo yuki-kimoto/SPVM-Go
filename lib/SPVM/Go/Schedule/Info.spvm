@@ -16,7 +16,6 @@ class Go::Schedule::Info {
   
   private enum {
     TYPE_NONE,
-    TYPE_PROCESS,
   }
   
   # Fields
