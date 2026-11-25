@@ -170,7 +170,6 @@ class Go {
         $uv_poll_ref->[0] = undef;
       }
     };
-    weaken $finish_cb->{schedule};
     
     $schedule->{uv_poll_finish_cbs_h}{"$fd"} = $finish_cb;
     
@@ -187,7 +186,6 @@ class Go {
       }
       $finish_cb->();
     };
-    weaken $poll_cb->{uv_poll_ref};
     
     $uv_poll->start($poll_cb, $events);
     
