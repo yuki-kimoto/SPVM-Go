@@ -14,7 +14,6 @@ class Go::Schedule {
   use Go::Goroutine;
   use Go::Error::IOTimeout;
   use Go::Time;
-  use Go::Schedule::Info;
   use UV;
   use UV::Loop;
   use UV::Constant as UV_C;
@@ -72,72 +71,6 @@ class Go::Schedule {
     my $goroutine = Go::Goroutine->new($task, undef, $caller_info);
     
     $self->{goroutines}->push($goroutine);
-  }
-  
-  private method disable_goroutine : void ($goroutine : Go::Goroutine, $schedule_info : Go::Schedule::Info) {
-    
-    my $finished_ref = [0];
-    my $finish_ch = Go->make;
-    my $cancel_ch = (Go::Channel)undef;
-    my $deadline_uv_timer_ref = [(UV::Handle::Timer)undef];
-    my $uv_loop = $self->{uv_loop};
-    my $deadline_cb = (UV::Callback::Timer)undef;
-    my $cancel_cb = (Callback)undef;
-    
-    my $schedule_type = $schedule_info->{type};
-    switch ($schedule_type) {
-    }
-    
-    my $context = $schedule_info->{context};
-    if ($context) {
-      my $deadline = $context->deadline;
-      if ($deadline) {
-        my $now = Go::Time->now;
-        my $duration = $deadline->sub($now);
-        my $duration_nsec = $duration->{nsec};
-        if ($duration_nsec < 0) {
-          $duration_nsec = 0L;
-        }
-        my $deadline_msec = $duration_nsec / 1_000_000;
-        
-        unless ($deadline_cb) {
-          die "[Unexpected Error]\$deadline_cb is not defined.";
-        }
-        my $deadline_uv_timer = UV::Handle::Timer->new;
-        $deadline_uv_timer_ref->[0] = $deadline_uv_timer;
-        $uv_loop->timer_init($deadline_uv_timer);
-        
-        my $deadline_timer_cb = [$deadline_cb : ] method : void ($deadline_uv_timer : UV::Handle::Timer) {
-          $deadline_cb->($deadline_uv_timer);
-        };
-        
-        $deadline_uv_timer->start($deadline_timer_cb, (long)$deadline_msec);
-      }
-      
-      $cancel_ch = $context->done;
-    }
-    
-    if ($cancel_ch) {
-      unless ($finish_ch) {
-        die "[Unexpected Error]\$finish_ch is not defined.";
-      }
-      unless ($cancel_cb) {
-        die "[Unexpected Error]\$cancel_cb is not defined.";
-      }
-      my $finish_or_cancel_select = Go->new_select;
-      $finish_or_cancel_select->add_read($finish_ch);
-      $finish_or_cancel_select->add_read($cancel_ch);
-      Go->go([$finish_or_cancel_select : , $finish_ch : , $cancel_ch : , $cancel_cb : ] method : void () {
-        my $result = $finish_or_cancel_select->select;
-        if ($result->channel == $cancel_ch) {
-          $cancel_cb->();
-        }
-      });
-    }
-    
-    my $goroutine_address = Fn->to_address($goroutine);
-    $self->{disabled_goroutines_h}->{$goroutine_address} = $goroutine;
-    $goroutine->{disabled} = 1;
   }
   
   private method enable_goroutine : void ($goroutine : Go::Goroutine) {
