@@ -126,29 +126,6 @@ class Go::Schedule {
     
     my $schedule_type = $schedule_info->{type};
     switch ($schedule_type) {
-      case Go::Schedule::Info->TYPE_SLEEP:
-      {
-        my $finish_cb = [$self : , $goroutine : , $finish_ch : , $deadline_uv_timer_ref : ] method : void ($args : object...) {
-          $finish_ch->close;
-          
-          my $deadline_uv_timer = $deadline_uv_timer_ref->[0];
-          if ($deadline_uv_timer) {
-            $deadline_uv_timer->set_timer_cb(undef);
-            $deadline_uv_timer->close_safe;
-            $deadline_uv_timer_ref->[0] = undef;
-          }
-          
-          $self->enable_goroutine($goroutine);
-        };
-        
-        $deadline_cb = [$finish_cb : ] method : void ($deadline_uv_timer : UV::Handle::Timer) {
-          $finish_cb->();
-        };
-        
-        $cancel_cb = [$finish_cb : ] method : void () {
-          $finish_cb->();
-        };
-      }
       case Go::Schedule::Info->TYPE_POLL_READ:
       case Go::Schedule::Info->TYPE_POLL_WRITE:
       {

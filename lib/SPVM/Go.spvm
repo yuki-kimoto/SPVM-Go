@@ -68,19 +68,30 @@ class Go {
     $schedule->schedule($schedule_info, $caller_info);
   }
   
-  static method sleep : void ($duration : Go::Duration_1l = undef) {
+  static method sleep : void ($duration : Go::Duration_1l) {
     
-    my $_ = Go::Context->with_timeout(Go->bg, $duration);
-    my $context = $_->context;
+    my $nsec = $duration->{nsec};
+    if ($nsec <= 0L) {
+      return;
+    }
     
-    my $schedule = $GO->{schedule};
+    my $timeout_msec = (long)($nsec / 1_000_000L);
     
-    my $schedule_info = new Go::Schedule::Info;
-    $schedule_info->{type} = Go::Schedule::Info->TYPE_SLEEP;
-    $schedule_info->{context} = $context;
+    my $uv_loop = Go->uv_loop;
+    my $timer = UV::Handle::Timer->new;
+    $uv_loop->timer_init($timer);
     
-    my $caller_info = caller;
-    $schedule->schedule($schedule_info, $caller_info);
+    my $sleep_ch = Go->make(1);
+    
+    my $timer_cb = [$timer : , $sleep_ch : ] method : void ($uv_timer : UV::Handle::Timer) {
+      $uv_timer->set_timer_cb(undef);
+      $uv_timer->close_safe;
+      $sleep_ch->write(1);
+    };
+    
+    $timer->start($timer_cb, $timeout_msec);
+    
+    $sleep_ch->read;
   }
   
   static method sleep_sec : void ($sec : double = 0) {

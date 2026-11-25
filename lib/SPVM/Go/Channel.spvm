@@ -261,6 +261,14 @@ class Go::Channel {
     
     my $goroutine = $schedule->{current_goroutine};
     
+    unless ($goroutine) {
+      my $caller_info = caller;
+      $goroutine = Go::Goroutine->new(method : void () {
+        Go->gosched;
+      }, undef, $caller_info);
+      $schedule->{goroutines}->push($goroutine);
+    }
+    
     my $async_cb = [$schedule : , $goroutine : , $wait : ,] method : void () {
       
       my $uv_async = $wait->{uv_async};
@@ -273,10 +281,22 @@ class Go::Channel {
     
     $uv_loop->async_init($uv_async, $async_cb);
     
-    my $goroutine_address = Fn->to_address($goroutine);
-    $schedule->{disabled_goroutines_h}->{$goroutine_address} = $goroutine;
-    $goroutine->{disabled} = 1;
-    Go->gosched;
+    if ($schedule->{current_goroutine}) {
+      my $goroutine_address = Fn->to_address($goroutine);
+      $schedule->{disabled_goroutines_h}->{$goroutine_address} = $goroutine;
+      $goroutine->{disabled} = 1;
+      Go->gosched;
+    }
+    else {
+      $schedule->{current_goroutine} = $goroutine;
+      
+      $schedule->run;
+      
+      $schedule->{schedule_goroutine} = undef;
+      
+      $schedule->{current_goroutine} = undef;
+    }
+
   }
   
 }
