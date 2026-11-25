@@ -252,12 +252,7 @@ class Go::Select {
           last;
         }
         else {
-          my $schedule = $self->{schedule};
-          
-          my $schedule_info = new Go::Schedule::Info;
-          
-          my $caller_info = caller;
-          $schedule->schedule($schedule_info, $caller_info);
+          Go->gosched;
         }
       }
     }
