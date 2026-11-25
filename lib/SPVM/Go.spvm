@@ -440,12 +440,6 @@ class Go {
     return $ret_length_ref->[0];
   }
   
-  private method DESTROY : void () {
-    
-    my $schedule = $self->{schedule};
-    
-  }
-  
   static method bg : Go::Context () {
     return Go::Context->background;
   }
