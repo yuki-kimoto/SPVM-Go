@@ -10,6 +10,7 @@ class Go::Context {
   use Go::Context::Value;
   use Go::Context::Error::Canceled;
   use Go::Context::Error::DeadlineExceeded;
+  use UV::Handle::Timer;
   
   use Fn;
   
@@ -29,6 +30,8 @@ class Go::Context {
   has parent : Go::Context;
   
   has children : Go::Context[];
+  
+  has deadline_uv_timer : UV::Handle::Timer;
   
   our $BACKGROUND_CONTEXT : Go::Context;
 
@@ -215,6 +218,13 @@ class Go::Context {
     }
     
     return $value;
+  }
+  
+  method DESTROY : void () {
+    
+    if (my $deadline_uv_timer = $self->{deadline_uv_timer}) {
+      $deadline_uv_timer->close_safe;
+    }
   }
   
 }
