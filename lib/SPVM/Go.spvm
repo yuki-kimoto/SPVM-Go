@@ -446,13 +446,6 @@ class Go {
     
   }
   
-  static method ENV_DEBUG : int () {
-    
-    my $debug = (int)Sys->env("SPVM_GO_DEBUG");
-    
-    return $debug;
-  }
-  
   static method bg : Go::Context () {
     return Go::Context->background;
   }
