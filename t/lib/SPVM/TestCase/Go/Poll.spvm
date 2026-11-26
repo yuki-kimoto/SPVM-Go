@@ -292,28 +292,15 @@ class TestCase::Go::Poll {
         Go->gosched_poll_cancel($socket_fd1);
       });
       
-      warn;
-      
-      my $context = Go::Context->with_timeout_sec(Go->bg, 100)->context;
-      Go->gosched_poll_read($context, $socket_fd1);
-      
-      warn;
+      Go->gosched_poll_read(Go::Context->with_timeout_sec(Go->bg, 100)->context, $socket_fd1);
       
       # Check doing nothing
       Go->gosched_poll_cancel($socket_fd1);
       
-      warn;
-      
       $success_ref->[0] = 1;
-      
-      warn dump $context;
     });
     
-    warn;
-    
     Go->gosched;
-    
-    warn;
     
     return $success_ref->[0];
   }
