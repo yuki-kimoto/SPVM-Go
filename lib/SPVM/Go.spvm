@@ -93,7 +93,7 @@ class Go {
     
     $uv_poll->start($poll_cb, $events);
     
-    &wait_context($context, $finish_ch, $finish_cb);
+    &wait_with_context($context, $finish_ch, $finish_cb);
     
     my $error_id = 0;
     my $exception = (string)undef;
@@ -113,7 +113,7 @@ class Go {
     }
   }
   
-  private static method wait_context : void ($context : Go::Context, $finish_ch : Go::Channel, $done_cb : Callback) {
+  static method wait_with_context : void ($context : Go::Context, $finish_ch : Go::Channel, $done_cb : Callback) {
     
     unless ($context) {
       die "Go::Context \$context must be defined.";
