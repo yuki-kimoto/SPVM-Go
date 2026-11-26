@@ -99,15 +99,21 @@ class Go {
     
     &wait_context($context, $finish_ch, $finish_cb);
     
-    if ($context) {
-      my $err = $context->err;
-      if ($err > 0) {
-        die $err, $context->cause;
-      }
+    my $error_id = 0;
+    my $exception = (string)undef;
+    
+    my $err = $context->err;
+    if ($err > 0) {
+      $error_id = $err;
+      $exception = $context->cause;
+    }
+    elsif ($poll_err_ref->[0]) {
+      $error_id = $poll_err_ref->[0];
+      $exception = $poll_cause_ref->[0];
     }
     
-    if ($poll_err_ref->[0]) {
-      die $poll_err_ref->[0], $poll_cause_ref->[0];
+    if ($error_id) {
+      die $error_id, $exception;
     }
   }
   
