@@ -182,7 +182,6 @@ class Go::OS::File {
       return 0;
     }
     
-    my $done_ch = $context ? $context->done : undef;
     my $result_ch = Go->make(1);
     my $done_ref = [0];
     my $read_buf = new_string_len $length;
@@ -223,25 +222,22 @@ class Go::OS::File {
     
     $uv_stream->read_start($read_buf, $length, $read_cb);
     
-    my $res = (object[])undef;
-    if ($done_ch) {
-      my $select = Go->new_select;
-      $select->add_read($result_ch);
-      $select->add_read($done_ch);
-      
-      my $selected = $select->select;
-      if ($selected->channel == $result_ch && !$selected->is_write) {
-        $res = (object[])$selected->value;
-      }
-      elsif ($selected->channel == $done_ch && !$selected->is_write) {
-        # Stop read on context done
-        $done_ref->[0] = 1;
+    # Stop read and unblock result_ch on context done
+    my $done_cb = [$uv_stream : , $result_ch : , $done_ref : ] method : void () {
+      $done_ref->[0] = 1;
+      if ($uv_stream) {
         $uv_stream->read_stop;
-        die $context->err;
       }
-    }
-    else {
-      $res = (object[])$result_ch->read;
+      $result_ch->close;
+    };
+    weaken $done_cb->{uv_stream};
+    
+    Go->monitor_context($context, $result_ch, $done_cb);
+    
+    my $res = (object[])$result_ch->read;
+    
+    if ($context && $context->err > 0) {
+      die $context->err, $context->cause;
     }
     
     my $nread = (int)$res->[0];
@@ -282,7 +278,6 @@ class Go::OS::File {
       return 0;
     }
     
-    my $done_ch = $context ? $context->done : undef;
     my $result_ch = Go->make(1);
     my $done_ref = [0];
     
@@ -306,24 +301,18 @@ class Go::OS::File {
     
     $write_req->write($uv_stream, $write_buf, $length, $write_cb);
     
-    my $res = (int[])undef;
-    if ($done_ch) {
-      my $select = Go->new_select;
-      $select->add_write($result_ch, 1);
-      $select->add_read($done_ch);
-      
-      my $selected = $select->select;
-      if ($selected->channel == $result_ch && $selected->is_write) {
-        $res = (int[])$selected->value;
-      }
-      elsif ($selected->channel == $done_ch && !$selected->is_write) {
-        # Ignore late callback after done
-        $done_ref->[0] = 1;
-        die $context->err;
-      }
-    }
-    else {
-      $res = (int[])$result_ch->read;
+    # Unblock result_ch on context done
+    my $done_cb = [$result_ch : , $done_ref : ] method : void () {
+      $done_ref->[0] = 1;
+      $result_ch->close;
+    };
+    
+    Go->monitor_context($context, $result_ch, $done_cb);
+    
+    my $res = (int[])$result_ch->read;
+    
+    if ($context && $context->err > 0) {
+      die $context->err, $context->cause;
     }
     
     my $written = $res->[0];
