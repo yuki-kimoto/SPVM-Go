@@ -64,7 +64,7 @@ class Go {
     $uv_poll_ref->[0] = $uv_poll;
     $uv_loop->poll_init($uv_poll, $fd);
     
-    my $finish_cb = [$schedule : , $finish_ch : , $fd : , $uv_poll_ref : ,] method : void () {
+    my $finish_cb = [$schedule : , $finish_ch : , $fd : , $uv_poll_ref : ] method : void () {
       $finish_ch->close;
       $schedule->{uv_poll_finish_cbs_h}->delete("$fd");
       
@@ -78,18 +78,15 @@ class Go {
     
     $schedule->{uv_poll_finish_cbs_h}{"$fd"} = $finish_cb;
     
-    my $poll_err_ref = [(int)0];
-    my $poll_cause_ref = [(string)undef];
+    my $status_ref = [(int)0];
     my $events = $is_read ? UV_C->UV_READABLE : UV_C->UV_WRITABLE;
-    my $poll_cb = [$poll_err_ref : , $poll_cause_ref : , $finish_cb : , $uv_poll_ref : ] method : void ($uv_poll : UV::Handle::Poll, $status : int, $events : int) {
-      if ($status < 0) {
-        $poll_err_ref->[0] = basic_type_id Error;
-        $poll_cause_ref->[0] = UV->strerror($status);
-      }
+    my $poll_cb = [$status_ref : , $finish_cb : , $uv_poll_ref : ] method : void ($uv_poll : UV::Handle::Poll, $status : int, $events : int) {
       
-      my $p = $uv_poll_ref->[0];
-      if ($p) {
-        $p->set_poll_cb(undef);
+      $status_ref->[0] = $status;
+      
+      my $uv_poll = $uv_poll_ref->[0];
+      if ($uv_poll) {
+        $uv_poll->set_poll_cb(undef);
       }
       $finish_cb->();
     };
@@ -106,9 +103,9 @@ class Go {
       $error_id = $err;
       $exception = $context->cause;
     }
-    elsif ($poll_err_ref->[0]) {
-      $error_id = $poll_err_ref->[0];
-      $exception = $poll_cause_ref->[0];
+    elsif ($status_ref->[0] < 0) {
+      $error_id = basic_type_id Error;
+      $exception = UV->strerror($status_ref->[0]);
     }
     
     if ($error_id) {
@@ -124,7 +121,6 @@ class Go {
     
     my $done_ch = $context->done;
     if ($done_ch) {
-      # Wait for completion or context cancellation
       my $select = Go->new_select;
       $select->add_read($finish_ch);
       $select->add_read($done_ch);
