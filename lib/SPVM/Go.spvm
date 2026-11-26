@@ -17,6 +17,7 @@ class Go {
   use Go::Sync::WaitGroup;
   use Go::OS::Exec::Cmd;
   use UV::Constant as UV_C;
+  use Go::Timer;
   
   our $GO : Go;
   

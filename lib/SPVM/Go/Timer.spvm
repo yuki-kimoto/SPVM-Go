@@ -1,0 +1,136 @@
+# Copyright (c) 2026 Yuki Kimoto
+# MIT License
+
+class Go::Timer {
+  version_from Go;
+  
+  use Fn;
+  use Go;
+  use Go::Channel;
+  use Go::Duration_1l;
+  use Go::Time;
+  use UV;
+  use UV::Handle::Timer;
+  
+  # Fields
+  has c : ro Go::Channel;
+  
+  has uv_timer : UV::Handle::Timer;
+  
+  has duration_nsec : long;
+  
+  has stopped : byte;
+  
+  # Class Methods
+  static method new : Go::Timer ($options : object[] = undef) {
+    
+    my $options_h = Fn->to_hash($options);
+    
+    unless ($options_h->exists("duration_nsec")) {
+      die "The duration_nsec option must be specified.";
+    }
+    my $duration_nsec = $options_h->get("duration_nsec")->(long);
+    
+    my $self = new Go::Timer;
+    $self->{duration_nsec} = $duration_nsec;
+    
+    my $ch = Go->make(1);
+    $self->{c} = $ch;
+    
+    my $uv_loop = Go->uv_loop;
+    my $uv_timer = UV::Handle::Timer->new;
+    $uv_loop->timer_init($uv_timer);
+    $self->{uv_timer} = $uv_timer;
+    
+    # Fire timer channel once and close handle
+    my $timer_cb = [$self : , $ch : , $uv_timer : ] method : void ($timer : UV::Handle::Timer) {
+      if ($self->{stopped}) {
+        $uv_timer->close_safe;
+        return;
+      }
+      
+      my $now = Go::Time->now;
+      $ch->write($now);
+      $ch->close;
+      $uv_timer->close_safe;
+    };
+    
+    my $timeout_ms = (long)($duration_nsec / 1_000_000L);
+    if ($timeout_ms < 0) {
+      $timeout_ms = 0L;
+    }
+    
+    $uv_timer->start($timer_cb, $timeout_ms);
+    
+    return $self;
+  }
+  
+  static method sleep : void ($duration : Go::Duration_1l) {
+    
+    my $timer = Go::Timer->new({duration_nsec => $duration->{nsec}});
+    
+    $timer->c->read;
+  }
+  
+  static method sleep_sec : void ($seconds : double) {
+    
+    my $duration = Go::Duration_1l->new_from_sec($seconds);
+    
+    &sleep($duration);
+  }
+  
+  static method after : Go::Channel ($duration : Go::Duration_1l) {
+    
+    my $timer = Go::Timer->new({duration_nsec => $duration->{nsec}});
+    
+    return $timer->c;
+  }
+  
+  static method after_sec : Go::Channel ($seconds : double) {
+    
+    my $duration = Go::Duration_1l->new_from_sec($seconds);
+    
+    return &after($duration);
+  }
+  
+  static method new_timer : Go::Timer ($duration : Go::Duration_1l) {
+    
+    return Go::Timer->new({duration_nsec => $duration->{nsec}});
+  }
+  
+  static method new_timer_sec : Go::Timer ($seconds : double) {
+    
+    my $duration = Go::Duration_1l->new_from_sec($seconds);
+    
+    return &new_timer($duration);
+  }
+  
+  # Instance Methods
+  method stop : int () {
+    
+    if ($self->{stopped}) {
+      return 0;
+    }
+    
+    $self->{stopped} = 1;
+    
+    my $uv_timer = $self->{uv_timer};
+    if ($uv_timer) {
+      $uv_timer->stop;
+      $uv_timer->close_safe;
+      $self->{uv_timer} = undef;
+    }
+    
+    my $ch = $self->{c};
+    if ($ch) {
+      $ch->close;
+    }
+    
+    return 1;
+  }
+  
+  method DESTROY : void () {
+    $self->stop;
+  }
+  
+}
