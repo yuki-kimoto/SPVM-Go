@@ -97,9 +97,7 @@ class Go {
     
     $uv_poll->start($poll_cb, $events);
     
-    &_setup_context($context, $finish_ch, $finish_cb);
-    
-    $finish_ch->read;
+    &wait_context($context, $finish_ch, $finish_cb);
     
     if ($context) {
       my $err = $context->err;
@@ -113,27 +111,25 @@ class Go {
     }
   }
   
-  private static method _setup_context : void (
-    $context : Go::Context,
-    $finish_ch : Go::Channel,
-    $finish_cb : Go::Schedule::Callback::Finish
-  ) {
+  private static method wait_context : void ($context : Go::Context, $finish_ch : Go::Channel, $finish_cb : Go::Schedule::Callback::Finish) {
+    
     unless ($context) {
-      return;
+      die "Go::Context \$context must be defined.";
     }
     
     my $done_ch = $context->done;
     if ($done_ch) {
-      # Wake up waiting goroutine on context cancellation or deadline
-      my $finish_or_cancel_select = Go->new_select;
-      $finish_or_cancel_select->add_read($finish_ch);
-      $finish_or_cancel_select->add_read($done_ch);
-      Go->go([$finish_or_cancel_select : , $finish_ch : , $done_ch : , $finish_cb : ] method : void () {
-        my $result = $finish_or_cancel_select->select;
-        if ($result->channel == $done_ch) {
-          $finish_cb->();
-        }
-      });
+      # Wait for completion or context cancellation
+      my $select = Go->new_select;
+      $select->add_read($finish_ch);
+      $select->add_read($done_ch);
+      my $result = $select->select;
+      if ($result->channel == $done_ch) {
+        $finish_cb->();
+      }
+    }
+    else {
+      $finish_ch->read;
     }
   }
   
