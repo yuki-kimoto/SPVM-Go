@@ -172,7 +172,9 @@ class Go::Schedule {
       
       $self->run;
       
-      $self->process_next_goroutine;
+      while (@{$self->{goroutines}}) {
+        $self->{goroutines}->shift;
+      }
       
       $self->{schedule_goroutine} = undef;
       

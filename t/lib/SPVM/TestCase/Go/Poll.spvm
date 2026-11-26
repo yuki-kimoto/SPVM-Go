@@ -266,34 +266,55 @@ class TestCase::Go::Poll {
   }
 
   static method gosched_poll_cancel : int () {
+    my $success_ref = [0];
     
-    my $socket_fd1 = -1;
-    my $socket_fd2 = -1;
-    
-    my $domain = Sys::Socket::Constant->AF_INET;
-    my $type = Sys::Socket::Constant->SOCK_STREAM;
-    my $protocol = 0;
-    
-    Sys::Socket::Util->inet_socketpair(\$socket_fd1, \$socket_fd2, $domain, $type, $protocol);
-    
-    Fn->defer([$socket_fd1 : , $socket_fd2 : ] method : void () {
-      Sys::Socket->close($socket_fd1);
-      Sys::Socket->close($socket_fd2);
-    });
-    
-    Sys::Socket::Util->set_blocking($socket_fd1, 0);
-    Sys::Socket::Util->set_blocking($socket_fd2, 0);
-    
-    Go->go([$socket_fd1 : ] method : void () {
-      Go->sleep_sec(0.5);
+    # Run poll cancel test inside a goroutine
+    Go->go([$success_ref : int[]] method : void () {
+      my $socket_fd1 = -1;
+      my $socket_fd2 = -1;
+      
+      my $domain = Sys::Socket::Constant->AF_INET;
+      my $type = Sys::Socket::Constant->SOCK_STREAM;
+      my $protocol = 0;
+      
+      Sys::Socket::Util->inet_socketpair(\$socket_fd1, \$socket_fd2, $domain, $type, $protocol);
+      
+      Fn->defer([$socket_fd1 : , $socket_fd2 : ] method : void () {
+        Sys::Socket->close($socket_fd1);
+        Sys::Socket->close($socket_fd2);
+      });
+      
+      Sys::Socket::Util->set_blocking($socket_fd1, 0);
+      Sys::Socket::Util->set_blocking($socket_fd2, 0);
+      
+      Go->go([$socket_fd1 : ] method : void () {
+        Go->sleep_sec(0.5);
+        Go->gosched_poll_cancel($socket_fd1);
+      });
+      
+      warn;
+      
+      my $context = Go::Context->with_timeout_sec(Go->bg, 100)->context;
+      Go->gosched_poll_read($context, $socket_fd1);
+      
+      warn;
+      
+      # Check doing nothing
       Go->gosched_poll_cancel($socket_fd1);
+      
+      warn;
+      
+      $success_ref->[0] = 1;
+      
+      warn dump $context;
     });
     
-    Go->gosched_poll_read(Go::Context->with_timeout_sec(Go->bg, 100)->context, $socket_fd1);
+    warn;
     
-    # Check doing nothing
-    Go->gosched_poll_cancel($socket_fd1);
+    Go->gosched;
     
-    return 1;
+    warn;
+    
+    return $success_ref->[0];
   }
 }

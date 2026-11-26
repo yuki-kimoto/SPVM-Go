@@ -11,6 +11,7 @@ class Go::Context {
   use Go::Context::Error::Canceled;
   use Go::Context::Error::DeadlineExceeded;
   use UV::Handle::Timer;
+  use UV::Callback::Timer;
   
   use Fn;
   
@@ -31,7 +32,9 @@ class Go::Context {
   
   has children : Go::Context[];
   
-  has deadline_uv_timer : UV::Handle::Timer;
+  has stop_ch : Go::Channel;
+  
+  has uv_timer : UV::Handle::Timer;
   
   our $BACKGROUND_CONTEXT : Go::Context;
 
@@ -130,11 +133,29 @@ class Go::Context {
     
     $self->{done} = Go->make;
     
+    my $stop_ch = Go->make;
+    $self->{stop_ch} = $stop_ch;
+    
+    my $uv_timer_ref = [(UV::Handle::Timer)undef];
+    my $timer_cb_ref = [(UV::Callback::Timer)undef];
+    
     my $default_err = $err;
     my $default_cause = $cause;
     
-    # Cancel with explicit error ID and cause, then propagate to children
-    my $cancel_with_err = [$self : ,] method : void ($cancel_err : int, $cancel_cause : string) {
+    # Cancel context, close timer handle, and propagate to children
+    my $cancel_with_err = [$self : , $stop_ch : , $uv_timer_ref : , $timer_cb_ref : ] method : void ($cancel_err : int, $cancel_cause : string) {
+      
+      if ($stop_ch) {
+        $stop_ch->close;
+      }
+      
+      if (my $t = $uv_timer_ref->[0]) {
+        $t->set_timer_cb(undef);
+        $t->stop;
+        $t->close_safe;
+        $uv_timer_ref->[0] = undef;
+      }
+      $timer_cb_ref->[0] = undef;
       
       if ($self->err > 0) {
         return;
@@ -171,16 +192,13 @@ class Go::Context {
         $child->{children} = new Go::Context[0];
       }
     };
+    weaken $cancel_with_err->{self};
     
     my $cancel = [$cancel_with_err : , $default_err : int, $default_cause : string] method : void ($override_cause : string = undef) {
       
       my $use_cause = $override_cause ? $override_cause : $default_cause;
       $cancel_with_err->($default_err, $use_cause);
     };
-    
-    my $derived = my $_ = Go::Context::Derived->new;
-    $_->set_context($self);
-    $_->set_cancel_cb($cancel);
     
     if ($deadline) {
       if ($parent_context->{deadline}) {
@@ -190,7 +208,43 @@ class Go::Context {
       }
       
       $self->{deadline} = $deadline;
+      
+      my $now = Go::Time->now;
+      my $duration = $deadline->sub($now);
+      my $duration_nsec = $duration->{nsec};
+      if ($duration_nsec < 0L) {
+        $duration_nsec = 0L;
+      }
+      my $timeout_msec = (long)($duration_nsec / 1_000_000L);
+      
+      my $uv_loop = Go->uv_loop;
+      my $uv_timer = UV::Handle::Timer->new;
+      $uv_loop->timer_init($uv_timer);
+      $self->{uv_timer} = $uv_timer;
+      $uv_timer_ref->[0] = $uv_timer;
+      
+      # Trigger deadline error and clean up timer handle on expiration
+      my $timer_cb = [$cancel_with_err : , $uv_timer_ref : , $timer_cb_ref : ] method : void ($timer : UV::Handle::Timer) {
+        if (my $t = $uv_timer_ref->[0]) {
+          $t->set_timer_cb(undef);
+          $t->stop;
+          $t->close_safe;
+          $uv_timer_ref->[0] = undef;
+        }
+        $timer_cb_ref->[0] = undef;
+        $cancel_with_err->(basic_type_id Go::Context::Error::DeadlineExceeded, "context deadline exceeded");
+      };
+      weaken $timer_cb->{uv_timer_ref};
+      weaken $timer_cb->{cancel_with_err};
+      weaken $timer_cb->{timer_cb_ref};
+      $timer_cb_ref->[0] = $timer_cb;
+      
+      $uv_timer->start($timer_cb, $timeout_msec);
     }
+    
+    my $derived = my $_ = Go::Context::Derived->new;
+    $_->set_context($self);
+    $_->set_cancel_cb($cancel);
     
     return $derived;
   }
@@ -222,9 +276,15 @@ class Go::Context {
   
   method DESTROY : void () {
     
-    if (my $deadline_uv_timer = $self->{deadline_uv_timer}) {
-      $deadline_uv_timer->close_safe;
+    if (my $uv_timer = $self->{uv_timer}) {
+      $uv_timer->set_timer_cb(undef);
+      $uv_timer->stop;
+      $uv_timer->close_safe;
+      $self->{uv_timer} = undef;
+    }
+    
+    if (my $stop_ch = $self->{stop_ch}) {
+      $stop_ch->close;
     }
   }
-  
 }

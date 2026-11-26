@@ -58,7 +58,6 @@ class Go {
     my $schedule = $GO->{schedule};
     my $uv_loop = $schedule->{uv_loop};
     my $finish_ch = Go->make;
-    my $deadline_uv_timer_ref = [(UV::Handle::Timer)undef];
     my $error_id_ref = [(int)0];
     my $exception_ref = [(string)undef];
     
@@ -67,17 +66,10 @@ class Go {
     $uv_poll_ref->[0] = $uv_poll;
     $uv_loop->poll_init($uv_poll, $fd);
     
-    # Clean up handles and break callback cycles
-    my $finish_cb = [$schedule : , $finish_ch : , $fd : , $uv_poll_ref : , $deadline_uv_timer_ref : ] method : void ($args : object...) {
+    # Clean up poll handle and break callback cycles
+    my $finish_cb = [$schedule : , $finish_ch : , $fd : , $uv_poll_ref : ] method : void ($args : object...) {
       $finish_ch->close;
       $schedule->{uv_poll_finish_cbs_h}->delete("$fd");
-      
-      my $deadline_uv_timer = $deadline_uv_timer_ref->[0];
-      if ($deadline_uv_timer) {
-        $deadline_uv_timer->set_timer_cb(undef);
-        $deadline_uv_timer->close_safe;
-        $deadline_uv_timer_ref->[0] = undef;
-      }
       
       my $uv_poll = $uv_poll_ref->[0];
       if ($uv_poll) {
@@ -105,7 +97,7 @@ class Go {
     
     $uv_poll->start($poll_cb, $events);
     
-    &_setup_context($context, $uv_loop, $finish_ch, $deadline_uv_timer_ref, $error_id_ref, $exception_ref, $finish_cb);
+    &_setup_context($context, $finish_ch, $error_id_ref, $exception_ref, $finish_cb);
     
     $finish_ch->read;
     
@@ -116,9 +108,7 @@ class Go {
   
   private static method _setup_context : void (
     $context : Go::Context,
-    $uv_loop : UV::Loop,
     $finish_ch : Go::Channel,
-    $deadline_uv_timer_ref : UV::Handle::Timer[],
     $error_id_ref : int[],
     $exception_ref : string[],
     $finish_cb : Go::Schedule::Callback::Finish
@@ -127,39 +117,19 @@ class Go {
       return;
     }
     
-    my $deadline = $context->deadline;
-    if ($deadline) {
-      my $deadline_cb = [$error_id_ref : , $exception_ref : , $finish_cb : ] method : void ($deadline_uv_timer : UV::Handle::Timer) {
-        $error_id_ref->[0] = basic_type_id Go::Context::Error::DeadlineExceeded;
-        $exception_ref->[0] = "Context deadline exceeded";
-        
-        $finish_cb->();
-      };
-      
-      my $now = Go::Time->now;
-      my $duration = $deadline->sub($now);
-      my $duration_nsec = $duration->{nsec};
-      if ($duration_nsec < 0) {
-        $duration_nsec = 0L;
-      }
-      my $deadline_msec = $duration_nsec / 1_000_000;
-      
-      my $deadline_uv_timer = UV::Handle::Timer->new;
-      $deadline_uv_timer_ref->[0] = $deadline_uv_timer;
-      $uv_loop->timer_init($deadline_uv_timer);
-      
-      my $deadline_timer_cb = [$deadline_cb : ] method : void ($deadline_uv_timer : UV::Handle::Timer) {
-        $deadline_cb->($deadline_uv_timer);
-      };
-      
-      $deadline_uv_timer->start($deadline_timer_cb, (long)$deadline_msec);
-    }
-    
     my $cancel_ch = $context->done;
     if ($cancel_ch) {
-      my $cancel_cb = [$error_id_ref : , $exception_ref : , $finish_cb : ] method : void () {
-        $error_id_ref->[0] = basic_type_id Go::Context::Error::Canceled;
-        $exception_ref->[0] = "Context canceled";
+      # Propagate context cancellation or deadline error on done
+      my $cancel_cb = [$context : , $error_id_ref : , $exception_ref : , $finish_cb : ] method : void () {
+        my $err_id = $context->err;
+        if ($err_id > 0) {
+          $error_id_ref->[0] = $err_id;
+          $exception_ref->[0] = $context->cause;
+        }
+        else {
+          $error_id_ref->[0] = basic_type_id Go::Context::Error::Canceled;
+          $exception_ref->[0] = "context canceled";
+        }
         
         $finish_cb->();
       };
@@ -209,7 +179,6 @@ class Go {
     my $schedule = $GO->{schedule};
     my $uv_loop = $schedule->{uv_loop};
     my $finish_ch = Go->make;
-    my $deadline_uv_timer_ref = [(UV::Handle::Timer)undef];
     my $ret_length_ref = [0];
     my $error_id_ref = [(int)0];
     my $exception_ref = [(string)undef];
@@ -222,17 +191,10 @@ class Go {
     $uv_pipe->open($fd_dup);
     $uv_pipe_ref->[0] = $uv_pipe;
     
-    # Clean up handles and close finish channel
-    my $finish_cb = [$schedule : , $finish_ch : , $fd : , $uv_pipe_ref : , $deadline_uv_timer_ref : ] method : void ($args : object...) {
+    # Clean up pipe handle and close finish channel
+    my $finish_cb = [$schedule : , $finish_ch : , $fd : , $uv_pipe_ref : ] method : void ($args : object...) {
       $finish_ch->close;
       $schedule->{uv_pipe_finish_cbs_h}->delete("$fd");
-      
-      my $deadline_uv_timer = $deadline_uv_timer_ref->[0];
-      if ($deadline_uv_timer) {
-        $deadline_uv_timer->set_timer_cb(undef);
-        $deadline_uv_timer->close_safe;
-        $deadline_uv_timer_ref->[0] = undef;
-      }
       
       my $uv_pipe = $uv_pipe_ref->[0];
       if ($uv_pipe) {
@@ -243,7 +205,6 @@ class Go {
     
     $schedule->{uv_pipe_finish_cbs_h}{"$fd"} = $finish_cb;
     
-    my $deadline_cb = (UV::Callback::Timer)undef;
     my $cancel_cb = (Callback)undef;
     
     if ($is_read) {
@@ -286,43 +247,23 @@ class Go {
       $uv_req_write->write($uv_pipe, $buffer, $buffer_length, $write_cb, $buffer_offset);
     }
     
-    $deadline_cb = [$error_id_ref : , $exception_ref : , $finish_cb : ] method : void ($deadline_uv_timer : UV::Handle::Timer) {
-      $error_id_ref->[0] = basic_type_id Go::Context::Error::DeadlineExceeded;
-      $exception_ref->[0] = "Context deadline exceeded";
-      
-      $finish_cb->();
-    };
-    
-    $cancel_cb = [$error_id_ref : , $exception_ref : , $finish_cb : ] method : void () {
-      $error_id_ref->[0] = basic_type_id Go::Context::Error::Canceled;
-      $exception_ref->[0] = "Context canceled";
+    # Propagate context cancellation or deadline error on done
+    $cancel_cb = [$context : , $error_id_ref : , $exception_ref : , $finish_cb : ] method : void () {
+      my $err_id = $context ? $context->err : 0;
+      if ($err_id > 0) {
+        $error_id_ref->[0] = $err_id;
+        $exception_ref->[0] = $context->cause;
+      }
+      else {
+        $error_id_ref->[0] = basic_type_id Go::Context::Error::Canceled;
+        $exception_ref->[0] = "context canceled";
+      }
       
       $finish_cb->();
     };
     
     my $cancel_ch = (Go::Channel)undef;
     if ($context) {
-      my $deadline = $context->deadline;
-      if ($deadline) {
-        my $now = Go::Time->now;
-        my $duration = $deadline->sub($now);
-        my $duration_nsec = $duration->{nsec};
-        if ($duration_nsec < 0) {
-          $duration_nsec = 0L;
-        }
-        my $deadline_msec = $duration_nsec / 1_000_000;
-        
-        my $deadline_uv_timer = UV::Handle::Timer->new;
-        $deadline_uv_timer_ref->[0] = $deadline_uv_timer;
-        $uv_loop->timer_init($deadline_uv_timer);
-        
-        my $deadline_timer_cb = [$deadline_cb : ] method : void ($deadline_uv_timer : UV::Handle::Timer) {
-          $deadline_cb->($deadline_uv_timer);
-        };
-        
-        $deadline_uv_timer->start($deadline_timer_cb, (long)$deadline_msec);
-      }
-      
       $cancel_ch = $context->done;
     }
     
@@ -419,13 +360,18 @@ class Go {
   
   static method after : Go::Channel ($duration : Go::Duration_1l = undef) {
     
-    my $duration_nsec = $duration->{nsec};
-    
+    my $deadline = Go::Time->now->add($duration);
     my $ch = Go->make;
     
-    Go->go([$ch : , $duration_nsec : ] method : void () {
-      my $duration = Go::Duration_1l->new($duration_nsec);
-      Go->sleep($duration);
+    # Poll until deadline arrives without holding extra goroutines
+    Go->go([$ch : , $deadline : ] method : void () {
+      while (1) {
+        my $now = Go::Time->now;
+        unless ($now->before($deadline)) {
+          last;
+        }
+        Go->gosched;
+      }
       
       $ch->write(1);
     });
