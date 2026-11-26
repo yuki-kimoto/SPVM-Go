@@ -197,8 +197,6 @@ class Go {
     
     $schedule->{uv_pipe_finish_cbs_h}{"$fd"} = $finish_cb;
     
-    my $cancel_cb = (Callback)undef;
-    
     if ($is_read) {
       my $read_cb = [$ret_length_ref : , $error_id_ref : , $exception_ref : , $finish_cb : ] method : void ($uv_stream : UV::Handle::Stream, $nread : int, $buf : string) {
         if ($nread < 0) {
@@ -240,7 +238,7 @@ class Go {
     }
     
     # Propagate context cancellation or deadline error on done
-    $cancel_cb = [$context : , $error_id_ref : , $exception_ref : , $finish_cb : ] method : void () {
+    my $cancel_cb = [$context : , $error_id_ref : , $exception_ref : , $finish_cb : ] method : void () {
       my $err_id = $context ? $context->err : 0;
       if ($err_id > 0) {
         $error_id_ref->[0] = $err_id;
@@ -254,22 +252,7 @@ class Go {
       $finish_cb->();
     };
     
-    my $done_ch = (Go::Channel)undef;
-    if ($context) {
-      $done_ch = $context->done;
-    }
-    
-    if ($done_ch) {
-      my $finish_or_cancel_select = Go->new_select;
-      $finish_or_cancel_select->add_read($finish_ch);
-      $finish_or_cancel_select->add_read($done_ch);
-      Go->go([$finish_or_cancel_select : , $finish_ch : , $done_ch : , $cancel_cb : ] method : void () {
-        my $result = $finish_or_cancel_select->select;
-        if ($result->channel == $done_ch) {
-          $cancel_cb->();
-        }
-      });
-    }
+    Go->monitor_context($context, $finish_ch, $cancel_cb);
     
     $finish_ch->read;
     
