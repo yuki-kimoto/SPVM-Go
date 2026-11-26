@@ -198,9 +198,7 @@ class Go::OS::Exec::Cmd {
     
     $uv_loop->spawn($uv_process, $options);
     
-    if ($context) {
-      Go->monitor_context($context, $finish_ch, $cancel_cb);
-    }
+    Go->monitor_context($context, $finish_ch, $cancel_cb);
   }
   
   method wait : long () {
