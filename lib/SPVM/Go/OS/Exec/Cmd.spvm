@@ -136,7 +136,9 @@ class Go::OS::Exec::Cmd {
     my $finish_ch = Go->make;
     $self->{_finish_ch} = $finish_ch;
     
+    my $done_ch = (Go::Channel)undef;
     my $uv_loop = Go->uv_loop;
+    my $cancel_cb = (Callback)undef;
     
     my $exit_status_ref = [(long)0];
     my $term_signal_ref = [(int)0];
@@ -155,8 +157,7 @@ class Go::OS::Exec::Cmd {
     my $cancel_cb_ref = [(Callback)undef];
     
     # Clean up process handle and callbacks on exit
-    my $exit_cb = [$exit_status_ref : , $term_signal_ref : , $finished_ref : , $finish_ch : , $uv_process_ref : , $exit_cb_ref : , $cancel_cb_ref : ] method : void ($uv_proc : UV::Handle::Process, $exit_status : long, $term_signal : int) {
-      $finished_ref->[0] = 1;
+    my $exit_cb = [$exit_status_ref : , $term_signal_ref : , $finish_ch : , $uv_process_ref : , $exit_cb_ref : , $cancel_cb_ref : ] method : void ($uv_proc : UV::Handle::Process, $exit_status : long, $term_signal : int) {
       $exit_status_ref->[0] = $exit_status;
       $term_signal_ref->[0] = $term_signal;
       
@@ -176,7 +177,7 @@ class Go::OS::Exec::Cmd {
     $options->set_exit_cb($exit_cb);
     
     # Kill process when context done fires before finish
-    my $cancel_cb = [$context : , $error_id_ref : , $exception_ref : , $uv_process_ref : , $finished_ref : , $sigkill : ] method : void () {
+    $cancel_cb = [$context : , $error_id_ref : , $exception_ref : , $uv_process_ref : , $finished_ref : , $sigkill : ] method : void () {
       my $err_id = $context ? $context->err : 0;
       if ($err_id > 0) {
         $error_id_ref->[0] = $err_id;
@@ -199,9 +200,25 @@ class Go::OS::Exec::Cmd {
     
     $uv_loop->spawn($uv_process, $options);
     
-    if ($context && $context->done) {
-      Go->go([$context : , $finish_ch : , $cancel_cb : ] method : void () {
-        Go->wait_with_context($context, $finish_ch, $cancel_cb);
+    if ($context) {
+      $done_ch = $context->done;
+    }
+    
+    if ($done_ch) {
+      unless ($finish_ch) {
+        die "[Unexpected Error]\$finish_ch is not defined.";
+      }
+      unless ($cancel_cb) {
+        die "[Unexpected Error]\$cancel_cb is not defined.";
+      }
+      my $finish_or_cancel_select = Go->new_select;
+      $finish_or_cancel_select->add_read($finish_ch);
+      $finish_or_cancel_select->add_read($done_ch);
+      Go->go([$finish_or_cancel_select : , $finish_ch : , $done_ch : , $cancel_cb : ] method : void () {
+        my $result = $finish_or_cancel_select->select;
+        if ($result->channel == $done_ch) {
+          $cancel_cb->();
+        }
       });
     }
   }
