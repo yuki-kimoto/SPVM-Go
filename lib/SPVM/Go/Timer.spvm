@@ -43,7 +43,7 @@ class Go::Timer {
     $self->{uv_timer} = $uv_timer;
     
     # Fire timer channel once and close handle
-    my $timer_cb = [$self : , $ch : , $uv_timer : ] method : void ($timer : UV::Handle::Timer) {
+    my $timer_cb = [$self : , $ch : , ] method : void ($uv_timer : UV::Handle::Timer) {
       if ($self->{stopped}) {
         $uv_timer->close_safe;
         return;
@@ -53,6 +53,7 @@ class Go::Timer {
       $ch->write($now);
       $ch->close;
       $uv_timer->close_safe;
+      $uv_timer->set_timer_cb(undef);
     };
     
     my $timeout_ms = (long)($duration_nsec / 1_000_000L);
