@@ -52,7 +52,7 @@ class Go {
   private static method gosched_poll_io : void ($context : Go::Context, $fd : int, $is_read : int) {
     
     unless ($fd >= 0) {
-      die "The file descriptor \$fd in schedule type TYPE_POLL_READ or TYPE_POLL_WRITE must be a non-negative value.";
+      die "The file descriptor \$fd must be a non-negative value.";
     }
     
     my $schedule = $GO->{schedule};
@@ -64,8 +64,7 @@ class Go {
     $uv_poll_ref->[0] = $uv_poll;
     $uv_loop->poll_init($uv_poll, $fd);
     
-    # Clean up poll handle and break callback cycles
-    my $finish_cb = [$schedule : , $finish_ch : , $fd : , $uv_poll_ref : ] method : void ($args : object...) {
+    my $finish_cb = [$schedule : , $finish_ch : , $fd : , $uv_poll_ref : ,] method : void () {
       $finish_ch->close;
       $schedule->{uv_poll_finish_cbs_h}->delete("$fd");
       
@@ -117,7 +116,7 @@ class Go {
     }
   }
   
-  private static method wait_context : void ($context : Go::Context, $finish_ch : Go::Channel, $finish_cb : Go::Schedule::Callback::Finish) {
+  private static method wait_context : void ($context : Go::Context, $finish_ch : Go::Channel, $done_cb : Callback) {
     
     unless ($context) {
       die "Go::Context \$context must be defined.";
@@ -131,7 +130,7 @@ class Go {
       $select->add_read($done_ch);
       my $result = $select->select;
       if ($result->channel == $done_ch) {
-        $finish_cb->();
+        $done_cb->();
       }
     }
     else {
