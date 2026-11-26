@@ -335,18 +335,13 @@ class Go {
   
   static method after : Go::Channel ($duration : Go::Duration_1l = undef) {
     
-    my $deadline = Go::Time->now->add($duration);
+    my $duration_nsec = $duration->{nsec};
+    
     my $ch = Go->make;
     
-    # Poll until deadline arrives without holding extra goroutines
-    Go->go([$ch : , $deadline : ] method : void () {
-      while (1) {
-        my $now = Go::Time->now;
-        unless ($now->before($deadline)) {
-          last;
-        }
-        Go->gosched;
-      }
+    Go->go([$ch : , $duration_nsec : ] method : void () {
+      my $duration = Go::Duration_1l->new($duration_nsec);
+      Go->sleep($duration);
       
       $ch->write(1);
     });
