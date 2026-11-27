@@ -57,56 +57,121 @@ class Go::Context {
       die "Go::Context \$parent_context must be defined.";
     }
     
-    my $self = new Go::Context;
-    
-    $self->init;
-    
-    $self->{parent} = $parent_context;
-    
-    return $self;
+    return $parent_context->without_cancel_v2;
   }
   
   static method with_cancel : Go::Context::Derived ($parent_context : Go::Context) {
     
-    return &with_cancel_common($parent_context, basic_type_id Go::Context::Error::Canceled, undef, undef);
+    unless ($parent_context) {
+      die "Go::Context \$parent_context must be defined.";
+    }
+    
+    return $parent_context->with_cancel_v2;
   }
   
   static method with_cancel_cause : Go::Context::Derived ($parent_context : Go::Context, $cause : string) {
     
-    return &with_cancel_common($parent_context, basic_type_id Go::Context::Error::Canceled, $cause, undef);
+    unless ($parent_context) {
+      die "Go::Context \$parent_context must be defined.";
+    }
+    
+    return $parent_context->with_cancel_cause_v2($cause);
   }
   
   static method with_deadline : Go::Context::Derived ($parent_context : Go::Context, $deadline : Go::Time) {
     
-    return &with_cancel_common($parent_context, basic_type_id Go::Context::Error::DeadlineExceeded, undef, $deadline);
+    unless ($parent_context) {
+      die "Go::Context \$parent_context must be defined.";
+    }
+    
+    return $parent_context->with_deadline_v2($deadline);
   }
   
   static method with_deadline_cause : Go::Context::Derived ($parent_context : Go::Context, $deadline : Go::Time, $cause : string) {
     
-    return &with_cancel_common($parent_context, basic_type_id Go::Context::Error::DeadlineExceeded, $cause, $deadline);
+    unless ($parent_context) {
+      die "Go::Context \$parent_context must be defined.";
+    }
+    
+    return $parent_context->with_deadline_cause_v2($deadline, $cause);
   }
   
   static method with_timeout : Go::Context::Derived ($parent_context : Go::Context, $timeout : Go::Duration_1l) {
     
-    return &with_deadline($parent_context, Go::Time->now->add($timeout));
+    unless ($parent_context) {
+      die "Go::Context \$parent_context must be defined.";
+    }
+    
+    return $parent_context->with_timeout_v2($timeout);
   }
   
   static method with_timeout_sec : Go::Context::Derived ($parent_context : Go::Context, $timeout_sec : double) {
     
-    my $timeout = Go::Duration_1l->new_from_sec($timeout_sec);
+    unless ($parent_context) {
+      die "Go::Context \$parent_context must be defined.";
+    }
     
-    return &with_timeout($parent_context, $timeout);
+    return $parent_context->with_timeout_sec_v2($timeout_sec);
   }
   
   static method with_value : Go::Context ($parent_context : Go::Context, $key : object, $value : object) {
-    return Go::Context::Value->new_with_value($parent_context, $key, $value);
-  }
-  
-  private static method with_cancel_common : Go::Context::Derived ($parent_context : Go::Context, $err : int = 0, $cause : string = undef, $deadline : Go::Time = undef) {
     
     unless ($parent_context) {
       die "Go::Context \$parent_context must be defined.";
     }
+    
+    return $parent_context->with_value_v2($key, $value);
+  }
+  
+  # Instance Methods
+  method without_cancel_v2 : Go::Context () {
+    
+    my $child = new Go::Context;
+    
+    $child->init;
+    
+    $child->{parent} = $self;
+    
+    return $child;
+  }
+  
+  method with_cancel_v2 : Go::Context::Derived () {
+    
+    return $self->with_cancel_common(basic_type_id Go::Context::Error::Canceled, undef, undef);
+  }
+  
+  method with_cancel_cause_v2 : Go::Context::Derived ($cause : string) {
+    
+    return $self->with_cancel_common(basic_type_id Go::Context::Error::Canceled, $cause, undef);
+  }
+  
+  method with_deadline_v2 : Go::Context::Derived ($deadline : Go::Time) {
+    
+    return $self->with_cancel_common(basic_type_id Go::Context::Error::DeadlineExceeded, undef, $deadline);
+  }
+  
+  method with_deadline_cause_v2 : Go::Context::Derived ($deadline : Go::Time, $cause : string) {
+    
+    return $self->with_cancel_common(basic_type_id Go::Context::Error::DeadlineExceeded, $cause, $deadline);
+  }
+  
+  method with_timeout_v2 : Go::Context::Derived ($timeout : Go::Duration_1l) {
+    
+    return $self->with_deadline_v2(Go::Time->now->add($timeout));
+  }
+  
+  method with_timeout_sec_v2 : Go::Context::Derived ($timeout_sec : double) {
+    
+    my $timeout = Go::Duration_1l->new_from_sec($timeout_sec);
+    
+    return $self->with_timeout_v2($timeout);
+  }
+  
+  method with_value_v2 : Go::Context ($key : object, $value : object) {
+    return Go::Context::Value->new_with_value($self, $key, $value);
+  }
+  
+  private method with_cancel_common : Go::Context::Derived ($err : int = 0, $cause : string = undef, $deadline : Go::Time = undef) {
     
     unless ($err > 0) {
       die "[Unexpected Error]\$err must be a positive value.";
@@ -121,20 +186,20 @@ class Go::Context {
       }
     }
     
-    my $self = new Go::Context;
+    my $child = new Go::Context;
     
-    $self->init;
+    $child->init;
     
-    $self->{parent} = $parent_context;
-    if (my $parent_children = $parent_context->{children}) {
-      List->new_ref($parent_children)->push($self);
+    $child->{parent} = $self;
+    if (my $parent_children = $self->{children}) {
+      List->new_ref($parent_children)->push($child);
     }
-    weaken $self->{parent};
+    weaken $child->{parent};
     
-    $self->{done} = Go->make;
+    $child->{done} = Go->make;
     
     my $stop_ch = Go->make;
-    $self->{stop_ch} = $stop_ch;
+    $child->{stop_ch} = $stop_ch;
     
     my $uv_timer_ref = [(UV::Handle::Timer)undef];
     my $timer_cb_ref = [(UV::Callback::Timer)undef];
@@ -142,8 +207,8 @@ class Go::Context {
     my $default_err = $err;
     my $default_cause = $cause;
     
-    # Cancel context, close timer handle, and propagate to children
-    my $cancel_with_err = [$self : , $stop_ch : , $uv_timer_ref : , $timer_cb_ref : ] method : void ($cancel_err : int, $cancel_cause : string) {
+    # Cancel child context, close timer handle, and propagate to descendants
+    my $cancel_with_err = [$child : , $stop_ch : , $uv_timer_ref : , $timer_cb_ref : ] method : void ($cancel_err : int, $cancel_cause : string) {
       
       if ($stop_ch) {
         $stop_ch->close;
@@ -157,42 +222,42 @@ class Go::Context {
       }
       $timer_cb_ref->[0] = undef;
       
-      if ($self->err > 0) {
+      if ($child->err > 0) {
         return;
       }
       
-      $self->{err} = $cancel_err;
-      $self->{cause} = $cancel_cause;
+      $child->{err} = $cancel_err;
+      $child->{cause} = $cancel_cause;
       
-      if ($self->done) {
-        $self->done->close;
+      if ($child->done) {
+        $child->done->close;
       }
       
-      my $all_children = (List of Go::Context)List->new($self->{children});
-      $self->{children} = new Go::Context[0];
+      my $all_children = (List of Go::Context)List->new($child->{children});
+      $child->{children} = new Go::Context[0];
       
       while (1) {
         unless ($all_children->length) {
           last;
         }
         
-        my $child = $all_children->shift;
+        my $descendant = $all_children->shift;
         
-        unweaken $child->{parent};
+        unweaken $descendant->{parent};
         
-        unless ($child isa Go::Context::Value) {
-          if ($child->done) {
-            $child->done->close;
-            $child->{err} = $cancel_err;
-            $child->{cause} = $cancel_cause;
+        unless ($descendant isa Go::Context::Value) {
+          if ($descendant->done) {
+            $descendant->done->close;
+            $descendant->{err} = $cancel_err;
+            $descendant->{cause} = $cancel_cause;
           }
         }
         
-        $all_children->push_($child->{children});
-        $child->{children} = new Go::Context[0];
+        $all_children->push_($descendant->{children});
+        $descendant->{children} = new Go::Context[0];
       }
     };
-    weaken $cancel_with_err->{self};
+    weaken $cancel_with_err->{child};
     
     my $cancel = [$cancel_with_err : , $default_err : int, $default_cause : string] method : void ($override_cause : string = undef) {
       
@@ -201,13 +266,13 @@ class Go::Context {
     };
     
     if ($deadline) {
-      if ($parent_context->{deadline}) {
-        if ($deadline->after($parent_context->{deadline})) {
-          $deadline = $parent_context->{deadline}->clone;
+      if ($self->{deadline}) {
+        if ($deadline->after($self->{deadline})) {
+          $deadline = $self->{deadline}->clone;
         }
       }
       
-      $self->{deadline} = $deadline;
+      $child->{deadline} = $deadline;
       
       my $now = Go::Time->now;
       my $duration = $deadline->sub($now);
@@ -220,7 +285,7 @@ class Go::Context {
       my $uv_loop = Go->uv_loop;
       my $uv_timer = UV::Handle::Timer->new;
       $uv_loop->timer_init($uv_timer);
-      $self->{uv_timer} = $uv_timer;
+      $child->{uv_timer} = $uv_timer;
       $uv_timer_ref->[0] = $uv_timer;
       
       # Trigger deadline error and clean up timer handle on expiration
@@ -243,13 +308,12 @@ class Go::Context {
     }
     
     my $derived = my $_ = Go::Context::Derived->new;
-    $_->set_context($self);
+    $_->set_context($child);
     $_->set_cancel_cb($cancel);
     
     return $derived;
   }
   
-  # Instance Methods
   protected method init : void () {
     
     $self->{children} = new Go::Context[0];
