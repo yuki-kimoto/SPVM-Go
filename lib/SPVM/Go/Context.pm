@@ -22,9 +22,9 @@ It is based on the implementation of C<context.Context> in the Go programming la
   my $ctx = Go::Context->background;
   
   # Create a context with 5 seconds timeout
-  my $derived = Go::Context->with_timeout_sec($ctx, 5.0);
-  my $ctx_with_timeout = $derived->ctx;
-  my $cancel = $derived->cancel;
+  my $derived = $ctx->with_timeout_sec(5.0);
+  my $ctx_with_timeout = $derived->context;
+  my $cancel = $derived->cancel_cb;
   
   # Done channel
   my $done = $ctx_with_timeout->done;
@@ -42,17 +42,27 @@ Returns a non-nil, empty L<Go::Context|SPVM::Go::Context>. It is never canceled,
 
 See L<context.Background|https://pkg.go.dev/context#Background>.
 
+=head2 todo
+
+C<static method todo : L<Go::Context|SPVM::Go::Context> ();>
+
+Returns a non-nil, empty L<Go::Context|SPVM::Go::Context>. Code should use C<todo> when it's unclear which C<Context> to use or it is not yet available.
+
+See L<context.TODO|https://pkg.go.dev/context#TODO>.
+
+=head1 Instance Methods
+
 =head2 without_cancel
 
-C<static method without_cancel : L<Go::Context|SPVM::Go::Context> ($parent_context : L<Go::Context|SPVM::Go::Context>);>
+C<method without_cancel : L<Go::Context|SPVM::Go::Context> ();>
 
-Returns a copy of C<$parent_context> that is not canceled when C<$parent_context> is canceled.
+Returns a copy of this context that is not canceled when this context is canceled.
 
 See L<context.WithoutCancel|https://pkg.go.dev/context#WithoutCancel>.
 
 =head2 with_cancel
 
-C<static method with_cancel : L<Go::Context::Derived|SPVM::Go::Context::Derived> ($parent_context : L<Go::Context|SPVM::Go::Context>);>
+C<method with_cancel : L<Go::Context::Derived|SPVM::Go::Context::Derived> ();>
 
 Returns a L<Go::Context::Derived|SPVM::Go::Context::Derived> object containing a new context and a cancel function.
 
@@ -60,7 +70,7 @@ See L<context.WithCancel|https://pkg.go.dev/context#WithCancel>.
 
 =head2 with_cancel_cause
 
-C<static method with_cancel_cause : L<Go::Context::Derived|SPVM::Go::Context::Derived> ($parent_context : L<Go::Context|SPVM::Go::Context>, $cause : string);>
+C<method with_cancel_cause : L<Go::Context::Derived|SPVM::Go::Context::Derived> ($cause : string);>
 
 Similar to L</with_cancel>, but also sets a cause for the cancellation.
 
@@ -68,15 +78,15 @@ See L<context.WithCancelCause|https://pkg.go.dev/context#WithCancelCause>.
 
 =head2 with_deadline
 
-C<static method with_deadline : L<Go::Context::Derived|SPVM::Go::Context::Derived> ($parent_context : L<Go::Context|SPVM::Go::Context>, $deadline : L<Go::Time|SPVM::Go::Time>);>
+C<method with_deadline : L<Go::Context::Derived|SPVM::Go::Context::Derived> ($deadline : L<Go::Time|SPVM::Go::Time>);>
 
-Returns a derived context that is canceled when the C<$deadline> expires or the parent's C<done> channel is closed.
+Returns a derived context that is canceled when the C<$deadline> expires or this context's C<done> channel is closed.
 
 See L<context.WithDeadline|https://pkg.go.dev/context#WithDeadline>.
 
 =head2 with_deadline_cause
 
-C<static method with_deadline_cause : L<Go::Context::Derived|SPVM::Go::Context::Derived> ($parent_context : L<Go::Context|SPVM::Go::Context>, $deadline : L<Go::Time|SPVM::Go::Time>, $cause : string);>
+C<method with_deadline_cause : L<Go::Context::Derived|SPVM::Go::Context::Derived> ($deadline : L<Go::Time|SPVM::Go::Time>, $cause : string);>
 
 Similar to L</with_deadline>, but also sets a cause when the C<$deadline> expires.
 
@@ -84,7 +94,7 @@ See L<context.WithDeadlineCause|https://pkg.go.dev/context#WithDeadlineCause>.
 
 =head2 with_timeout
 
-C<static method with_timeout : L<Go::Context::Derived|SPVM::Go::Context::Derived> ($parent_context : L<Go::Context|SPVM::Go::Context>, $timeout : L<Go::Duration_1l|SPVM::Go::Duration_1l>);>
+C<method with_timeout : L<Go::Context::Derived|SPVM::Go::Context::Derived> ($timeout : L<Go::Duration_1l|SPVM::Go::Duration_1l>);>
 
 A wrapper for L</with_deadline> that takes a duration C<$timeout> instead of a specific time.
 
@@ -92,19 +102,17 @@ See L<context.WithTimeout|https://pkg.go.dev/context#WithTimeout>.
 
 =head2 with_timeout_sec
 
-C<static method with_timeout_sec : L<Go::Context::Derived|SPVM::Go::Context::Derived> ($parent_context : L<Go::Context|SPVM::Go::Context>, $timeout_sec : double);>
+C<method with_timeout_sec : L<Go::Context::Derived|SPVM::Go::Context::Derived> ($timeout_sec : double);>
 
 A helper method that creates a timeout context from the specified number of seconds C<$timeout_sec> (as a C<double>).
 
 =head2 with_value
 
-C<static method with_value : L<Go::Context|SPVM::Go::Context> ($parent_context : L<Go::Context|SPVM::Go::Context>, $key : object, $value : object);>
+C<method with_value : L<Go::Context|SPVM::Go::Context> ($key : object, $value : object);>
 
-Returns a copy of C<$parent_context> in which the value associated with C<$key> is C<$value>.
+Returns a copy of this context in which the value associated with C<$key> is C<$value>.
 
 See L<context.WithValue|https://pkg.go.dev/context#WithValue>.
-
-=head1 Instance Methods
 
 =head2 deadline
 

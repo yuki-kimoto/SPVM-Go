@@ -8,24 +8,24 @@ package SPVM::Go::OS::File;
 
 =head1 Name
 
-SPVM::Go::OS::File - File and Pipe Descriptor Wrapper
+SPVM::Go::OS::File - File, TCP, and Pipe Descriptor Wrapper
 
 =head1 Description
 
-Go::OS::File class in L<SPVM> represents an operating system file descriptor or pipe endpoint, similar to C<os.File> in the Go programming language.
+Go::OS::File class in L<SPVM> represents an operating system file descriptor, TCP socket, or pipe endpoint, similar to C<os.File> in the Go programming language.
 
 =head1 Usage
 
   use Go;
   use Go::OS::File;
   
-  my $pipe = Go::OS::File->prepare_pipe_end;
-  $pipe->syswrite(Go->bg, "hello");
-  $pipe->close;
+  my $file = Go::OS::File->new_pipe_end($fd);
+  $file->write(Go->bg, "hello");
+  $file->close;
 
 =head1 Details
 
-L<Go::OS::File|SPVM::Go::OS::File> wraps file descriptors and libuv stream handles for standard I/O streams (C<$STDIN>, C<$STDOUT>, C<$STDERR>), existing file descriptors, and pipe endpoints used with L<Go::OS::Exec::Cmd|SPVM::Go::OS::Exec::Cmd>.
+L<Go::OS::File|SPVM::Go::OS::File> wraps file descriptors and libuv stream handles for standard I/O streams (C<$STDIN>, C<$STDOUT>, C<$STDERR>), existing file descriptors, TCP sockets, and pipe endpoints used with L<Go::OS::Exec::Cmd|SPVM::Go::OS::Exec::Cmd> and non-blocking I/O.
 
 =head1 Class Variables
 
@@ -65,7 +65,13 @@ The operating system file descriptor.
 
 C<has uv_stream : L<UV::Handle::Stream|SPVM::UV::Handle::Stream>;>
 
-The libuv stream handle associated with the pipe.
+The libuv stream handle associated with the TCP socket or pipe endpoint.
+
+=head2 finish_cb
+
+C<has finish_cb : L<Callback|SPVM::Callback>;>
+
+The callback invoked to complete or cancel an in-progress read or write operation.
 
 =head2 no_close
 
@@ -73,17 +79,11 @@ C<has no_close : byte;>
 
 If true, C<close> throws an exception and C<DESTROY> does not close the descriptor.
 
-=head2 opened
+=head2 closed
 
-C<has opened : byte;>
+C<has closed : ro byte;>
 
-Indicates whether the underlying file descriptor is currently open.
-
-=head2 other_uv_pipe
-
-C<has other_uv_pipe : L<UV::Handle::Pipe|SPVM::UV::Handle::Pipe>;>
-
-The libuv pipe handle wrapping the paired endpoint descriptor.
+Indicates whether the file has been closed.
 
 =head1 Class Methods
 
@@ -93,31 +93,43 @@ C<static method new_file : L<Go::OS::File|SPVM::Go::OS::File> ($fd : int);>
 
 Creates a L<Go::OS::File|SPVM::Go::OS::File> object for a non-negative file descriptor C<$fd> with C<no_close> set to 1.
 
+=head2 new_tcp
+
+C<static method new_tcp : L<Go::OS::File|SPVM::Go::OS::File> ($fd : int);>
+
+Duplicates a non-negative TCP socket file descriptor C<$fd>, initializes a L<UV::Handle::TCP|SPVM::UV::Handle::TCP> handle on the event loop, opens the duplicated descriptor, and returns a L<Go::OS::File|SPVM::Go::OS::File> object.
+
+=head2 new_pipe_end
+
+C<static method new_pipe_end : L<Go::OS::File|SPVM::Go::OS::File> ($fd : int);>
+
+Duplicates a non-negative pipe file descriptor C<$fd>, initializes a L<UV::Handle::Pipe|SPVM::UV::Handle::Pipe> handle on the event loop, opens the duplicated descriptor, and returns a pipe-end L<Go::OS::File|SPVM::Go::OS::File> object.
+
 =head2 prepare_pipe_end
 
 C<static method prepare_pipe_end : L<Go::OS::File|SPVM::Go::OS::File> ();>
 
-Creates a pipe pair, initializes the paired pipe handle on the event loop, and returns a pipe-end L<Go::OS::File|SPVM::Go::OS::File> object.
+Creates a placeholder L<Go::OS::File|SPVM::Go::OS::File> object for a pipe endpoint before a file descriptor is attached.
 
 =head1 Instance Methods
+
+=head2 read
+
+C<method read : int ($context : L<Go::Context|SPVM::Go::Context>, $string : mutable string, $length : int = -1, $offset : int = 0);>
+
+Reads bytes from the TCP or pipe stream into C<$string> cooperatively with the goroutine scheduler and context C<$context>.
+
+=head2 write
+
+C<method write : int ($context : L<Go::Context|SPVM::Go::Context>, $string : string, $length : int = -1, $offset : int = 0);>
+
+Writes bytes from C<$string> to the TCP or pipe stream cooperatively with the goroutine scheduler and context C<$context>.
 
 =head2 close
 
 C<method close : void ();>
 
-Closes the pipe handles and file descriptor if C<no_close> is not set.
-
-=head2 sysread
-
-C<method sysread : int ($context : L<Go::Context|SPVM::Go::Context>, $string : mutable string, $length : int = -1, $offset : int = 0);>
-
-Reads bytes from the pipe descriptor into C<$string> cooperatively with the goroutine scheduler and context C<$context>.
-
-=head2 syswrite
-
-C<method syswrite : int ($context : L<Go::Context|SPVM::Go::Context>, $string : string, $length : int = -1, $offset : int = 0);>
-
-Writes bytes from C<$string> to the pipe descriptor cooperatively with the goroutine scheduler and context C<$context>.
+Cancels any active operation, closes the libuv stream handle if present, and marks the file as closed unless C<no_close> is set.
 
 =head2 DESTROY
 
