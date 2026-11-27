@@ -116,29 +116,6 @@ class Go {
     }
   }
   
-  static method monitor_context : void ($context : Go::Context, $finish_ch : Go::Channel, $done_cb : Callback) {
-    
-    unless ($context) {
-      die "Go::Context \$context must be defined.";
-    }
-    
-    my $done_ch = $context->done;
-    if ($done_ch) {
-      my $select = Go->new_select;
-      $select->add_read($finish_ch);
-      $select->add_read($done_ch);
-      
-      Go->go([$select : , $done_ch : , $done_cb : ] method : void () {
-        my $result = $select->select;
-        if ($done_ch && $result->channel == $done_ch) {
-          if ($done_cb) {
-            $done_cb->();
-          }
-        }
-      });
-    }
-  }
-  
   static method gosched_poll_cancel : void ($fd : int) {
     
     my $schedule = $GO->{schedule};
@@ -292,6 +269,14 @@ class Go {
     return $channel;
   }
   
+  static method bg : Go::Context () {
+    return Go::Context->background;
+  }
+  
+  static method todo : Go::Context () {
+    return Go::Context->todo;
+  }
+  
   static method new_select : Go::Select () {
     
     my $schedule = $GO->{schedule};
@@ -299,34 +284,6 @@ class Go {
     my $select = Go::Select->new($schedule);
     
     return $select;
-  }
-  
-  static method sleep : void ($duration : Go::Duration_1l) {
-    
-    Go::Timer->sleep($duration);
-  }
-  
-  static method sleep_sec : void ($sec : double = 0) {
-    
-    Go::Timer->sleep_sec($sec);
-  }
-  
-  static method after : Go::Channel ($duration : Go::Duration_1l = undef) {
-    
-    return Go::Timer->after($duration);
-  }
-  
-  static method after_sec : Go::Channel ($sec : double = 0) {
-    
-    return Go::Timer->after_sec($sec);
-  }
-  
-  static method bg : Go::Context () {
-    return Go::Context->background;
-  }
-  
-  static method todo : Go::Context () {
-    return Go::Context->todo;
   }
   
   static method new_wait_group : Go::Sync::WaitGroup ($add : int = 0) {
@@ -347,6 +304,53 @@ class Go {
   static method uv_loop : UV::Loop () {
     return $Go::GO->{schedule}{uv_loop};
   }
-
+  
+  static method monitor_context : void ($context : Go::Context, $finish_ch : Go::Channel, $done_cb : Callback) {
+    
+    unless ($context) {
+      die "Go::Context \$context must be defined.";
+    }
+    
+    my $done_ch = $context->done;
+    if ($done_ch) {
+      my $select = Go->new_select;
+      $select->add_read($finish_ch);
+      $select->add_read($done_ch);
+      
+      Go->go([$select : , $done_ch : , $done_cb : ] method : void () {
+        my $result = $select->select;
+        if ($done_ch && $result->channel == $done_ch) {
+          if ($done_cb) {
+            $done_cb->();
+          }
+        }
+      });
+    }
+  }
+  
+  # Deprecated
+  static method sleep : void ($duration : Go::Duration_1l) {
+    
+    Go::Timer->sleep($duration);
+  }
+  
+  # Deprecated
+  static method sleep_sec : void ($sec : double = 0) {
+    
+    Go::Timer->sleep_sec($sec);
+  }
+  
+  # Deprecated
+  static method after : Go::Channel ($duration : Go::Duration_1l = undef) {
+    
+    return Go::Timer->after($duration);
+  }
+  
+  # Deprecated
+  static method after_sec : Go::Channel ($sec : double = 0) {
+    
+    return Go::Timer->after_sec($sec);
+  }
+  
 }
 
