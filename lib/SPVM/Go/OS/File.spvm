@@ -15,7 +15,7 @@ class Go::OS::File {
   use UV;
   use UV::Constant as UV_C;
   use UV::Handle::Stream;
-  # use UV::Handle::TCP;
+  use UV::Handle::TCP;
   use UV::Handle::Pipe;
   use UV::Request::Write;
   use Sys;
@@ -78,7 +78,21 @@ class Go::OS::File {
       die "The file descriptor \$fd must be a non-negative number.";
     }
     
-    die "Not implemented.";
+    # Duplicate fd for libuv TCP ownership
+    my $dup_fd = Sys::IO->dup($fd);
+    
+    my $uv_loop = Go->uv_loop;
+    my $uv_tcp = UV::Handle::TCP->new;
+    $uv_loop->tcp_init($uv_tcp);
+    $uv_tcp->open($dup_fd);
+    
+    my $self = new Go::OS::File;
+    
+    $self->{fd} = $dup_fd;
+    $self->{type} = &TYPE_TCP;
+    $self->{uv_stream} = $uv_tcp;
+    
+    return $self;
   }
   
   static method new_pipe_end : Go::OS::File ($fd : int) {
