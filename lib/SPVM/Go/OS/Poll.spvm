@@ -87,9 +87,8 @@ class Go::OS::Poll {
     $uv_poll->set_poll_cb(undef);
     $uv_poll->stop;
     $uv_poll->close_safe;
-    $self->{uv_poll} = undef;
-    
     Go->gosched;
+    $self->{uv_poll} = undef;
   }
   
   method DESTROY : void () {

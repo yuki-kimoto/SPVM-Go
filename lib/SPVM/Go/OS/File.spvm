@@ -219,8 +219,6 @@ class Go::OS::File {
       Fn->memcpy($string, $offset, $data, 0, $nread);
     }
     
-    Go->gosched;
-    
     return $nread;
   }
   
@@ -317,8 +315,6 @@ class Go::OS::File {
       die "libuv write error:" . UV->strerror($status);
     }
     
-    Go->gosched;
-    
     return $written;
   }
   
@@ -339,13 +335,12 @@ class Go::OS::File {
     
     if (my $uv_stream = $self->{uv_stream}) {
       $uv_stream->close_safe;
+      Go->gosched;
       $self->{uv_stream} = undef;
     }
     
     $self->{fd} = -1;
     $self->{closed} = 1;
-    
-    Go->gosched;
   }
   
   method DESTROY : void () {
