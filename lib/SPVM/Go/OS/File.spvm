@@ -124,26 +124,24 @@ class Go::OS::File {
     
     my $type = $self->{type};
     
-    if ($type == &TYPE_PIPE) {
-      my $uv_stream = $self->{uv_stream};
-      return &read_uv_stream($context, $uv_stream, $string, $length, $offset);
+    unless ($type == &TYPE_PIPE || $type == &TYPE_TCP) {
+      die "Not supported type. \$type=$type. You perhaps specify FILE type.";
     }
-    else {
-      die "[Unexpected Error]Not supported type. \$type=$type.";
-    }
+    
+    my $uv_stream = $self->{uv_stream};
+    return &read_uv_stream($context, $uv_stream, $string, $length, $offset);
   }
   
   method write : int ($context : Go::Context, $string : string, $length : int = -1, $offset : int = 0) {
     
     my $type = $self->{type};
     
-    if ($type == &TYPE_PIPE) {
-      my $uv_stream = $self->{uv_stream};
-      return &write_uv_stream($context, $uv_stream, $string, $length, $offset);
+    unless ($type == &TYPE_PIPE || $type == &TYPE_TCP) {
+      die "Not supported type. \$type=$type. You perhaps specify FILE type.";
     }
-    else {
-      die "[Unexpected Error]Not supported type. \$type=$type.";
-    }
+    
+    my $uv_stream = $self->{uv_stream};
+    return &write_uv_stream($context, $uv_stream, $string, $length, $offset);
   }
   
   method DESTROY : void () {
