@@ -170,15 +170,17 @@ class Go::Schedule {
         $self->{goroutines}->push($goroutine);
       }
       
+      Fn->defer([$self : ,] method : void () {
+        while (@{$self->{goroutines}}) {
+          $self->{goroutines}->shift;
+        }
+        
+        $self->{schedule_goroutine} = undef;
+        
+        $self->{current_goroutine} = undef;
+      });
+      
       $self->run;
-      
-      while (@{$self->{goroutines}}) {
-        $self->{goroutines}->shift;
-      }
-      
-      $self->{schedule_goroutine} = undef;
-      
-      $self->{current_goroutine} = undef;
     }
   }
   
