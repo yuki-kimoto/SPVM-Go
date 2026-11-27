@@ -47,8 +47,8 @@ class TestCase::Go::Context {
     # Run without_cancel test inside a goroutine
     Go->go([$success_ref : int[]] method : void () {
       {
-        my $parent_derived = Go::Context->with_cancel(Go::Context->background);
-        my $ctx_child = $parent_derived->context->without_cancel_v2;
+        my $parent_derived = Go::Context->background->with_cancel;
+        my $ctx_child = $parent_derived->context->without_cancel;
         
         # Cancel the parent
         $parent_derived->cancel_cb->("parent is canceled");
@@ -80,7 +80,7 @@ class TestCase::Go::Context {
     Go->go([$success_ref : int[]] method : void () {
       {
         my $ctx_parent = Go::Context->background;
-        my $derived = $ctx_parent->with_cancel_v2;
+        my $derived = $ctx_parent->with_cancel;
         my $ctx = $derived->context;
         my $cancel = $derived->cancel_cb;
 
@@ -104,12 +104,12 @@ class TestCase::Go::Context {
       }
       
       {
-        my $ctx_p_derived = Go::Context->with_cancel(Go::Context->background);
+        my $ctx_p_derived = Go::Context->background->with_cancel;
         my $key = "ID";
         my $value = "foo";
-        my $ctx_v = Go::Context->with_value($ctx_p_derived->context, $key, $value);
-        my $ctx_c_derived = Go::Context->with_cancel($ctx_v);
-        my $ctx_gc_derived = Go::Context->with_cancel($ctx_c_derived->context);
+        my $ctx_v = $ctx_p_derived->context->with_value($key, $value);
+        my $ctx_c_derived = $ctx_v->with_cancel;
+        my $ctx_gc_derived = $ctx_c_derived->context->with_cancel;
 
         # Cancel the top-level parent
         $ctx_p_derived->cancel_cb->();
@@ -141,7 +141,7 @@ class TestCase::Go::Context {
       {
         my $ctx_parent = Go::Context->background;
         my $cause_msg = "critical error occurred";
-        my $derived = Go::Context->with_cancel_cause($ctx_parent, $cause_msg);
+        my $derived = $ctx_parent->with_cancel_cause($cause_msg);
         my $ctx = $derived->context;
         my $cancel = $derived->cancel_cb;
 
@@ -180,7 +180,7 @@ class TestCase::Go::Context {
         my $timeout_sec = 3;
         my $deadline = Go::Time->now->add_sec($timeout_sec);
         
-        my $derived = Go::Context->with_deadline($ctx_parent, $deadline);
+        my $derived = $ctx_parent->with_deadline($deadline);
         my $ctx = $derived->context;
         
         # Check if the deadline is correctly set
@@ -204,11 +204,11 @@ class TestCase::Go::Context {
         my $timeout_sec = 0.2;
         my $deadline = Go::Time->now->add_sec($timeout_sec);
         
-        my $derived_c1 = $ctx_parent->with_deadline_v2($deadline);
+        my $derived_c1 = $ctx_parent->with_deadline($deadline);
         my $ctx_c1 = $derived_c1->context;
         
         my $deadline_c2 = $deadline->add_sec(-0.1);
-        my $derived_c2 = Go::Context->with_deadline($ctx_c1, $deadline_c2);
+        my $derived_c2 = $ctx_c1->with_deadline($deadline_c2);
         my $ctx_c2 = $derived_c2->context;
         
         # Check if the deadline is correctly set
@@ -235,11 +235,11 @@ class TestCase::Go::Context {
         my $timeout_sec = 0.2;
         my $deadline = Go::Time->now->add_sec($timeout_sec);
         
-        my $derived_c1 = Go::Context->with_deadline($ctx_parent, $deadline);
+        my $derived_c1 = $ctx_parent->with_deadline($deadline);
         my $ctx_c1 = $derived_c1->context;
         
         my $deadline_c2 = $deadline->add_sec(0.1);
-        my $derived_c2 = Go::Context->with_deadline($ctx_c1, $deadline_c2);
+        my $derived_c2 = $ctx_c1->with_deadline($deadline_c2);
         my $ctx_c2 = $derived_c2->context;
         
         # Check if the deadline is correctly set
@@ -274,7 +274,7 @@ class TestCase::Go::Context {
     # Run cancellation test inside a goroutine
     Go->go([$success_ref : int[]] method : void () {
       {
-        my $ctx_parent_derived = Go::Context->with_cancel(Go::Context->background);
+        my $ctx_parent_derived = Go::Context->background->with_cancel;
         my $ctx_parent = $ctx_parent_derived->context;
         my $cancel_parent = $ctx_parent_derived->cancel_cb;
         
@@ -282,7 +282,7 @@ class TestCase::Go::Context {
         my $timeout_sec = 1.0;
         my $deadline = Go::Time->now->add_sec($timeout_sec);
         
-        my $derived = Go::Context->with_deadline($ctx_parent, $deadline);
+        my $derived = $ctx_parent->with_deadline($deadline);
         my $ctx = $derived->context;
         
         # Initially, no error should exist
@@ -319,7 +319,7 @@ class TestCase::Go::Context {
         my $deadline = Go::Time->now->add_sec($timeout_sec);
         my $cause_msg = "database connection timeout";
         
-        my $derived = Go::Context->with_deadline_cause($ctx_parent, $deadline, $cause_msg);
+        my $derived = $ctx_parent->with_deadline_cause($deadline, $cause_msg);
         my $ctx = $derived->context;
         
         # Should not be expired yet
@@ -349,7 +349,7 @@ class TestCase::Go::Context {
         my $timeout_nanos = 100_000_000L;
         my $duration = Go::Duration_1l->new($timeout_nanos);
         
-        my $derived = $ctx_parent->with_timeout_v2($duration);
+        my $derived = $ctx_parent->with_timeout($duration);
         my $ctx = $derived->context;
 
         # Should not be expired yet
@@ -377,7 +377,7 @@ class TestCase::Go::Context {
         
         # Set timeout to 0.1 seconds directly as a double
         my $timeout_sec = 0.1;
-        my $derived = $ctx_parent->with_timeout_sec_v2($timeout_sec);
+        my $derived = $ctx_parent->with_timeout_sec($timeout_sec);
         my $ctx = $derived->context;
 
         # Should not be expired yet
@@ -404,7 +404,7 @@ class TestCase::Go::Context {
         my $key = "USER_ID";
         my $val = "kimocchan";
         my $ctx_bg = Go::Context->background;
-        my $ctx_val = Go::Context->with_value($ctx_bg, $key, $val);
+        my $ctx_val = $ctx_bg->with_value($key, $val);
 
         # Value must be retrievable by key and cast to (string) for eq operator
         unless ($ctx_val->value($key)->(string) eq $val) {
@@ -424,13 +424,13 @@ class TestCase::Go::Context {
         my $val_c = "child_val";
 
         # Create parent context with a value
-        my $ctx_p = Go::Context->with_value(Go::Context->background, $key_p, $val_p);
+        my $ctx_p = Go::Context->background->with_value($key_p, $val_p);
         
         # Create child context with another value
-        my $ctx_c = Go::Context->with_value($ctx_p, $key_c, $val_c);
+        my $ctx_c = $ctx_p->with_value($key_c, $val_c);
         
         # Create grandchild context
-        my $ctx_gc = Go::Context->with_value($ctx_c, "GC_KEY", "gc_val");
+        my $ctx_gc = $ctx_c->with_value("GC_KEY", "gc_val");
 
         # Grandchild should see parent value
         unless ((string)$ctx_gc->value($key_p) eq $val_p) {

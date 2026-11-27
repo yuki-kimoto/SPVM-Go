@@ -67,7 +67,7 @@ class TestCase::Go::Pipe {
         }
       }
       
-      # legnth
+      # length
       {
         my $write_length_ref = [-1];
         Go->go([$write_fh : , $write_length_ref : ] method : void () {
@@ -221,7 +221,7 @@ class TestCase::Go::Pipe {
           my $write_buffer_length = 0;
           my $write_buffer_offset = 0;
           my $timeout_sec = 0;
-          $write_length_ref->[0] = Go->gosched_pipe_write(Go::Context->with_timeout_sec(Go->bg, $timeout_sec)->context, $write_fh, $write_buffer, $write_buffer_length, $write_buffer_offset, );
+          $write_length_ref->[0] = Go->gosched_pipe_write(Go->bg->with_timeout_sec($timeout_sec)->context, $write_fh, $write_buffer, $write_buffer_length, $write_buffer_offset);
         });
         Go->gosched;
         
@@ -230,7 +230,7 @@ class TestCase::Go::Pipe {
         my $read_buffer_offset = 0;
         my $timeout_sec = 0.5;
         
-        eval { Go->gosched_pipe_read(Go::Context->with_timeout_sec(Go->bg, $timeout_sec)->context, $read_fh, $read_buffer, $read_buffer_length, $read_buffer_offset); }
+        eval { Go->gosched_pipe_read(Go->bg->with_timeout_sec($timeout_sec)->context, $read_fh, $read_buffer, $read_buffer_length, $read_buffer_offset); }
         
         unless ($@ isa Go::Error::IOTimeout) {
           return 0;
@@ -337,7 +337,7 @@ class TestCase::Go::Pipe {
           my $write_buffer_length = 0;
           my $write_buffer_offset = 0;
           my $timeout_sec = 0;
-          $write_length_ref->[0] = $write_file->write(Go::Context->with_timeout_sec(Go->bg, $timeout_sec)->context, $write_buffer, $write_buffer_length, $write_buffer_offset);
+          $write_length_ref->[0] = $write_file->write(Go->bg->with_timeout_sec($timeout_sec)->context, $write_buffer, $write_buffer_length, $write_buffer_offset);
         });
         Go->gosched;
         
@@ -346,7 +346,7 @@ class TestCase::Go::Pipe {
         my $read_buffer_offset = 0;
         my $timeout_sec = 0.5;
         
-        eval { $read_file->read(Go::Context->with_timeout_sec(Go->bg, $timeout_sec)->context, $read_buffer, $read_buffer_length, $read_buffer_offset); }
+        eval { $read_file->read(Go->bg->with_timeout_sec($timeout_sec)->context, $read_buffer, $read_buffer_length, $read_buffer_offset); }
         
         unless ($@ isa Go::Error::IOTimeout) {
           $read_file->close;

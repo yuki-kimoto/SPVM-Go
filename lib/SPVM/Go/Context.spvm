@@ -74,79 +74,47 @@ class Go::Context {
     }
   }
   
-  static method without_cancel : Go::Context ($parent_context : Go::Context) {
-    
-    unless ($parent_context) {
-      die "Go::Context \$parent_context must be defined.";
-    }
-    
-    return $parent_context->without_cancel_v2;
-  }
-  
-  static method with_cancel : Go::Context::Derived ($parent_context : Go::Context) {
-    
-    unless ($parent_context) {
-      die "Go::Context \$parent_context must be defined.";
-    }
-    
-    return $parent_context->with_cancel_v2;
-  }
-  
-  static method with_cancel_cause : Go::Context::Derived ($parent_context : Go::Context, $cause : string) {
-    
-    unless ($parent_context) {
-      die "Go::Context \$parent_context must be defined.";
-    }
-    
-    return $parent_context->with_cancel_cause_v2($cause);
-  }
-  
-  static method with_deadline : Go::Context::Derived ($parent_context : Go::Context, $deadline : Go::Time) {
-    
-    unless ($parent_context) {
-      die "Go::Context \$parent_context must be defined.";
-    }
-    
-    return $parent_context->with_deadline_v2($deadline);
-  }
-  
-  static method with_deadline_cause : Go::Context::Derived ($parent_context : Go::Context, $deadline : Go::Time, $cause : string) {
-    
-    unless ($parent_context) {
-      die "Go::Context \$parent_context must be defined.";
-    }
-    
-    return $parent_context->with_deadline_cause_v2($deadline, $cause);
-  }
-  
-  static method with_timeout : Go::Context::Derived ($parent_context : Go::Context, $timeout : Go::Duration_1l) {
-    
-    unless ($parent_context) {
-      die "Go::Context \$parent_context must be defined.";
-    }
-    
-    return $parent_context->with_timeout_v2($timeout);
-  }
-  
-  static method with_timeout_sec : Go::Context::Derived ($parent_context : Go::Context, $timeout_sec : double) {
-    
-    unless ($parent_context) {
-      die "Go::Context \$parent_context must be defined.";
-    }
-    
-    return $parent_context->with_timeout_sec_v2($timeout_sec);
-  }
-  
-  static method with_value : Go::Context ($parent_context : Go::Context, $key : object, $value : object) {
-    
-    unless ($parent_context) {
-      die "Go::Context \$parent_context must be defined.";
-    }
-    
-    return $parent_context->with_value_v2($key, $value);
-  }
-  
   # Instance Methods
+  method without_cancel : Go::Context () {
+    
+    return $self->without_cancel_v2;
+  }
+  
+  method with_cancel : Go::Context::Derived () {
+    
+    return $self->with_cancel_v2;
+  }
+  
+  method with_cancel_cause : Go::Context::Derived ($cause : string) {
+    
+    return $self->with_cancel_cause_v2($cause);
+  }
+  
+  method with_deadline : Go::Context::Derived ($deadline : Go::Time) {
+    
+    return $self->with_deadline_v2($deadline);
+  }
+  
+  method with_deadline_cause : Go::Context::Derived ($deadline : Go::Time, $cause : string) {
+    
+    return $self->with_deadline_cause_v2($deadline, $cause);
+  }
+  
+  method with_timeout : Go::Context::Derived ($timeout : Go::Duration_1l) {
+    
+    return $self->with_timeout_v2($timeout);
+  }
+  
+  method with_timeout_sec : Go::Context::Derived ($timeout_sec : double) {
+    
+    return $self->with_timeout_sec_v2($timeout_sec);
+  }
+  
+  method with_value : Go::Context ($key : object, $value : object) {
+    
+    return $self->with_value_v2($key, $value);
+  }
+  
   method without_cancel_v2 : Go::Context () {
     
     my $child = new Go::Context;
