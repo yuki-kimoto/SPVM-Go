@@ -1,3 +1,9 @@
+0.057 2026-11-27
+  [Requirement Changes]
+    * Require SPVM::UV 0.010.
+  [New Features]
+    * Add new_tcp to Go::OS::File.
+
 0.056 2026-11-27
   [Incompatible Changes]
     * Change derivation methods in Go::Context (`without_cancel`, `with_cancel`, `with_cancel_cause`, `with_deadline`, `with_deadline_cause`, `with_timeout`, `with_timeout_sec`, `with_value`) to instance methods.
