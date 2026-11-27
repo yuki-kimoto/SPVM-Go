@@ -1,3 +1,16 @@
+0.055 2026-11-27
+  [New Features]
+    * Add Go::OS::Poll class.
+    * Add Go::Timer class.
+    * Add new_pipe_end to Go::OS::File.
+    * Add start and wait methods to Go::OS::Exec::Cmd
+  [Incompatible Changes]
+    * Move I/O read/write and channel wait logic into Go::OS::File and Go::Channel, removing Go::Schedule::Info and legacy schedule types.
+    * Remove DESTROY, ENV_DEBUG, and caller_info methods.
+  [Internal Changes]
+    * Refactor Go::Schedule, Go::Context (deadline_uv_timer and monitor_context / wait_context), channel_wait, and poll/pipe I/O handling.
+* Clean up remaining goroutines in defer and remove unnecessary weaken usage.
+
 0.054 2026-11-24
   [Incompatible Changes]
     * Rewrite Go::OS::Exec, Go::OS::File, Go::OS::Cmd. Rename Go::OS::FD to Go::OS::File.
