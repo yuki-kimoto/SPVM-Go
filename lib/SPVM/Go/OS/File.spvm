@@ -19,8 +19,8 @@ class Go::OS::File {
   private enum {
     TYPE_UNKNOWN,
     TYPE_FILE,
-    TYPE_SOCKET,
-    TYPE_PIPE_END,
+    TYPE_TCP,
+    TYPE_PIPE,
   }
   
   # Class Variables
@@ -66,7 +66,7 @@ class Go::OS::File {
     return $self;
   }
   
-  static method new_socket : Go::OS::File ($fd : int) {
+  static method new_tcp : Go::OS::File ($fd : int) {
     
     unless ($fd >= 0) {
       die "The file descriptor \$fd must be a non-negative number.";
@@ -75,7 +75,7 @@ class Go::OS::File {
     my $self = new Go::OS::File;
     
     $self->{fd} = $fd;
-    $self->{type} = &TYPE_SOCKET;
+    $self->{type} = &TYPE_TCP;
     
     die "Not implemented.";
     
@@ -91,7 +91,7 @@ class Go::OS::File {
     my $self = new Go::OS::File;
     
     $self->{fd} = $fd;
-    $self->{type} = &TYPE_PIPE_END;
+    $self->{type} = &TYPE_PIPE;
     
     die "Not implemented.";
     
@@ -103,7 +103,7 @@ class Go::OS::File {
     my $self = new Go::OS::File;
     
     $self->{fd} = -1;
-    $self->{type} = &TYPE_PIPE_END;
+    $self->{type} = &TYPE_PIPE;
     
     return $self;
   }
@@ -130,7 +130,7 @@ class Go::OS::File {
     
     my $type = $self->{type};
     
-    if ($type == &TYPE_PIPE_END) {
+    if ($type == &TYPE_PIPE) {
       my $uv_stream = $self->{uv_stream};
       return &read_uv_stream($context, $uv_stream, $string, $length, $offset);
     }
@@ -143,7 +143,7 @@ class Go::OS::File {
     
     my $type = $self->{type};
     
-    if ($type == &TYPE_PIPE_END) {
+    if ($type == &TYPE_PIPE) {
       my $uv_stream = $self->{uv_stream};
       return &write_uv_stream($context, $uv_stream, $string, $length, $offset);
     }

@@ -50,7 +50,7 @@ class Go::OS::Exec::Cmd {
           $container->set_flags(UV_C->UV_INHERIT_FD);
           $container->set_fd($go_file->{fd});
         }
-        case Go::OS::File->TYPE_PIPE_END : {
+        case Go::OS::File->TYPE_PIPE : {
           my $uv_loop = Go->uv_loop;
           my $uv_pipe = UV::Handle::Pipe->new;
           $uv_loop->pipe_init($uv_pipe, 0);
