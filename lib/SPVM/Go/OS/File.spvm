@@ -6,6 +6,7 @@ class Go::OS::File {
   allow Go::OS::Exec::Cmd;
   allow Go::Schedule;
   
+  use Callback;
   use Fn;
   use Go;
   use Go::Context;
@@ -14,6 +15,8 @@ class Go::OS::File {
   use UV;
   use UV::Constant as UV_C;
   use UV::Handle::Stream;
+  # use UV::Handle::TCP;
+  use UV::Handle::Pipe;
   use UV::Request::Write;
   use Sys;
   
@@ -47,7 +50,11 @@ class Go::OS::File {
   
   has uv_stream : UV::Handle::Stream;
   
+  has finish_cb : Callback;
+  
   has no_close : byte;
+  
+  has closed : ro byte;
   
   # Class Methods
   static method new_file : Go::OS::File ($fd : int) {
@@ -71,14 +78,7 @@ class Go::OS::File {
       die "The file descriptor \$fd must be a non-negative number.";
     }
     
-    my $self = new Go::OS::File;
-    
-    $self->{fd} = $fd;
-    $self->{type} = &TYPE_TCP;
-    
     die "Not implemented.";
-    
-    return $self;
   }
   
   static method new_pipe_end : Go::OS::File ($fd : int) {
@@ -87,12 +87,19 @@ class Go::OS::File {
       die "The file descriptor \$fd must be a non-negative number.";
     }
     
+    # Duplicate fd for libuv pipe ownership
+    my $dup_fd = Sys::IO->dup($fd);
+    
+    my $uv_loop = Go->uv_loop;
+    my $uv_pipe = UV::Handle::Pipe->new;
+    $uv_loop->pipe_init($uv_pipe, 0);
+    $uv_pipe->open($dup_fd);
+    
     my $self = new Go::OS::File;
     
-    $self->{fd} = $fd;
+    $self->{fd} = $dup_fd;
     $self->{type} = &TYPE_PIPE;
-    
-    die "Not implemented.";
+    $self->{uv_stream} = $uv_pipe;
     
     return $self;
   }
@@ -108,6 +115,10 @@ class Go::OS::File {
   }
   
   method read : int ($context : Go::Context, $string : mutable string, $length : int = -1, $offset : int = 0) {
+    
+    if ($self->{closed}) {
+      die "The file is already closed.";
+    }
     
     my $type = $self->{type};
     
@@ -140,16 +151,25 @@ class Go::OS::File {
     my $done_ref = [0];
     my $read_buf = new_string_len $length;
     
-    # Send read result once
-    my $send_result = [$result_ch : , $done_ref : ] method : void ($nread : int, $buf : string, $err : int) {
+    # Finish read once with optional result or cancel
+    my $finish_cb = [$uv_stream : , $result_ch : , $done_ref : ] method : void ($nread : int = 0, $buf : string = undef, $err : int = 0, $has_result : int = 0) {
       if ($done_ref->[0]) {
         return;
       }
       $done_ref->[0] = 1;
-      $result_ch->write([(object)$nread, $buf, $err]);
+      if ($uv_stream) {
+        $uv_stream->read_stop;
+      }
+      if ($has_result) {
+        $result_ch->write([(object)$nread, $buf, $err]);
+      }
+      $result_ch->close;
     };
+    weaken $finish_cb->{uv_stream};
     
-    my $read_cb = [$uv_stream : , $send_result : , $done_ref : ] method : void ($stream : UV::Handle::Stream, $nread : int, $buf : mutable string) {
+    $self->{finish_cb} = $finish_cb;
+    
+    my $read_cb = [$finish_cb : , $done_ref : ] method : void ($stream : UV::Handle::Stream, $nread : int, $buf : mutable string) {
       $stream->read_stop;
       
       if ($done_ref->[0]) {
@@ -159,39 +179,34 @@ class Go::OS::File {
       if ($nread > 0) {
         my $copy_buf = new_string_len $nread;
         Fn->memcpy($copy_buf, 0, $buf, 0, $nread);
-        $send_result->($nread, $copy_buf, 0);
+        $finish_cb->($nread, $copy_buf, 0, 1);
       }
       elsif ($nread == 0) {
         # Retry read on empty callback
         $stream->read_start($buf, length $buf, $self);
       }
       elsif ($nread == UV_C->UV_EOF) {
-        $send_result->(0, undef, 0);
+        $finish_cb->(0, undef, 0, 1);
       }
       else {
-        $send_result->(-1, undef, $nread);
+        $finish_cb->(-1, undef, $nread, 1);
       }
     };
-    weaken $read_cb->{uv_stream};
     
     $uv_stream->read_start($read_buf, $length, $read_cb);
     
-    # Stop read and unblock result_ch on context done
-    my $done_cb = [$uv_stream : , $result_ch : , $done_ref : ] method : void () {
-      $done_ref->[0] = 1;
-      if ($uv_stream) {
-        $uv_stream->read_stop;
-      }
-      $result_ch->close;
-    };
-    weaken $done_cb->{uv_stream};
-    
-    Go->monitor_context($context, $result_ch, $done_cb);
+    Go->monitor_context($context, $result_ch, $finish_cb);
     
     my $res = (object[])$result_ch->read;
     
-    if ($context && $context->err > 0) {
+    $self->{finish_cb} = undef;
+    
+    if ($context->err > 0) {
       die $context->err, $context->cause;
+    }
+    
+    unless ($res) {
+      return 0;
     }
     
     my $nread = (int)$res->[0];
@@ -208,6 +223,10 @@ class Go::OS::File {
   }
   
   method write : int ($context : Go::Context, $string : string, $length : int = -1, $offset : int = 0) {
+    
+    if ($self->{closed}) {
+      die "The file is already closed.";
+    }
     
     my $type = $self->{type};
     
@@ -246,35 +265,48 @@ class Go::OS::File {
     my $write_buf = new_string_len $length;
     Fn->memcpy($write_buf, 0, $string, $offset, $length);
     
-    my $write_req = UV::Request::Write->new;
-    my $write_cb = [$result_ch : , $done_ref : , $write_req : , $length : ] method : void ($req : UV::Request::Write, $status : int) {
-      $req->set_write_cb(undef);
+    # Finish write once with optional result or cancel
+    my $finish_cb = [$result_ch : , $done_ref : ] method : void ($written : int = 0, $status : int = 0, $has_result : int = 0) {
       if ($done_ref->[0]) {
         return;
       }
       $done_ref->[0] = 1;
+      if ($has_result) {
+        $result_ch->write([$written, $status]);
+      }
+      $result_ch->close;
+    };
+    
+    $self->{finish_cb} = $finish_cb;
+    
+    my $write_req = UV::Request::Write->new;
+    my $write_cb = [$finish_cb : , $done_ref : , $write_req : , $length : ] method : void ($req : UV::Request::Write, $status : int) {
+      $req->set_write_cb(undef);
+      if ($done_ref->[0]) {
+        return;
+      }
       if ($status < 0) {
-        $result_ch->write([-1, $status]);
+        $finish_cb->(-1, $status, 1);
       }
       else {
-        $result_ch->write([$length, 0]);
+        $finish_cb->($length, 0, 1);
       }
     };
     
     $write_req->write($uv_stream, $write_buf, $length, $write_cb);
     
-    # Unblock result_ch on context done
-    my $done_cb = [$result_ch : , $done_ref : ] method : void () {
-      $done_ref->[0] = 1;
-      $result_ch->close;
-    };
-    
-    Go->monitor_context($context, $result_ch, $done_cb);
+    Go->monitor_context($context, $result_ch, $finish_cb);
     
     my $res = (int[])$result_ch->read;
     
-    if ($context && $context->err > 0) {
+    $self->{finish_cb} = undef;
+    
+    if ($context->err > 0) {
       die $context->err, $context->cause;
+    }
+    
+    unless ($res) {
+      return 0;
     }
     
     my $written = $res->[0];
@@ -291,17 +323,26 @@ class Go::OS::File {
     if ($self->{no_close}) {
       die "'no_close' field is specified.";
     }
-    else {
-      if (my $uv_stream = $self->{uv_stream}) {
-        $uv_stream->close_safe;
-        $self->{uv_stream} = undef;
-      }
+    
+    if ($self->{closed}) {
+      return;
     }
+    
+    if (my $finish_cb = $self->{finish_cb}) {
+      $self->{finish_cb} = undef;
+      $finish_cb->();
+    }
+    
+    if (my $uv_stream = $self->{uv_stream}) {
+      $uv_stream->close_safe;
+      $self->{uv_stream} = undef;
+    }
+    
+    $self->{fd} = -1;
+    $self->{closed} = 1;
   }
   
   method DESTROY : void () {
-    
-    my $type = $self->{type};
     
     unless ($self->{no_close}) {
       $self->close;
