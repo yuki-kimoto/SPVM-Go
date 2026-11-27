@@ -46,8 +46,6 @@ class Go::OS::File {
   
   has uv_stream : UV::Handle::Stream;
   
-  has uv_poll : UV::Handle::Poll;
-  
   has no_close : byte;
   
   # Class Methods
@@ -117,11 +115,6 @@ class Go::OS::File {
       if (my $uv_stream = $self->{uv_stream}) {
         $uv_stream->close_safe;
         $self->{uv_stream} = undef;
-      }
-      
-      if (my $uv_poll = $self->{uv_poll}) {
-        $uv_poll->close_safe;
-        $self->{uv_poll} = undef;
       }
     }
   }
