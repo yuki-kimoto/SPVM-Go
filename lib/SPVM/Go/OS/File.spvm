@@ -340,6 +340,8 @@ class Go::OS::File {
     
     $self->{fd} = -1;
     $self->{closed} = 1;
+    
+    Go->gosched;
   }
   
   method DESTROY : void () {
