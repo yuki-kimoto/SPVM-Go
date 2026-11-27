@@ -367,4 +367,115 @@ class TestCase::Go::Pipe {
     
     return 1;
   }
+  
+  static method basic_tcp_v2 : int () {
+    
+    {
+      my $fd1 = -1;
+      my $fd2 = -1;
+      
+      Sys::Socket::Util->inet_socketpair(\$fd1, \$fd2, SOCKET_C->AF_INET, SOCKET_C->SOCK_STREAM, 0);
+      Sys::Socket::Util->set_blocking($fd1, 0);
+      Sys::Socket::Util->set_blocking($fd2, 0);
+      
+      # Wrap TCP sockets in Go::OS::File
+      my $file1 = Go::OS::File->new_tcp($fd1);
+      my $file2 = Go::OS::File->new_tcp($fd2);
+      
+      {
+        my $write_length_ref = [-1];
+        Go->go([$file1 : , $write_length_ref : ] method : void () {
+          my $write_buffer = "abc";
+          my $write_buffer_length = length $write_buffer;
+          $write_length_ref->[0] = $file1->write(Go->bg, $write_buffer, $write_buffer_length);
+        });
+        Go->gosched;
+        
+        my $read_buffer = new_string_len 3;
+        my $read_buffer_length = length $read_buffer;
+        my $read_length = $file2->read(Go->bg, $read_buffer, $read_buffer_length);
+        
+        unless ($write_length_ref->[0] == 3) {
+          $file1->close;
+          $file2->close;
+          Sys::Socket->close($fd1);
+          Sys::Socket->close($fd2);
+          return 0;
+        }
+        
+        unless ($read_buffer eq "abc") {
+          $file1->close;
+          $file2->close;
+          Sys::Socket->close($fd1);
+          Sys::Socket->close($fd2);
+          return 0;
+        }
+        
+        unless ($read_length == 3) {
+          $file1->close;
+          $file2->close;
+          Sys::Socket->close($fd1);
+          Sys::Socket->close($fd2);
+          return 0;
+        }
+      }
+      
+      $file1->close;
+      $file2->close;
+      Sys::Socket->close($fd1);
+      Sys::Socket->close($fd2);
+    }
+    
+    return 1;
+  }
+  
+  static method timeout_tcp_v2 : int () {
+    
+    {
+      my $fd1 = -1;
+      my $fd2 = -1;
+      
+      Sys::Socket::Util->inet_socketpair(\$fd1, \$fd2, SOCKET_C->AF_INET, SOCKET_C->SOCK_STREAM, 0);
+      Sys::Socket::Util->set_blocking($fd1, 0);
+      Sys::Socket::Util->set_blocking($fd2, 0);
+      
+      # Wrap TCP sockets in Go::OS::File
+      my $file1 = Go::OS::File->new_tcp($fd1);
+      my $file2 = Go::OS::File->new_tcp($fd2);
+      
+      {
+        my $write_length_ref = [-1];
+        Go->go([$file1 : , $write_length_ref : ] method : void () {
+          my $write_buffer = "abc";
+          my $write_buffer_length = 0;
+          my $write_buffer_offset = 0;
+          my $timeout_sec = 0;
+          $write_length_ref->[0] = $file1->write(Go->bg->with_timeout_sec($timeout_sec)->context, $write_buffer, $write_buffer_length, $write_buffer_offset);
+        });
+        Go->gosched;
+        
+        my $read_buffer = new_string_len 3;
+        my $read_buffer_length = length $read_buffer;
+        my $read_buffer_offset = 0;
+        my $timeout_sec = 0.5;
+        
+        eval { $file2->read(Go->bg->with_timeout_sec($timeout_sec)->context, $read_buffer, $read_buffer_length, $read_buffer_offset); }
+        
+        unless ($@ isa Go::Error::IOTimeout) {
+          $file1->close;
+          $file2->close;
+          Sys::Socket->close($fd1);
+          Sys::Socket->close($fd2);
+          return 0;
+        }
+      }
+      
+      $file1->close;
+      $file2->close;
+      Sys::Socket->close($fd1);
+      Sys::Socket->close($fd2);
+    }
+    
+    return 1;
+  }
 }

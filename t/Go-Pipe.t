@@ -20,6 +20,10 @@ ok(SPVM::TestCase::Go::Pipe->basic_v2);
 
 ok(SPVM::TestCase::Go::Pipe->timeout_v2);
 
+ok(SPVM::TestCase::Go::Pipe->basic_tcp_v2);
+
+ok(SPVM::TestCase::Go::Pipe->timeout_tcp_v2);
+
 $api->destroy_runtime_permanent_vars;
 
 my $end_memory_blocks_count = $api->get_memory_blocks_count;
