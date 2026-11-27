@@ -125,7 +125,7 @@ class Go::OS::Poll {
     
     $uv_poll->start($poll_cb, $events);
     
-    Go->monitor_context($context, $finish_ch, $finish_cb);
+    Go::Context->monitor_context($context, $finish_cb, $finish_ch);
     
     $finish_ch->read;
     

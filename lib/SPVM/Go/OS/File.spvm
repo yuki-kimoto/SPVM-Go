@@ -195,7 +195,7 @@ class Go::OS::File {
     
     $uv_stream->read_start($read_buf, $length, $read_cb);
     
-    Go->monitor_context($context, $result_ch, $finish_cb);
+    Go::Context->monitor_context($context, $finish_cb, $result_ch);
     
     my $res = (object[])$result_ch->read;
     
@@ -297,7 +297,7 @@ class Go::OS::File {
     
     $write_req->write($uv_stream, $write_buf, $length, $write_cb);
     
-    Go->monitor_context($context, $result_ch, $finish_cb);
+    Go::Context->monitor_context($context, $finish_cb, $result_ch);
     
     my $res = (int[])$result_ch->read;
     

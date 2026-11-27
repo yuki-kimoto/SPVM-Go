@@ -95,29 +95,6 @@ class Go {
     return $Go::GO->{schedule}{uv_loop};
   }
   
-  static method monitor_context : void ($context : Go::Context, $finish_ch : Go::Channel, $done_cb : Callback) {
-    
-    unless ($context) {
-      die "Go::Context \$context must be defined.";
-    }
-    
-    my $done_ch = $context->done;
-    if ($done_ch) {
-      my $select = Go->new_select;
-      $select->add_read($finish_ch);
-      $select->add_read($done_ch);
-      
-      Go->go([$select : , $done_ch : , $done_cb : ] method : void () {
-        my $result = $select->select;
-        if ($done_ch && $result->channel == $done_ch) {
-          if ($done_cb) {
-            $done_cb->();
-          }
-        }
-      });
-    }
-  }
-  
   # Deprecated
   static method sleep : void ($duration : Go::Duration_1l) {
     
@@ -199,7 +176,7 @@ class Go {
     
     $uv_poll->start($poll_cb, $events);
     
-    &monitor_context($context, $finish_ch, $finish_cb);
+    Go::Context->monitor_context($context, $finish_cb, $finish_ch);
     
     $finish_ch->read;
     
@@ -339,7 +316,7 @@ class Go {
       $finish_cb->();
     };
     
-    Go->monitor_context($context, $finish_ch, $cancel_cb);
+    Go::Context->monitor_context($context, $cancel_cb, $finish_ch);
     
     $finish_ch->read;
     

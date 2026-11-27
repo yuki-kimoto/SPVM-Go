@@ -51,6 +51,29 @@ class Go::Context {
     return $BACKGROUND_CONTEXT;
   }
   
+  static method monitor_context : void ($context : Go::Context, $done_cb : Callback, $cancel_ch : Go::Channel) {
+    
+    unless ($context) {
+      die "Go::Context \$context must be defined.";
+    }
+    
+    my $done_ch = $context->done;
+    if ($done_ch) {
+      my $select = Go->new_select;
+      $select->add_read($cancel_ch);
+      $select->add_read($done_ch);
+      
+      Go->go([$select : , $done_ch : , $done_cb : , ] method : void () {
+        my $result = $select->select;
+        if ($result->channel == $done_ch) {
+          if ($done_cb) {
+            $done_cb->();
+          }
+        }
+      });
+    }
+  }
+  
   static method without_cancel : Go::Context ($parent_context : Go::Context) {
     
     unless ($parent_context) {
