@@ -1,3 +1,7 @@
+0.056 2026-11-27
+  [Incompatible Changes]
+    * Remove deprecated `sleep`, `sleep_sec`, `after`, and `after_sec` (moved to `Go::Timer`).
+
 0.055 2026-11-27
   [New Features]
     * Add Go::OS::Poll class.

@@ -96,30 +96,6 @@ class Go {
   }
   
   # Deprecated
-  static method sleep : void ($duration : Go::Duration_1l) {
-    
-    Go::Timer->sleep($duration);
-  }
-  
-  # Deprecated
-  static method sleep_sec : void ($sec : double = 0) {
-    
-    Go::Timer->sleep_sec($sec);
-  }
-  
-  # Deprecated
-  static method after : Go::Channel ($duration : Go::Duration_1l = undef) {
-    
-    return Go::Timer->after($duration);
-  }
-  
-  # Deprecated
-  static method after_sec : Go::Channel ($sec : double = 0) {
-    
-    return Go::Timer->after_sec($sec);
-  }
-  
-  # Deprecated
   static method gosched_poll_read : void ($context : Go::Context, $fd : int) {
     
     &gosched_poll_io($context, $fd, 1);

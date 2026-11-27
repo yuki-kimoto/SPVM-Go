@@ -235,7 +235,7 @@ class TestCase::Go::Channel {
           $RESULT->push($ch->len);
         });
         
-        Go->sleep_sec(0.1);
+        Go::Timer->sleep_sec(0.1);
         
         my $ok = 0;
         
@@ -364,7 +364,7 @@ class TestCase::Go::Channel {
         
         Go->gosched;
         
-        Go->sleep_sec(0.1);
+        Go::Timer->sleep_sec(0.1);
         
         my $ok = 0;
         

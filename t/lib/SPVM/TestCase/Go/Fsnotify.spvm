@@ -26,7 +26,7 @@ class TestCase::Go::Fsnotify {
         
         my $target_file = "$temp_dir/test_fs_event.txt";
         
-        Go->sleep_sec(0.5); # For mac FSEvents warm up
+        Go::Timer->sleep_sec(0.5); # For mac FSEvents warm up
         Sys->open(my $_ = [(Sys::IO::FileStream)undef], "w", $target_file);
         my $fh = $_->[0];
         Sys->close($fh);
@@ -79,7 +79,7 @@ class TestCase::Go::Fsnotify {
         
         my $target_file = "$dir1/test_dir1.txt";
         
-        Go->sleep_sec(0.5); # For mac FSEvents warm up
+        Go::Timer->sleep_sec(0.5); # For mac FSEvents warm up
         Sys->open(my $_ = [(Sys::IO::FileStream)undef], "w", $target_file);
         my $fh = $_->[0];
         Sys->close($fh);
@@ -123,7 +123,7 @@ class TestCase::Go::Fsnotify {
         
         my $target_file = "$dir2/test_dir2.txt";
         
-        Go->sleep_sec(0.5); # For mac FSEvents warm up
+        Go::Timer->sleep_sec(0.5); # For mac FSEvents warm up
         Sys->open(my $_ = [(Sys::IO::FileStream)undef], "w", $target_file);
         my $fh = $_->[0];
         Sys->close($fh);

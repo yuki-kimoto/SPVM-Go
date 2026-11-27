@@ -56,7 +56,7 @@ class TestCase::Go::OS::Exec {
       my $cancel_cb = $_->cancel_cb;
     
       Go->go([$cancel_cb : ] method : void () {
-        Go->sleep_sec(0.5);
+        Go::Timer->sleep_sec(0.5);
         $cancel_cb->();
       });
     
@@ -175,7 +175,7 @@ class TestCase::Go::OS::Exec {
         my $cmd = Go::OS::Exec->command($context, ["perl", "-e", "while(1){}"]);
         
         Go->go([$cancel_cb : ] method : void () {
-          Go->sleep_sec(0.5);
+          Go::Timer->sleep_sec(0.5);
           $cancel_cb->();
         });
         

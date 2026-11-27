@@ -136,7 +136,7 @@ class TestCase::Go::Poll {
   static method spawn_echo : void ($fd : int, $delay_sec : double = 0) {
     Go->go([$fd : , $delay_sec : ] method : void () {
       if ($delay_sec > 0) {
-        Go->sleep_sec($delay_sec);
+        Go::Timer->sleep_sec($delay_sec);
       }
       
       my $total_buf = StringBuffer->new;
@@ -288,7 +288,7 @@ class TestCase::Go::Poll {
       Sys::Socket::Util->set_blocking($socket_fd2, 0);
       
       Go->go([$socket_fd1 : ] method : void () {
-        Go->sleep_sec(0.5);
+        Go::Timer->sleep_sec(0.5);
         Go->gosched_poll_cancel($socket_fd1);
       });
       

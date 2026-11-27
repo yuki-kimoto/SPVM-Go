@@ -170,24 +170,6 @@ Cancels suspending the current goroutine for pipe read/write given the file desc
 
 The control is transferred to the scheduler.
 
-=head2 sleep
-
-C<static method sleep : void ($duration : Go::Duration_1l = undef)>
-
-Sleeps the nanoseconds $duration.
-
-Exceptions:
-
-This method must be called from the main thread. Otherwise an exception is thrown.
-
-$seconds must be less than or equal to Fn->INT_MAX. Otherwise an exception is thrown.
-
-=head2 sleep_sec
-
-C<static method sleep_sec : void ($sec : double = 0);>
-
-Same as L</"sleep">, but sleeps the seconds $sec.
-
 =head2 new_wait_group
 
 C<static method new_wait_group : L<Go::Sync::WaitGroup|SPVM::Go::Sync::WaitGroup> ($add : int = 0);>
@@ -388,18 +370,6 @@ C<static method new_command : L<Go::OS::Exec::Cmd|SPVM::Go::OS::Exec::Cmd> ($con
 
 Creates a new L<Go::OS::Exec::Cmd|SPVM::Go::OS::Exec::Cmd> object given the context $context and the command arguments $command.
 
-=head2 after
-
-C<static method after : L<Go::Channel|SPVM::Go::Channel> ($duration : L<Go::Duration_1l|SPVM::Go::Duration_1l> = undef);>
-
-Waits for the duration $duration and then sends a value to the returned channel, mimicking C<time.After> in the Go programming language.
-
-=head2 after_sec
-
-C<static method after_sec : L<Go::Channel|SPVM::Go::Channel> ($sec : double = 0);>
-
-Same as L</"after">, but waits for the seconds $sec.
-
 =head2 bg
 
 C<static method bg : L<Go::Context|SPVM::Go::Context> ();>
@@ -437,6 +407,8 @@ Casts the value of L</"SPVM_GO_DEBUG> environment variable to int type and retur
 =item * L<Go::Duration_1l|SPVM::Go::Duration_1l>
 
 =item * L<Go::Context|SPVM::Go::Context>
+
+=item * L<Go::Timer|SPVM::Go::Timer>
 
 =back
 
