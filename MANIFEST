@@ -77,6 +77,7 @@ t/Go-Duration_1l.t
 t/Go-Exec.t
 t/Go-Fsnotify.t
 t/Go-Goroutine.t
+t/Go-OS-Poll.t
 t/Go-OS-Signal.t
 t/Go-Pipe.t
 t/Go-Poll.t
@@ -91,6 +92,7 @@ t/lib/SPVM/TestCase/Go/Duration_1l.spvm
 t/lib/SPVM/TestCase/Go/Fsnotify.spvm
 t/lib/SPVM/TestCase/Go/Goroutine.spvm
 t/lib/SPVM/TestCase/Go/OS/Exec.spvm
+t/lib/SPVM/TestCase/Go/OS/Poll.spvm
 t/lib/SPVM/TestCase/Go/OS/Signal.spvm
 t/lib/SPVM/TestCase/Go/Pipe.spvm
 t/lib/SPVM/TestCase/Go/Poll.spvm

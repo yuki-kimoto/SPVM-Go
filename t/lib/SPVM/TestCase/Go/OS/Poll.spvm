@@ -1,0 +1,175 @@
+# Copyright (c) 2026 Yuki Kimoto
+# MIT License
+
+class TestCase::Go::OS::Poll {
+  use Go;
+  use Go::OS::Poll;
+  use Go::Context;
+  use Sys::Socket;
+  use Sys::Socket::Constant as SOCKET;
+  use Sys::Socket::Util;
+  use Sys::Socket::Errno;
+  use Errno;
+  use StringList;
+  use StringBuffer;
+  use Fn;
+  use Array;
+
+  our $RESULTS : StringList[];
+
+  static method basic : int () {
+    
+    $RESULTS = new StringList[1];
+    $RESULTS->[0] = StringList->new;
+    
+    my $fd1 = -1;
+    my $fd2 = -1;
+    Sys::Socket::Util->inet_socketpair(\$fd1, \$fd2, SOCKET->AF_INET, SOCKET->SOCK_STREAM, 0);
+    Sys::Socket::Util->set_blocking($fd1, 0);
+    Sys::Socket::Util->set_blocking($fd2, 0);
+    
+    my $poll1 = Go::OS::Poll->new_poll($fd1);
+    my $poll2 = Go::OS::Poll->new_poll($fd2);
+    
+    # Run echo goroutine using Go::OS::Poll
+    &spawn_echo($fd2, $poll2);
+    
+    Go->go([$fd1 : , $poll1 : ] method : void () {
+      my $id = 0;
+      &go_send_and_recv_fd($fd1, $poll1, $id);
+      $poll1->close;
+      Sys::Socket->close($fd1);
+    });
+    
+    Go->gosched;
+    
+    unless ($poll1->opened == 0 && $poll2->opened == 0) {
+      return 0;
+    }
+    
+    unless (Array->equals_string($RESULTS->[0]->to_array, ["4", "2", "0", "3", "abc", "3", "def", "0"])) {
+      return 0;
+    }
+    
+    $RESULTS = undef;
+    return 1;
+  }
+
+  private static method spawn_echo : void ($fd : int, $poll : Go::OS::Poll) {
+    Go->go([$fd : , $poll : ] method : void () {
+      my $total_buf = StringBuffer->new;
+      while (1) {
+        my $buf = (mutable string)new_string_len 256;
+        my $read_len = &go_recv($fd, $poll, $buf, length $buf);
+        
+        if ($read_len <= 0) {
+          last;
+        }
+        
+        my $slice = Fn->substr($buf, 0, $read_len);
+        $total_buf->push($slice);
+      }
+      
+      my $response = $total_buf->to_string;
+      if (length $response > 0) {
+        &go_send($fd, $poll, $response, 0);
+      }
+      
+      $poll->close;
+      Sys::Socket->close($fd);
+    });
+  }
+
+  private static method go_send_and_recv_fd : int ($fd : int, $poll : Go::OS::Poll, $id : int) {
+    
+    my $status = 0;
+    
+    {
+      my $send_buffer = "abcd";
+      my $send_length = &go_send($fd, $poll, $send_buffer, 0);
+      $RESULTS->[$id]->push((string)$send_length);
+    }
+    
+    {
+      my $send_buffer = "ef";
+      my $send_length = &go_send($fd, $poll, $send_buffer, 0);
+      $RESULTS->[$id]->push((string)$send_length);
+    }
+    
+    my $status_shutdown = Sys::Socket->shutdown($fd, SOCKET->SHUT_WR);
+    $RESULTS->[$id]->push((string)$status_shutdown);
+    
+    {
+      my $recv_buffer = (mutable string)new_string_len 3;
+      my $recv_length = &go_recv($fd, $poll, $recv_buffer, length $recv_buffer);
+      if ($recv_length < 0) { return 1; }
+      $RESULTS->[$id]->push((string)$recv_length);
+      $RESULTS->[$id]->push($recv_buffer);
+    }
+    
+    {
+      my $recv_buffer = (mutable string)new_string_len 3;
+      my $recv_length = &go_recv($fd, $poll, $recv_buffer, length $recv_buffer);
+      if ($recv_length < 0) { return 1; }
+      $RESULTS->[$id]->push((string)$recv_length);
+      $RESULTS->[$id]->push($recv_buffer);
+    }
+    
+    {
+      my $recv_buffer = (mutable string)new_string_len 3;
+      my $recv_length = &go_recv($fd, $poll, $recv_buffer, length $recv_buffer);
+      if ($recv_length < 0) { return 1; }
+      $RESULTS->[$id]->push((string)$recv_length);
+    }
+    
+    return $status;
+  }
+
+  private static method go_recv : int ($socket : int, $poll : Go::OS::Poll, $buf : mutable string, $count : int) {
+    
+    my $context = Go->bg->with_cancel_v2->context;
+    
+    my $recv_length = -1;
+    while (1) {
+      eval { $recv_length = Sys->recv($socket, $buf, $count, 0); }
+      
+      if ($@) {
+        if (Sys::Socket::Errno->errno == Sys::Socket::Errno->EWOULDBLOCK || Sys::Socket::Errno->errno == Errno->EINTR) {
+          $poll->read($context);
+        }
+        else {
+          die $@;
+        }
+      }
+      else {
+        last;
+      }
+    }
+    
+    return $recv_length;
+  }
+
+  private static method go_send : int ($socket : int, $poll : Go::OS::Poll, $buf : string, $flags : int) {
+    
+    my $context = Go->bg->with_cancel_v2->context;
+    
+    my $send_length = -1;
+    while (1) {
+      eval { $send_length = Sys->send($socket, $buf, $flags); }
+      
+      if ($@) {
+        if (Sys::Socket::Errno->errno == Sys::Socket::Errno->EWOULDBLOCK || Sys::Socket::Errno->errno == Errno->EINTR) {
+          $poll->write($context);
+        }
+        else {
+          die $@;
+        }
+      }
+      else {
+        last;
+      }
+    }
+    
+    return $send_length;
+  }
+}

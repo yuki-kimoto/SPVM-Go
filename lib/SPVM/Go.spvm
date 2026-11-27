@@ -41,92 +41,6 @@ class Go {
     $schedule->schedule;
   }
   
-  static method gosched_poll_read : void ($context : Go::Context, $fd : int) {
-    
-    &gosched_poll_io($context, $fd, 1);
-  }
-  
-  static method gosched_poll_write : void ($context : Go::Context, $fd : int) {
-    
-    &gosched_poll_io($context, $fd, 0);
-  }
-  
-  private static method gosched_poll_io : void ($context : Go::Context, $fd : int, $is_read : int) {
-    
-    unless ($fd >= 0) {
-      die "The file descriptor \$fd must be a non-negative value.";
-    }
-    
-    my $schedule = $GO->{schedule};
-    my $uv_loop = $schedule->{uv_loop};
-    my $finish_ch = Go->make;
-    
-    my $uv_poll_ref = [(UV::Handle::Poll)undef];
-    my $uv_poll = UV::Handle::Poll->new;
-    $uv_poll_ref->[0] = $uv_poll;
-    $uv_loop->poll_init($uv_poll, $fd);
-    
-    my $finish_cb = [$schedule : , $finish_ch : , $fd : , $uv_poll_ref : ] method : void () {
-      $finish_ch->close;
-      $schedule->{uv_poll_finish_cbs_h}->delete("$fd");
-      
-      my $uv_poll = $uv_poll_ref->[0];
-      if ($uv_poll) {
-        $uv_poll->set_poll_cb(undef);
-        $uv_poll->close_safe;
-        $uv_poll_ref->[0] = undef;
-      }
-    };
-    
-    $schedule->{uv_poll_finish_cbs_h}{"$fd"} = $finish_cb;
-    
-    my $status_ref = [(int)0];
-    my $events = $is_read ? UV_C->UV_READABLE : UV_C->UV_WRITABLE;
-    my $poll_cb = [$status_ref : , $finish_cb : , $uv_poll_ref : ] method : void ($uv_poll : UV::Handle::Poll, $status : int, $events : int) {
-      
-      $status_ref->[0] = $status;
-      
-      my $uv_poll = $uv_poll_ref->[0];
-      if ($uv_poll) {
-        $uv_poll->set_poll_cb(undef);
-      }
-      $finish_cb->();
-    };
-    
-    $uv_poll->start($poll_cb, $events);
-    
-    &monitor_context($context, $finish_ch, $finish_cb);
-    
-    $finish_ch->read;
-    
-    my $error_id = 0;
-    my $exception = (string)undef;
-    
-    my $err = $context->err;
-    if ($err > 0) {
-      $error_id = $err;
-      $exception = $context->cause;
-    }
-    elsif ($status_ref->[0] < 0) {
-      $error_id = basic_type_id Error;
-      $exception = UV->strerror($status_ref->[0]);
-    }
-    
-    if ($error_id) {
-      die $error_id, $exception;
-    }
-  }
-  
-  static method gosched_poll_cancel : void ($fd : int) {
-    
-    my $schedule = $GO->{schedule};
-    my $uv_poll_finish_cb = $schedule->{uv_poll_finish_cbs_h}{"$fd"};
-    
-    if ($uv_poll_finish_cb) {
-      $uv_poll_finish_cb->();
-    }
-  }
-  
   static method gosched_pipe_read : int ($context : Go::Context, $fd : int, $string : mutable string, $length : int = -1, $offset : int = 0) {
     
     return &gosched_pipe_io($context, $fd, $string, $length, $offset, 1);
@@ -351,6 +265,96 @@ class Go {
   static method after_sec : Go::Channel ($sec : double = 0) {
     
     return Go::Timer->after_sec($sec);
+  }
+  
+  # Deprecated
+  static method gosched_poll_read : void ($context : Go::Context, $fd : int) {
+    
+    &gosched_poll_io($context, $fd, 1);
+  }
+  
+  # Deprecated
+  static method gosched_poll_write : void ($context : Go::Context, $fd : int) {
+    
+    &gosched_poll_io($context, $fd, 0);
+  }
+  
+  # Deprecated
+  private static method gosched_poll_io : void ($context : Go::Context, $fd : int, $is_read : int) {
+    
+    unless ($fd >= 0) {
+      die "The file descriptor \$fd must be a non-negative value.";
+    }
+    
+    my $schedule = $GO->{schedule};
+    my $uv_loop = $schedule->{uv_loop};
+    my $finish_ch = Go->make;
+    
+    my $uv_poll_ref = [(UV::Handle::Poll)undef];
+    my $uv_poll = UV::Handle::Poll->new;
+    $uv_poll_ref->[0] = $uv_poll;
+    $uv_loop->poll_init($uv_poll, $fd);
+    
+    my $finish_cb = [$schedule : , $finish_ch : , $fd : , $uv_poll_ref : ] method : void () {
+      $finish_ch->close;
+      $schedule->{uv_poll_finish_cbs_h}->delete("$fd");
+      
+      my $uv_poll = $uv_poll_ref->[0];
+      if ($uv_poll) {
+        $uv_poll->set_poll_cb(undef);
+        $uv_poll->close_safe;
+        $uv_poll_ref->[0] = undef;
+      }
+    };
+    
+    $schedule->{uv_poll_finish_cbs_h}{"$fd"} = $finish_cb;
+    
+    my $status_ref = [(int)0];
+    my $events = $is_read ? UV_C->UV_READABLE : UV_C->UV_WRITABLE;
+    my $poll_cb = [$status_ref : , $finish_cb : , $uv_poll_ref : ] method : void ($uv_poll : UV::Handle::Poll, $status : int, $events : int) {
+      
+      $status_ref->[0] = $status;
+      
+      my $uv_poll = $uv_poll_ref->[0];
+      if ($uv_poll) {
+        $uv_poll->set_poll_cb(undef);
+      }
+      $finish_cb->();
+    };
+    
+    $uv_poll->start($poll_cb, $events);
+    
+    &monitor_context($context, $finish_ch, $finish_cb);
+    
+    $finish_ch->read;
+    
+    my $error_id = 0;
+    my $exception = (string)undef;
+    
+    my $err = $context->err;
+    if ($err > 0) {
+      $error_id = $err;
+      $exception = $context->cause;
+    }
+    elsif ($status_ref->[0] < 0) {
+      $error_id = basic_type_id Error;
+      $exception = UV->strerror($status_ref->[0]);
+    }
+    
+    if ($error_id) {
+      die $error_id, $exception;
+    }
+  }
+  
+  # Deprecated
+  static method gosched_poll_cancel : void ($fd : int) {
+    
+    my $schedule = $GO->{schedule};
+    my $uv_poll_finish_cb = $schedule->{uv_poll_finish_cbs_h}{"$fd"};
+    
+    if ($uv_poll_finish_cb) {
+      $uv_poll_finish_cb->();
+    }
   }
   
 }
