@@ -34,138 +34,6 @@ class Go {
     $GO = $go;
   }
   
-  static method gosched : void () {
-    
-    my $schedule = $GO->{schedule};
-    
-    $schedule->schedule;
-  }
-  
-  static method gosched_pipe_read : int ($context : Go::Context, $fd : int, $string : mutable string, $length : int = -1, $offset : int = 0) {
-    
-    return &gosched_pipe_io($context, $fd, $string, $length, $offset, 1);
-  }
-  
-  static method gosched_pipe_write : int ($context : Go::Context, $fd : int, $string : string, $length : int = -1, $offset : int = 0) {
-    
-    return &gosched_pipe_io($context, $fd, $string, $length, $offset, 0);
-  }
-  
-  private static method gosched_pipe_io : int ($context : Go::Context, $fd : int, $buffer : string, $buffer_length : int, $buffer_offset : int, $is_read : int) {
-    
-    if ($buffer_length < 0) {
-      $buffer_length = length $buffer;
-    }
-    
-    unless ($fd >= 0) {
-      die "The file descriptor \$fd in schedule type TYPE_PIPE_READ or TYPE_PIPE_WRITE must be a non-negative value.";
-    }
-    
-    my $schedule = $GO->{schedule};
-    my $uv_loop = $schedule->{uv_loop};
-    my $finish_ch = Go->make;
-    my $ret_length_ref = [0];
-    my $error_id_ref = [(int)0];
-    my $exception_ref = [(string)undef];
-    
-    my $uv_pipe_ref = [(UV::Handle::Pipe)undef];
-    my $uv_pipe = UV::Handle::Pipe->new;
-    my $ipc = 0;
-    $uv_loop->pipe_init($uv_pipe, $ipc);
-    my $fd_dup = Sys::IO->dup($fd);
-    $uv_pipe->open($fd_dup);
-    $uv_pipe_ref->[0] = $uv_pipe;
-    
-    # Clean up pipe handle and close finish channel
-    my $finish_cb = [$schedule : , $finish_ch : , $fd : , $uv_pipe_ref : ] method : void ($args : object...) {
-      $finish_ch->close;
-      $schedule->{uv_pipe_finish_cbs_h}->delete("$fd");
-      
-      my $uv_pipe = $uv_pipe_ref->[0];
-      if ($uv_pipe) {
-        $uv_pipe->close_safe;
-        $uv_pipe_ref->[0] = undef;
-      }
-    };
-    
-    $schedule->{uv_pipe_finish_cbs_h}{"$fd"} = $finish_cb;
-    
-    if ($is_read) {
-      my $read_cb = [$ret_length_ref : , $error_id_ref : , $exception_ref : , $finish_cb : ] method : void ($uv_stream : UV::Handle::Stream, $nread : int, $buf : string) {
-        if ($nread < 0) {
-          if ($nread == UV_C->UV_EOF) {
-            $ret_length_ref->[0] = 0;
-          }
-          else {
-            $error_id_ref->[0] = basic_type_id Error;
-            $exception_ref->[0] = UV->strerror($nread);
-            $ret_length_ref->[0] = $nread;
-          }
-        }
-        else {
-          $ret_length_ref->[0] = $nread;
-        }
-        
-        $uv_stream->read_stop;
-        
-        $finish_cb->();
-      };
-      
-      $uv_pipe->read_start((mutable string)$buffer, $buffer_length, $read_cb, $buffer_offset);
-    }
-    else {
-      my $uv_req_write = UV::Request::Write->new;
-      
-      my $write_cb = [$ret_length_ref : , $error_id_ref : , $exception_ref : , $buffer_length : , $finish_cb : , $uv_req_write : ] method : void ($req : UV::Request::Write, $status : int) {
-        if ($status < 0) {
-          $error_id_ref->[0] = basic_type_id Error;
-          $exception_ref->[0] = UV->strerror($status);
-        }
-        $ret_length_ref->[0] = $buffer_length;
-        
-        $finish_cb->();
-        $uv_req_write->set_write_cb(undef);
-      };
-      
-      $uv_req_write->write($uv_pipe, $buffer, $buffer_length, $write_cb, $buffer_offset);
-    }
-    
-    # Propagate context cancellation or deadline error on done
-    my $cancel_cb = [$context : , $error_id_ref : , $exception_ref : , $finish_cb : ] method : void () {
-      my $err_id = $context ? $context->err : 0;
-      if ($err_id > 0) {
-        $error_id_ref->[0] = $err_id;
-        $exception_ref->[0] = $context->cause;
-      }
-      else {
-        $error_id_ref->[0] = basic_type_id Go::Context::Error::Canceled;
-        $exception_ref->[0] = "context canceled";
-      }
-      
-      $finish_cb->();
-    };
-    
-    Go->monitor_context($context, $finish_ch, $cancel_cb);
-    
-    $finish_ch->read;
-    
-    if ($error_id_ref->[0]) {
-      die $error_id_ref->[0], $exception_ref->[0];
-    }
-    
-    return $ret_length_ref->[0];
-  }
-  
-  static method gosched_pipe_cancel : void ($fd : int) {
-    
-    my $schedule = $GO->{schedule};
-    my $uv_pipe_finish_cb = $schedule->{uv_pipe_finish_cbs_h}{"$fd"};
-    
-    if ($uv_pipe_finish_cb) {
-      $uv_pipe_finish_cb->();
-    }
-  }
-  
   static method go : void ($task : Callback) {
     
     my $schedule = $GO->{schedule};
@@ -173,6 +41,13 @@ class Go {
     my $caller_info = caller;
     
     $schedule->add_task($task, $caller_info);
+  }
+  
+  static method gosched : void () {
+    
+    my $schedule = $GO->{schedule};
+    
+    $schedule->schedule;
   }
   
   static method make : Go::Channel ($capacity : int = 0) {
@@ -354,6 +229,135 @@ class Go {
     
     if ($uv_poll_finish_cb) {
       $uv_poll_finish_cb->();
+    }
+  }
+  
+  # Deprecated
+  static method gosched_pipe_read : int ($context : Go::Context, $fd : int, $string : mutable string, $length : int = -1, $offset : int = 0) {
+    
+    return &gosched_pipe_io($context, $fd, $string, $length, $offset, 1);
+  }
+  
+  # Deprecated
+  static method gosched_pipe_write : int ($context : Go::Context, $fd : int, $string : string, $length : int = -1, $offset : int = 0) {
+    
+    return &gosched_pipe_io($context, $fd, $string, $length, $offset, 0);
+  }
+  
+  # Deprecated
+  private static method gosched_pipe_io : int ($context : Go::Context, $fd : int, $buffer : string, $buffer_length : int, $buffer_offset : int, $is_read : int) {
+    
+    if ($buffer_length < 0) {
+      $buffer_length = length $buffer;
+    }
+    
+    unless ($fd >= 0) {
+      die "The file descriptor \$fd in schedule type TYPE_PIPE_READ or TYPE_PIPE_WRITE must be a non-negative value.";
+    }
+    
+    my $schedule = $GO->{schedule};
+    my $uv_loop = $schedule->{uv_loop};
+    my $finish_ch = Go->make;
+    my $ret_length_ref = [0];
+    my $error_id_ref = [(int)0];
+    my $exception_ref = [(string)undef];
+    
+    my $uv_pipe_ref = [(UV::Handle::Pipe)undef];
+    my $uv_pipe = UV::Handle::Pipe->new;
+    my $ipc = 0;
+    $uv_loop->pipe_init($uv_pipe, $ipc);
+    my $fd_dup = Sys::IO->dup($fd);
+    $uv_pipe->open($fd_dup);
+    $uv_pipe_ref->[0] = $uv_pipe;
+    
+    # Clean up pipe handle and close finish channel
+    my $finish_cb = [$schedule : , $finish_ch : , $fd : , $uv_pipe_ref : ] method : void ($args : object...) {
+      $finish_ch->close;
+      $schedule->{uv_pipe_finish_cbs_h}->delete("$fd");
+      
+      my $uv_pipe = $uv_pipe_ref->[0];
+      if ($uv_pipe) {
+        $uv_pipe->close_safe;
+        $uv_pipe_ref->[0] = undef;
+      }
+    };
+    
+    $schedule->{uv_pipe_finish_cbs_h}{"$fd"} = $finish_cb;
+    
+    if ($is_read) {
+      my $read_cb = [$ret_length_ref : , $error_id_ref : , $exception_ref : , $finish_cb : ] method : void ($uv_stream : UV::Handle::Stream, $nread : int, $buf : string) {
+        if ($nread < 0) {
+          if ($nread == UV_C->UV_EOF) {
+            $ret_length_ref->[0] = 0;
+          }
+          else {
+            $error_id_ref->[0] = basic_type_id Error;
+            $exception_ref->[0] = UV->strerror($nread);
+            $ret_length_ref->[0] = $nread;
+          }
+        }
+        else {
+          $ret_length_ref->[0] = $nread;
+        }
+        
+        $uv_stream->read_stop;
+        
+        $finish_cb->();
+      };
+      
+      $uv_pipe->read_start((mutable string)$buffer, $buffer_length, $read_cb, $buffer_offset);
+    }
+    else {
+      my $uv_req_write = UV::Request::Write->new;
+      
+      my $write_cb = [$ret_length_ref : , $error_id_ref : , $exception_ref : , $buffer_length : , $finish_cb : , $uv_req_write : ] method : void ($req : UV::Request::Write, $status : int) {
+        if ($status < 0) {
+          $error_id_ref->[0] = basic_type_id Error;
+          $exception_ref->[0] = UV->strerror($status);
+        }
+        $ret_length_ref->[0] = $buffer_length;
+        
+        $finish_cb->();
+        $uv_req_write->set_write_cb(undef);
+      };
+      
+      $uv_req_write->write($uv_pipe, $buffer, $buffer_length, $write_cb, $buffer_offset);
+    }
+    
+    # Propagate context cancellation or deadline error on done
+    my $cancel_cb = [$context : , $error_id_ref : , $exception_ref : , $finish_cb : ] method : void () {
+      my $err_id = $context ? $context->err : 0;
+      if ($err_id > 0) {
+        $error_id_ref->[0] = $err_id;
+        $exception_ref->[0] = $context->cause;
+      }
+      else {
+        $error_id_ref->[0] = basic_type_id Go::Context::Error::Canceled;
+        $exception_ref->[0] = "context canceled";
+      }
+      
+      $finish_cb->();
+    };
+    
+    Go->monitor_context($context, $finish_ch, $cancel_cb);
+    
+    $finish_ch->read;
+    
+    if ($error_id_ref->[0]) {
+      die $error_id_ref->[0], $exception_ref->[0];
+    }
+    
+    return $ret_length_ref->[0];
+  }
+  
+  # Deprecated
+  static method gosched_pipe_cancel : void ($fd : int) {
+    
+    my $schedule = $GO->{schedule};
+    my $uv_pipe_finish_cb = $schedule->{uv_pipe_finish_cbs_h}{"$fd"};
+    
+    if ($uv_pipe_finish_cb) {
+      $uv_pipe_finish_cb->();
     }
   }
   

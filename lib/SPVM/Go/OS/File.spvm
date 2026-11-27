@@ -219,6 +219,8 @@ class Go::OS::File {
       Fn->memcpy($string, $offset, $data, 0, $nread);
     }
     
+    Go->gosched;
+    
     return $nread;
   }
   
@@ -314,6 +316,8 @@ class Go::OS::File {
     if ($status < 0) {
       die "libuv write error:" . UV->strerror($status);
     }
+    
+    Go->gosched;
     
     return $written;
   }
