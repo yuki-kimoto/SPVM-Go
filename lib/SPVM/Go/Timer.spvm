@@ -55,6 +55,7 @@ class Go::Timer {
       $uv_timer->close_safe;
       $uv_timer->set_timer_cb(undef);
     };
+    weaken $timer_cb->{self};
     
     my $timeout_ms = (long)($duration_nsec / 1_000_000L);
     if ($timeout_ms < 0) {
@@ -80,20 +81,6 @@ class Go::Timer {
     &sleep($duration);
   }
   
-  static method after : Go::Channel ($duration : Go::Duration_1l) {
-    
-    my $timer = Go::Timer->new({duration_nsec => $duration->{nsec}});
-    
-    return $timer->c;
-  }
-  
-  static method after_sec : Go::Channel ($seconds : double) {
-    
-    my $duration = Go::Duration_1l->new_from_sec($seconds);
-    
-    return &after($duration);
-  }
-  
   static method new_timer : Go::Timer ($duration : Go::Duration_1l) {
     
     return Go::Timer->new({duration_nsec => $duration->{nsec}});
@@ -107,10 +94,10 @@ class Go::Timer {
   }
   
   # Instance Methods
-  method stop : int () {
+  method stop : void () {
     
     if ($self->{stopped}) {
-      return 0;
+      return;
     }
     
     $self->{stopped} = 1;
@@ -119,6 +106,7 @@ class Go::Timer {
     if ($uv_timer) {
       $uv_timer->stop;
       $uv_timer->close_safe;
+      Go->gosched;
       $self->{uv_timer} = undef;
     }
     
@@ -126,8 +114,6 @@ class Go::Timer {
     if ($ch) {
       $ch->close;
     }
-    
-    return 1;
   }
   
   method DESTROY : void () {

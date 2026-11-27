@@ -1,0 +1,121 @@
+class TestCase::Go::Timer {
+  
+  use Go;
+  use Go::Timer;
+  use Go::Duration_1l;
+  use Go::Time;
+  use Go::Channel;
+  
+  static method sleep : int () {
+    
+    # sleep with duration
+    {
+      my $start = Go::Time->now;
+      my $duration = Go::Duration_1l->new_from_sec(0.02);
+      Go::Timer->sleep($duration);
+      my $elapsed_nsec = Go::Time->now->sub($start)->{nsec};
+      
+      unless ($elapsed_nsec >= 15_000_000L) {
+        diag;
+        return 0;
+      }
+    }
+    
+    # sleep_sec
+    {
+      my $start = Go::Time->now;
+      Go::Timer->sleep_sec(0.02);
+      my $elapsed_nsec = Go::Time->now->sub($start)->{nsec};
+      
+      unless ($elapsed_nsec >= 15_000_000L) {
+        diag;
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method timer : int () {
+    
+    # new_timer normal fire
+    {
+      my $start = Go::Time->now;
+      my $duration = Go::Duration_1l->new_from_sec(0.02);
+      my $timer = Go::Timer->new_timer($duration);
+      
+      my $ok = 0;
+      my $val = $timer->c->read(\$ok);
+      my $elapsed_nsec = Go::Time->now->sub($start)->{nsec};
+      
+      unless ($ok && $val isa Go::Time && $elapsed_nsec >= 15_000_000L) {
+        diag;
+        return 0;
+      }
+      
+      # Channel is closed after firing
+      my $after_close_ok = 0;
+      my $after_close_val = $timer->c->read(\$after_close_ok);
+      if ($after_close_ok || $after_close_val) {
+        diag;
+        return 0;
+      }
+      
+      # Stopping an already fired timer should not fail
+      $timer->stop;
+    }
+    
+    # new_timer_sec normal fire
+    {
+      my $start = Go::Time->now;
+      my $timer = Go::Timer->new_timer_sec(0.02);
+      
+      my $ok = 0;
+      my $val = $timer->c->read(\$ok);
+      my $elapsed_nsec = Go::Time->now->sub($start)->{nsec};
+      
+      unless ($ok && $val isa Go::Time && $elapsed_nsec >= 15_000_000L) {
+        diag;
+        return 0;
+      }
+      
+      $timer->stop;
+    }
+    
+    # new_timer cancel via stop
+    {
+      my $duration = Go::Duration_1l->new_from_sec(10);
+      my $timer = Go::Timer->new_timer($duration);
+      
+      $timer->stop;
+      
+      # Calling stop again should not fail
+      $timer->stop;
+      
+      # Channel should be closed and not yield a fired time value
+      my $ok = 0;
+      my $val = $timer->c->read(\$ok);
+      if ($ok || $val) {
+        diag;
+        return 0;
+      }
+    }
+    
+    # new_timer_sec cancel via stop
+    {
+      my $timer = Go::Timer->new_timer_sec(10);
+      
+      $timer->stop;
+      
+      my $ok = 0;
+      my $val = $timer->c->read(\$ok);
+      if ($ok || $val) {
+        diag;
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+}
