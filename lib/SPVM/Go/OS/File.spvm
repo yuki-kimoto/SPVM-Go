@@ -107,19 +107,6 @@ class Go::OS::File {
     return $self;
   }
   
-  method close : void () {
-    
-    if ($self->{no_close}) {
-      die "'no_close' field is specified.";
-    }
-    else {
-      if (my $uv_stream = $self->{uv_stream}) {
-        $uv_stream->close_safe;
-        $self->{uv_stream} = undef;
-      }
-    }
-  }
-  
   method read : int ($context : Go::Context, $string : mutable string, $length : int = -1, $offset : int = 0) {
     
     my $type = $self->{type};
@@ -129,31 +116,6 @@ class Go::OS::File {
     }
     
     my $uv_stream = $self->{uv_stream};
-    return &read_uv_stream($context, $uv_stream, $string, $length, $offset);
-  }
-  
-  method write : int ($context : Go::Context, $string : string, $length : int = -1, $offset : int = 0) {
-    
-    my $type = $self->{type};
-    
-    unless ($type == &TYPE_PIPE || $type == &TYPE_TCP) {
-      die "Not supported type. \$type=$type. You perhaps specify FILE type.";
-    }
-    
-    my $uv_stream = $self->{uv_stream};
-    return &write_uv_stream($context, $uv_stream, $string, $length, $offset);
-  }
-  
-  method DESTROY : void () {
-    
-    my $type = $self->{type};
-    
-    unless ($self->{no_close}) {
-      $self->close;
-    }
-  }
-  
-  private static method read_uv_stream : int ($context : Go::Context, $uv_stream : UV::Handle::Stream, $string : mutable string, $length : int = -1, $offset : int = 0) {
     
     unless ($uv_stream) {
       die "The uv_stream must be defined.";
@@ -245,7 +207,15 @@ class Go::OS::File {
     return $nread;
   }
   
-  private static method write_uv_stream : int ($context : Go::Context, $uv_stream : UV::Handle::Stream, $string : string, $length : int = -1, $offset : int = 0) {
+  method write : int ($context : Go::Context, $string : string, $length : int = -1, $offset : int = 0) {
+    
+    my $type = $self->{type};
+    
+    unless ($type == &TYPE_PIPE || $type == &TYPE_TCP) {
+      die "Not supported type. \$type=$type. You perhaps specify FILE type.";
+    }
+    
+    my $uv_stream = $self->{uv_stream};
     
     unless ($uv_stream) {
       die "The uv_stream must be defined.";
@@ -314,6 +284,28 @@ class Go::OS::File {
     }
     
     return $written;
+  }
+  
+  method close : void () {
+    
+    if ($self->{no_close}) {
+      die "'no_close' field is specified.";
+    }
+    else {
+      if (my $uv_stream = $self->{uv_stream}) {
+        $uv_stream->close_safe;
+        $self->{uv_stream} = undef;
+      }
+    }
+  }
+  
+  method DESTROY : void () {
+    
+    my $type = $self->{type};
+    
+    unless ($self->{no_close}) {
+      $self->close;
+    }
   }
   
 }
