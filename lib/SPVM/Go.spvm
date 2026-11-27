@@ -18,6 +18,7 @@ class Go {
   use Go::OS::Exec::Cmd;
   use UV::Constant as UV_C;
   use Go::Timer;
+  use Go::OS::Poll;
   
   our $GO : Go;
   

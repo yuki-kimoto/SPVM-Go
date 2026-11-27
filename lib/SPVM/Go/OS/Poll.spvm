@@ -1,0 +1,148 @@
+# Copyright (c) 2026 Yuki Kimoto
+# MIT License
+
+class Go::OS::Poll {
+  version_from Go;
+  
+  use Callback;
+  use Fn;
+  use Go;
+  use Go::Channel;
+  use Go::Context;
+  use UV;
+  use UV::Constant as UV_C;
+  use UV::Handle::Poll;
+  
+  has fd : ro int;
+  
+  has uv_poll : UV::Handle::Poll;
+  
+  has finish_cb : Callback;
+  
+  has opened : virtual ro int
+    get {
+      return !!$self->{uv_poll};
+    }
+  ;
+  
+  static method new : Go::OS::Poll ($options : object[] = undef) {
+    
+    my $self = new Go::OS::Poll;
+    
+    $self->init($options);
+    
+    return $self;
+  }
+  
+  static method new_poll : Go::OS::Poll ($fd : int) {
+    
+    return &new({fd => $fd});
+  }
+  
+  protected method init : void ($options : object[] = undef) {
+    
+    my $options_h = Fn->to_hash($options);
+    
+    unless ($options_h->exists("fd")) {
+      die "The fd option must be specified.";
+    }
+    
+    my $fd = $options_h->get("fd")->(int);
+    unless ($fd >= 0) {
+      die "The file descriptor \$fd must be a non-negative value.";
+    }
+    
+    $self->{fd} = $fd;
+    
+    my $uv_loop = Go->uv_loop;
+    my $uv_poll = UV::Handle::Poll->new;
+    $uv_loop->poll_init($uv_poll, $fd);
+    $self->{uv_poll} = $uv_poll;
+  }
+  
+  method read : void ($context : Go::Context) {
+    
+    my $is_write = 0;
+    $self->poll($context, $is_write);
+  }
+  
+  method write : void ($context : Go::Context) {
+    
+    my $is_write = 1;
+    $self->poll($context, $is_write);
+  }
+  
+  method close : void () {
+    
+    unless ($self->opened) {
+      return;
+    }
+    
+    if (my $finish_cb = $self->{finish_cb}) {
+      $self->{finish_cb} = undef;
+      $finish_cb->();
+    }
+    
+    my $uv_poll = $self->{uv_poll};
+    $uv_poll->set_poll_cb(undef);
+    $uv_poll->stop;
+    $uv_poll->close_safe;
+    $self->{uv_poll} = undef;
+  }
+  
+  method DESTROY : void () {
+    
+    $self->close;
+  }
+  
+  private method poll : void ($context : Go::Context, $is_write : int) {
+    
+    unless ($self->opened) {
+      die "Go::OS::Poll is closed.";
+    }
+    
+    my $uv_poll = $self->{uv_poll};
+    
+    my $finish_ch = Go->make;
+    my $status_ref = [0];
+    
+    my $finish_cb = [$uv_poll : , $finish_ch : ] method : void () {
+      $uv_poll->set_poll_cb(undef);
+      $uv_poll->stop;
+      $finish_ch->close;
+    };
+    
+    $self->{finish_cb} = $finish_cb;
+    
+    my $events = $is_write ? UV_C->UV_WRITABLE : UV_C->UV_READABLE;
+    
+    my $poll_cb = [$status_ref : , $finish_cb : ] method : void ($uv_poll : UV::Handle::Poll, $status : int, $events : int) {
+      $status_ref->[0] = $status;
+      $finish_cb->();
+    };
+    
+    $uv_poll->start($poll_cb, $events);
+    
+    Go->monitor_context($context, $finish_ch, $finish_cb);
+    
+    $finish_ch->read;
+    
+    $self->{finish_cb} = undef;
+    
+    my $error_id = 0;
+    my $exception = (string)undef;
+    
+    if ($context->err > 0) {
+      $error_id = $context->err;
+      $exception = $context->cause;
+    }
+    elsif ($status_ref->[0] < 0) {
+      $error_id = basic_type_id Error;
+      $exception = UV->strerror($status_ref->[0]);
+    }
+    
+    if ($error_id) {
+      die $error_id, $exception;
+    }
+  }
+}
