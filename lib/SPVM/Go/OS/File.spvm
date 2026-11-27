@@ -15,6 +15,7 @@ class Go::OS::File {
   use UV::Constant as UV_C;
   use UV::Handle::Stream;
   use UV::Request::Write;
+  use Sys;
   
   private enum {
     TYPE_UNKNOWN,
@@ -26,17 +27,17 @@ class Go::OS::File {
   # Class Variables
   our $STDIN : ro Go::OS::File;
   INIT {
-    $STDIN = &new_file(0);
+    $STDIN = &new_file(Sys->fileno(Sys->STDIN));
   }
   
   our $STDOUT : ro Go::OS::File;
   INIT {
-    $STDOUT = &new_file(1);
+    $STDOUT = &new_file(Sys->fileno(Sys->STDOUT));
   }
   
   our $STDERR : ro Go::OS::File;
   INIT {
-    $STDERR = &new_file(2);
+    $STDERR = &new_file(Sys->fileno(Sys->STDERR));
   }
   
   # Fields
